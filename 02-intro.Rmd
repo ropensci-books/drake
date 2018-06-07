@@ -1,0 +1,152 @@
+# Introduction {#intro}
+
+```{r, echo = F}
+suppressMessages(suppressWarnings(library(drake)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+unlink(".drake", recursive = TRUE)
+clean(destroy = TRUE, verbose = FALSE)
+unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = TRUE,
+  error = TRUE,
+  fig.width = 6,
+  fig.height = 6,
+  fig.align = "center"
+)
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
+dat <- system.file(
+  file.path("examples", "main", "raw_data.xlsx"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = dat, to = "raw_data.xlsx")
+rmd <- system.file(
+  file.path("examples", "main", "report.Rmd"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = rmd, to = "report.Rmd")
+```
+
+A typical data analysis workflow is a sequence of data transformations. Raw data becomes tidy data, then turns into fitted models, summaries, and reports.
+
+<img src="./tidydag.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
+
+## Set the stage.
+
+To set up a project, load your packages,
+
+```{r mainpackages}
+library(drake)
+library(dplyr)
+library(ggplot2)
+```
+
+load your custom functions,
+
+```{r createplot1}
+create_plot <- function(data) {
+  ggplot(data, aes(x = Petal.Width, fill = Species)) +
+    geom_histogram()
+}
+```
+
+check any supporting files (optional),
+
+```{r suppfiles}
+## Get the files with drake_example("main").
+file.exists("raw_data.xlsx")
+file.exists("report.Rmd")
+```
+
+and plan what you are going to do.
+
+```{r createplan}
+plan <- drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Species = forcats::fct_inorder(Species)) %>%
+    select(-X__1),
+  hist = create_plot(data),
+  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  )
+)
+plan
+```
+
+## Make your results.
+
+So far, we have just been setting the stage. Use `make()` to do the real work. Targets are built in the correct order regardless of the row order of `plan`.
+
+```{r make1}
+make(plan)
+```
+
+Except for files like `report.html`, your output is stored in a hidden `.drake/` folder. Reading it back is easy.
+
+```{r readddata1}
+readd(data) # See also loadd().
+```
+
+## Go back and fix things.
+
+You may look back on your work and see room for improvement, but it's all good! The whole point of `drake` is to help you go back and change things quickly and painlessly. For example, we forgot to give our histogram a bin width.
+
+```{r loaddhist, eval = FALSE}
+readd(hist)
+##> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+<img src="./hist1.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
+
+So let's fix the plotting function.
+
+```{r changefn}
+create_plot <- function(data) {
+  ggplot(data, aes(x = Petal.Width, fill = Species)) +
+    geom_histogram(binwidth = 0.25) +
+    theme_gray(20)
+}
+```
+
+`Drake` knows which results are affected.
+
+```{r visdrakegraphreadme, eval = FALSE}
+config <- drake_config(plan)
+vis_drake_graph(config) # Interactive graph: hover, zoom, drag, etc.
+```
+
+<iframe
+src = "https://ropensci.github.io/drake/images/pitch3.html"
+width = "100%" height = "600px" allowtransparency="true"
+style="border: none; box-shadow: none">
+</iframe>
+
+The next `make()` just builds `hist` and `report.html`. No point in wasting time on the data or model.
+
+```{r justhistetc}
+make(plan)
+```
+
+```{r hist2, eval = FALSE}
+loadd(hist)
+hist
+```
+
+<img src="./hist2.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
+
+
+## Try it yourself!
+
+Use `drake_example("main")` to get all the materials.
+
+```{r endofline_pitch, echo = FALSE}
+clean(destroy = TRUE, verbose = FALSE)
+unlink(c("report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"))
+```
