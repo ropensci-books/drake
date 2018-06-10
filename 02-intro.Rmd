@@ -32,7 +32,7 @@ tmp <- file.copy(from = rmd, to = "report.Rmd")
 
 A typical data analysis workflow is a sequence of data transformations. Raw data becomes tidy data, then turns into fitted models, summaries, and reports.
 
-<img src="./tidydag.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
+<img src="./images/tidydag.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
 
 ## Set the stage.
 
@@ -80,6 +80,13 @@ plan <- drake_plan(
 plan
 ```
 
+Optionally, visualize your workflow to make sure you set it up correctly. The graph is interactive, so you can click, drag, hover, zoom, and explore.
+
+```{r 02visgraph}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
 ## Make your results.
 
 So far, we have just been setting the stage. Use `make()` to do the real work. Targets are built in the correct order regardless of the row order of `plan`.
@@ -94,16 +101,19 @@ Except for files like `report.html`, your output is stored in a hidden `.drake/`
 readd(data) # See also loadd().
 ```
 
+The graph shows everything up to date.
+
+```{r 02visgraph2}
+vis_drake_graph(config)
+```
+
 ## Go back and fix things.
 
 You may look back on your work and see room for improvement, but it's all good! The whole point of `drake` is to help you go back and change things quickly and painlessly. For example, we forgot to give our histogram a bin width.
 
-```{r loaddhist, eval = FALSE}
+```{r loaddhist}
 readd(hist)
-##> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
-
-<img src="./hist1.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
 
 So let's fix the plotting function.
 
@@ -117,16 +127,9 @@ create_plot <- function(data) {
 
 `Drake` knows which results are affected.
 
-```{r visdrakegraphreadme, eval = FALSE}
-config <- drake_config(plan)
-vis_drake_graph(config) # Interactive graph: hover, zoom, drag, etc.
+```{r intro-visdrakegraph}
+vis_drake_graph(config)
 ```
-
-<iframe
-src = "https://ropensci.github.io/drake/images/pitch3.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
 
 The next `make()` just builds `hist` and `report.html`. No point in wasting time on the data or model.
 
@@ -134,13 +137,10 @@ The next `make()` just builds `hist` and `report.html`. No point in wasting time
 make(plan)
 ```
 
-```{r hist2, eval = FALSE}
+```{r hist2}
 loadd(hist)
 hist
 ```
-
-<img src="./hist2.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px">
-
 
 ## Try it yourself!
 

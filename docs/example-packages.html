@@ -46,6 +46,10 @@
 
 
 
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.3/visNetwork.js"></script>
 
 
 <style type="text/css">
@@ -246,7 +250,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>13</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="14" data-path="results-1.html"><a href="results-1.html"><i class="fa fa-check"></i><b>14</b> Results</a></li>
 </ul>
 
       </nav>
@@ -279,13 +282,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(cranlogs)
 <span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)
 ##         date count package
-## 1 2018-05-30 20475   dplyr
-## 2 2018-05-31 18864   dplyr
-## 3 2018-06-01 15717   dplyr
-## 4 2018-06-02  7951   dplyr
-## 5 2018-06-03  8335   dplyr
-## 6 2018-06-04 17784   dplyr
-## 7 2018-06-05 18841   dplyr</code></pre></div>
+## 1 2018-06-03  8335   dplyr
+## 2 2018-06-04 17784   dplyr
+## 3 2018-06-05 18841   dplyr
+## 4 2018-06-06 18368   dplyr
+## 5 2018-06-07 18640   dplyr
+## 6 2018-06-08 15263   dplyr
+## 7 2018-06-09  8421   dplyr</code></pre></div>
 <p>Above, each count is the number of times <code>dplyr</code> was downloaded from the RStudio CRAN mirror on the given day. To stay up to date with the latest download statistics, we need to refresh the data frequently. With <code>drake</code>, we can bring all our work up to date without restarting everything from scratch.</p>
 </div>
 <div id="analysis" class="section level2">
@@ -366,9 +369,6 @@ output_plan
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)
 )
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
 
 report_plan
 ## # A tibble: 1 x 2
@@ -382,9 +382,6 @@ report_plan
   output_plan,
   report_plan
 )
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
 
 whole_plan
 ## # A tibble: 7 x 3
@@ -399,71 +396,40 @@ whole_plan
 ## 7 &quot;\&quot;report.md\&quot;&quot; &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;repo… any</code></pre></div>
 <p>Now, we run the project to download the data and analyze it. The results will be summarized in the knitted report, <code>report.md</code>, but you can also read the results directly from the cache.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(whole_plan)
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
 ## target older
 ## target recent: trigger &quot;always&quot;
+## target averages_older
+## target averages_recent
+## target plot_older
+## target plot_recent
 ## target file &quot;report.md&quot;
-## fail &quot;report.md&quot;
-## Error: Target `&quot;report.md&quot;` failed. Call `diagnose(&quot;report.md&quot;)` for details. Error message:
-##   duplicate label &#39;setuppackagesreport&#39;
+## Used non-default triggers. Some targets may not be up to date.
 
 <span class="kw">readd</span>(averages_recent)
-## Error: key &#39;averages_recent&#39; (&#39;objects&#39;) not found
+## # A tibble: 3 x 2
+##   package mean_downloads
+##   &lt;chr&gt;            &lt;dbl&gt;
+## 1 ggplot2         14482.
+## 2 knitr            9130.
+## 3 Rcpp            21748.
 
 <span class="kw">readd</span>(averages_older)
-## Error: key &#39;averages_older&#39; (&#39;objects&#39;) not found
+## # A tibble: 3 x 2
+##   package mean_downloads
+##   &lt;chr&gt;            &lt;dbl&gt;
+## 1 ggplot2         14641.
+## 2 knitr            9069.
+## 3 Rcpp            14408.
 
-<span class="kw">readd</span>(plot_recent)
-## Error: key &#39;plot_recent&#39; (&#39;objects&#39;) not found
-
-<span class="kw">readd</span>(plot_older)
-## Error: key &#39;plot_older&#39; (&#39;objects&#39;) not found</code></pre></div>
+<span class="kw">readd</span>(plot_recent)</code></pre></div>
+<p><img src="drake-manual_files/figure-html/firstmakepackages-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">readd</span>(plot_older)</code></pre></div>
+<p><img src="drake-manual_files/figure-html/firstmakepackages-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Because we used triggers, each <code>make()</code> rebuilds the <code>recent</code> target to get the latest download numbers for today. If the newly-downloaded data are the same as last time and nothing else changes, <code>drake</code> skips all the other targets.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(whole_plan)
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
-## Unloading targets from environment:
-##   recent
-##   older
-## Warning in value[[3L]](cond): Could not parse file &#39;report.Rmd&#39;. Drake
-## dependencies could not be extracted from code chunks: duplicate label
-## &#39;setuppackagesreport&#39;
 ## target recent: trigger &quot;always&quot;
-## target file &quot;report.md&quot;
-## fail &quot;report.md&quot;
-## Error: Target `&quot;report.md&quot;` failed. Call `diagnose(&quot;report.md&quot;)` for details. Error message:
-##   duplicate label &#39;setuppackagesreport&#39;</code></pre></div>
+## Used non-default triggers. Some targets may not be up to date.</code></pre></div>
 <p>To visualize the build behavior, plot the dependency network. Target <code>recent</code> and everything depending on it is always out of date because of the <code>&quot;always&quot;</code> trigger. If you rerun the project tomorrow, the <code>recent</code> dataset will have shifted one day forward, so <code>make()</code> will refresh <code>averages_recent</code>, <code>plot_recent</code>, and <code>report.md</code>. Targets <code>averages_older</code> and <code>plot_older</code> should be unaffected, so <code>drake</code> will skip them.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(whole_plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre></div>

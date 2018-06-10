@@ -46,6 +46,10 @@
 
 
 
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.3/visNetwork.js"></script>
 
 
 <style type="text/css">
@@ -246,7 +250,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>13</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="14" data-path="results-1.html"><a href="results-1.html"><i class="fa fa-check"></i><b>14</b> Results</a></li>
 </ul>
 
       </nav>
@@ -386,42 +389,19 @@ report_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(pa
 ## Because of the calls to `readd()` and `loadd()`, `drake` knows that `small`, `large`, and `coef_regression2_small` are dependencies of this R Markdown report. This dependency relationship is what causes the report to be processed at the very end.</code></pre></div>
 <p>Now, all our imports are set up. When the real work begins, <code>drake</code> will import functions and data objects from your R session environment</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ls</span>()
-##   [1] &quot;additions&quot;          &quot;AES&quot;                &quot;AESdecryptECB&quot;     
-##   [4] &quot;AESencryptECB&quot;      &quot;AESinit&quot;            &quot;attr_sha1&quot;         
-##   [7] &quot;b&quot;                  &quot;bad_plan&quot;           &quot;cache&quot;             
-##  [10] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
-##  [13] &quot;cr&quot;                 &quot;cranlogs_plan&quot;      &quot;create_plot&quot;       
-##  [16] &quot;dat&quot;                &quot;data_plan&quot;          &quot;debug_plan&quot;        
-##  [19] &quot;df&quot;                 &quot;digest&quot;             &quot;digest_impl&quot;       
-##  [22] &quot;dl&quot;                 &quot;error&quot;              &quot;f&quot;                 
-##  [25] &quot;g&quot;                  &quot;get_logs&quot;           &quot;get_rmspe&quot;         
-##  [28] &quot;good_plan&quot;          &quot;hard_plan&quot;          &quot;hmac&quot;              
-##  [31] &quot;ld&quot;                 &quot;little_b&quot;           &quot;local&quot;             
-##  [34] &quot;make_my_plot&quot;       &quot;make_my_table&quot;      &quot;makeRaw&quot;           
-##  [37] &quot;makeRaw.character&quot;  &quot;makeRaw.default&quot;    &quot;makeRaw.digest&quot;    
-##  [40] &quot;makeRaw.raw&quot;        &quot;methods&quot;            &quot;model_plan&quot;        
-##  [43] &quot;modes&quot;              &quot;my_analyses&quot;        &quot;my_datasets&quot;       
-##  [46] &quot;my_plan&quot;            &quot;my_variable&quot;        &quot;new_objects&quot;       
-##  [49] &quot;new_simulation&quot;     &quot;num2hex&quot;            &quot;output_plan&quot;       
-##  [52] &quot;output_types&quot;       &quot;package_list&quot;       &quot;padWithZeros&quot;      
-##  [55] &quot;path&quot;               &quot;plan&quot;               &quot;plot_rmspe&quot;        
-##  [58] &quot;predictors&quot;         &quot;print.AES&quot;          &quot;Produc&quot;            
-##  [61] &quot;query&quot;              &quot;random_rows&quot;        &quot;recent&quot;            
-##  [64] &quot;reg1&quot;               &quot;reg2&quot;               &quot;report&quot;            
-##  [67] &quot;reportfile&quot;         &quot;report_file&quot;        &quot;report_plan&quot;       
-##  [70] &quot;results&quot;            &quot;rmd&quot;                &quot;rmspe_plan&quot;        
-##  [73] &quot;rmspe_results_plan&quot; &quot;rules_grid&quot;         &quot;sha1&quot;              
-##  [76] &quot;sha1.anova&quot;         &quot;sha1.array&quot;         &quot;sha1.call&quot;         
-##  [79] &quot;sha1.character&quot;     &quot;sha1.complex&quot;       &quot;sha1.data.frame&quot;   
-##  [82] &quot;sha1.Date&quot;          &quot;sha1.default&quot;       &quot;sha1.factor&quot;       
-##  [85] &quot;sha1.function&quot;      &quot;sha1.integer&quot;       &quot;sha1.list&quot;         
-##  [88] &quot;sha1.logical&quot;       &quot;sha1.matrix&quot;        &quot;sha1.name&quot;         
-##  [91] &quot;sha1.NULL&quot;          &quot;sha1.numeric&quot;       &quot;sha1.pairlist&quot;     
-##  [94] &quot;sha1.POSIXct&quot;       &quot;sha1.POSIXlt&quot;       &quot;sha1.raw&quot;          
-##  [97] &quot;simulate&quot;           &quot;spell_check_ignore&quot; &quot;suffixes&quot;          
-## [100] &quot;summary_types&quot;      &quot;targets&quot;            &quot;td&quot;                
-## [103] &quot;tmp&quot;                &quot;url&quot;                &quot;whole_plan&quot;        
-## [106] &quot;x&quot;                  &quot;x_plan&quot;</code></pre></div>
+##  [1] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
+##  [4] &quot;cr&quot;                 &quot;create_plot&quot;        &quot;dat&quot;               
+##  [7] &quot;data_plan&quot;          &quot;dl&quot;                 &quot;get_rmspe&quot;         
+## [10] &quot;hist&quot;               &quot;ld&quot;                 &quot;local&quot;             
+## [13] &quot;make_my_plot&quot;       &quot;make_my_table&quot;      &quot;model_plan&quot;        
+## [16] &quot;output_plan&quot;        &quot;output_types&quot;       &quot;package_list&quot;      
+## [19] &quot;path&quot;               &quot;plan&quot;               &quot;plot_rmspe&quot;        
+## [22] &quot;predictors&quot;         &quot;Produc&quot;             &quot;random_rows&quot;       
+## [25] &quot;reg1&quot;               &quot;reg2&quot;               &quot;reportfile&quot;        
+## [28] &quot;report_file&quot;        &quot;report_plan&quot;        &quot;results&quot;           
+## [31] &quot;rmd&quot;                &quot;rmspe_plan&quot;         &quot;rmspe_results_plan&quot;
+## [34] &quot;simulate&quot;           &quot;spell_check_ignore&quot; &quot;targets&quot;           
+## [37] &quot;td&quot;                 &quot;tmp&quot;                &quot;whole_plan&quot;</code></pre></div>
 <p>and saved files from your file system.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">list.files</span>()
 ##  [1] &quot;02-intro.Rmd&quot;            &quot;03-example-packages.Rmd&quot;
@@ -430,14 +410,13 @@ report_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(pa
 ##  [7] &quot;08-vis.Rmd&quot;              &quot;09-hpc.Rmd&quot;             
 ##  [9] &quot;10-time.Rmd&quot;             &quot;11-store.Rmd&quot;           
 ## [11] &quot;12-caution.Rmd&quot;          &quot;13-faq.Rmd&quot;             
-## [13] &quot;_bookdown_files&quot;         &quot;_bookdown.yml&quot;          
-## [15] &quot;build.R&quot;                 &quot;DESCRIPTION&quot;            
-## [17] &quot;docs&quot;                    &quot;drake-manual_files&quot;     
-## [19] &quot;drake-manual.Rmd&quot;        &quot;drake-manual.Rproj&quot;     
-## [21] &quot;hist1.png&quot;               &quot;hist2.png&quot;              
+## [13] &quot;_book&quot;                   &quot;_bookdown_files&quot;        
+## [15] &quot;_bookdown.yml&quot;           &quot;build.R&quot;                
+## [17] &quot;DESCRIPTION&quot;             &quot;docs&quot;                   
+## [19] &quot;drake-manual_files&quot;      &quot;drake-manual.Rmd&quot;       
+## [21] &quot;drake-manual.Rproj&quot;      &quot;images&quot;                 
 ## [23] &quot;index.Rmd&quot;               &quot;LICENSE&quot;                
-## [25] &quot;README.md&quot;               &quot;report.Rmd&quot;             
-## [27] &quot;tidydag.png&quot;</code></pre></div>
+## [25] &quot;README.md&quot;               &quot;report.Rmd&quot;</code></pre></div>
 </div>
 <div id="the-workflow-plan-data-frame" class="section level2">
 <h2><span class="header-section-number">5.5</span> The workflow plan data frame</h2>
@@ -481,14 +460,14 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 ## [1] &quot;regression2_large&quot; &quot;summary&quot;           &quot;suppressWarnings&quot;</code></pre></div>
 <p>List all the reproducibly-tracked objects and files.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(my_plan, <span class="dt">targets =</span> <span class="st">&quot;small&quot;</span>)
-## [1] &quot;data.frame&quot;  &quot;nrow&quot;        &quot;mtcars&quot;      &quot;random_rows&quot; &quot;sample.int&quot; 
+## [1] &quot;nrow&quot;        &quot;sample.int&quot;  &quot;data.frame&quot;  &quot;mtcars&quot;      &quot;random_rows&quot;
 ## [6] &quot;small&quot;       &quot;simulate&quot;
 
 <span class="kw">tracked</span>(my_plan)
-##  [1] &quot;data.frame&quot;             &quot;lm&quot;                    
-##  [3] &quot;nrow&quot;                   &quot;suppressWarnings&quot;      
-##  [5] &quot;mtcars&quot;                 &quot;random_rows&quot;           
-##  [7] &quot;sample.int&quot;             &quot;summary&quot;               
+##  [1] &quot;nrow&quot;                   &quot;sample.int&quot;            
+##  [3] &quot;data.frame&quot;             &quot;mtcars&quot;                
+##  [5] &quot;random_rows&quot;            &quot;suppressWarnings&quot;      
+##  [7] &quot;lm&quot;                     &quot;summary&quot;               
 ##  [9] &quot;coef_regression2_small&quot; &quot;knit&quot;                  
 ## [11] &quot;large&quot;                  &quot;\&quot;report.Rmd\&quot;&quot;        
 ## [13] &quot;small&quot;                  &quot;simulate&quot;              
@@ -756,42 +735,22 @@ x_plan
 ## x2          -0.708536 0.08285938 -8.551066 4.617125e-11</code></pre></div>
 <p>The non-file dependencies of your last target are already loaded in your workspace.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ls</span>()
-##   [1] &quot;additions&quot;          &quot;AES&quot;                &quot;AESdecryptECB&quot;     
-##   [4] &quot;AESencryptECB&quot;      &quot;AESinit&quot;            &quot;attr_sha1&quot;         
-##   [7] &quot;b&quot;                  &quot;bad_plan&quot;           &quot;cache&quot;             
-##  [10] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
-##  [13] &quot;cr&quot;                 &quot;cranlogs_plan&quot;      &quot;create_plot&quot;       
-##  [16] &quot;dat&quot;                &quot;data_plan&quot;          &quot;debug_plan&quot;        
-##  [19] &quot;df&quot;                 &quot;digest&quot;             &quot;digest_impl&quot;       
-##  [22] &quot;dl&quot;                 &quot;error&quot;              &quot;f&quot;                 
-##  [25] &quot;g&quot;                  &quot;get_logs&quot;           &quot;get_rmspe&quot;         
-##  [28] &quot;good_plan&quot;          &quot;hard_plan&quot;          &quot;hmac&quot;              
-##  [31] &quot;ld&quot;                 &quot;little_b&quot;           &quot;local&quot;             
-##  [34] &quot;make_my_plot&quot;       &quot;make_my_table&quot;      &quot;makeRaw&quot;           
-##  [37] &quot;makeRaw.character&quot;  &quot;makeRaw.default&quot;    &quot;makeRaw.digest&quot;    
-##  [40] &quot;makeRaw.raw&quot;        &quot;methods&quot;            &quot;model_plan&quot;        
-##  [43] &quot;modes&quot;              &quot;my_analyses&quot;        &quot;my_datasets&quot;       
-##  [46] &quot;my_plan&quot;            &quot;my_variable&quot;        &quot;new_objects&quot;       
-##  [49] &quot;new_simulation&quot;     &quot;num2hex&quot;            &quot;output_plan&quot;       
-##  [52] &quot;output_types&quot;       &quot;package_list&quot;       &quot;padWithZeros&quot;      
-##  [55] &quot;path&quot;               &quot;plan&quot;               &quot;plot_rmspe&quot;        
-##  [58] &quot;predictors&quot;         &quot;print.AES&quot;          &quot;Produc&quot;            
-##  [61] &quot;query&quot;              &quot;random_rows&quot;        &quot;recent&quot;            
-##  [64] &quot;reg1&quot;               &quot;reg2&quot;               &quot;report&quot;            
-##  [67] &quot;reportfile&quot;         &quot;report_file&quot;        &quot;report_plan&quot;       
-##  [70] &quot;results&quot;            &quot;rmd&quot;                &quot;rmspe_plan&quot;        
-##  [73] &quot;rmspe_results_plan&quot; &quot;rules_grid&quot;         &quot;sha1&quot;              
-##  [76] &quot;sha1.anova&quot;         &quot;sha1.array&quot;         &quot;sha1.call&quot;         
-##  [79] &quot;sha1.character&quot;     &quot;sha1.complex&quot;       &quot;sha1.data.frame&quot;   
-##  [82] &quot;sha1.Date&quot;          &quot;sha1.default&quot;       &quot;sha1.factor&quot;       
-##  [85] &quot;sha1.function&quot;      &quot;sha1.integer&quot;       &quot;sha1.list&quot;         
-##  [88] &quot;sha1.logical&quot;       &quot;sha1.matrix&quot;        &quot;sha1.name&quot;         
-##  [91] &quot;sha1.NULL&quot;          &quot;sha1.numeric&quot;       &quot;sha1.pairlist&quot;     
-##  [94] &quot;sha1.POSIXct&quot;       &quot;sha1.POSIXlt&quot;       &quot;sha1.raw&quot;          
-##  [97] &quot;simulate&quot;           &quot;spell_check_ignore&quot; &quot;suffixes&quot;          
-## [100] &quot;summary_types&quot;      &quot;targets&quot;            &quot;td&quot;                
-## [103] &quot;tmp&quot;                &quot;url&quot;                &quot;whole_plan&quot;        
-## [106] &quot;x&quot;                  &quot;x_plan&quot;</code></pre></div>
+##  [1] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
+##  [4] &quot;cr&quot;                 &quot;create_plot&quot;        &quot;dat&quot;               
+##  [7] &quot;data_plan&quot;          &quot;df&quot;                 &quot;dl&quot;                
+## [10] &quot;get_rmspe&quot;          &quot;hist&quot;               &quot;ld&quot;                
+## [13] &quot;local&quot;              &quot;make_my_plot&quot;       &quot;make_my_table&quot;     
+## [16] &quot;methods&quot;            &quot;model_plan&quot;         &quot;my_analyses&quot;       
+## [19] &quot;my_datasets&quot;        &quot;my_plan&quot;            &quot;output_plan&quot;       
+## [22] &quot;output_types&quot;       &quot;package_list&quot;       &quot;path&quot;              
+## [25] &quot;plan&quot;               &quot;plot_rmspe&quot;         &quot;predictors&quot;        
+## [28] &quot;Produc&quot;             &quot;random_rows&quot;        &quot;reg1&quot;              
+## [31] &quot;reg2&quot;               &quot;report&quot;             &quot;reportfile&quot;        
+## [34] &quot;report_file&quot;        &quot;report_plan&quot;        &quot;results&quot;           
+## [37] &quot;rmd&quot;                &quot;rmspe_plan&quot;         &quot;rmspe_results_plan&quot;
+## [40] &quot;simulate&quot;           &quot;spell_check_ignore&quot; &quot;summary_types&quot;     
+## [43] &quot;targets&quot;            &quot;td&quot;                 &quot;tmp&quot;               
+## [46] &quot;whole_plan&quot;         &quot;x_plan&quot;</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config) <span class="co"># Everything is up to date.</span>
 ## character(0)
 
@@ -799,16 +758,16 @@ x_plan
 ## # A tibble: 28 x 5
 ##    item                   type   elapsed        user           system     
 ##  * &lt;chr&gt;                  &lt;chr&gt;  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Durat&gt;
-##  1 coef_regression1_large target 0.004s         0.003s         0s         
-##  2 coef_regression1_small target 0.003s         0.004s         0.001s     
-##  3 coef_regression2_large target 0.004s         0.004s         0s         
+##  1 coef_regression1_large target 0.003s         0.004s         0s         
+##  2 coef_regression1_small target 0.005s         0.005s         0s         
+##  3 coef_regression2_large target 0.004s         0.003s         0.001s     
 ##  4 coef_regression2_small target 0.004s         0.004s         0s         
-##  5 data.frame             import 0.021s         0.022s         0s         
+##  5 data.frame             import 0.022s         0.021s         0.001s     
 ##  6 knit                   import 0.015s         0.015s         0s         
 ##  7 large                  target 0.004s         0.004s         0s         
-##  8 lm                     import 0.009s         0.009s         0s         
-##  9 mtcars                 import 0s             0.001s         0s         
-## 10 nrow                   import 0.007s         0.007s         0s         
+##  8 lm                     import 0.008s         0.007s         0s         
+##  9 mtcars                 import 0.001s         0.001s         0s         
+## 10 nrow                   import 0.006s         0.005s         0s         
 ## # ... with 18 more rows</code></pre></div>
 <p>See also <code>predict_runtime()</code> and <code>rate_limiting_times()</code>.</p>
 <p>In the new graph, the black nodes from before are now green.</p>
@@ -885,61 +844,14 @@ x_plan
 ## 6 regression2_small reg2(small)
 
 <span class="kw">head</span>(<span class="kw">progress</span>()) <span class="co"># See also in_progress()</span>
-## $method
-## NULL
-## 
-## $url
-## NULL
-## 
-## $headers
-## NULL
-## 
-## $fields
-## NULL
-## 
-## $options
-## $options$noprogress
-## [1] FALSE
-## 
-## $options$progressfunction
-## function (down, up) 
-## {
-##     if (type == &quot;down&quot;) {
-##         total &lt;- down[[1]]
-##         now &lt;- down[[2]]
-##     }
-##     else {
-##         total &lt;- up[[1]]
-##         now &lt;- up[[2]]
-##     }
-##     if (total == 0 &amp;&amp; now == 0) {
-##         bar &lt;&lt;- NULL
-##     }
-##     else if (total == 0) {
-##         cat(&quot;\rDownloading: &quot;, bytes(now, digits = 2), &quot;     &quot;, 
-##             sep = &quot;&quot;, file = con)
-##         utils::flush.console()
-##     }
-##     else {
-##         if (is.null(bar)) {
-##             bar &lt;&lt;- utils::txtProgressBar(max = total, style = 3, 
-##                 file = con)
-##         }
-##         utils::setTxtProgressBar(bar, now)
-##         if (now == total) 
-##             close(bar)
-##     }
-##     TRUE
-## }
-## &lt;bytecode: 0xc6d4988&gt;
-## &lt;environment: 0x15263d50&gt;
-## 
-## 
-## $auth_token
-## NULL
+## coef_regression1_large coef_regression1_small coef_regression2_large 
+##             &quot;finished&quot;             &quot;finished&quot;             &quot;finished&quot; 
+## coef_regression2_small             data.frame                   knit 
+##             &quot;finished&quot;             &quot;finished&quot;             &quot;finished&quot;
 
 <span class="kw">progress</span>(large)
-## Error in match.arg(type): object &#39;large&#39; not found
+##      large 
+## &quot;finished&quot;
 
 ## drake_session() # sessionInfo() of the last make() # nolint</code></pre></div>
 <p>The next time you run <code>make(my_plan)</code>, nothing will build because <code>drake</code> knows everything is already up to date.</p>
@@ -981,7 +893,7 @@ config<span class="op">$</span>cache<span class="op">$</span><span class="kw">ge
 ## [1] &quot;7d836504e5060e6d&quot;
 
 config<span class="op">$</span>cache<span class="op">$</span><span class="kw">get_hash</span>(<span class="dt">key =</span> <span class="st">&quot;reg2&quot;</span>) <span class="co"># different</span>
-## [1] &quot;7e2acc37c6431350&quot;</code></pre></div>
+## [1] &quot;b05742bf4eac3a9f&quot;</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Hover, click, drag, zoom, and pan.
 ## Same as drake_graph():
 <span class="kw">vis_drake_graph</span>(config, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;500px&quot;</span>)</code></pre></div>
@@ -1110,8 +1022,6 @@ my_plan
 ## 1 little_b &quot;\&quot;b\&quot;&quot;   
 ## 2 letter   !!little_b
 <span class="kw">make</span>(my_plan)
-## Unloading targets from environment:
-##   little_b
 ## target little_b
 ## target letter
 <span class="kw">readd</span>(letter)

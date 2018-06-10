@@ -46,6 +46,10 @@
 
 
 
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.3/visNetwork.js"></script>
 
 
 <style type="text/css">
@@ -246,7 +250,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>13</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="14" data-path="results-1.html"><a href="results-1.html"><i class="fa fa-check"></i><b>14</b> Results</a></li>
 </ul>
 
       </nav>
@@ -358,14 +361,14 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <p><code>Drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
 <p>List all the reproducibly-tracked objects and files, including imports and targets.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(my_plan, <span class="dt">targets =</span> <span class="st">&quot;small&quot;</span>)
-## [1] &quot;data.frame&quot;  &quot;nrow&quot;        &quot;mtcars&quot;      &quot;random_rows&quot; &quot;sample.int&quot; 
+## [1] &quot;nrow&quot;        &quot;sample.int&quot;  &quot;data.frame&quot;  &quot;mtcars&quot;      &quot;random_rows&quot;
 ## [6] &quot;small&quot;       &quot;simulate&quot;
 
 <span class="kw">tracked</span>(my_plan)
-##  [1] &quot;data.frame&quot;             &quot;lm&quot;                    
-##  [3] &quot;nrow&quot;                   &quot;suppressWarnings&quot;      
-##  [5] &quot;mtcars&quot;                 &quot;random_rows&quot;           
-##  [7] &quot;sample.int&quot;             &quot;summary&quot;               
+##  [1] &quot;nrow&quot;                   &quot;sample.int&quot;            
+##  [3] &quot;suppressWarnings&quot;       &quot;data.frame&quot;            
+##  [5] &quot;summary&quot;                &quot;lm&quot;                    
+##  [7] &quot;mtcars&quot;                 &quot;random_rows&quot;           
 ##  [9] &quot;coef_regression2_small&quot; &quot;knit&quot;                  
 ## [11] &quot;large&quot;                  &quot;\&quot;report.Rmd\&quot;&quot;        
 ## [13] &quot;small&quot;                  &quot;simulate&quot;              
@@ -462,7 +465,7 @@ config<span class="op">$</span>cache<span class="op">$</span><span class="kw">ge
 ## [1] &quot;d47109544c89ca7a&quot;
 
 config<span class="op">$</span>cache<span class="op">$</span><span class="kw">get_hash</span>(<span class="dt">key =</span> <span class="st">&quot;reg2&quot;</span>) <span class="co"># different</span>
-## [1] &quot;73e58f05bb88d4d2&quot;</code></pre></div>
+## [1] &quot;718119c29380409f&quot;</code></pre></div>
 <p>In <code>drake</code>, the “kernel” of a target or import is the piece of the output that is reproducibly tracked. For ordinary R objects, the kernel is just the object itself. For custom external files, it is a separate hash. But for functions, the kernel is the deparsed body of the function, together with the dependency hash if the function is imported (see <code>drake:::store_function()</code>).</p>
 <p>The internal functions <code>drake:::meta()</code> and <code>drake:::meta_list()</code> compute the metadata on each target that <code>drake</code> uses to decide which targets to build and which to skip (via <code>drake:::should_build_target()</code>). Then, after the target/import is processed, <code>drake:::finish_meta()</code> updates the metadata (except for the <code>$missing</code> element) before it is cached. See <code>diagnose()</code> to read available metadata, along with any errors, warnings, and messages generated during the build.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(<span class="kw">diagnose</span>(small))
@@ -475,19 +478,19 @@ config<span class="op">$</span>cache<span class="op">$</span><span class="kw">ge
 ##  $ command     : chr &quot;{\n simulate(48) \n}&quot;
 ##  $ depends     : chr &quot;eb89933a9211e556671c06c5018dcdb7efdad4593b4adff4f88ee6a34de61f7f&quot;
 ##  $ file        : chr NA
-##  $ start       : &#39;proc_time&#39; Named num [1:5] 386.7 34.2 4233.2 113.8 135.3
+##  $ start       : &#39;proc_time&#39; Named num [1:5] 46.65 8.02 1238.69 61.8 39.03
 ##   ..- attr(*, &quot;names&quot;)= chr [1:5] &quot;user.self&quot; &quot;sys.self&quot; &quot;elapsed&quot; &quot;user.child&quot; ...
 ##  $ time_command:&#39;data.frame&#39;:    1 obs. of  5 variables:
 ##   ..$ item   : chr &quot;small&quot;
 ##   ..$ type   : chr &quot;target&quot;
 ##   ..$ elapsed: num 0
-##   ..$ user   : num 0
+##   ..$ user   : num 0.001
 ##   ..$ system : num 0
 ##  $ time_build  :&#39;data.frame&#39;:    1 obs. of  5 variables:
 ##   ..$ item   : chr &quot;small&quot;
 ##   ..$ type   : chr &quot;target&quot;
-##   ..$ elapsed: num 0.003
-##   ..$ user   : num 0.003
+##   ..$ elapsed: num 0.004
+##   ..$ user   : num 0.004
 ##   ..$ system : num 0
 
 <span class="kw">str</span>(<span class="kw">diagnose</span>(<span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">report.md</span><span class="ch">\&quot;</span><span class="st">&quot;</span>))
@@ -500,20 +503,20 @@ config<span class="op">$</span>cache<span class="op">$</span><span class="kw">ge
 ##  $ command     : chr &quot;{\n knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\&quot;), quiet = TRUE) \n}&quot;
 ##  $ depends     : chr &quot;c48c0247f07440bb89da71c0a50be4e40bd4ceaa4548f18717708174b3fadf17&quot;
 ##  $ file        : chr &quot;65f43df5f3fb7d0e2b78b2fa2ada9a635a7557780e79e08805156d60b53e7abc&quot;
-##  $ start       : &#39;proc_time&#39; Named num [1:5] 386.9 34.2 4233.3 113.8 135.3
+##  $ start       : &#39;proc_time&#39; Named num [1:5] 46.8 8.03 1238.86 61.8 39.03
 ##   ..- attr(*, &quot;names&quot;)= chr [1:5] &quot;user.self&quot; &quot;sys.self&quot; &quot;elapsed&quot; &quot;user.child&quot; ...
 ##  $ time_command:&#39;data.frame&#39;:    1 obs. of  5 variables:
 ##   ..$ item   : chr &quot;\&quot;report.md\&quot;&quot;
 ##   ..$ type   : chr &quot;target&quot;
-##   ..$ elapsed: num 0.035
-##   ..$ user   : num 0.036
+##   ..$ elapsed: num 0.042
+##   ..$ user   : num 0.042
 ##   ..$ system : num 0
-##  $ mtime       : POSIXct[1:1], format: &quot;2018-06-06 21:42:02&quot;
+##  $ mtime       : POSIXct[1:1], format: &quot;2018-06-10 19:15:41&quot;
 ##  $ time_build  :&#39;data.frame&#39;:    1 obs. of  5 variables:
 ##   ..$ item   : chr &quot;\&quot;report.md\&quot;&quot;
 ##   ..$ type   : chr &quot;target&quot;
-##   ..$ elapsed: num 0.038
-##   ..$ user   : num 0.039
+##   ..$ elapsed: num 0.045
+##   ..$ user   : num 0.045
 ##   ..$ system : num 0</code></pre></div>
 <p>If your target’s last build succeeded, then <code>diagnose(your_target)</code> has the most current information from that build. But if your target failed, then only <code>diagnose(your_target)$error</code>, <code>diagnose(your_target)$warnings</code>, and <code>diagnose(your_target)$messages</code> correspond to the failure, and all the other metadata correspond to the last build that completed without an error.</p>
 </div>
@@ -693,8 +696,6 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="dt">new =</span> <span class="kw">stdout</span>(),
   <span class="kw">make</span>(bad_plan)
 )
-## Unloading targets from environment:
-##   b
 ## target a
 ## target b
 ## target my_target
