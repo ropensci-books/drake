@@ -169,9 +169,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="vis.html"><a href="vis.html"><i class="fa fa-check"></i><b>8</b> Visualization with drake</a><ul>
 <li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#dependency-reactivity"><i class="fa fa-check"></i><b>8.1</b> Dependency reactivity</a></li>
 <li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.2</b> Subgraphs</a></li>
-<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#parallel-computing-visualized"><i class="fa fa-check"></i><b>8.3</b> Parallel computing visualized</a></li>
-<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.4</b> Control the legend.</a></li>
-<li class="chapter" data-level="8.5" data-path="vis.html"><a href="vis.html#more-flexibility"><i class="fa fa-check"></i><b>8.5</b> More flexibility</a></li>
+<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.3</b> Control the legend.</a></li>
+<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#more-flexibility"><i class="fa fa-check"></i><b>8.4</b> More flexibility</a></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>9</b> High-performance computing with drake</a><ul>
 <li class="chapter" data-level="9.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>9.1</b> Batch mode for long workflows</a></li>
@@ -275,15 +274,47 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>When you run <code>make()</code>, <code>drake</code> stores your imports and targets in a hidden cache.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
 <span class="kw">load_mtcars_example</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
-config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan)</code></pre></div>
+config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan)
+## target large
+## target small
+## target regression1_large
+## target regression2_large
+## target regression1_small
+## target regression2_small
+## target summ_regression1_large
+## target coef_regression1_large
+## target summ_regression2_large
+## target coef_regression2_large
+## target summ_regression1_small
+## target coef_regression1_small
+## target coef_regression2_small
+## target summ_regression2_small
+## target file &quot;report.md&quot;</code></pre></div>
 <p>You can explore your cached data using functions <code>loadd()</code>, <code>readd()</code>, <code>cached()</code>, and others.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">cached</span>())
+## [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+## [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [5] &quot;data.frame&quot;             &quot;knit&quot;
 
 <span class="kw">head</span>(<span class="kw">readd</span>(small))
+##       x    y
+## 1 3.730 17.3
+## 2 5.250 10.4
+## 3 3.730 17.3
+## 4 5.345 14.7
+## 5 3.190 24.4
+## 6 3.440 17.8
 
 <span class="kw">loadd</span>(large)
 
 <span class="kw">head</span>(large)
+##       x    y
+## 1 3.780 15.2
+## 2 3.170 15.8
+## 3 5.424 10.4
+## 4 5.250 10.4
+## 5 3.780 15.2
+## 6 3.570 14.3
 
 <span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></code></pre></div>
 <p>By default, these objects live in a hidden <code>.drake</code> folder in your working directory.</p>
@@ -296,22 +327,91 @@ config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan)</code
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>()
 
 cache<span class="op">$</span><span class="kw">list</span>()
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;data.frame&quot;             &quot;knit&quot;                  
+##  [7] &quot;large&quot;                  &quot;lm&quot;                    
+##  [9] &quot;mtcars&quot;                 &quot;nrow&quot;                  
+## [11] &quot;random_rows&quot;            &quot;reg1&quot;                  
+## [13] &quot;reg2&quot;                   &quot;regression1_large&quot;     
+## [15] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+## [17] &quot;regression2_small&quot;      &quot;\&quot;report.md\&quot;&quot;         
+## [19] &quot;\&quot;report.Rmd\&quot;&quot;         &quot;sample.int&quot;            
+## [21] &quot;simulate&quot;               &quot;small&quot;                 
+## [23] &quot;summary&quot;                &quot;summ_regression1_large&quot;
+## [25] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [27] &quot;summ_regression2_small&quot; &quot;suppressWarnings&quot;
 
 <span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))
+##       x    y
+## 1 3.730 17.3
+## 2 5.250 10.4
+## 3 3.730 17.3
+## 4 5.345 14.7
+## 5 3.190 24.4
+## 6 3.440 17.8
 
 <span class="kw">tail</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>, <span class="dt">namespace =</span> <span class="st">&quot;meta&quot;</span>))
+## $command
+## [1] &quot;{\n simulate(48) \n}&quot;
+## 
+## $depends
+## [1] &quot;eb89933a9211e556671c06c5018dcdb7efdad4593b4adff4f88ee6a34de61f7f&quot;
+## 
+## $file
+## [1] NA
+## 
+## $start
+##    user  system elapsed 
+## 223.029  16.192 154.974 
+## 
+## $time_command
+##    item   type elapsed  user system
+## 1 small target   0.001 0.001      0
+## 
+## $time_build
+##    item   type elapsed  user system
+## 1 small target   0.004 0.004      0
 
-cache<span class="op">$</span><span class="kw">list_namespaces</span>()</code></pre></div>
+cache<span class="op">$</span><span class="kw">list_namespaces</span>()
+## [1] &quot;attempt&quot;  &quot;common&quot;   &quot;config&quot;   &quot;kernels&quot;  &quot;meta&quot;     &quot;objects&quot; 
+## [7] &quot;progress&quot; &quot;session&quot;</code></pre></div>
 <p>Create a new cache of your own with <code>new_cache()</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="dt">path =</span> <span class="st">&quot;cache2&quot;</span>)
-<span class="kw">file.exists</span>(<span class="st">&quot;cache2&quot;</span>)</code></pre></div>
+<span class="kw">file.exists</span>(<span class="st">&quot;cache2&quot;</span>)
+## [1] TRUE</code></pre></div>
 <p>You can use multiple caches simultaneously, default and non-default alike.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">config  &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">cache =</span> cache)
 config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">cache =</span> cache2)
 <span class="kw">outdated</span>(config)
+## character(0)
 <span class="kw">outdated</span>(config2)
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
+##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+##  [9] &quot;regression2_small&quot;      &quot;\&quot;report.md\&quot;&quot;         
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
 <span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache)
-<span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache2)</code></pre></div>
+## All targets are already up to date.
+<span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache2)
+## target large
+## target small
+## target regression1_large
+## target regression2_large
+## target regression1_small
+## target regression2_small
+## target summ_regression1_large
+## target coef_regression1_large
+## target summ_regression2_large
+## target coef_regression2_large
+## target summ_regression1_small
+## target coef_regression1_small
+## target coef_regression2_small
+## target summ_regression2_small
+## target file &quot;report.md&quot;</code></pre></div>
 <p>There are a couple different ways to retrieve caches.</p>
 <ul>
 <li><code>get_cache(path = &quot;my_path&quot;)</code> assumes <code>my_path</code> is a project root containing a <code>.drake</code> folder. If it does not find a <code>.drake</code> folder in <code>my_path</code>, it searches up through the ancestors of <code>my_path</code> until it finds one.</li>
@@ -320,11 +420,18 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cache3 &lt;-<span class="st"> </span><span class="kw">get_cache</span>(<span class="dt">path =</span> <span class="kw">getwd</span>()) <span class="co"># Finds the .drake folder in your directory.</span>
 <span class="kw">head</span>(cache3<span class="op">$</span><span class="kw">list</span>())
+## [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+## [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [5] &quot;data.frame&quot;             &quot;knit&quot;
 cache4 &lt;-<span class="st"> </span><span class="kw">this_cache</span>(<span class="dt">path =</span> <span class="st">&quot;cache2&quot;</span>) <span class="co"># The cache folder is literally called cache2.</span>
-<span class="kw">head</span>(cache4<span class="op">$</span><span class="kw">list</span>())</code></pre></div>
+<span class="kw">head</span>(cache4<span class="op">$</span><span class="kw">list</span>())
+## [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+## [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [5] &quot;data.frame&quot;             &quot;knit&quot;</code></pre></div>
 <p>Destroy caches to remove them from your file system.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cache4<span class="op">$</span><span class="kw">destroy</span>()
-cache2<span class="op">$</span><span class="kw">list</span>() <span class="co"># Same folder as cache4.</span></code></pre></div>
+cache2<span class="op">$</span><span class="kw">list</span>() <span class="co"># Same folder as cache4.</span>
+## character(0)</code></pre></div>
 <p>See <a href="https://github.com/richfitz/storr">storr</a> for more on <code>drake</code>’s caching infrastructure.</p>
 </div>
 <div id="hash-algorithms" class="section level2">
@@ -335,27 +442,37 @@ smaller_data &lt;-<span class="st"> </span><span class="dv">12</span>
 larger_data &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1000</span>)
 
 <span class="kw">digest</span>(smaller_data) <span class="co"># compute the hash</span>
+## [1] &quot;23c80a31c0713176016e6e18d76a5f31&quot;
 
-<span class="kw">digest</span>(larger_data)</code></pre></div>
+<span class="kw">digest</span>(larger_data)
+## [1] &quot;7386d2909711f2be4e9fdb2f3b1de03b&quot;</code></pre></div>
 <p>However, different hash algorithms vary in length.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;sha512&quot;</span>)
+## [1] &quot;a1c86d5a6880ec6333d4b04e3b84b04fff3e77dd11d1084790573bf454a85fdc71c9c86c88f9b62ecec120ec8866cbb7fe3ca2669159474fa38e25f59e7d028f&quot;
 
 <span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;md5&quot;</span>)
+## [1] &quot;7386d2909711f2be4e9fdb2f3b1de03b&quot;
 
 <span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;xxhash64&quot;</span>)
+## [1] &quot;2ecacf8c43cefe91&quot;
 
-<span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;murmur32&quot;</span>)</code></pre></div>
+<span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;murmur32&quot;</span>)
+## [1] &quot;bd5a15f6&quot;</code></pre></div>
 </div>
 <div id="which-hash-algorithm-should-you-choose" class="section level2">
 <h2><span class="header-section-number">11.3</span> Which hash algorithm should you choose?</h2>
 <p>Hashing is expensive, and unsurprisingly, shorter hashes are usually faster to compute. So why not always use <code>murmur32</code>? One reason is the risk of collisions: that is, when two different objects have the same hash. In general, shorter hashes have more frequent collisions. On the other hand, a longer hash is not always the answer. Besides the loss of speed, <code>drake</code> and <a href="https://github.com/richfitz/storr">storr</a> sometimes use hash keys as file names, and long hashes could violate the 260-character cap on Windows file paths. That is why <code>drake</code> uses a shorter hash algorithm for internal cache-related file names and a longer hash algorithm for everything else.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">default_short_hash_algo</span>()
+## [1] &quot;xxhash64&quot;
 
 <span class="kw">default_long_hash_algo</span>()
+## [1] &quot;sha256&quot;
 
 <span class="kw">short_hash</span>(cache)
+## [1] &quot;xxhash64&quot;
 
-<span class="kw">long_hash</span>(cache)</code></pre></div>
+<span class="kw">long_hash</span>(cache)
+## [1] &quot;sha256&quot;</code></pre></div>
 </div>
 <div id="select-the-hash-algorithms-of-the-cache" class="section level2">
 <h2><span class="header-section-number">11.4</span> Select the hash algorithms of the cache</h2>
@@ -374,10 +491,13 @@ tmp &lt;-<span class="st"> </span><span class="kw">new_cache</span>(
 config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 
 <span class="kw">short_hash</span>(config<span class="op">$</span>cache) <span class="co"># xxhash64 is the default_short_hash_algo()</span>
+## [1] &quot;crc32&quot;
 
-<span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># sha256 is the default_long_hash_algo()</span></code></pre></div>
+<span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># sha256 is the default_long_hash_algo()</span>
+## [1] &quot;sha1&quot;</code></pre></div>
 <p>You can change the long hash algorithm without throwing away the cache, but your project will rebuild from scratch. As for the short hash, you are committed until you delete the cache and all its supporting files.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config) <span class="co"># empty</span>
+## character(0)
 
 config<span class="op">$</span>cache &lt;-<span class="st"> </span><span class="kw">configure_cache</span>(
   config<span class="op">$</span>cache,
@@ -387,12 +507,22 @@ config<span class="op">$</span>cache &lt;-<span class="st"> </span><span class="
 <p>Below, the targets become outdated because the existing hash keys do not match the new hash algorithm.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>, <span class="dt">cache =</span> config<span class="op">$</span>cache)
 <span class="kw">outdated</span>(config)
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
+##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+##  [9] &quot;regression2_small&quot;      &quot;\&quot;report.md\&quot;&quot;         
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
 
 config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 
 <span class="kw">short_hash</span>(config<span class="op">$</span>cache) <span class="co"># same as before</span>
+## [1] &quot;crc32&quot;
 
-<span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># different from before</span></code></pre></div>
+<span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># different from before</span>
+## [1] &quot;murmur32&quot;</code></pre></div>
 </div>
 <div id="using-storr-directly" class="section level2">
 <h2><span class="header-section-number">11.5</span> Using <code>storr</code> directly</h2>
@@ -401,10 +531,13 @@ config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan, <span
 my_storr &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;my_storr&quot;</span>, <span class="dt">mangle_key =</span> <span class="ot">TRUE</span>)
 new_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">simple =</span> <span class="kw">sqrt</span>(<span class="dv">4</span>))
 <span class="kw">make</span>(new_plan, <span class="dt">cache =</span> my_storr)
+## target simple
 
 <span class="kw">cached</span>(<span class="dt">cache =</span> my_storr)
+## [1] &quot;simple&quot; &quot;sqrt&quot;
 
-<span class="kw">readd</span>(simple, <span class="dt">cache =</span> my_storr)</code></pre></div>
+<span class="kw">readd</span>(simple, <span class="dt">cache =</span> my_storr)
+## [1] 2</code></pre></div>
 <p>In addition to <code>storr_rds()</code>, <code>drake</code> supports in-memory caches created from <code>storr_environment()</code>. However, parallel computing is not supported these caches. The <code>jobs</code> argument must be 1, and the <code>parallelism</code> argument must be either <code>&quot;mclapply&quot;</code> or <code>&quot;parLapply&quot;</code>. (It is sufficient to leave the default values alone.)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">memory_cache &lt;-<span class="st"> </span><span class="kw">storr_environment</span>()
 other_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
@@ -414,10 +547,16 @@ other_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 )
 
 <span class="kw">make</span>(other_plan, <span class="dt">cache =</span> memory_cache)
+## target some_data
+## target more_data
+## target result
 
 <span class="kw">cached</span>(<span class="dt">cache =</span> memory_cache)
+## [1] &quot;c&quot;         &quot;mean&quot;      &quot;more_data&quot; &quot;result&quot;    &quot;rnorm&quot;     &quot;rpois&quot;    
+## [7] &quot;some_data&quot;
 
-<span class="kw">readd</span>(result, <span class="dt">cache =</span> memory_cache)</code></pre></div>
+<span class="kw">readd</span>(result, <span class="dt">cache =</span> memory_cache)
+## [1] 6.232917</code></pre></div>
 <p>In theory, it should be possible to leverage serious databases using <code>storr_dbi()</code>. However, if you use such caches, please heed the following.</p>
 <ol style="list-style-type: decimal">
 <li>Be sure you have <a href="https://github.com/richfitz/storr">storr</a> version 1.1.3 or greater installed.</li>
@@ -440,6 +579,19 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(small, large)
 
 <span class="kw">cached</span>() <span class="co"># &#39;small&#39; and &#39;large&#39; are gone</span>
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;data.frame&quot;             &quot;knit&quot;                  
+##  [7] &quot;lm&quot;                     &quot;mtcars&quot;                
+##  [9] &quot;nrow&quot;                   &quot;random_rows&quot;           
+## [11] &quot;reg1&quot;                   &quot;reg2&quot;                  
+## [13] &quot;regression1_large&quot;      &quot;regression1_small&quot;     
+## [15] &quot;regression2_large&quot;      &quot;regression2_small&quot;     
+## [17] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
+## [19] &quot;sample.int&quot;             &quot;simulate&quot;              
+## [21] &quot;summary&quot;                &quot;summ_regression1_large&quot;
+## [23] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [25] &quot;summ_regression2_small&quot; &quot;suppressWarnings&quot;
 
 <span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>)
 

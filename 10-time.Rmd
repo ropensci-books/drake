@@ -29,7 +29,7 @@ build_times(starts_with("coef"), digits = 8)
 build_times(digits = 8, targets_only = TRUE)
 ```
 
-For `drake` version 4.1.0 and earlier, `build_times()` just measures the elapsed runtime of each command in `my_plan$command`. For later versions, the build times also account for all the internal operations in `drake:::build()`, such as [storage and hashing](https://github.com/ropensci/drake/blob/master/vignettes/storage.Rmd).
+For `drake` version 4.1.0 and earlier, `build_times()` just measures the elapsed runtime of each command in `my_plan$command`. For later versions, the build times also account for all the internal operations in `drake:::build()`, such as [storage and hashing](#store).
 
 ## Predict total runtime
 
@@ -96,4 +96,4 @@ unlink(c(
   "*.lock", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 ```
 
-A final note on predicting runtime: the output of `predict_runtime()` and `predict_load_balancing()` also depends the optional `workers` column of your `drake_plan()`. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the [high-performance computing guide](https://ropensci.github.io/drake/articles/parallelism.html) for more.
+A final note on predicting runtime: the output of `predict_runtime()` and `predict_load_balancing()` also depends the optional `workers` column of your `drake_plan()`. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the [high-performance computing guide](#hpc) for more.

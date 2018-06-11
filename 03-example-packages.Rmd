@@ -19,7 +19,7 @@ reportfile <- file.path("examples", "packages", "report.Rmd") %>%
 file.copy(reportfile, getwd())
 ```
 
-This vignette explores R package download trends using the `cranlogs` package.
+This chapter explores R package download trends using the `cranlogs` package.
 
 ## Get the code.
 
@@ -90,7 +90,7 @@ data_plan
 ```
 
 Our `data_plan` data frame has a `"trigger"` column because the latest download data needs to be refreshed every day. We use
-triggers to force `recent` to always build. For more on triggers, see the [vignette on debugging and testing](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd). Instead of triggers, we could have just made `recent` a global variable like `package_list` instead of a formal target in `data_plan`.
+triggers to force `recent` to always build. For more on triggers, see the [chapter on debugging and testing](#debug). Instead of triggers, we could have just made `recent` a global variable like `package_list` instead of a formal target in `data_plan`.
 
 We want to summarize each set of
 download statistics a couple different ways.
@@ -196,20 +196,14 @@ so `make()` will refresh `averages_recent`, `plot_recent`, and
 `report.md`. Targets `averages_older` and `plot_older`
 should be unaffected, so `drake` will skip them.
 
-```{r plotpackagesgraph, eval = FALSE}
+```{r plotpackagesgraph}
 config <- drake_config(whole_plan)
 vis_drake_graph(config)
 ```
 
-<iframe
-src = "https://ropensci.github.io/drake/images/packages.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
-
 ## What remote data sources in general?
 
-When you rely on data from the internet, you should trigger a new download when the data change remotely. [This section of the best practices guide](https://github.com/ropensci/drake/blob/master/vignettes/best-practices.Rmd#remote-data-sources) explains how to automatically refresh the data when the online timestamp changes.
+When you rely on data from the internet, you should trigger a new download when the data change remotely. The [best practices guide](#best-practices) explains how to automatically refresh the data when the online timestamp changes.
 
 ```{r rmfiles_main02, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)

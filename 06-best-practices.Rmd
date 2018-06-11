@@ -17,7 +17,7 @@ pkgconfig::set_config("drake::strings_in_dots" = "literals")
 tmp <- file.create("data.csv")
 ```
 
-This vignette describes general best practices for creating, configuring, and running `drake` projects. It answers frequently asked questions and clears up common misconceptions, and it will continuously develop in response to community feedback.
+This chapter describes general best practices for creating, configuring, and running `drake` projects. It answers frequently asked questions and clears up common misconceptions, and it will continuously develop in response to community feedback.
 
 ## How to organize your files
 
@@ -48,6 +48,10 @@ It is best to write your code as a bunch of functions. You can save those functi
 source("my_functions.R")
 ```
 
+```{r sourcefunctionsbk, echo = FALSE}
+get_data <- analyze_data <- summarize_results <- function(){}
+```
+
 Then, set up your workflow plan data frame.
 
 ```{r storecode1}
@@ -62,16 +66,10 @@ good_plan
 
 `Drake` knows that `my_analysis` depends on `my_data` because `my_data` is an argument to `analyze_data()`, which is part of the command for `my_analysis`.
 
-```{r visgood, eval = FALSE}
+```{r visgood}
 config <- drake_config(good_plan)
 vis_drake_graph(config)
 ```
-
-<iframe
-src = "https://ropensci.github.io/drake/images/good-commands.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
 
 Now, you can call `make()` to build the targets.
 
@@ -103,16 +101,19 @@ bad_plan
 
 But now, the dependency structure of your work is broken. Your R script files are dependencies, but since `my_data` is not mentioned in a function or command, `drake` does not know that `my_analysis` depends on it.
 
-```{r visbad, eval = FALSE}
+```{r scripts, echo = FALSE}
+files <- c("get_data.R", "analyze_data.R", "summarize_data.R")
+lapply(files, file.create)
+```
+
+```{r visbad}
 config <- drake_config(bad_plan)
 vis_drake_graph(config)
 ```
 
-<iframe
-src = "https://ropensci.github.io/drake/images/bad-commands.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
+```{r scripts2, echo = FALSE}
+lapply(files, file.remove)
+```
 
 Dangers:
 
@@ -226,29 +227,19 @@ make(plan1, cache = cache1)
 make(plan2, cache = cache2)
 ```
 
-See the [storage guide](https://ropensci.github.io/drake/articles/storage.html) for more on caching, particularly functions `get_cache()` and `this_cache()`.
+See the [storage guide](#store) for more on caching, particularly functions `get_cache()` and `this_cache()`.
 
 ### R Markdown and knitr reports
 
 For a serious project, you should use `drake`'s `make()` function outside `knitr`. In other words, you should treat R Markdown reports and other `knitr` documents as targets and imports, not as a way to run `make()`. Viewed as targets, `drake` makes special exceptions for R Markdown reports and other [knitr](https://github.com/yihui/knitr) reports such as `*.Rmd` and `*.Rnw` files. Not every `drake` project needs them, but it is good practice to use them to summarize the final results of a project once all the other targets have already been built. The mtcars example, for instance, has an R Markdown report. `report.Rmd` is knitted to build `report.md`, which summarizes the final results.
 
-```{r revisitmtcars}
-## Load all the functions and the workflow plan data frame, my_plan.
-load_mtcars_example() # Get the code with drake_example("mtcars").
-```
-
 To see where `report.md` will be built, look to the right of the dependency graph.
 
-```{r revisitmtcarsgraph, eval = FALSE}
+```{r revisitmtcarsgraph}
+load_mtcars_example(overwrite = TRUE) # Get the code with drake_example("mtcars").
 config <- drake_config(my_plan)
 vis_drake_graph(config)
 ```
-
-<iframe
-src = "https://ropensci.github.io/drake/images/outdated.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
 
 `Drake` treats [knitr](https://github.com/yihui/knitr) report as a special cases. Whenever `drake` sees `knit()` or `render()` ([rmarkdown](https://github.com/rstudio/rmarkdown)) mentioned in a command, it dives into the source file to look for dependencies. Consider `report.Rmd`, which you can view [here](https://github.com/ropensci/drake/blob/master/inst/examples/mtcars/report.Rmd). When `drake` sees `readd(small)` in an active code chunk, it knows [report.Rmd](https://github.com/ropensci/drake/blob/master/inst/examples/mtcars/report.Rmd) depends on the target called `small`, and it draws the appropriate arrow in the dependency graph above. And if `small` ever changes, `make(my_plan)` will re-process [report.Rmd](https://github.com/ropensci/drake/blob/master/inst/examples/mtcars/report.Rmd) to produce the target file `report.md`.
 
@@ -432,7 +423,7 @@ cranlogs_plan <- drake_plan(
 cranlogs_plan
 ```
 
-To make sure we always have the latest timestamp, we use the `"always"` trigger. (See [this section of the debugging vignette](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd#test-with-triggers) for more on triggers.)
+To make sure we always have the latest timestamp, we use the `"always"` trigger. (For more on triggers, see the [guide to debugging and testing drake projects](#debug).)
 
 ```{r logs4}
 cranlogs_plan$trigger <- c("always", "any")

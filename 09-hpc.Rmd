@@ -53,11 +53,11 @@ If you do write a custom [`Makefile`](https://www.gnu.org/software/make/) at the
 
 When you deploy your project, `drake` uses the dependency network to figure out how to run your work in parallel. You as the user do not have to micromanage when individual targets are built.
 
-<iframe
-src = "https://ropensci.github.io/drake/images/outdated.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
+```{r hpcgraph}
+load_mtcars_example()
+config <- drake_config(my_plan)
+vis_drake_graph(config)
+```
 
 ## Parallel backends
 
@@ -299,7 +299,7 @@ plan
 
 Because of the `priority` column, if targets `A` and `B` are both ready to build, then `A` will be assigned to a worker first. Custom priorities apply to the staged scheduling backends, plus the `"future"` backend.
 
-The `predict_runtime()` and `predict_load_balancing()` functions emulate persistent workers, and the predictions also apply to transient workers. See the [timing guide](https://ropensci.github.io/drake/articles/timing.html) for a demonstration. These functions also respond to the `workers` column.
+The `predict_runtime()` and `predict_load_balancing()` functions emulate persistent workers, and the predictions also apply to transient workers. See the [timing guide](#time) for a demonstration. These functions also respond to the `workers` column.
 
 ### Transient scheduling
 
@@ -355,41 +355,31 @@ plan_sub <-
 
 plan <- bind_rows(plan_data, plan_sub)
 plan
-```
 
-```{r staged3, eval = FALSE}
 config <- drake_config(plan)
-vis_drake_graph(plan)
+vis_drake_graph(config)
 ```
-
-<div style = "text-align: center">
-<iframe
-src = "https://ropensci.github.io/drake/images/staged.html"
-width = "100%" height = "600px" allowtransparency="true"
-style="border: none; box-shadow: none">
-</iframe>
-</div>
 
 ## Final thoughts
 
 ### Debugging
 
-For large workflows, downsizing and debugging tools become super important. See the ["debug" vignette](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd) for help on diagnosing problems with a workflow. [Triggers](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd#test-with-triggers) and [cached error logs](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd#diagnose-failures) especially speed the development and testing process.
+For large workflows, downsizing and debugging tools become super important. See the [guide to debugging and testing `drake` projects](#debug) for help on diagnosing problems with a workflow. Triggers and cached error logs especially speed the development and testing process.
 
 ### Drake as an ordinary job scheduler
 
-If you do not care about reproducibility and you want `drake` to be an ordinary job scheduler, consider using [alternative triggers](https://github.com/ropensci/drake/blob/master/vignettes/debug.Rmd#test-with-triggers).
+If you do not care about reproducibility and you want `drake` to be an ordinary job scheduler, consider using alternative triggers (see `?triggers`).
 
 ```{r triggerparallel, eval = FALSE}
 load_mtcars_example()
 make(my_plan, trigger = "missing") # Also consider "always".
 ```
 
-Above, `drake` only builds the missing targets. This skips much of the [time-consuming hashing](https://github.com/ropensci/drake/blob/master/vignettes/storage.Rmd#hash-algorithms) that ordinarily detects which targets are out of date.
+Above, `drake` only builds the missing targets. This skips much of the time-consuming hashing that ordinarily detects which targets are out of date.
 
 ### More resources
 
-See the [timing vignette](https://github.com/ropensci/drake/blob/master/vignettes/timing.Rmd) for explanations of functions `predict_runtime()` and `predict_load_balancing()`, which can help you plan and strategize deployment.
+See the [timing guide](#time) for explanations of functions `predict_runtime()` and `predict_load_balancing()`, which can help you plan and strategize deployment.
 
 ## Footnotes
 
