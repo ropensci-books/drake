@@ -828,7 +828,12 @@ function setNodeIdList(selectList, params, nodes){
       
   option = document.createElement("option");
   option.value = "";
-  option.text = "Select by id";
+  if(params.main === undefined){
+    option.text = "Select by id";
+  } else {
+    option.text = params.main;
+  }
+  
   selectList.appendChild(option);
       
   // have to set for all nodes ?
@@ -1086,7 +1091,7 @@ function uncollapsedNetwork(nodes, fit, resetHighlight, network, elid) {
   }
 
   for (var inodes = 0; inodes < arr_nodes.length; inodes++) {
-    selectedNode = arr_nodes[inodes];
+    selectedNode = '' + arr_nodes[inodes];
     if(selectedNode !== undefined){
         if(network.isCluster(selectedNode)){
           network.openCluster(selectedNode)
@@ -1567,7 +1572,12 @@ if (HTMLWidgets.shinyMode){
             if(data.options.byselection.enabled === true){
               option2 = document.createElement("option");
               option2.value = "";
-              option2.text = "Select by " + data.options.byselection.variable;
+              if(data.options.byselection.main === undefined){
+                option2.text = "Select by " + data.options.byselection.variable;
+              } else {
+                option2.text = data.options.byselection.main;
+              }
+              
               selectList2.appendChild(option2);
       
               if(data.options.byselection.values !== undefined){
@@ -1635,6 +1645,7 @@ if (HTMLWidgets.shinyMode){
             selectList.options.length = 0;
             if(data.options.idselection.enabled === true){
               setNodeIdList(selectList, data.options.idselection, graph.nodes)
+              el.idselection = true;
             } else {
               selectList.style.display = 'none';
               el.idselection = false;
@@ -1910,14 +1921,16 @@ if (HTMLWidgets.shinyMode){
       // get container id
       var el = document.getElementById(data.id);
       if(el){
-        if(data.tree.updateShape != undefined){
-          el.tree.updateShape = data.tree.updateShape
-        }
-        if(data.tree.shapeVar != undefined){
-          el.tree.shapeVar = data.tree.shapeVar
-        }
-        if(data.tree.shapeY != undefined){
-          el.tree.shapeY = data.tree.shapeY
+      if(el.tree){
+          if(data.tree.updateShape != undefined){
+            el.tree.updateShape = data.tree.updateShape
+          }
+          if(data.tree.shapeVar != undefined){
+            el.tree.shapeVar = data.tree.shapeVar
+          }
+          if(data.tree.shapeY != undefined){
+            el.tree.shapeY = data.tree.shapeY
+          }
         }
       }
   });
@@ -2151,7 +2164,12 @@ HTMLWidgets.widget({
       
       option2 = document.createElement("option");
       option2.value = "";
-      option2.text = "Select by " + x.byselection.variable;
+      if(x.byselection.main === undefined){
+        option2.text = "Select by " + x.byselection.variable;
+      } else {
+        option2.text = x.byselection.main;
+      }
+
       selectList2.appendChild(option2);
       
       //Create and append the options
@@ -2688,7 +2706,15 @@ HTMLWidgets.widget({
     var popupState = false;
     var popupTimeout = null;
     var vispopup = document.createElement("div");
+   
+    // disable vis.js tooltip 
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = 'div.vis-tooltip {display : none}';
+    document.getElementsByTagName('head')[0].appendChild(style);
+
     var popupStyle = 'position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2)'
+    
     if(x.tooltipStyle !== undefined){
       popupStyle = x.tooltipStyle
     }
@@ -3371,6 +3397,7 @@ HTMLWidgets.widget({
     div_footer.id = "footer"+el.id;
     div_footer.setAttribute('style',  'font-family:Georgia, Times New Roman, Times, serif;font-size:12px;text-align:center;background-color: inherit;');
     div_footer.style.display = 'none';
+
     document.getElementById("graph" + el.id).appendChild(div_footer);  
     if(x.footer !== null){
       div_footer.innerHTML = x.footer.text;
