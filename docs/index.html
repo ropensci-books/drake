@@ -317,12 +317,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
 <span class="kw">library</span>(devtools)
 <span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre></div>
-<p>You may encounter an error due to <a href="https://github.com/duncantl/CodeDepends"><code>CodeDepends</code></a> (ref: <a href="https://github.com/duncantl/CodeDepends/issues/30">duncantl/CodeDepends#30</a>, <a href="https://github.com/duncantl/CodeDepends/issues/34">duncantl/CodeDepends#34</a>).</p>
+<p>If you are installing the current CRAN version (5.2.1), you may encounter an error due to <a href="https://github.com/duncantl/CodeDepends"><code>CodeDepends</code></a> (ref: <a href="https://github.com/duncantl/CodeDepends/issues/30">duncantl/CodeDepends#30</a>, <a href="https://github.com/duncantl/CodeDepends/issues/34">duncantl/CodeDepends#34</a>).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)
 <span class="co">#&gt; ...</span>
 <span class="co">#&gt; ERROR: dependency ‘graph’ is not available for package ‘CodeDepends’</span>
 <span class="co">#&gt; ...</span></code></pre></div>
-<p>This is because <code>drake</code> depends on <a href="https://github.com/duncantl/CodeDepends"><code>CodeDepends</code></a>, which depends on <a href="https://www.bioconductor.org/packages/release/bioc/html/graph.html"><code>graph</code></a>, which is not on <a href="https://cran.r-project.org">CRAN</a>. Simply install <a href="https://www.bioconductor.org/packages/release/bioc/html/graph.html"><code>graph</code></a> from <a href="https://www.bioconductor.org">Bioconductor</a> and proceed.</p>
+<p>This is because <code>drake</code> 5.2.1 depends on <a href="https://github.com/duncantl/CodeDepends"><code>CodeDepends</code></a>, which depends on <a href="https://www.bioconductor.org/packages/release/bioc/html/graph.html"><code>graph</code></a>, which is not on <a href="https://cran.r-project.org">CRAN</a>. You have two possible solutions.</p>
+<ol style="list-style-type: decimal">
+<li>Install the development version with <code>devtools::install_github(&quot;ropensci/drake&quot;)</code></li>
+<li>Install <a href="https://www.bioconductor.org/packages/release/bioc/html/graph.html"><code>graph</code></a> from <a href="https://www.bioconductor.org">Bioconductor</a> and proceed with the CRAN version of <code>drake</code>.</li>
+</ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://bioconductor.org/biocLite.R&quot;</span>)
 <span class="kw">biocLite</span>(<span class="st">&quot;graph&quot;</span>)
 <span class="kw">install.packages</span>(<span class="st">&quot;CodeDepends&quot;</span>)
