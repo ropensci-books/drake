@@ -1,0 +1,159 @@
+# Workflow data frames {#workflow-df}
+
+This chapter provides a systematic introduction to workflow data frames, how 
+you can create - modify and execute them. Throughout, we will use the Gross 
+state products example. 
+You can learn more about the example itself in the corresponding
+[chapter](#example-gsp). We
+won't comment the example explicitly, we just use it as illustration.
+```{r, echo = FALSE}
+library(drake)
+drake_example("gsp") # create source files for example
+withr::with_dir("gsp/", source("make.R"))
+```
+
+## What is a workflow plan data frame?
+
+A workflow plan data frame is *the* pillar of drake and the main input to 
+`drake::make()`. A workflow plan data frame is what the name says, 
+it is a data frame. From the [GSP example](#example-gsp):
+```{r}
+class(model_plan)
+```
+You can construct one conveniently with `drake_plan()`.
+There is no magic. A workflow plan has two mandatory columns: `command`, which 
+contains R code (as plain text) and `target` which stores the name of the 
+targets. Hence, every row in the workflow plan corresponds to a target. This
+may look like this:
+```{r}
+head(model_plan)
+```
+
+Optionally, you can add a column `trigger` that determines the condition under 
+which a target gets build (e.g. `"always"` to build the target with every 
+`make()` call).  You can learn more about triggers in [XXX]. You can also add
+arbitrary other columns (such as a grouping column to group commands) exactly 
+the way you manipulate data frames.
+```{r}
+model_plan$my_col <- "my_custom_column"
+head(model_plan)
+```
+
+
+## Why putting everything into a data frame?
+
+You may wonder why the data frame was chosen as the data structure to represent
+workflow plans. Data frames are fist-class citizen in R. They are R objects you 
+can operate on using the power of R. 
+[remake](https://github.com/richfitz/remake), which was a major 
+source of inspiration for drake, uses a Makefile - just as GNU Make. This meant
+that the workflow plan could not be manipulated programmatically. For example, 
+you could not generate many targets with `combn()` or `expand.grid()` (as it was 
+done in the [GSP example](#example-gsp)), 
+use wildcards (see next paragraph), filter for certain targets or 
+triggers and the like. In the data frame format, you can easily split one
+plan up into multiple, bind plans together with `bind_plans()` etc. 
+
+## Wildcard templating: a tool for generating lots of targets.
+
+One advantage of using data frames to represent workflow plans becomes evident 
+with the introduction of wildcards. Wildcards are essentially placeholders 
+for *something yet to come*. We denote data wildcards with `dataset__`.
+This *something* can be multiple things - and 
+drake will take care of creating all combinations of these *things* and your 
+workflow plan. There are usually two steps (that can be repeated as needed): 
+
+- Set up a workflow plan that contains data you want to use for your analysis.
+  This may contain more than one target.^[This example is in fact only 
+  interesting if there is more than one target in the `datasets` workflow plan.]
+
+```{r}
+datasets <- drake_plan(
+  uniform = runif(50),
+  normal  = rnorm(50)
+)
+```
+
+- Set up another workflow plan that transforms the data. Use the placeholder
+  (i.e. the wildcard) and think through the analysis as if there was just one 
+  data target. I.e, we have two analysis tasks: sampling one and sampling two 
+  observations from a data set.
+```{r}
+methods <- drake_plan(
+  small_sample = sample(dataset__, 6),
+  large_sample = sample(dataset__, 10)
+)
+```
+
+- Next, you combine the two workflow plans into one by substituting in your 
+  data with `plan_analyses()`. 
+```{r}
+(analysis <- plan_analyses(methods, datasets = datasets))
+```
+
+- In a similar way, you can extend the plan just created with `plan_summaries()`, 
+  using the wildcard `analysis__`. Let's assume that after sampling, you want to 
+  find out more about the distribution of the data and decide to calculate some
+  sample moments. Again, abstract from the number of samples you drew from the 
+  data, and think in terms of one result of your sampling. We call this result 
+  analysis. For every analysis result, you want to calculate the
+  mean and the standard deviation, which means you have two goals in your 
+  next step. First we create the plan for this step:
+```{r}
+post_analysis <- drake_plan(
+  mean = mean(analysis__),
+  sd   = sd(analysis__)
+)
+```
+- Then, we again replace our wild card with the results from the previous step, 
+  this time using `plan_analyses()`. Use the option `gather` to indicate whether
+  or not a separate target with all the final targets (`mean_*` and `sd_*`) 
+  should be added to the workflow data frame.
+```{r}
+plan_summaries(
+  post_analysis, analyses, datasets, gather = NULL
+)
+```
+Before you can call `make()` on this plan, you need to bind it with 
+`datasets` and `analyses` using `bind_plans()` or `rbind`.
+
+If you don't like to think in these data-analysis-post-analysis steps, you can 
+also use the (more) generic function `plan_evaluate()` that you can cascade 
+as you want. The approach also differs in the sense that you don't need two 
+workflow plans (like in `plan_summaries()`), but only one plan where you put 
+some wildcards and then a vector of values that should replace the wildcard.
+Let's reproduce what we had above with this approach:
+```{r}
+sampled <- drake_plan(
+  small = sample(generic_wild_card__, 6),
+  large = sample(generic_wild_card__, 10)
+)
+
+datasets <- drake_plan(
+  uniform = runif(50),
+  normal  = rnorm(50)
+)
+
+sampled_evaluated <- evaluate_plan(
+  sampled, wildcard = "generic_wild_card__", values = datasets$target
+)
+
+moments <- drake_plan(
+  mean = mean(generic_wild_card__),
+  sd   = sd(generic_wild_card__)
+)
+
+moments_evaluated <- evaluate_plan(
+  moments, wildcard = "generic_wild_card__", values = sampled_evaluated$target
+)
+```
+Again, you need to bind the intermediate inputs with the
+final plan:
+```{r}
+bind_plans(
+  datasets,
+  sampled_evaluated,
+  moments_evaluated
+)
+```
+
