@@ -157,16 +157,16 @@ To deploy to a cluster (say, a [SLURM](https://slurm.schedmd.com/) cluster), you
 library(future.batchtools)
 ```
 
-You also need [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) to configure [`batchtools`](https://github.com/mllg/batchtools) the remote resources, such as the memory and wall time limits. Use `drake_batchtools_tmpl_file()` to write one of the examples from the [`drake_example()` files](https://github.com/ropensci/drake/tree/master/inst/examples). You will probably need to edit it manually to match your resources and needs.
+You also need [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) to configure [`batchtools`](https://github.com/mllg/batchtools) the remote resources, such as the memory and wall time limits. Use `drake_hpc_template_file()` to write one of the available example template files (list with `drake_hpc_template_files()` or [browse here](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files)). You will probably need to edit your tempalte file manually to match your resources and needs.
 
 ```{r exlksjdf, eval = FALSE}
-drake_batchtools_tmpl_file("slurm") # Write batchtools.slurm.tmpl.
+drake_hpc_tempalte_file("slurm_future.tmpl") # Write the file slurm_future.tmpl.
 ```
 
 Load the template file your `future::plan()` and call `make()` to run the project.
 
 ```{r futurebatchtools2, eval = FALSE}
-future::plan(batchtools_slurm, template = "batchtools.slurm.tmpl")
+future::plan(batchtools_slurm, template = "slurm_future.tmpl")
 make(my_plan, parallelism = "future", jobs = 2)
 ## Same technology, different scheduling:
 make(my_plan, parallelism = "future_lapply", jobs = 2)
