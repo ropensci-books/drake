@@ -7,8 +7,12 @@ example.
 ## What is a workflow plan data frame?
 
 The workflow plan data frame is one of the main pillars of drake and the main 
-input to `drake::make()`. You can construct one conveniently 
-with `drake_plan()`. 
+input to `drake::make()`. 
+The purpose of a plan is to declare the data objects and files you are going to 
+produce later on. We refer to these as targets.
+You can declare targets in any order and drake will figure out the order of 
+execution.
+You can construct one conveniently with `drake_plan()`. 
 Below, we create a plan with two targets:
 ```{r}
 library(drake)
@@ -19,7 +23,24 @@ plan <- drake_plan(
 plan
 ```
 In plain English, we want to obtain 10 values from the uniform distribution and
-50 from the normal distribution.
+50 from the normal distribution. Let's do it:
+```{r}
+make(plan)
+```
+
+This is it. Now you might wonder where these two targets are stored. They
+live in the drake cache. To make them available in your R session, you can 
+either load them into the global environment with `loadd()` (which is called
+for its side effects) or with `readd()` (which returns the target itself and has
+no side effects.). That means that you can treat the return value of `readd()`
+as any other R object.
+```{r}
+mean(readd(uniform))
+```
+
+Note that creating the plan does not run any of
+the code in the `command` column, that will only happen when you call `make()`
+on the plan.
 
 A workflow plan data frame is what the name says, it is a data frame. 
 ```{r}
