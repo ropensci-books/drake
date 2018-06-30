@@ -7,13 +7,11 @@ example.
 ## What is a workflow plan data frame?
 
 The workflow plan data frame is one of the main pillars of drake and the main 
-input to `drake::make()`. 
+input to `make()`. 
 The purpose of a plan is to declare the data objects and files you are going to 
-produce later on. We refer to these as targets.
-You can declare targets in any order and drake will figure out the order of 
-execution.
-You can construct one conveniently with `drake_plan()`. 
-Below, we create a plan with two targets:
+produce later on. We refer to these as *targets*. You can declare targets in 
+any order and drake will figure out the order of execution. You can construct 
+one conveniently with `drake_plan()`. Below, we create a plan with two targets:
 ```{r}
 library(drake)
 plan <- drake_plan(
@@ -38,9 +36,8 @@ as any other R object.
 mean(readd(uniform))
 ```
 
-Note that creating the plan does not run any of
-the code in the `command` column, that will only happen when you call `make()`
-on the plan.
+Note that creating the plan does not run any of the code in the `command` 
+column, that will only happen when you call `make()` on the plan.
 
 A workflow plan data frame is what the name says, it is a data frame. 
 ```{r}
@@ -60,22 +57,50 @@ plan$my_col <- "my_custom_column"
 plan
 ```
 
+## Why making a plan?
+
+Ok, fine, you might think. I can also run `runif(10)` in my console, why should
+I use this complicated workflow? In brief because if your project grows in size 
+and complexity, it's hard to keep in mind which parts of a project get outdated
+when you modify an input or code. Let drake take care of it, so you can focus 
+on the content of your project. Whenever you call `make()`, drake will only
+re-build targets that got outdated since the last `make()`. 
+```{r}
+make(plan)
+```
+
+There are a whole lot of other advantages associated 
+with using drake, you can check out [Visualization with drake] or 
+[High-performance computing with drake] for more information.
+
 
 ## Why putting everything into a data frame?
 
-You may wonder why the data frame was chosen as the data structure to represent
+Now that we've explained why it's a good idea to make a plan, you may wonder 
+why you should use drake, as there are similar tools like GNU Make or the 
+R package [remake](https://github.com/richfitz/remake)
+that let you specify targets and their build commands and 
+dependencies.^[In those tools, the equivalent of a plan is called `Makefile`.] 
+
+drake is an R focussed implementation of Make - and 
+the data frame was chosen as the data structure to represent
 workflow plans. Data frames are fist-class citizen in R. They are R objects you 
 can operate on using the power of R. 
 [remake](https://github.com/richfitz/remake), which was a major 
 source of inspiration for drake, uses a Makefile - just as GNU Make. This meant
-that the workflow plan could not be manipulated programmatically. For example, 
+that the workflow plan could not be manipulated programmatically and the whole 
+plan had to be written by hand. For example, 
 you could not generate many targets with `combn()` or `expand.grid()` (as it was 
 done in the [GSP example](#example-gsp)), 
-use wildcards (see next paragraph), filter for certain targets or 
+use wildcards (see [Wildcard templating: a tool for generating lots of targets]), filter for certain targets or 
 triggers and the like. In the data frame format, you can easily split one
 plan up into multiple, bind plans together with `bind_plans()` etc. 
 
-## Wildcard templating: a tool for generating lots of targets.
+In addition, drake uses static code analysis to detect dependencies among 
+targets which GNU Make is not capable of. In GNU Make, 
+all dependencies need to be delared manually, along with the build command.
+
+## Wildcard templating: a tool for generating lots of targets
 
 One advantage of using data frames to represent workflow plans becomes evident 
 with the introduction of wildcards. Wildcards are essentially placeholders 
