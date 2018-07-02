@@ -3,12 +3,12 @@
 ```{r loaddrake14, echo = FALSE}
 suppressPackageStartupMessages(library(drake))
 pkgconfig::set_config("drake::string_in_dots" = "literals")
-file.create("report.Rmd")
+tmp <- file.create("report.Rmd")
 ```
 
 ## What is a workflow plan data frame?
 
-Your workflow plan data frame is where you declare all the objects and files you are going to produce when you run your project. It enumerate each output item, or *target*, and the R *command* that will produce it. Here is the workflow plan from our [previous example](#hpc).
+Your workflow plan data frame is the object where you declare all the objects and files you are going to produce when you run your project. It enumerates each output item, or *target*, and the R *command* that will produce it. Here is the workflow plan from our [previous example](#hpc).
 
 ```{r firstexampleplan}
 plan <- drake_plan(
@@ -31,7 +31,7 @@ When you run `make(plan)`, `drake` will produce targets `raw_data`, `data`, `his
 
 ## Rationale
 
-Why go to the trouble of declaring all your targets in advance? Why put it all in a data frame? The workflow plan may seem like a burden to set up, but the rewards are worth the effort.
+The workflow plan may seem like a burden to set up, and the use of data frames may seem counterintuitive at first, but the rewards are worth the effort.
 
 ### You can skip up-to-date work.
 
