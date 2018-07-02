@@ -316,54 +316,6 @@ unlink(
 )
 ```
 
-## Generating workflow plan data frames
-
-`Drake` has the following functions to generate workflow plan data frames (the `plan` argument of `make()`, where you list your targets and commands). 
-
-- `drake_plan()`
-- `evaluate_plan()`
-- `expand_plan()`
-- `gather_plan()`
-- `reduce_plan()`
-- `plan_analyses()`
-- `plan_summaries()`
-
-Except for `drake_plan()`, they all use wildcards as templates. For example, suppose your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.
-
-```{r schoolswildcards1}
-hard_plan <- drake_plan(
-  credits = check_credit_hours(school__),
-  students = check_students(school__),
-  grads = check_graduations(school__),
-  public_funds = check_public_funding(school__)
-)
-
-evaluate_plan(
-  hard_plan,
-  rules = list(school__ = c("schoolA", "schoolB", "schoolC"))
-)
-```
-
-But what if some metrics do not make sense? For example, what if `schoolC` is a completely privately-funded school? With no public funds, `check_public_funds(schoolC)` may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.
-
-```{r schoolsplanfinal}
-plan_template <- drake_plan(
-  credits = check_credit_hours(all_schools__),
-  students = check_students(all_schools__),
-  grads = check_graduations(all_schools__),
-  public_funds = check_public_funding(public_schools__)
-)
-evaluate_plan(
-  plan = plan_template,
-  rules = list(
-    all_schools__ =  c("schoolA", "schoolB", "schoolC"),
-    public_schools__ = c("schoolA", "schoolB")
-  )
-)
-```
-
-Thanks to [Alex Axthelm](https://github.com/AlexAxthelm) for this use case in [issue 235](https://github.com/ropensci/drake/issues/235).
-
 ## Remote data sources
 
 Some workflows rely on remote data from the internet, and the workflow needs to refresh when the datasets change. As an example, let us consider the download logs of [CRAN packages](https://cran.r-project.org/).

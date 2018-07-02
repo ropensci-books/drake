@@ -192,7 +192,7 @@ Thanks to [Alex Axthelm](https://github.com/AlexAxthelm) for this use case in [i
 
 In the [`mtcars` example](#example-mtcars), we will analyze bootstrapped versions of the `mtcars` dataset to look for an association between the weight and the fuel efficiency of cars. This example uses `plan_analyses()` and `plan_summaries()`, two specialized applications of `evaluate_plan()`. First, we generate the plan for the bootstrapped datasets.
 
-```{r datasets}
+```{r datasets2}
 my_datasets <- drake_plan(
   small = simulate(48),
   large = simulate(64))
@@ -201,7 +201,7 @@ my_datasets
 
 We want to analyze each dataset with one of two regression models.
 
-```{r methods}
+```{r methods2}
 methods <- drake_plan(
   regression1 = reg1(dataset__),
   regression2 = reg2(dataset__))
@@ -210,14 +210,14 @@ methods
 
 We evaluate the `dataset__` wildcard to generate all the regression commands we will need.
 
-```{r analyses}
+```{r analyses2}
 my_analyses <- plan_analyses(methods, datasets = my_datasets)
 my_analyses
 ```
 
 Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.
 
-```{r summaries}
+```{r summaries2}
 summary_types <- drake_plan(
   summ = suppressWarnings(summary(analysis__$residuals)),
   coef = suppressWarnings(summary(analysis__))$coefficients
@@ -231,7 +231,7 @@ results
 
 Next, we bind all the rows together for a single plan that we can later supply to `make()`.
 
-```{r wholeplan04}
+```{r wholeplan2}
 my_plan <- rbind(my_datasets, my_analyses, results)
 my_plan
 ```

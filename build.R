@@ -41,7 +41,7 @@ faq <- function(){
   close(con)
 }
 
-faq()
+#faq()
 
 bookdown::render_book(
   input = "index.Rmd", 
