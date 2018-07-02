@@ -1,0 +1,307 @@
+# Workflow data frames {#plans}
+
+```{r loaddrake14, echo = FALSE}
+suppressPackageStartupMessages(library(drake))
+pkgconfig::set_config("drake::string_in_dots" = "literals")
+file.create("report.Rmd")
+```
+
+## What is a workflow plan data frame?
+
+Your workflow plan data frame is where you declare all the objects and files you are going to produce when you run your project. It enumerate each output item, or *target*, and the R *command* that will produce it. Here is the workflow plan from our [previous example](#hpc).
+
+```{r firstexampleplan}
+plan <- drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Species = forcats::fct_inorder(Species)) %>%
+    select(-X__1),
+  hist = create_plot(data),
+  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  )
+)
+plan
+```
+
+When you run `make(plan)`, `drake` will produce targets `raw_data`, `data`, `hist`, `fit`, and `report.Rmd`.
+
+## Rationale
+
+Why go to the trouble of declaring all your targets in advance? Why put it all in a data frame? The workflow plan may seem like a burden to set up, but the rewards are worth the effort.
+
+### You can skip up-to-date work.
+
+As we saw in our [previous example](#hpc), repeated `make()`s skip work that is already up to date. The reason `drake` can skip things is that you declared all the skippable steps as targets in the workflow plan. Thus, workflow plans are vital to the time savings `drake` brings to large projects.
+
+This approach of declaring targets in advance has stood the test of time. The idea dates at least as far back as [GNU Make](https://www.gnu.org/software/make/), which uses  `Makefile`s to declare targets and dependencies. `drake`'s predecessor [`remake`](https://github.com/richfitz/remake) uses [`YAML`](http://yaml.org/) files in a similar way.
+
+### You do not need to worry about which targets run first.
+
+When you call `make()` on the plan above, `drake` takes care of `"raw_data.xlsx"`, then `raw_data`, and then `data` in sequence. Once `data` completes, `fit` and `hist` can start in any order, and then `"report.md"` begins once everything else is done. Because `drake` analyzes your commands for dependencies, it always builds your targets in this correct order. That means you can rearrange the rows of the workflow plan in any way you want, which is not the case with lines in an R script or code chunks in a `knitr` report.
+
+```{r firstexampleplan2}
+drake_plan(
+  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  ),
+  hist = create_plot(data),
+  data = raw_data %>%
+    mutate(Species = forcats::fct_inorder(Species)) %>%
+    select(-X__1),
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx"))
+)
+```
+
+
+### Data frames scale well.
+
+`Makefile`s are successful for [Make](https://www.gnu.org/software/make/) because they accommodate software written in multiple languages. However, such external configuration files are not the best solution for R. Maintaining a `Makefile` or a [`remake`](https://github.com/richfitz/remake) [`YAML`](http://yaml.org/) file requires a lot of manual typing. But with `drake` plans, you can use the usual data frame manipulation tools to expand, generate, and piece together large projets. The [gsp example](#example-gsp) shows how `expand.grid()` and `rbind()` to automatically create plans with hundreds of targets. In addition, `drake` has a wildcard templating mechanism to generate large plans.
+
+
+## Generating large workflow plans
+
+`drake` provides many more utilites that increase the flexibility of workflow plan generation beyond `expand.grid()`.
+
+- `drake_plan()`
+- `evaluate_plan()`
+- `plan_analyses()`
+- `plan_summaries()`
+- `expand_plan()`
+- `gather_plan()`
+- `reduce_plan()`
+
+### Wildcard templating
+
+In `drake`, you can write plans with wildcards. These wilrdards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let's say you are running a simulation study, and you need to generate sets of random numbers from different distributions.
+
+
+```{r evaluteplan1}
+plan <- drake_plan(
+  t  = rt(1000, df = 5),
+  normal = runif(1000, mean = 0, sd = 1)
+)
+```
+
+If you need to generate many datasets with different means, you may wish to write out each target individually.
+
+```{r evaluteplan2, eval = FALSE}
+drake_plan(
+  t  = rt(1000, df = 5),
+  normal_0 = runif(1000, mean = 0, sd = 1),
+  normal_1 = runif(1000, mean = 1, sd = 1),
+  normal_2 = runif(1000, mean = 2, sd = 1),
+  normal_3 = runif(1000, mean = 3, sd = 1),
+  normal_4 = runif(1000, mean = 4, sd = 1),
+  normal_5 = runif(1000, mean = 5, sd = 1),
+  normal_6 = runif(1000, mean = 6, sd = 1),
+  normal_7 = runif(1000, mean = 7, sd = 1),
+  normal_8 = runif(1000, mean = 8, sd = 1),
+  normal_9 = runif(1000, mean = 9, sd = 1)
+)
+```
+
+But writing all that code manually is a pain and prone to human error. Instead, use `evaluate_plan()`
+
+```{r evaluateplan3}
+plan <- drake_plan(
+  t  = rt(1000, df = 5),
+  normal = runif(1000, mean = mean__, sd = 1)
+)
+evaluate_plan(plan, wildcard = "mean__", values = 0:9)
+```
+
+You can specify multiple wildcards at once. If multiple wildcards appear in the same command, you will get a new target for each unique combination of values.
+
+```{r evaluateplan4}
+plan <- drake_plan(
+  t  = rt(1000, df = df__),
+  normal = runif(1000, mean = mean__, sd = sd__)
+)
+evaluate_plan(
+  plan,
+  rules = list(
+    mean__ = c(0, 1),
+    sd__ = c(3, 4),
+    df__ = 5:7
+  )
+)
+```
+
+Set `expand` to `FALSE` to disable expansion.
+
+```{r noexpand}
+plan <- drake_plan(
+  t  = rpois(samples__, lambda = mean__),
+  normal = runif(samples__, mean = mean__)
+)
+evaluate_plan(
+  plan,
+  rules = list(
+    samples__ = c(50, 100),
+    mean__ = c(1, 5)
+  ),
+  expand = FALSE
+)
+```
+
+Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.
+
+```{r schoolswildcards1}
+hard_plan <- drake_plan(
+  credits = check_credit_hours(school__),
+  students = check_students(school__),
+  grads = check_graduations(school__),
+  public_funds = check_public_funding(school__)
+)
+
+evaluate_plan(
+  hard_plan,
+  rules = list(school__ = c("schoolA", "schoolB", "schoolC"))
+)
+```
+
+But what if some metrics do not make sense? For example, what if `schoolC` is a completely privately-funded school? With no public funds, `check_public_funds(schoolC)` may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.
+
+```{r schoolsplanfinal}
+plan_template <- drake_plan(
+  credits = check_credit_hours(all_schools__),
+  students = check_students(all_schools__),
+  grads = check_graduations(all_schools__),
+  public_funds = check_public_funding(public_schools__)
+)
+evaluate_plan(
+  plan = plan_template,
+  rules = list(
+    all_schools__ =  c("schoolA", "schoolB", "schoolC"),
+    public_schools__ = c("schoolA", "schoolB")
+  )
+)
+```
+
+Thanks to [Alex Axthelm](https://github.com/AlexAxthelm) for this use case in [issue 235](https://github.com/ropensci/drake/issues/235).
+
+
+### Specialized wildcard functionality
+
+In the [`mtcars` example](#example-mtcars), we will analyze bootstrapped versions of the `mtcars` dataset to look for an association between the weight and the fuel efficiency of cars. This example uses `plan_analyses()` and `plan_summaries()`, two specialized applications of `evaluate_plan()`. First, we generate the plan for the bootstrapped datasets.
+
+```{r datasets}
+my_datasets <- drake_plan(
+  small = simulate(48),
+  large = simulate(64))
+my_datasets
+```
+
+We want to analyze each dataset with one of two regression models.
+
+```{r methods}
+methods <- drake_plan(
+  regression1 = reg1(dataset__),
+  regression2 = reg2(dataset__))
+methods
+```
+
+We evaluate the `dataset__` wildcard to generate all the regression commands we will need.
+
+```{r analyses}
+my_analyses <- plan_analyses(methods, datasets = my_datasets)
+my_analyses
+```
+
+Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.
+
+```{r summaries}
+summary_types <- drake_plan(
+  summ = suppressWarnings(summary(analysis__$residuals)),
+  coef = suppressWarnings(summary(analysis__))$coefficients
+)
+summary_types
+
+results <- plan_summaries(summary_types, analyses = my_analyses,
+  datasets = my_datasets, gather = NULL) # Gathering is suppressed here.
+results
+```
+
+Next, we bind all the rows together for a single plan that we can later supply to `make()`.
+
+```{r wholeplan04}
+my_plan <- rbind(my_datasets, my_analyses, results)
+my_plan
+```
+
+
+### Non-wildcard functions
+
+#### `expand_plan()`
+
+Sometimes, you just want multiple replicates of the same targets.
+
+```{r expandplan}
+plan <- drake_plan(
+  fake_data = simulate_from_model(),
+  bootstrapped_data = bootstrap_from_real_data(real_data)
+)
+expand_plan(plan, values = 1:3)
+```
+
+
+#### `gather_plan()`
+
+Other times, you want to combine multiple targets into one. 
+
+```{r gather1}
+plan <- drake_plan(
+  small = data.frame(type = "small", x = rnorm(25), y = rnorm(25)),
+  large = data.frame(type = "large", x = rnorm(1000), y = rnorm(1000))
+)
+gather_plan(plan, target = "combined")
+```
+
+In this case, `small` and `large` are data frames, so it may be more convenient to combine the rows together.
+
+```{r gather2}
+gather_plan(plan, target = "combined", gather = "rbind")
+```
+
+#### `reduce_plan()`
+
+`reduce_plan()` is similar to `gather_plan()`, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.
+
+```{r reduceplan}
+plan <- drake_plan(
+  a = 1,
+  b = 2,
+  c = 3,
+  d = 4
+)
+reduce_plan(plan)
+```
+
+You can control how each pair of targets gets combined.
+
+```{r reduceplan2}
+reduce_plan(plan, begin = "c(", op = ", ", end = ")")
+```
+
+
+## Optional columns in your plan.
+
+Besides the usual columns `target` and `command`, there are other columns you can add.
+
+- `cpu`, `elapsed`, and `timeout`: number of seconds to wait for the target to build before timing out (`timeout` for a general upper bound, `cpu` for CPU time, and `elapsed` for elapsed time).
+- `priority`: for [paralllel computing](#hpc), optionally rank the targets according to priority. That way, when two targets become ready to build at the same time, `drake` will pick the one with the dominant priority first.
+- `retries`: number of times to retry building a target in the event of an error.
+- `trigger`: choose the criterion that `drake` uses to decide whether to build the target. See `?triggers` to learn more.
+- `worker`: for [paralllel computing](#hpc), optionally name the preferred worker to assign to each target. 
+
+
+```{r enddrake14, echo = FALSE}
+unlink("report.Rmd")
+```
