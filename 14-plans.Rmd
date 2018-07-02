@@ -1,45 +1,38 @@
 # Workflow data frames {#workflow-df}
 
-This chapter provides a systematic introduction to workflow data frames, how 
-you can create - modify and execute them. We'll therefore introduce a minimal 
-example.
+This chapter is all about workflow plan data frames and how to create, modify, and execute them.
 
 ## What is a workflow plan data frame?
 
-The workflow plan data frame is one of the main pillars of drake and the main 
-input to `make()`. 
-The purpose of a plan is to declare the data objects and files you are going to 
-produce later on. We refer to these as *targets*. You can declare targets in 
-any order and drake will figure out the order of execution. You can construct 
-one conveniently with `drake_plan()`. Below, we create a plan with two targets:
-```{r}
+### A manifesto of targets
+
+The purpose of the plan to declare the data objects and files you are going to produce when you run your project later on. These object/file outputs are called *targets*.
+
+```{r what-is-a-plan}
 library(drake)
 plan <- drake_plan(
-  uniform = runif(10), 
-  normal  = rnorm(50)
+  average = mean(c(normal, uniform)),
+  normal  = rnorm(50),
+  uniform = runif(10)
 )
 plan
 ```
-In plain English, we want to obtain 10 values from the uniform distribution and
-50 from the normal distribution. Let's do it:
-```{r}
+
+Creating the plan does not actually build our targets `uniform` and `normal`. For that, we have to use `make()`.
+
+```{r what-is-a-plan-make}
 make(plan)
 ```
 
-This is it. Now you might wonder where these two targets are stored. They
-live in the drake cache. To make them available in your R session, you can 
-either load them into the global environment with `loadd()` (which is called
-for its side effects) or with `readd()` (which returns the target itself and has
-no side effects.). That means that you can treat the return value of `readd()`
-as any other R object.
-```{r}
+The targets live in a cache (`.drake/` folder), and you can access them with the `loadd()` and `readd()` functions.
+
+
+```{r what-is-a-plan-readd}
 mean(readd(uniform))
 ```
 
-Note that creating the plan does not run any of the code in the `command` 
-column, that will only happen when you call `make()` on the plan.
+### The plan is just a data frame.
 
-A workflow plan data frame is what the name says, it is a data frame. 
 ```{r}
 class(plan)
 ```
@@ -57,7 +50,7 @@ plan$my_col <- "my_custom_column"
 plan
 ```
 
-## Why making a plan?
+## Why make a plan?
 
 Ok, fine, you might think. I can also run `runif(10)` in my console, why should
 I use this complicated workflow? In brief because if your project grows in size 
