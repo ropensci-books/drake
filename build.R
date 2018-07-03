@@ -33,7 +33,7 @@ faq <- function(){
   urls <- combine_fields(faq, "html_url")
   links <- paste0("- [", titles, "](", urls, ")")
 
-  dest <- "13-faq.Rmd"
+  dest <- "14-faq.Rmd"
   tmp <- file.copy(from = "faq-stub.md", to = dest, overwrite = TRUE)
   
   con <- file(dest, "a")
@@ -41,8 +41,8 @@ faq <- function(){
   close(con)
 }
 
-#faq()
-
+faq()
+drake::clean(destroy = TRUE)
 bookdown::render_book(
   input = "index.Rmd", 
   output_format = "bookdown::gitbook",
