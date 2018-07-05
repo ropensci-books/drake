@@ -1,5 +1,5 @@
-#!/bin/bash
-
+#!/bin/sh
+echo "begin deploying"
 set -e
 
 [ -z "${GITHUB_PAT}" ] && exit 0
@@ -14,3 +14,4 @@ cp -r ../_book/* ./
 git add --all *
 git commit -m "Update the manual" || true
 git push -q origin gh-pages
+echo "done deploying"
