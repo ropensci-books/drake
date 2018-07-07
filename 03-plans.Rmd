@@ -2,7 +2,7 @@
 
 ```{r loaddrake14, echo = FALSE}
 suppressPackageStartupMessages(library(drake))
-pkgconfig::set_config("drake::string_in_dots" = "literals")
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
 tmp <- file.create("report.Rmd")
 ```
 
@@ -171,6 +171,7 @@ But what if some metrics do not make sense? For example, what if `schoolC` is a 
 
 ```{r schoolsplanfinal}
 plan_template <- drake_plan(
+  school = get_school_data("school__"),
   credits = check_credit_hours(all_schools__),
   students = check_students(all_schools__),
   grads = check_graduations(all_schools__),
@@ -179,9 +180,11 @@ plan_template <- drake_plan(
 evaluate_plan(
   plan = plan_template,
   rules = list(
-    all_schools__ =  c("schoolA", "schoolB", "schoolC"),
-    public_schools__ = c("schoolA", "schoolB")
-  )
+    school__ = c("A", "B", "C"),
+    all_schools__ =  c("school_A", "school_B", "school_C"),
+    public_schools__ = c("school_A", "school_B")
+  ),
+  trace = TRUE
 )
 ```
 
@@ -194,7 +197,7 @@ With `evaluate_plan(trace = TRUE)`, you can generate columns that show how the t
 
 ```{r trace1}
 plan_template <- drake_plan(
-  school = get_school_data(school__),
+  school = get_school_data("school__"),
   credits = check_credit_hours(all_schools__),
   students = check_students(all_schools__),
   grads = check_graduations(all_schools__),
@@ -224,8 +227,7 @@ config <- drake_config(plan)
 vis_drake_graph(
   config,
   group = "all_schools__",
-  clusters = c("school_A", "school_B", "school_C"),
-  targets_only = TRUE
+  clusters = c("school_A", "school_B", "school_C")
 )
 ```
 
@@ -345,5 +347,6 @@ Besides the usual columns `target` and `command`, there are other columns you ca
 
 
 ```{r enddrake14, echo = FALSE}
+drake::clean(destroy = TRUE)
 unlink("report.Rmd")
 ```
