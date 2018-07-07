@@ -174,8 +174,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="3.3" data-path="plans.html"><a href="plans.html#generating-large-workflow-plans"><i class="fa fa-check"></i><b>3.3</b> Generating large workflow plans</a><ul>
 <li class="chapter" data-level="3.3.1" data-path="plans.html"><a href="plans.html#wildcard-templating"><i class="fa fa-check"></i><b>3.3.1</b> Wildcard templating</a></li>
-<li class="chapter" data-level="3.3.2" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>3.3.2</b> Specialized wildcard functionality</a></li>
-<li class="chapter" data-level="3.3.3" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>3.3.3</b> Non-wildcard functions</a></li>
+<li class="chapter" data-level="3.3.2" data-path="plans.html"><a href="plans.html#wildcard-clusters"><i class="fa fa-check"></i><b>3.3.2</b> Wildcard clusters</a></li>
+<li class="chapter" data-level="3.3.3" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>3.3.3</b> Specialized wildcard functionality</a></li>
+<li class="chapter" data-level="3.3.4" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>3.3.4</b> Non-wildcard functions</a></li>
 </ul></li>
 <li class="chapter" data-level="3.4" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>3.4</b> Optional columns in your plan.</a></li>
 </ul></li>
@@ -554,8 +555,57 @@ plan
 ## 11 public_funds_schoolB check_public_funding(schoolB)</code></pre>
 <p>Thanks to <a href="https://github.com/AlexAxthelm">Alex Axthelm</a> for this use case in <a href="https://github.com/ropensci/drake/issues/235">issue 235</a>.</p>
 </div>
+<div id="wildcard-clusters" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Wildcard clusters</h3>
+<p>With <code>evaluate_plan(trace = TRUE)</code>, you can generate columns that show how the targets were generated from the wildcards.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">school =</span> <span class="kw">get_school_data</span>(school__),
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)
+)
+plan &lt;-<span class="st"> </span><span class="kw">evaluate_plan</span>(
+  <span class="dt">plan =</span> plan_template,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),
+    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),
+    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)
+  ),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+plan
+## # A tibble: 14 x 5
+##    target                command   school__ all_schools__ public_schools__
+##  * &lt;chr&gt;                 &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;           
+##  1 school_A              get_scho… A        &lt;NA&gt;          &lt;NA&gt;            
+##  2 school_B              get_scho… B        &lt;NA&gt;          &lt;NA&gt;            
+##  3 school_C              get_scho… C        &lt;NA&gt;          &lt;NA&gt;            
+##  4 credits_school_A      check_cr… &lt;NA&gt;     school_A      &lt;NA&gt;            
+##  5 credits_school_B      check_cr… &lt;NA&gt;     school_B      &lt;NA&gt;            
+##  6 credits_school_C      check_cr… &lt;NA&gt;     school_C      &lt;NA&gt;            
+##  7 students_school_A     check_st… &lt;NA&gt;     school_A      &lt;NA&gt;            
+##  8 students_school_B     check_st… &lt;NA&gt;     school_B      &lt;NA&gt;            
+##  9 students_school_C     check_st… &lt;NA&gt;     school_C      &lt;NA&gt;            
+## 10 grads_school_A        check_gr… &lt;NA&gt;     school_A      &lt;NA&gt;            
+## 11 grads_school_B        check_gr… &lt;NA&gt;     school_B      &lt;NA&gt;            
+## 12 grads_school_C        check_gr… &lt;NA&gt;     school_C      &lt;NA&gt;            
+## 13 public_funds_school_A check_pu… &lt;NA&gt;     &lt;NA&gt;          school_A        
+## 14 public_funds_school_B check_pu… &lt;NA&gt;     &lt;NA&gt;          school_B</code></pre>
+<p>And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">vis_drake_graph</span>(
+  config,
+  <span class="dt">group =</span> <span class="st">&quot;all_schools__&quot;</span>,
+  <span class="dt">clusters =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),
+  <span class="dt">targets_only =</span> <span class="ot">TRUE</span>
+)</code></pre>
+<div id="htmlwidget-e2045036e7a6211c2d88" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e2045036e7a6211c2d88">{"x":{"nodes":{"id":["public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"label":["public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"command":["check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(A)","get_school_data(B)","get_school_data(C)","check_credit_hours(school_A)","check_credit_hours(school_B)","check_credit_hours(school_C)"],"school__":[null,null,"A","B","C",null,null,null],"all_schools__":[null,null,null,null,null,"school_A","school_B","school_C"],"public_schools__":["school_A","school_B",null,null,null,null,null,null],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","cluster","cluster","cluster"],"font.size":[20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","diamond","diamond","diamond"],"level":[2,2,1,1,1,2,2,2],"hover_label":["check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(A)","get_school_data(B)","get_school_data(C)","credits_school_A, grads_school_A, students_school_A","credits_school_B, grads_school_B, students_school_B","credits_school_C, grads_school_C, students_school_C"],"x":[-1,0,-0.75,0.25,1,-0.5,0.5,1],"y":[1,1,-1,-1,-1,1,1,1]},"edges":{"from":["school_A","school_A","school_B","school_B","school_C"],"to":["all_schools__: school_A","public_funds_school_A","all_schools__: school_B","public_funds_school_B","all_schools__: school_C"],"arrows":["to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object","Cluster"],"color":["#000000","#888888","#888888"],"shape":["dot","dot","diamond"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[2,7,10]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>See the <a href="vis.html#vis">visualization guide</a> for more details.</p>
+</div>
 <div id="specialized-wildcard-functionality" class="section level3">
-<h3><span class="header-section-number">3.3.2</span> Specialized wildcard functionality</h3>
+<h3><span class="header-section-number">3.3.3</span> Specialized wildcard functionality</h3>
 <p>In the <a href="#example-mtcars"><code>mtcars</code> example</a>, we will analyze bootstrapped versions of the <code>mtcars</code> dataset to look for an association between the weight and the fuel efficiency of cars. This example uses <code>plan_analyses()</code> and <code>plan_summaries()</code>, two specialized applications of <code>evaluate_plan()</code>. First, we generate the plan for the bootstrapped datasets.</p>
 <pre class="sourceCode r"><code class="sourceCode r">my_datasets &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
@@ -634,9 +684,9 @@ my_plan
 ## 14 coef_regression2_large suppressWarnings(summary(regression2_large))$co…</code></pre>
 </div>
 <div id="non-wildcard-functions" class="section level3">
-<h3><span class="header-section-number">3.3.3</span> Non-wildcard functions</h3>
+<h3><span class="header-section-number">3.3.4</span> Non-wildcard functions</h3>
 <div id="expand_plan" class="section level4">
-<h4><span class="header-section-number">3.3.3.1</span> <code>expand_plan()</code></h4>
+<h4><span class="header-section-number">3.3.4.1</span> <code>expand_plan()</code></h4>
 <p>Sometimes, you just want multiple replicates of the same targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">fake_data =</span> <span class="kw">simulate_from_model</span>(),
@@ -654,7 +704,7 @@ my_plan
 ## 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</code></pre>
 </div>
 <div id="gather_plan" class="section level4">
-<h4><span class="header-section-number">3.3.3.2</span> <code>gather_plan()</code></h4>
+<h4><span class="header-section-number">3.3.4.2</span> <code>gather_plan()</code></h4>
 <p>Other times, you want to combine multiple targets into one.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">small =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>)),
@@ -673,7 +723,7 @@ my_plan
 ## 1 combined rbind(small = small, large = large)</code></pre>
 </div>
 <div id="reduce_plan" class="section level4">
-<h4><span class="header-section-number">3.3.3.3</span> <code>reduce_plan()</code></h4>
+<h4><span class="header-section-number">3.3.4.3</span> <code>reduce_plan()</code></h4>
 <p><code>reduce_plan()</code> is similar to <code>gather_plan()</code>, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">a =</span> <span class="dv">1</span>,
