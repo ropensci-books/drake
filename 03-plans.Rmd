@@ -188,6 +188,49 @@ evaluate_plan(
 Thanks to [Alex Axthelm](https://github.com/AlexAxthelm) for this use case in [issue 235](https://github.com/ropensci/drake/issues/235).
 
 
+### Wildcard clusters
+
+With `evaluate_plan(trace = TRUE)`, you can generate columns that show how the targets were generated from the wildcards.
+
+```{r trace1}
+plan_template <- drake_plan(
+  school = get_school_data(school__),
+  credits = check_credit_hours(all_schools__),
+  students = check_students(all_schools__),
+  grads = check_graduations(all_schools__),
+  public_funds = check_public_funding(public_schools__)
+)
+plan <- evaluate_plan(
+  plan = plan_template,
+  rules = list(
+    school__ = c("A", "B", "C"),
+    all_schools__ =  c("school_A", "school_B", "school_C"),
+    public_schools__ = c("school_A", "school_B")
+  ),
+  trace = TRUE
+)
+plan
+```
+
+And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.
+
+```{r tracevis1hide, echo = FALSE}
+check_credit_hours <- check_students <- check_graduations <-
+  check_public_funding <- get_school_data <- function(){}
+```
+
+```{r tracevis1}
+config <- drake_config(plan)
+vis_drake_graph(
+  config,
+  group = "all_schools__",
+  clusters = c("school_A", "school_B", "school_C"),
+  targets_only = TRUE
+)
+```
+
+See the [visualization guide](#vis) for more details.
+
 ### Specialized wildcard functionality
 
 In the [`mtcars` example](#example-mtcars), we will analyze bootstrapped versions of the `mtcars` dataset to look for an association between the weight and the fuel efficiency of cars. This example uses `plan_analyses()` and `plan_summaries()`, two specialized applications of `evaluate_plan()`. First, we generate the plan for the bootstrapped datasets.
@@ -235,7 +278,6 @@ Next, we bind all the rows together for a single plan that we can later supply t
 my_plan <- rbind(my_datasets, my_analyses, results)
 my_plan
 ```
-
 
 ### Non-wildcard functions
 
