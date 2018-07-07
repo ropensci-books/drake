@@ -1,18 +1,9 @@
 language: R
-sudo: false
-cache:
-  packages: true
-  directories:
-  - _bookdown_files
-  - $HOME/.npm
+cache: packages
 
-before_install:
-- npm install netlify-cli -g
+before_script:
+  - chmod +x ./deploy.sh
 
 script:
-- Rscript build.R
-
-deploy:
-  provider: script
-  script: netlify deploy -t $NETLIFYKEY
-  skip_cleanup: true
+  - Rscript build.R
+  - ./deploy.sh
