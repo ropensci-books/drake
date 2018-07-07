@@ -95,7 +95,7 @@ vis_drake_graph(config, ncol_legend = 0)
 
 With the `group` and `clusters` arguments to `vis_drake_graph()` and `drake_graph_info()`, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [workflow plan guide](#plans). Our plan was generated with `evaluate_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
 
-```{r tracevis1}
+```{r tracevisgraph1}
 plan_template <- drake_plan(
   school = get_school_data("school__"),
   credits = check_credit_hours(all_schools__),
@@ -117,7 +117,7 @@ plan
 
 Ordinarily, the workflow graph gives a separate node to each individual import object or target.
 
-```{r tracevis1hide, echo = FALSE}
+```{r tracevisgraphhide1, echo = FALSE}
 check_credit_hours <- check_students <- check_graduations <-
   check_public_funding <- get_school_data <- function(){}
 ```
@@ -130,7 +130,7 @@ vis_drake_graph(config)
 For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument of `vis_drake_graph()`, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(config)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
 
 
-```{r tracevis1}
+```{r tracevisgraph2}
 config <- drake_config(plan)
 vis_drake_graph(
   config,
