@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>The drake R Package User Manual</title>
+  <meta name="description" content="The drake R Package User Manual">
+  <meta name="generator" content="bookdown 0.7.13 and GitBook 2.6.7">
+
+  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The drake R Package User Manual" />
+  
+  
+  
+
+<meta name="author" content="Will Landau, Alex Axthelm, Jasper Clarkberg, Kirill Müller, Lorenz Walthert, Ben Marwick, and Peter Slaughter">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="store.html">
+<link rel="next" href="faq.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.4/visNetwork.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.1</b> The drake R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.2</b> Installation</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.3</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.3.1</b> What gets done stays done.</a></li>
+<li class="chapter" data-level="1.3.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.3.2</b> Reproducibility with confidence</a></li>
+<li class="chapter" data-level="1.3.3" data-path="index.html"><a href="index.html#aggressively-scale-up."><i class="fa fa-check"></i><b>1.3.3</b> Aggressively scale up.</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.4</b> Documentation</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="index.html"><a href="index.html#cheat-sheet"><i class="fa fa-check"></i><b>1.4.1</b> Cheat sheet</a></li>
+<li class="chapter" data-level="1.4.2" data-path="index.html"><a href="index.html#frequently-asked-questions"><i class="fa fa-check"></i><b>1.4.2</b> Frequently asked questions</a></li>
+<li class="chapter" data-level="1.4.3" data-path="index.html"><a href="index.html#function-reference"><i class="fa fa-check"></i><b>1.4.3</b> Function reference</a></li>
+<li class="chapter" data-level="1.4.4" data-path="index.html"><a href="index.html#tutorials"><i class="fa fa-check"></i><b>1.4.4</b> Tutorials</a></li>
+<li class="chapter" data-level="1.4.5" data-path="index.html"><a href="index.html#examples"><i class="fa fa-check"></i><b>1.4.5</b> Examples</a></li>
+<li class="chapter" data-level="1.4.6" data-path="index.html"><a href="index.html#presentations"><i class="fa fa-check"></i><b>1.4.6</b> Presentations</a></li>
+<li class="chapter" data-level="1.4.7" data-path="index.html"><a href="index.html#real-example-projects"><i class="fa fa-check"></i><b>1.4.7</b> Real example projects</a></li>
+<li class="chapter" data-level="1.4.8" data-path="index.html"><a href="index.html#context-and-history"><i class="fa fa-check"></i><b>1.4.8</b> Context and history</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.5</b> Help and troubleshooting</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#similar-work"><i class="fa fa-check"></i><b>1.6</b> Similar work</a><ul>
+<li class="chapter" data-level="1.6.1" data-path="index.html"><a href="index.html#gnu-make"><i class="fa fa-check"></i><b>1.6.1</b> GNU Make</a></li>
+<li class="chapter" data-level="1.6.2" data-path="index.html"><a href="index.html#remake"><i class="fa fa-check"></i><b>1.6.2</b> Remake</a></li>
+<li class="chapter" data-level="1.6.3" data-path="index.html"><a href="index.html#memoise"><i class="fa fa-check"></i><b>1.6.3</b> Memoise</a></li>
+<li class="chapter" data-level="1.6.4" data-path="index.html"><a href="index.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>1.6.4</b> Knitr and R Markdown</a></li>
+<li class="chapter" data-level="1.6.5" data-path="index.html"><a href="index.html#factuals-drake"><i class="fa fa-check"></i><b>1.6.5</b> Factual’s Drake</a></li>
+<li class="chapter" data-level="1.6.6" data-path="index.html"><a href="index.html#other-pipeline-toolkits"><i class="fa fa-check"></i><b>1.6.6</b> Other pipeline toolkits</a></li>
+</ul></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>1.7</b> Acknowledgements</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="example-main.html"><a href="example-main.html"><i class="fa fa-check"></i><b>2</b> The main example</a><ul>
+<li class="chapter" data-level="2.1" data-path="example-main.html"><a href="example-main.html#set-the-stage."><i class="fa fa-check"></i><b>2.1</b> Set the stage.</a></li>
+<li class="chapter" data-level="2.2" data-path="example-main.html"><a href="example-main.html#make-your-results."><i class="fa fa-check"></i><b>2.2</b> Make your results.</a></li>
+<li class="chapter" data-level="2.3" data-path="example-main.html"><a href="example-main.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>2.3</b> Go back and fix things.</a></li>
+<li class="chapter" data-level="2.4" data-path="example-main.html"><a href="example-main.html#try-it-yourself"><i class="fa fa-check"></i><b>2.4</b> Try it yourself!</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>3</b> Workflow data frames</a><ul>
+<li class="chapter" data-level="3.1" data-path="plans.html"><a href="plans.html#what-is-a-workflow-plan-data-frame"><i class="fa fa-check"></i><b>3.1</b> What is a workflow plan data frame?</a></li>
+<li class="chapter" data-level="3.2" data-path="plans.html"><a href="plans.html#rationale"><i class="fa fa-check"></i><b>3.2</b> Rationale</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="plans.html"><a href="plans.html#you-can-skip-up-to-date-work."><i class="fa fa-check"></i><b>3.2.1</b> You can skip up-to-date work.</a></li>
+<li class="chapter" data-level="3.2.2" data-path="plans.html"><a href="plans.html#you-do-not-need-to-worry-about-which-targets-run-first."><i class="fa fa-check"></i><b>3.2.2</b> You do not need to worry about which targets run first.</a></li>
+<li class="chapter" data-level="3.2.3" data-path="plans.html"><a href="plans.html#data-frames-scale-well."><i class="fa fa-check"></i><b>3.2.3</b> Data frames scale well.</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="plans.html"><a href="plans.html#generating-large-workflow-plans"><i class="fa fa-check"></i><b>3.3</b> Generating large workflow plans</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="plans.html"><a href="plans.html#wildcard-templating"><i class="fa fa-check"></i><b>3.3.1</b> Wildcard templating</a></li>
+<li class="chapter" data-level="3.3.2" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>3.3.2</b> Specialized wildcard functionality</a></li>
+<li class="chapter" data-level="3.3.3" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>3.3.3</b> Non-wildcard functions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>3.4</b> Optional columns in your plan.</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="example-packages.html"><a href="example-packages.html"><i class="fa fa-check"></i><b>4</b> Example: R package download trends</a><ul>
+<li class="chapter" data-level="4.1" data-path="example-packages.html"><a href="example-packages.html#get-the-code."><i class="fa fa-check"></i><b>4.1</b> Get the code.</a></li>
+<li class="chapter" data-level="4.2" data-path="example-packages.html"><a href="example-packages.html#overview"><i class="fa fa-check"></i><b>4.2</b> Overview</a></li>
+<li class="chapter" data-level="4.3" data-path="example-packages.html"><a href="example-packages.html#analysis"><i class="fa fa-check"></i><b>4.3</b> Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="example-packages.html"><a href="example-packages.html#what-remote-data-sources-in-general"><i class="fa fa-check"></i><b>4.4</b> What remote data sources in general?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="example-gsp.html"><a href="example-gsp.html"><i class="fa fa-check"></i><b>5</b> Example: gross state products</a><ul>
+<li class="chapter" data-level="5.1" data-path="example-gsp.html"><a href="example-gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
+<li class="chapter" data-level="5.2" data-path="example-gsp.html"><a href="example-gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>5.2</b> Objective and methods</a></li>
+<li class="chapter" data-level="5.3" data-path="example-gsp.html"><a href="example-gsp.html#data"><i class="fa fa-check"></i><b>5.3</b> Data</a></li>
+<li class="chapter" data-level="5.4" data-path="example-gsp.html"><a href="example-gsp.html#analysis-1"><i class="fa fa-check"></i><b>5.4</b> Analysis</a></li>
+<li class="chapter" data-level="5.5" data-path="example-gsp.html"><a href="example-gsp.html#results"><i class="fa fa-check"></i><b>5.5</b> Results</a></li>
+<li class="chapter" data-level="5.6" data-path="example-gsp.html"><a href="example-gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>5.6</b> Comparison with GNU Make</a></li>
+<li class="chapter" data-level="5.7" data-path="example-gsp.html"><a href="example-gsp.html#references"><i class="fa fa-check"></i><b>5.7</b> References</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>6</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="6.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>6.1</b> Get the code.</a></li>
+<li class="chapter" data-level="6.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>6.2</b> Quick examples</a></li>
+<li class="chapter" data-level="6.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>6.3</b> The motivation of the mtcars example</a></li>
+<li class="chapter" data-level="6.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>6.4</b> Set up the mtcars example</a></li>
+<li class="chapter" data-level="6.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>6.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="6.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-workflow-plan"><i class="fa fa-check"></i><b>6.6</b> Generate the workflow plan</a></li>
+<li class="chapter" data-level="6.7" data-path="mtcars.html"><a href="mtcars.html#flexible-workflow-plan-generation"><i class="fa fa-check"></i><b>6.7</b> Flexible workflow plan generation</a></li>
+<li class="chapter" data-level="6.8" data-path="mtcars.html"><a href="mtcars.html#run-the-workflow"><i class="fa fa-check"></i><b>6.8</b> Run the workflow</a></li>
+<li class="chapter" data-level="6.9" data-path="mtcars.html"><a href="mtcars.html#automatic-watching-for-changed-dependencies"><i class="fa fa-check"></i><b>6.9</b> Automatic watching for changed dependencies</a></li>
+<li class="chapter" data-level="6.10" data-path="mtcars.html"><a href="mtcars.html#a-note-on-tidy-evaluation"><i class="fa fa-check"></i><b>6.10</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="6.11" data-path="mtcars.html"><a href="mtcars.html#need-more-speed"><i class="fa fa-check"></i><b>6.11</b> Need more speed?</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="best-practices.html"><a href="best-practices.html"><i class="fa fa-check"></i><b>7</b> General best practices for drake projects</a><ul>
+<li class="chapter" data-level="7.1" data-path="best-practices.html"><a href="best-practices.html#how-to-organize-your-files"><i class="fa fa-check"></i><b>7.1</b> How to organize your files</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="best-practices.html"><a href="best-practices.html#examples-1"><i class="fa fa-check"></i><b>7.1.1</b> Examples</a></li>
+<li class="chapter" data-level="7.1.2" data-path="best-practices.html"><a href="best-practices.html#where-do-you-put-your-code"><i class="fa fa-check"></i><b>7.1.2</b> Where do you put your code?</a></li>
+<li class="chapter" data-level="7.1.3" data-path="best-practices.html"><a href="best-practices.html#remember-your-commands-are-code-chunks-not-r-scripts"><i class="fa fa-check"></i><b>7.1.3</b> Remember: your commands are code chunks, not R scripts</a></li>
+<li class="chapter" data-level="7.1.4" data-path="best-practices.html"><a href="best-practices.html#file-output-targets"><i class="fa fa-check"></i><b>7.1.4</b> File output targets</a></li>
+<li class="chapter" data-level="7.1.5" data-path="best-practices.html"><a href="best-practices.html#r-markdown-and-knitr-reports"><i class="fa fa-check"></i><b>7.1.5</b> R Markdown and knitr reports</a></li>
+<li class="chapter" data-level="7.1.6" data-path="best-practices.html"><a href="best-practices.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.1.6</b> Workflows as R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="best-practices.html"><a href="best-practices.html#remote-data-sources"><i class="fa fa-check"></i><b>7.2</b> Remote data sources</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="vis.html"><a href="vis.html"><i class="fa fa-check"></i><b>8</b> Visualization with drake</a><ul>
+<li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#dependency-reactivity"><i class="fa fa-check"></i><b>8.1</b> Dependency reactivity</a></li>
+<li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.2</b> Subgraphs</a></li>
+<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.3</b> Control the legend.</a></li>
+<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#more-flexibility"><i class="fa fa-check"></i><b>8.4</b> More flexibility</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="debug.html"><a href="debug.html"><i class="fa fa-check"></i><b>9</b> Debugging and testing drake projects</a><ul>
+<li class="chapter" data-level="9.1" data-path="debug.html"><a href="debug.html#the-configuration-list"><i class="fa fa-check"></i><b>9.1</b> The configuration list</a></li>
+<li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#plan-your-work."><i class="fa fa-check"></i><b>9.2</b> Plan your work.</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="debug.html"><a href="debug.html#workflow-plan-data-frames"><i class="fa fa-check"></i><b>9.2.1</b> Workflow plan data frames</a></li>
+<li class="chapter" data-level="9.2.2" data-path="debug.html"><a href="debug.html#visualize-your-workflow."><i class="fa fa-check"></i><b>9.2.2</b> Visualize your workflow.</a></li>
+<li class="chapter" data-level="9.2.3" data-path="debug.html"><a href="debug.html#check-dependency-relationships."><i class="fa fa-check"></i><b>9.2.3</b> Check dependency relationships.</a></li>
+<li class="chapter" data-level="9.2.4" data-path="debug.html"><a href="debug.html#outdated-up-to-date-and-missing-items"><i class="fa fa-check"></i><b>9.2.4</b> Outdated, up to date, and missing items</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#test-with-triggers."><i class="fa fa-check"></i><b>9.3</b> Test with triggers.</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#skipping-imports"><i class="fa fa-check"></i><b>9.4</b> Skipping imports</a></li>
+<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#impose-timeouts-and-retries"><i class="fa fa-check"></i><b>9.5</b> Impose timeouts and retries</a></li>
+<li class="chapter" data-level="9.6" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.6</b> Diagnose failures.</a><ul>
+<li class="chapter" data-level="9.6.1" data-path="debug.html"><a href="debug.html#tidy-evaluation-a-caveat-to-diagnosing-interactively"><i class="fa fa-check"></i><b>9.6.1</b> Tidy evaluation: a caveat to diagnosing interactively</a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="debug.html"><a href="debug.html#debrief-a-build-session."><i class="fa fa-check"></i><b>9.7</b> Debrief a build session.</a></li>
+<li class="chapter" data-level="9.8" data-path="debug.html"><a href="debug.html#start-tinkering."><i class="fa fa-check"></i><b>9.8</b> Start tinkering.</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing with drake</a><ul>
+<li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
+<li class="chapter" data-level="10.2" data-path="hpc.html"><a href="hpc.html#let-drake-schedule-your-targets."><i class="fa fa-check"></i><b>10.2</b> Let drake schedule your targets.</a></li>
+<li class="chapter" data-level="10.3" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>10.3</b> Parallel backends</a></li>
+<li class="chapter" data-level="10.4" data-path="hpc.html"><a href="hpc.html#local-workers"><i class="fa fa-check"></i><b>10.4</b> Local workers</a></li>
+<li class="chapter" data-level="10.5" data-path="hpc.html"><a href="hpc.html#remote-workers"><i class="fa fa-check"></i><b>10.5</b> Remote workers</a><ul>
+<li class="chapter" data-level="10.5.1" data-path="hpc.html"><a href="hpc.html#future-future_lapply-and-future_lapply_staged"><i class="fa fa-check"></i><b>10.5.1</b> <code>&quot;future&quot;</code>, <code>&quot;future_lapply&quot;</code>, and <code>&quot;future_lapply_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.2" data-path="hpc.html"><a href="hpc.html#clustermq_staged"><i class="fa fa-check"></i><b>10.5.2</b> <code>&quot;clustermq_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.3" data-path="hpc.html"><a href="hpc.html#makefile"><i class="fa fa-check"></i><b>10.5.3</b> <code>&quot;Makefile&quot;</code></a></li>
+</ul></li>
+<li class="chapter" data-level="10.6" data-path="hpc.html"><a href="hpc.html#scheduling-algorithms"><i class="fa fa-check"></i><b>10.6</b> Scheduling algorithms</a><ul>
+<li class="chapter" data-level="10.6.1" data-path="hpc.html"><a href="hpc.html#persistent-scheduling"><i class="fa fa-check"></i><b>10.6.1</b> Persistent scheduling</a></li>
+<li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#transient-scheduling"><i class="fa fa-check"></i><b>10.6.2</b> Transient scheduling</a></li>
+<li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#staged-scheduling"><i class="fa fa-check"></i><b>10.6.3</b> Staged scheduling</a></li>
+</ul></li>
+<li class="chapter" data-level="10.7" data-path="hpc.html"><a href="hpc.html#final-thoughts"><i class="fa fa-check"></i><b>10.7</b> Final thoughts</a><ul>
+<li class="chapter" data-level="10.7.1" data-path="hpc.html"><a href="hpc.html#debugging"><i class="fa fa-check"></i><b>10.7.1</b> Debugging</a></li>
+<li class="chapter" data-level="10.7.2" data-path="hpc.html"><a href="hpc.html#drake-as-an-ordinary-job-scheduler"><i class="fa fa-check"></i><b>10.7.2</b> Drake as an ordinary job scheduler</a></li>
+<li class="chapter" data-level="10.7.3" data-path="hpc.html"><a href="hpc.html#more-resources"><i class="fa fa-check"></i><b>10.7.3</b> More resources</a></li>
+</ul></li>
+<li class="chapter" data-level="10.8" data-path="hpc.html"><a href="hpc.html#footnotes"><i class="fa fa-check"></i><b>10.8</b> Footnotes</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>11</b> Time: logging, prediction, and strategy</a><ul>
+<li class="chapter" data-level="11.1" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>11.1</b> Predict total runtime</a></li>
+<li class="chapter" data-level="11.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>11.2</b> Strategize your high-performance computing</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>12</b> Storage</a><ul>
+<li class="chapter" data-level="12.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>12.1</b> Caches</a></li>
+<li class="chapter" data-level="12.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>12.2</b> Hash algorithms</a></li>
+<li class="chapter" data-level="12.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>12.3</b> Which hash algorithm should you choose?</a></li>
+<li class="chapter" data-level="12.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>12.4</b> Select the hash algorithms of the cache</a></li>
+<li class="chapter" data-level="12.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>12.5</b> Using <code>storr</code> directly</a></li>
+<li class="chapter" data-level="12.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>12.6</b> Cleaning up</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="caution.html"><a href="caution.html"><i class="fa fa-check"></i><b>13</b> Cautionary notes</a><ul>
+<li class="chapter" data-level="13.1" data-path="caution.html"><a href="caution.html#projects-built-with-drake-4.4.0-are-not-back-compatible-with-drake-4.4.0."><i class="fa fa-check"></i><b>13.1</b> Projects built with drake &lt;= 4.4.0 are not back compatible with drake &gt; 4.4.0.</a></li>
+<li class="chapter" data-level="13.2" data-path="caution.html"><a href="caution.html#workflow-plans"><i class="fa fa-check"></i><b>13.2</b> Workflow plans</a><ul>
+<li class="chapter" data-level="13.2.1" data-path="caution.html"><a href="caution.html#externalizing-commands-in-r-script-files"><i class="fa fa-check"></i><b>13.2.1</b> Externalizing commands in R script files</a></li>
+<li class="chapter" data-level="13.2.2" data-path="caution.html"><a href="caution.html#commands-are-not-perfectly-flexible."><i class="fa fa-check"></i><b>13.2.2</b> Commands are NOT perfectly flexible.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="caution.html"><a href="caution.html#execution"><i class="fa fa-check"></i><b>13.3</b> Execution</a><ul>
+<li class="chapter" data-level="13.3.1" data-path="caution.html"><a href="caution.html#install-drake-properly."><i class="fa fa-check"></i><b>13.3.1</b> Install <code>drake</code> properly.</a></li>
+<li class="chapter" data-level="13.3.2" data-path="caution.html"><a href="caution.html#install-all-your-packages."><i class="fa fa-check"></i><b>13.3.2</b> Install all your packages.</a></li>
+<li class="chapter" data-level="13.3.3" data-path="caution.html"><a href="caution.html#a-note-on-tidy-evaluation-1"><i class="fa fa-check"></i><b>13.3.3</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="13.3.4" data-path="caution.html"><a href="caution.html#find-and-diagnose-your-errors."><i class="fa fa-check"></i><b>13.3.4</b> Find and diagnose your errors.</a></li>
+<li class="chapter" data-level="13.3.5" data-path="caution.html"><a href="caution.html#refresh-the-drake_config-list-early-and-often."><i class="fa fa-check"></i><b>13.3.5</b> Refresh the <code>drake_config()</code> list early and often.</a></li>
+<li class="chapter" data-level="13.3.6" data-path="caution.html"><a href="caution.html#workflows-as-r-packages."><i class="fa fa-check"></i><b>13.3.6</b> Workflows as R packages.</a></li>
+<li class="chapter" data-level="13.3.7" data-path="caution.html"><a href="caution.html#the-lazy_load-flag-does-not-work-with-parlapply-parallelism."><i class="fa fa-check"></i><b>13.3.7</b> The <code>lazy_load</code> flag does not work with <code>&quot;parLapply&quot;</code> parallelism.</a></li>
+<li class="chapter" data-level="13.3.8" data-path="caution.html"><a href="caution.html#timeouts-may-be-unreliable."><i class="fa fa-check"></i><b>13.3.8</b> Timeouts may be unreliable.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.4" data-path="caution.html"><a href="caution.html#dependencies"><i class="fa fa-check"></i><b>13.4</b> Dependencies</a><ul>
+<li class="chapter" data-level="13.4.1" data-path="caution.html"><a href="caution.html#objects-that-contain-functions-may-trigger-unwanted-builds"><i class="fa fa-check"></i><b>13.4.1</b> Objects that contain functions may trigger unwanted builds</a></li>
+<li class="chapter" data-level="13.4.2" data-path="caution.html"><a href="caution.html#the-magrittr-dot-.-is-always-ignored."><i class="fa fa-check"></i><b>13.4.2</b> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</a></li>
+<li class="chapter" data-level="13.4.3" data-path="caution.html"><a href="caution.html#triggers-and-skipped-imports"><i class="fa fa-check"></i><b>13.4.3</b> Triggers and skipped imports</a></li>
+<li class="chapter" data-level="13.4.4" data-path="caution.html"><a href="caution.html#dependencies-are-not-tracked-in-some-edge-cases."><i class="fa fa-check"></i><b>13.4.4</b> Dependencies are not tracked in some edge cases.</a></li>
+<li class="chapter" data-level="13.4.5" data-path="caution.html"><a href="caution.html#dependencies-of-knitr-reports"><i class="fa fa-check"></i><b>13.4.5</b> Dependencies of <code>knitr</code> reports</a></li>
+<li class="chapter" data-level="13.4.6" data-path="caution.html"><a href="caution.html#knitr-inputs-and-file-outputs-in-imported-functions."><i class="fa fa-check"></i><b>13.4.6</b> Knitr inputs and file outputs in imported functions.</a></li>
+<li class="chapter" data-level="13.4.7" data-path="caution.html"><a href="caution.html#functions-produced-by-vectorize"><i class="fa fa-check"></i><b>13.4.7</b> Functions produced by <code>Vectorize()</code></a></li>
+<li class="chapter" data-level="13.4.8" data-path="caution.html"><a href="caution.html#compiled-code-is-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.8</b> Compiled code is not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.9" data-path="caution.html"><a href="caution.html#directories-folders-are-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.9</b> Directories (folders) are not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.10" data-path="caution.html"><a href="caution.html#packages-are-not-tracked-as-dependencies."><i class="fa fa-check"></i><b>13.4.10</b> Packages are not tracked as dependencies.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.5" data-path="caution.html"><a href="caution.html#high-performance-computing"><i class="fa fa-check"></i><b>13.5</b> High-performance computing</a><ul>
+<li class="chapter" data-level="13.5.1" data-path="caution.html"><a href="caution.html#the-practical-utility-of-parallel-computing"><i class="fa fa-check"></i><b>13.5.1</b> The practical utility of parallel computing</a></li>
+<li class="chapter" data-level="13.5.2" data-path="caution.html"><a href="caution.html#maximum-number-of-simultaneous-jobs"><i class="fa fa-check"></i><b>13.5.2</b> Maximum number of simultaneous jobs</a></li>
+<li class="chapter" data-level="13.5.3" data-path="caution.html"><a href="caution.html#parallel-computing-on-windows"><i class="fa fa-check"></i><b>13.5.3</b> Parallel computing on Windows</a></li>
+<li class="chapter" data-level="13.5.4" data-path="caution.html"><a href="caution.html#configuring-futurebatchtools-parallelism-for-clusters"><i class="fa fa-check"></i><b>13.5.4</b> Configuring <a href="https://github.com/HenrikBengtsson/future">future</a>/<a href="https://github.com/mllg/batchtools">batchtools</a> parallelism for clusters</a></li>
+<li class="chapter" data-level="13.5.5" data-path="caution.html"><a href="caution.html#proper-makefiles-are-not-standalone."><i class="fa fa-check"></i><b>13.5.5</b> Proper Makefiles are not standalone.</a></li>
+<li class="chapter" data-level="13.5.6" data-path="caution.html"><a href="caution.html#makefile-level-parallelism-for-imported-objects-and-files"><i class="fa fa-check"></i><b>13.5.6</b> Makefile-level parallelism for imported objects and files</a></li>
+<li class="chapter" data-level="13.5.7" data-path="caution.html"><a href="caution.html#zombie-processes"><i class="fa fa-check"></i><b>13.5.7</b> Zombie processes</a></li>
+</ul></li>
+<li class="chapter" data-level="13.6" data-path="caution.html"><a href="caution.html#storage"><i class="fa fa-check"></i><b>13.6</b> Storage</a><ul>
+<li class="chapter" data-level="13.6.1" data-path="caution.html"><a href="caution.html#projects-hosted-on-dropbox-and-similar-platforms"><i class="fa fa-check"></i><b>13.6.1</b> Projects hosted on Dropbox and similar platforms</a></li>
+<li class="chapter" data-level="13.6.2" data-path="caution.html"><a href="caution.html#cache-customization-is-limited"><i class="fa fa-check"></i><b>13.6.2</b> Cache customization is limited</a></li>
+<li class="chapter" data-level="13.6.3" data-path="caution.html"><a href="caution.html#runtime-predictions"><i class="fa fa-check"></i><b>13.6.3</b> Runtime predictions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>14</b> Frequently-asked questions</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The drake R Package User Manual</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="caution" class="section level1">
+<h1><span class="header-section-number">Chapter 13</span> Cautionary notes</h1>
+<pre><code>## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+<p>This chapter addresses <code>drake</code>’s known edge cases, pitfalls, and weaknesses that might not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the <a href="https://github.com/ropensci/drake/issues">issue tracker</a>, where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version of <code>drake</code>. For a guide to debugging and testing <code>drake</code> projects, please refer to the separate <a href="debug.html#debug">guide to debugging and testing drake projects</a>.</p>
+<div id="projects-built-with-drake-4.4.0-are-not-back-compatible-with-drake-4.4.0." class="section level2">
+<h2><span class="header-section-number">13.1</span> Projects built with drake &lt;= 4.4.0 are not back compatible with drake &gt; 4.4.0.</h2>
+<p>The cache internals changed between 4.4.0 and 5.0.0. Unfortunately, you will need to <code>make()</code> your project all over again.</p>
+</div>
+<div id="workflow-plans" class="section level2">
+<h2><span class="header-section-number">13.2</span> Workflow plans</h2>
+<div id="externalizing-commands-in-r-script-files" class="section level3">
+<h3><span class="header-section-number">13.2.1</span> Externalizing commands in R script files</h3>
+<p>It is common practice to divide the work of a project into multiple R files, but if you do this, you will not get the most out of <code>drake</code>. Please see the <a href="best-practices.html#best-practices">best practices chapter</a> for more details.</p>
+</div>
+<div id="commands-are-not-perfectly-flexible." class="section level3">
+<h3><span class="header-section-number">13.2.2</span> Commands are NOT perfectly flexible.</h3>
+<p>In your workflow plan data frame (produced by <code>drake_plan()</code> and accepted by <code>make()</code>), your commands can usually be flexible R expressions.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">target1 =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sqrt</span>(<span class="dv">3</span>)),
+  <span class="dt">target2 =</span> <span class="kw">my_function</span>(web_scraped_data) <span class="op">%&gt;%</span><span class="st"> </span>my_tidy
+)
+## # A tibble: 2 x 2
+##   target  command                                  
+## * &lt;chr&gt;   &lt;chr&gt;                                    
+## 1 target1 1 + 1 - sqrt(sqrt(3))                    
+## 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</code></pre>
+<p>However, please try to avoid formulas and function definitions in your commands. You may be able to get away with <code>drake_plan(f = function(x){x + 1})</code> or <code>drake_plan(f = y ~ x)</code> in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let <code>make()</code> import them. (Alternatively, use the <code>envir</code> argument to <code>make()</code> to tightly control which imported functions are available.) Use the <code>check_plan()</code> function to help screen and quality-control your workflow plan data frame, use <code>tracked()</code> to see the items that are reproducibly tracked, and use <code>vis_drake_graph()</code> and <code>build_drake_graph()</code> to see the dependency structure of your project.</p>
+</div>
+</div>
+<div id="execution" class="section level2">
+<h2><span class="header-section-number">13.3</span> Execution</h2>
+<div id="install-drake-properly." class="section level3">
+<h3><span class="header-section-number">13.3.1</span> Install <code>drake</code> properly.</h3>
+<p>You must properly install <code>drake</code> using <code>install.packages()</code>, <code>devtools::install_github()</code>, or a similar approach. Functions like <code>devtools::load_all()</code> are insufficient, particularly for parallel computing functionality in which separate new R sessions try to <code>require(drake)</code>.</p>
+</div>
+<div id="install-all-your-packages." class="section level3">
+<h3><span class="header-section-number">13.3.2</span> Install all your packages.</h3>
+<p>Your workflow may depend on external packages such as
+<a href="https://CRAN.R-project.org/package=ggplot2">ggplot2</a>, <a href="https://CRAN.R-project.org/package=dplyr">dplyr</a>, and <a href="https://CRAN.R-project.org/package=MASS">MASS</a>. Such packages must be formally installed with <code>install.packages()</code>, <code>devtools::install_github()</code>, <code>devtools::install_local()</code>, or a similar command. If you load uninstalled packages with <code>devtools::load_all()</code>, results may be unpredictable and incorrect.</p>
+</div>
+<div id="a-note-on-tidy-evaluation-1" class="section level3">
+<h3><span class="header-section-number">13.3.3</span> A note on tidy evaluation</h3>
+<p>Running commands in your R console is not always exactly like running them with <code>make()</code>. That’s because <code>make()</code> uses tidy evaluation as implemented in the <a href="https://github.com/tidyverse/rlang"><code>rlang</code> package</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## This workflow plan uses rlang&#39;s quasiquotation operator `!!`.
+my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">list =</span> <span class="kw">c</span>(
+  <span class="dt">little_b =</span> <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">b</span><span class="ch">\&quot;</span><span class="st">&quot;</span>,
+  <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span>
+))
+my_plan
+## # A tibble: 2 x 2
+##   target   command   
+## * &lt;chr&gt;    &lt;chr&gt;     
+## 1 little_b &quot;\&quot;b\&quot;&quot;   
+## 2 letter   !!little_b
+<span class="kw">make</span>(my_plan)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+<span class="kw">readd</span>(letter)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+<p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_evaluation = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_variable &lt;-<span class="st"> </span><span class="dv">5</span>
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="op">!!</span>my_variable,
+  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)
+)
+## # A tibble: 3 x 2
+##   target command      
+## * &lt;chr&gt;  &lt;chr&gt;        
+## 1 a      5            
+## 2 b      5 + 1        
+## 3 d      !!my_variable
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="op">!!</span>my_variable,
+  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),
+  <span class="dt">tidy_evaluation =</span> <span class="ot">FALSE</span>
+)
+## # A tibble: 3 x 2
+##   target command          
+## * &lt;chr&gt;  &lt;chr&gt;            
+## 1 a      !!my_variable    
+## 2 b      !!my_variable + 1
+## 3 d      !!my_variable</code></pre>
+<p>For instances of <code>!!</code> that remain in the workflow plan, <code>make()</code> will run these commands in tidy fashion, evaluating the <code>!!</code> operator using the environment you provided.</p>
+</div>
+<div id="find-and-diagnose-your-errors." class="section level3">
+<h3><span class="header-section-number">13.3.4</span> Find and diagnose your errors.</h3>
+<p>When <code>make()</code> fails, use <code>failed()</code> and <code>diagnose()</code> to debug. Try the following out yourself.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Targets with available diagnostic metadata, incluing errors, warnings, etc.
+<span class="kw">diagnose</span>()
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+
+f &lt;-<span class="st"> </span><span class="cf">function</span>(){
+  <span class="kw">stop</span>(<span class="st">&quot;unusual error&quot;</span>)
+}
+
+bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">target =</span> <span class="kw">f</span>())
+
+withr<span class="op">::</span><span class="kw">with_message_sink</span>(
+  <span class="kw">stdout</span>(),
+  <span class="kw">make</span>(bad_plan)
+)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+
+<span class="kw">failed</span>() <span class="co"># From the last make() only</span>
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+
+error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<span class="op">$</span>error <span class="co"># See also warnings and messages.</span>
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+
+error<span class="op">$</span>message
+## [1] &quot;`x` cannot be negative.&quot;
+
+error<span class="op">$</span>call
+## f(b)
+
+error<span class="op">$</span>calls <span class="co"># View the traceback.</span>
+## [[1]]
+## local({
+##     f(b)
+## })
+## 
+## [[2]]
+## eval.parent(substitute(eval(quote(expr), envir)))
+## 
+## [[3]]
+## eval(expr, p)
+## 
+## [[4]]
+## eval(expr, p)
+## 
+## [[5]]
+## eval(quote({
+##     f(b)
+## }), new.env())
+## 
+## [[6]]
+## eval(quote({
+##     f(b)
+## }), new.env())
+## 
+## [[7]]
+## f(b)
+## 
+## [[8]]
+## stop(&quot;`x` cannot be negative.&quot;)</code></pre>
+</div>
+<div id="refresh-the-drake_config-list-early-and-often." class="section level3">
+<h3><span class="header-section-number">13.3.5</span> Refresh the <code>drake_config()</code> list early and often.</h3>
+<p>The master configuration list returned by <code>drake_config()</code> is important to <code>drake</code>’s internals, and you will need it for functions like <code>outdated()</code> and <code>vis_drake_graph()</code>. The config list corresponds to a single call to <code>make()</code>, and you should not modify it by hand afterwards. For example, modifying the <code>targets</code> element post-hoc will have no effect because the <code>graph</code> element will remain the same. It is best to just call <code>drake_config()</code> again.</p>
+</div>
+<div id="workflows-as-r-packages." class="section level3">
+<h3><span class="header-section-number">13.3.6</span> Workflows as R packages.</h3>
+<p>The R package structure is a great way to organize the files of your project. Writing your own package to contain your data science workflow is a good idea, but you will need to</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>expose_imports()</code> to properly account for all your nested function dependencies, and</li>
+<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code>.</li>
+</ol>
+<p>See the <a href="best-practices.html#best-practices">best practices guide</a> and <code>?expose_imports</code> for detailed explanations. Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a> for the workaround.</p>
+</div>
+<div id="the-lazy_load-flag-does-not-work-with-parlapply-parallelism." class="section level3">
+<h3><span class="header-section-number">13.3.7</span> The <code>lazy_load</code> flag does not work with <code>&quot;parLapply&quot;</code> parallelism.</h3>
+<p>Ordinarily, <code>drake</code> prunes the execution environment at every parallelizable stage. In other words, it loads all the dependencies and unloads anything superfluous for entire batches of targets. This approach may require too much memory for some use cases, so there is an option to delay the loading of dependencies using the <code>lazy_load</code> argument to <code>make()</code> (powered by <code>delayedAssign()</code>). There are two major risks.</p>
+<ol style="list-style-type: decimal">
+<li><p><code>make(..., lazy_load = TRUE, parallelism = &quot;parLapply&quot;, jobs = 2)</code> does not work. If you want to use local multisession parallelism with multiple jobs and lazy loading, try <code>&quot;future_lapply&quot;</code> parallelism instead.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
+future<span class="op">::</span><span class="kw">plan</span>(multisession)
+<span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
+<span class="kw">make</span>(my_plan, <span class="dt">lazy_load =</span> <span class="ot">TRUE</span>, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</code></pre></li>
+<li><p>Delayed evaluation may cause the same dependencies to be loaded multiple times, and these duplicated loads could be slow.</p></li>
+</ol>
+</div>
+<div id="timeouts-may-be-unreliable." class="section level3">
+<h3><span class="header-section-number">13.3.8</span> Timeouts may be unreliable.</h3>
+<p>You can call <code>make(..., timeout = 10)</code> to time out all each target after 10 seconds. However, timeouts rely on <a href="https://github.com/HenrikBengtsson/R.utils/issues/74">R.utils::withTimeout()</a>, which in turn relies on <code>setTimeLimit()</code>. These functions are the best that R can offer right now, but they have <a href="https://github.com/HenrikBengtsson/R.utils/issues/74">known issues</a>, and timeouts may fail to take effect for certain environments.</p>
+</div>
+</div>
+<div id="dependencies" class="section level2">
+<h2><span class="header-section-number">13.4</span> Dependencies</h2>
+<div id="objects-that-contain-functions-may-trigger-unwanted-builds" class="section level3">
+<h3><span class="header-section-number">13.4.1</span> Objects that contain functions may trigger unwanted builds</h3>
+<p>For example, an <code>R6</code> class changes whenever a new <code>R6</code> object of that class is created.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(digest)
+<span class="kw">library</span>(R6)
+circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
+  <span class="st">&quot;circle_class&quot;</span>,
+  <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),
+  <span class="dt">public =</span> <span class="kw">list</span>(
+    <span class="dt">initialize =</span> <span class="cf">function</span>(radius){
+      private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius
+    },
+    <span class="dt">area =</span> <span class="cf">function</span>(){
+      pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span>
+    }
+  )
+)
+<span class="kw">digest</span>(circle_class)
+## [1] &quot;3bb42ea422f635aa7d5d52ec2ca388c3&quot;
+circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
+<span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
+## [1] &quot;c37281b45cf42a2d0138fd01becde415&quot;
+<span class="kw">rm</span>(circle)</code></pre>
+<p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">circle =</span> circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">10</span>),
+  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
+)
+<span class="kw">make</span>(plan) <span class="co"># `circle_class` changes because it is referenced.</span>
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+<span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span>
+## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+<p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){
+  circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
+    <span class="st">&quot;circle_class&quot;</span>,
+    <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),
+    <span class="dt">public =</span> <span class="kw">list</span>(
+      <span class="dt">initialize =</span> <span class="cf">function</span>(radius){
+        private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius
+      },
+      <span class="dt">area =</span> <span class="cf">function</span>(){
+        pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span>
+      }
+    )
+  )
+  circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> radius)
+}
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">circle =</span> <span class="kw">new_circle</span>(<span class="dt">radius =</span> <span class="dv">10</span>),
+  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
+)
+<span class="kw">make</span>(plan)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
+<span class="kw">make</span>(plan)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+</div>
+<div id="the-magrittr-dot-.-is-always-ignored." class="section level3">
+<h3><span class="header-section-number">13.4.2</span> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</h3>
+<p>It is common practice to use a literal dot (<code>.</code>) to carry an object through a <a href="https://github.com/tidyverse/magrittr"><code>magrittr</code></a> pipeline. Due to some tricky limitations in static code analysis, <code>drake</code> never treats the dot (<code>.</code>) as a dependency, even if you use it as an ordinary variable outside of a <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> context.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_code</span>(<span class="st">&quot;sqrt(x + y + .)&quot;</span>)
+## [1] &quot;sqrt&quot; &quot;x&quot;    &quot;y&quot;
+<span class="kw">deps_code</span>(<span class="st">&quot;dplyr::filter(complete.cases(.))&quot;</span>)
+## [1] &quot;complete.cases&quot; &quot;dplyr::filter&quot;</code></pre>
+</div>
+<div id="triggers-and-skipped-imports" class="section level3">
+<h3><span class="header-section-number">13.4.3</span> Triggers and skipped imports</h3>
+<p>With alternate triggers (see <code>?triggers</code>) and the option in <code>make()</code> to skip imports, you can sacrifice reproducibility to gain speed. However, these options can throw the dependency network out of sync. You should only use them for testing and debugging.</p>
+</div>
+<div id="dependencies-are-not-tracked-in-some-edge-cases." class="section level3">
+<h3><span class="header-section-number">13.4.4</span> Dependencies are not tracked in some edge cases.</h3>
+<p>You should explicitly learn the items in your workflow and the dependencies of your targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">?deps
+?tracked
+?vis_drake_graph</code></pre>
+<p><code>Drake</code> can be fooled into skipping objects that should be treated as dependencies. For example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(){
+  b &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">envir =</span> <span class="kw">globalenv</span>()) <span class="co"># x is incorrectly ignored</span>
+  digest<span class="op">::</span><span class="kw">digest</span>(file_dependency)
+}
+
+<span class="kw">deps_code</span>(f)
+## [1] &quot;digest::digest&quot;  &quot;file_dependency&quot; &quot;get&quot;             &quot;globalenv&quot;
+
+command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span>
+<span class="kw">deps_code</span>(command)
+## [1] &quot;\&quot;input_file.rds\&quot;&quot; &quot;assign&quot;             &quot;digest::digest&quot;</code></pre>
+<p><code>Drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
+</div>
+<div id="dependencies-of-knitr-reports" class="section level3">
+<h3><span class="header-section-number">13.4.5</span> Dependencies of <code>knitr</code> reports</h3>
+<p>If you have <code>knitr</code> reports, you can use <code>knitr_report()</code> in your commands so that your reports are refreshed every time one of their dependencies changes. See <code>drake_example(&quot;mtcars&quot;)</code> and the <code>?knitr_in()</code> help file examples for demonstrations. Dependencies are detected if you call <code>loadd()</code> or <code>readd()</code> in your code chunks. But beware: an empty call to <code>loadd()</code> does not account for any dependencies even though it loads all the available targets into your R session.</p>
+</div>
+<div id="knitr-inputs-and-file-outputs-in-imported-functions." class="section level3">
+<h3><span class="header-section-number">13.4.6</span> Knitr inputs and file outputs in imported functions.</h3>
+<p>Similarly, <code>file_out()</code> in a command tells <code>drake</code> that the result of a command is an output file. Clearly, this is inappropriate for imported functions, but <code>drake</code> will look anyway. Do not try to use <code>file_out()</code> or <code>knitr_in()</code> inside your custom imported functions. <code>Drake</code> only pays attention to them in proper commands in your workflow plan data frame. However, <code>file_in()</code> is perfectly fine if your imported function needs a file in order to run. Here are some examples.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## toally_fine() will depend on the imported data.csv file.
+## But make sure data.csv is an imported file and not a file target.
+totally_okay &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){
+  <span class="kw">read.csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>))
+}
+
+## file_out() is for file targets, so `drake` will ignore it.
+avoid_this &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){
+  <span class="kw">read.csv</span>(<span class="kw">file_out</span>(<span class="st">&quot;data.csv&quot;</span>))
+}
+
+## knitr_in() is for knitr files with dependencies
+## in their active code chunks (explicitly referenced with loadd() and readd().
+## Drake just treats knitr_in() as an ordinary file input in this case.
+## You should really be using file_in() instead.
+avoid_this &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){
+  <span class="kw">read.csv</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>))
+}</code></pre>
+</div>
+<div id="functions-produced-by-vectorize" class="section level3">
+<h3><span class="header-section-number">13.4.7</span> Functions produced by <code>Vectorize()</code></h3>
+<p>With functions produced by <code>Vectorize()</code>, detecting dependencies is especially hard because the body of every such function is</p>
+<pre class="sourceCode r"><code class="sourceCode r">args &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">as.list</span>(<span class="kw">match.call</span>())[<span class="op">-</span>1L], eval, <span class="kw">parent.frame</span>())
+names &lt;-<span class="st"> </span><span class="cf">if</span> (<span class="kw">is.null</span>(<span class="kw">names</span>(args)))
+    <span class="kw">character</span>(<span class="kw">length</span>(args)) <span class="cf">else</span> <span class="kw">names</span>(args)
+dovec &lt;-<span class="st"> </span>names <span class="op">%in%</span><span class="st"> </span>vectorize.args
+<span class="kw">do.call</span>(<span class="st">&quot;mapply&quot;</span>, <span class="kw">c</span>(<span class="dt">FUN =</span> FUN, args[dovec], <span class="dt">MoreArgs =</span> <span class="kw">list</span>(args[<span class="op">!</span>dovec]),
+    <span class="dt">SIMPLIFY =</span> SIMPLIFY, <span class="dt">USE.NAMES =</span> USE.NAMES))</code></pre>
+<p>Thus, if <code>f</code> is constructed with <code>Vectorize(g, ...)</code>, <code>drake</code> searches <code>g()</code> for dependencies, not <code>f()</code>. In fact, if <code>drake</code> sees that <code>environment(f)[[&quot;FUN&quot;]]</code> exists and is a function, then <code>environment(f)[[&quot;FUN&quot;]]</code> will be analyzed instead of <code>f()</code>. Furthermore, if <code>f()</code> is the output of <code>Vectorize()</code>, then <code>drake</code> reproducibly tracks <code>environment(f)[[&quot;FUN&quot;]]</code> rather than <code>f()</code> itself. Thus, if the configuration settings of vectorization change (such as which arguments are vectorized), but the core element-wise functionality remains the same, then <code>make()</code> will not react. Also, if you hover over the <code>f</code> node in <code>vis_drake_graph(hover = TRUE)</code>, then you will see the body of <code>environment(f)[[&quot;FUN&quot;]]</code>, not the body of <code>f()</code>.</p>
+</div>
+<div id="compiled-code-is-not-reproducibly-tracked." class="section level3">
+<h3><span class="header-section-number">13.4.8</span> Compiled code is not reproducibly tracked.</h3>
+<p>Some R functions use <code>.Call()</code> to run compiled code in the backend. The R code in these functions is tracked, but not the compiled object called with <code>.Call()</code>, nor its C/C++/Fortran source.</p>
+</div>
+<div id="directories-folders-are-not-reproducibly-tracked." class="section level3">
+<h3><span class="header-section-number">13.4.9</span> Directories (folders) are not reproducibly tracked.</h3>
+<p>In your workflow plan, you can use <code>file_in()</code>, <code>file_out()</code>, and <code>knitr_in()</code> to assert that some targets/imports are external files. However, entire directories (i.e. folders) cannot be reproducibly tracked this way. Please see <a href="https://github.com/ropensci/drake/issues/12">issue 12</a> for a discussion.</p>
+</div>
+<div id="packages-are-not-tracked-as-dependencies." class="section level3">
+<h3><span class="header-section-number">13.4.10</span> Packages are not tracked as dependencies.</h3>
+<p><code>Drake</code> may import functions from packages, but the packages themselves are not tracked as dependencies. For this, you will need other tools that support reproducibility beyond the scope of <code>drake</code>. <a href="https://rstudio.github.io/packrat">Packrat</a> creates a tightly-controlled local library of packages to extend the shelf life of your project. And with <a href="https://www.docker.com/">Docker</a>, you can execute your project on a <a href="https://en.wikipedia.org/wiki/Virtual_machine">virtual machine</a> to ensure platform independence. Together, <a href="https://rstudio.github.io/packrat">packrat</a> and <a href="https://www.docker.com/">Docker</a> can help others reproduce your work even if they have different software and hardware.</p>
+</div>
+</div>
+<div id="high-performance-computing" class="section level2">
+<h2><span class="header-section-number">13.5</span> High-performance computing</h2>
+<div id="the-practical-utility-of-parallel-computing" class="section level3">
+<h3><span class="header-section-number">13.5.1</span> The practical utility of parallel computing</h3>
+<p><code>Drake</code> claims that it can</p>
+<ol style="list-style-type: decimal">
+<li>Build and cache your targets in parallel (in stages).</li>
+<li>Build and cache your targets in the correct order, finishing dependencies before starting targets that depend on them.</li>
+<li>Deploy your targets to the parallel backend of your choice.</li>
+</ol>
+<p>However, the practical efficiency of the parallel computing functionality remains to be verified rigorously. Serious performance studies will be part of future work that has not yet been conducted at the time of writing. In addition, each project has its own best parallel computing set up, and the user needs to optimize it on a case-by-case basis. Some general considerations include the following.</p>
+<ul>
+<li>The high overhead and high scalability of distributed computing versus the low overhead and low scalability of local multicore computing.</li>
+<li>The high memory usage of local multicore computing, especially <code>&quot;mclapply&quot;</code> parallelism, as opposed to distributed computing, which can spread the memory demands over the available nodes on a cluster.</li>
+<li>The marginal gains of increasing the number of jobs indefinitely, especially in the case of local multicore computing if the number of cores is low.</li>
+</ul>
+</div>
+<div id="maximum-number-of-simultaneous-jobs" class="section level3">
+<h3><span class="header-section-number">13.5.2</span> Maximum number of simultaneous jobs</h3>
+<p>Be mindful of the maximum number of simultaneous parallel jobs you deploy. At best, too many jobs is poor etiquette on a system with many users and limited resources. At worst, too many jobs will crash a system. The <code>jobs</code> argument to <code>make()</code> sets the maximum number of simultaneous jobs in most cases, but not all.</p>
+<p>For most of <code>drake</code>’s parallel backends, <code>jobs</code> sets the maximum number of simultaneous parallel jobs. However, there are ways to break the pattern. For example, <code>make(..., parallelism = &quot;Makefile&quot;, jobs = 2, args = &quot;--jobs=4&quot;)</code> uses at most 2 jobs for the imports and at most 4 jobs for the targets. (In <code>make()</code>, <code>args</code> overrides <code>jobs</code> for the targets). For <code>make(..., parallelism = &quot;future_lapply&quot;)</code>, the <code>jobs</code> argument is ignored altogether. Instead, you should set the <code>workers</code> argument where it is available (for example, <code>future::plan(mutlisession(workers = 2))</code> or <code>future::plan(future.batchtools::batchtools_local(workers = 2))</code>) in the preparations before <code>make()</code>. Alternatively, you might limit the max number of jobs by setting <code>options(mc.cores = 2)</code> before calling <code>make()</code>. Depending on the <code>future</code> backend you select with <code>future::plan()</code> or <code>future::plan()</code>, you might make use of one of the other environment variables listed in <code>?future::future.options</code>.</p>
+</div>
+<div id="parallel-computing-on-windows" class="section level3">
+<h3><span class="header-section-number">13.5.3</span> Parallel computing on Windows</h3>
+<p>On Windows, do not use <code>make(..., parallelism = &quot;mclapply&quot;, jobs = n)</code> with <code>n</code> greater than 1. You could try, but <code>jobs</code> will just be demoted to 1. Instead, please replace <code>&quot;mclapply&quot;</code> with one of the other <code>parallelism_choices()</code> or let <code>drake</code> choose the <code>parallelism</code> backend for you. For <code>make(..., parallelism = &quot;Makefile&quot;)</code>, Windows users need to download and install <a href="https://cran.r-project.org/bin/windows/Rtools/"><code>Rtools</code></a>.</p>
+</div>
+<div id="configuring-futurebatchtools-parallelism-for-clusters" class="section level3">
+<h3><span class="header-section-number">13.5.4</span> Configuring <a href="https://github.com/HenrikBengtsson/future">future</a>/<a href="https://github.com/mllg/batchtools">batchtools</a> parallelism for clusters</h3>
+<p>The <code>&quot;future_lapply&quot;</code> backend unlocks a large array of distributed computing options on serious computing clusters. However, it is your responsibility to configure your workflow for your specific job scheduler. In particular, special <a href="https://github.com/mllg/batchtools">batchtools</a> <code>*.tmpl</code> configuration files are required, and the technique is described in the documentation of <a href="https://github.com/mllg/batchtools">batchtools</a>. You can find some examples of these files in the <code>inst/templates</code> folders of the <a href="https://github.com/mllg/batchtools/tree/master/inst/templates">batchtools</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools/tree/master/inst/templates">future.batchtools</a> GitHub repositories. <code>Drake</code> has some <a href="https://github.com/ropensci/drake/tree/master/inst/examples">built-in prepackaged example workflows</a>. See <code>drake_examples()</code> to view your options, and then <code>drake_example()</code> to write the files for an example.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;sge&quot;</span>)    <span class="co"># Sun/Univa Grid Engine workflow and supporting files</span>
+<span class="kw">drake_example</span>(<span class="st">&quot;slurm&quot;</span>)  <span class="co"># SLURM</span>
+<span class="kw">drake_example</span>(<span class="st">&quot;torque&quot;</span>) <span class="co"># TORQUE</span></code></pre>
+<p>To write just <code>*.tmpl</code> files from these examples, see the <code>drake_batchtools_tmpl_file()</code> function.</p>
+<p>Unfortunately, there is no one-size-fits-all <code>*.tmpl</code> configuration file for any job scheduler, so we cannot guarantee that the above examples will work for you out of the box. To learn how to configure the files to suit your needs, you should make sure you understand your job scheduler and <a href="https://github.com/mllg/batchtools">batchtools</a>.</p>
+</div>
+<div id="proper-makefiles-are-not-standalone." class="section level3">
+<h3><span class="header-section-number">13.5.5</span> Proper Makefiles are not standalone.</h3>
+<p>The <a href="http://kbroman.org/minimal_make/">Makefile</a> generated by <code>make(myplan, parallelism = &quot;Makefile&quot;)</code> is not standalone. Do not run it outside of <code>drake::make()</code>. <code>Drake</code> uses dummy timestamp files to tell the <a href="http://kbroman.org/minimal_make/">Makefile</a> what to do, and running <code>make</code> in the <a href="https://www.howtogeek.com/140679/beginner-geek-how-to-start-using-the-linux-terminal/">terminal</a> will most likely give incorrect results.</p>
+</div>
+<div id="makefile-level-parallelism-for-imported-objects-and-files" class="section level3">
+<h3><span class="header-section-number">13.5.6</span> Makefile-level parallelism for imported objects and files</h3>
+<p>Makefile-level parallelism is only used for targets in your workflow plan data frame, not imports. To process imported objects and files, drake selects the best local parallel backend for your system and uses the <code>jobs</code> argument to <code>make()</code>. To use at most 2 jobs for imports and at most 4 jobs for targets, run</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(..., <span class="dt">parallelism =</span> <span class="st">&quot;Makefile&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>, <span class="dt">args =</span> <span class="st">&quot;--jobs=4&quot;</span>)</code></pre>
+</div>
+<div id="zombie-processes" class="section level3">
+<h3><span class="header-section-number">13.5.7</span> Zombie processes</h3>
+<p>Some parallel backends, particularly <code>mclapply</code> and <code>future::multicore</code>, may create zombie processes. Zombie children are not usually harmful, but you may wish to kill them yourself. The following function by <a href="https://github.com/CarlBoneri">Carl Boneri</a> should work on Unix-like systems. For a discussion, see <a href="https://github.com/ropensci/drake/issues/116">drake issue 116</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">fork_kill_zombies &lt;-<span class="st"> </span><span class="cf">function</span>(){
+  <span class="kw">require</span>(inline)
+  includes &lt;-<span class="st"> &quot;#include &lt;sys/wait.h&gt;&quot;</span>
+  code &lt;-<span class="st"> &quot;int wstat; while (waitpid(-1, &amp;wstat, WNOHANG) &gt; 0) {};&quot;</span>
+
+  wait &lt;-<span class="st"> </span>inline<span class="op">::</span><span class="kw">cfunction</span>(
+    <span class="dt">body =</span> code,
+    <span class="dt">includes =</span> includes,
+    <span class="dt">convention =</span> <span class="st">&quot;.C&quot;</span>
+  )
+
+  <span class="kw">invisible</span>(<span class="kw">wait</span>())
+}</code></pre>
+</div>
+</div>
+<div id="storage" class="section level2">
+<h2><span class="header-section-number">13.6</span> Storage</h2>
+<div id="projects-hosted-on-dropbox-and-similar-platforms" class="section level3">
+<h3><span class="header-section-number">13.6.1</span> Projects hosted on Dropbox and similar platforms</h3>
+<p>If download a <code>drake</code> project from <a href="https://www.dropbox.com/">Dropbox</a>, you may get an error like the one in <a href="https://github.com/ropensci/drake/issues/198">issue 198</a>:</p>
+<pre><code>
+cache pathto/.drake
+connect 61 imports: ...
+connect 200 targets: ...
+Error in rawToChar(as.raw(x)) : 
+  embedded nul in string: 'initial_drake_version\0\0\x9a\x9d\xdc\0J\xe9\0\0\0(\x9d\xf9brם\0\xca)\0\0\xb4\xd7\0\0\0\0\xb9'
+In addition: Warning message:
+In rawToChar(as.raw(x)) :
+  out-of-range values treated as 0 in coercion to raw
+</code></pre>
+<p>This is probably because <a href="https://www.dropbox.com/">Dropbox</a> generates a bunch of “conflicted copy” files when file transfers do not go smoothly. This confuses <a href="https://github.com/richfitz/storr">storr</a>, <code>drake</code>’s caching backend.</p>
+<pre><code>
+keys/config/aG9vaw (Sandy Sum's conflicted copy 2018-01-31)
+keys/config/am9icw (Sandy Sum's conflicted copy 2018-01-31)
+keys/config/c2VlZA (Sandy Sum's conflicted copy 2018-01-31)
+</code></pre>
+<p>Just remove these files using <code>drake_gc()</code> and proceed with your work.</p>
+<pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>()
+<span class="kw">drake_gc</span>(cache)</code></pre>
+</div>
+<div id="cache-customization-is-limited" class="section level3">
+<h3><span class="header-section-number">13.6.2</span> Cache customization is limited</h3>
+<p>The <a href="store.html#store">storage guide</a> describes how storage works in <code>drake</code>. As explained near the end of that chapter, you can plug custom <a href="https://github.com/richfitz/storr">storr</a> caches into <code>make()</code>. However, non-RDS caches such as <code>storr_dbi()</code> may not work with most forms of parallel computing. The <code>storr::storr_dbi()</code> cache and many others are not thread-safe. Either use no parallel computing at all or set <code>parallelism = &quot;future&quot;</code> with <code>caching = &quot;master&quot;</code>. The <code>&quot;future&quot;</code> backend is currently experimental, but it allows the master process to do all the caching in order to avoid race conditions.</p>
+</div>
+<div id="runtime-predictions" class="section level3">
+<h3><span class="header-section-number">13.6.3</span> Runtime predictions</h3>
+<p>In <code>predict_runtime()</code> and <code>rate_limiting_times()</code>, <code>drake</code> only accounts for the targets with logged build times. If some targets have not been timed, <code>drake</code> throws a warning and prints the untimed targets.</p>
+<pre><code>## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="store.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="faq.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

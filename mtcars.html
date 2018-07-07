@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>The drake R Package User Manual</title>
+  <meta name="description" content="The drake R Package User Manual">
+  <meta name="generator" content="bookdown 0.7.13 and GitBook 2.6.7">
+
+  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The drake R Package User Manual" />
+  
+  
+  
+
+<meta name="author" content="Will Landau, Alex Axthelm, Jasper Clarkberg, Kirill Müller, Lorenz Walthert, Ben Marwick, and Peter Slaughter">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="example-gsp.html">
+<link rel="next" href="best-practices.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.4/visNetwork.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.1</b> The drake R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.2</b> Installation</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.3</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.3.1</b> What gets done stays done.</a></li>
+<li class="chapter" data-level="1.3.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.3.2</b> Reproducibility with confidence</a></li>
+<li class="chapter" data-level="1.3.3" data-path="index.html"><a href="index.html#aggressively-scale-up."><i class="fa fa-check"></i><b>1.3.3</b> Aggressively scale up.</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.4</b> Documentation</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="index.html"><a href="index.html#cheat-sheet"><i class="fa fa-check"></i><b>1.4.1</b> Cheat sheet</a></li>
+<li class="chapter" data-level="1.4.2" data-path="index.html"><a href="index.html#frequently-asked-questions"><i class="fa fa-check"></i><b>1.4.2</b> Frequently asked questions</a></li>
+<li class="chapter" data-level="1.4.3" data-path="index.html"><a href="index.html#function-reference"><i class="fa fa-check"></i><b>1.4.3</b> Function reference</a></li>
+<li class="chapter" data-level="1.4.4" data-path="index.html"><a href="index.html#tutorials"><i class="fa fa-check"></i><b>1.4.4</b> Tutorials</a></li>
+<li class="chapter" data-level="1.4.5" data-path="index.html"><a href="index.html#examples"><i class="fa fa-check"></i><b>1.4.5</b> Examples</a></li>
+<li class="chapter" data-level="1.4.6" data-path="index.html"><a href="index.html#presentations"><i class="fa fa-check"></i><b>1.4.6</b> Presentations</a></li>
+<li class="chapter" data-level="1.4.7" data-path="index.html"><a href="index.html#real-example-projects"><i class="fa fa-check"></i><b>1.4.7</b> Real example projects</a></li>
+<li class="chapter" data-level="1.4.8" data-path="index.html"><a href="index.html#context-and-history"><i class="fa fa-check"></i><b>1.4.8</b> Context and history</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.5</b> Help and troubleshooting</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#similar-work"><i class="fa fa-check"></i><b>1.6</b> Similar work</a><ul>
+<li class="chapter" data-level="1.6.1" data-path="index.html"><a href="index.html#gnu-make"><i class="fa fa-check"></i><b>1.6.1</b> GNU Make</a></li>
+<li class="chapter" data-level="1.6.2" data-path="index.html"><a href="index.html#remake"><i class="fa fa-check"></i><b>1.6.2</b> Remake</a></li>
+<li class="chapter" data-level="1.6.3" data-path="index.html"><a href="index.html#memoise"><i class="fa fa-check"></i><b>1.6.3</b> Memoise</a></li>
+<li class="chapter" data-level="1.6.4" data-path="index.html"><a href="index.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>1.6.4</b> Knitr and R Markdown</a></li>
+<li class="chapter" data-level="1.6.5" data-path="index.html"><a href="index.html#factuals-drake"><i class="fa fa-check"></i><b>1.6.5</b> Factual’s Drake</a></li>
+<li class="chapter" data-level="1.6.6" data-path="index.html"><a href="index.html#other-pipeline-toolkits"><i class="fa fa-check"></i><b>1.6.6</b> Other pipeline toolkits</a></li>
+</ul></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>1.7</b> Acknowledgements</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="example-main.html"><a href="example-main.html"><i class="fa fa-check"></i><b>2</b> The main example</a><ul>
+<li class="chapter" data-level="2.1" data-path="example-main.html"><a href="example-main.html#set-the-stage."><i class="fa fa-check"></i><b>2.1</b> Set the stage.</a></li>
+<li class="chapter" data-level="2.2" data-path="example-main.html"><a href="example-main.html#make-your-results."><i class="fa fa-check"></i><b>2.2</b> Make your results.</a></li>
+<li class="chapter" data-level="2.3" data-path="example-main.html"><a href="example-main.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>2.3</b> Go back and fix things.</a></li>
+<li class="chapter" data-level="2.4" data-path="example-main.html"><a href="example-main.html#try-it-yourself"><i class="fa fa-check"></i><b>2.4</b> Try it yourself!</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>3</b> Workflow data frames</a><ul>
+<li class="chapter" data-level="3.1" data-path="plans.html"><a href="plans.html#what-is-a-workflow-plan-data-frame"><i class="fa fa-check"></i><b>3.1</b> What is a workflow plan data frame?</a></li>
+<li class="chapter" data-level="3.2" data-path="plans.html"><a href="plans.html#rationale"><i class="fa fa-check"></i><b>3.2</b> Rationale</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="plans.html"><a href="plans.html#you-can-skip-up-to-date-work."><i class="fa fa-check"></i><b>3.2.1</b> You can skip up-to-date work.</a></li>
+<li class="chapter" data-level="3.2.2" data-path="plans.html"><a href="plans.html#you-do-not-need-to-worry-about-which-targets-run-first."><i class="fa fa-check"></i><b>3.2.2</b> You do not need to worry about which targets run first.</a></li>
+<li class="chapter" data-level="3.2.3" data-path="plans.html"><a href="plans.html#data-frames-scale-well."><i class="fa fa-check"></i><b>3.2.3</b> Data frames scale well.</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="plans.html"><a href="plans.html#generating-large-workflow-plans"><i class="fa fa-check"></i><b>3.3</b> Generating large workflow plans</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="plans.html"><a href="plans.html#wildcard-templating"><i class="fa fa-check"></i><b>3.3.1</b> Wildcard templating</a></li>
+<li class="chapter" data-level="3.3.2" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>3.3.2</b> Specialized wildcard functionality</a></li>
+<li class="chapter" data-level="3.3.3" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>3.3.3</b> Non-wildcard functions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>3.4</b> Optional columns in your plan.</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="example-packages.html"><a href="example-packages.html"><i class="fa fa-check"></i><b>4</b> Example: R package download trends</a><ul>
+<li class="chapter" data-level="4.1" data-path="example-packages.html"><a href="example-packages.html#get-the-code."><i class="fa fa-check"></i><b>4.1</b> Get the code.</a></li>
+<li class="chapter" data-level="4.2" data-path="example-packages.html"><a href="example-packages.html#overview"><i class="fa fa-check"></i><b>4.2</b> Overview</a></li>
+<li class="chapter" data-level="4.3" data-path="example-packages.html"><a href="example-packages.html#analysis"><i class="fa fa-check"></i><b>4.3</b> Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="example-packages.html"><a href="example-packages.html#what-remote-data-sources-in-general"><i class="fa fa-check"></i><b>4.4</b> What remote data sources in general?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="example-gsp.html"><a href="example-gsp.html"><i class="fa fa-check"></i><b>5</b> Example: gross state products</a><ul>
+<li class="chapter" data-level="5.1" data-path="example-gsp.html"><a href="example-gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
+<li class="chapter" data-level="5.2" data-path="example-gsp.html"><a href="example-gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>5.2</b> Objective and methods</a></li>
+<li class="chapter" data-level="5.3" data-path="example-gsp.html"><a href="example-gsp.html#data"><i class="fa fa-check"></i><b>5.3</b> Data</a></li>
+<li class="chapter" data-level="5.4" data-path="example-gsp.html"><a href="example-gsp.html#analysis-1"><i class="fa fa-check"></i><b>5.4</b> Analysis</a></li>
+<li class="chapter" data-level="5.5" data-path="example-gsp.html"><a href="example-gsp.html#results"><i class="fa fa-check"></i><b>5.5</b> Results</a></li>
+<li class="chapter" data-level="5.6" data-path="example-gsp.html"><a href="example-gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>5.6</b> Comparison with GNU Make</a></li>
+<li class="chapter" data-level="5.7" data-path="example-gsp.html"><a href="example-gsp.html#references"><i class="fa fa-check"></i><b>5.7</b> References</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>6</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="6.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>6.1</b> Get the code.</a></li>
+<li class="chapter" data-level="6.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>6.2</b> Quick examples</a></li>
+<li class="chapter" data-level="6.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>6.3</b> The motivation of the mtcars example</a></li>
+<li class="chapter" data-level="6.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>6.4</b> Set up the mtcars example</a></li>
+<li class="chapter" data-level="6.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>6.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="6.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-workflow-plan"><i class="fa fa-check"></i><b>6.6</b> Generate the workflow plan</a></li>
+<li class="chapter" data-level="6.7" data-path="mtcars.html"><a href="mtcars.html#flexible-workflow-plan-generation"><i class="fa fa-check"></i><b>6.7</b> Flexible workflow plan generation</a></li>
+<li class="chapter" data-level="6.8" data-path="mtcars.html"><a href="mtcars.html#run-the-workflow"><i class="fa fa-check"></i><b>6.8</b> Run the workflow</a></li>
+<li class="chapter" data-level="6.9" data-path="mtcars.html"><a href="mtcars.html#automatic-watching-for-changed-dependencies"><i class="fa fa-check"></i><b>6.9</b> Automatic watching for changed dependencies</a></li>
+<li class="chapter" data-level="6.10" data-path="mtcars.html"><a href="mtcars.html#a-note-on-tidy-evaluation"><i class="fa fa-check"></i><b>6.10</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="6.11" data-path="mtcars.html"><a href="mtcars.html#need-more-speed"><i class="fa fa-check"></i><b>6.11</b> Need more speed?</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="best-practices.html"><a href="best-practices.html"><i class="fa fa-check"></i><b>7</b> General best practices for drake projects</a><ul>
+<li class="chapter" data-level="7.1" data-path="best-practices.html"><a href="best-practices.html#how-to-organize-your-files"><i class="fa fa-check"></i><b>7.1</b> How to organize your files</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="best-practices.html"><a href="best-practices.html#examples-1"><i class="fa fa-check"></i><b>7.1.1</b> Examples</a></li>
+<li class="chapter" data-level="7.1.2" data-path="best-practices.html"><a href="best-practices.html#where-do-you-put-your-code"><i class="fa fa-check"></i><b>7.1.2</b> Where do you put your code?</a></li>
+<li class="chapter" data-level="7.1.3" data-path="best-practices.html"><a href="best-practices.html#remember-your-commands-are-code-chunks-not-r-scripts"><i class="fa fa-check"></i><b>7.1.3</b> Remember: your commands are code chunks, not R scripts</a></li>
+<li class="chapter" data-level="7.1.4" data-path="best-practices.html"><a href="best-practices.html#file-output-targets"><i class="fa fa-check"></i><b>7.1.4</b> File output targets</a></li>
+<li class="chapter" data-level="7.1.5" data-path="best-practices.html"><a href="best-practices.html#r-markdown-and-knitr-reports"><i class="fa fa-check"></i><b>7.1.5</b> R Markdown and knitr reports</a></li>
+<li class="chapter" data-level="7.1.6" data-path="best-practices.html"><a href="best-practices.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.1.6</b> Workflows as R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="best-practices.html"><a href="best-practices.html#remote-data-sources"><i class="fa fa-check"></i><b>7.2</b> Remote data sources</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="vis.html"><a href="vis.html"><i class="fa fa-check"></i><b>8</b> Visualization with drake</a><ul>
+<li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#dependency-reactivity"><i class="fa fa-check"></i><b>8.1</b> Dependency reactivity</a></li>
+<li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.2</b> Subgraphs</a></li>
+<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.3</b> Control the legend.</a></li>
+<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#more-flexibility"><i class="fa fa-check"></i><b>8.4</b> More flexibility</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="debug.html"><a href="debug.html"><i class="fa fa-check"></i><b>9</b> Debugging and testing drake projects</a><ul>
+<li class="chapter" data-level="9.1" data-path="debug.html"><a href="debug.html#the-configuration-list"><i class="fa fa-check"></i><b>9.1</b> The configuration list</a></li>
+<li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#plan-your-work."><i class="fa fa-check"></i><b>9.2</b> Plan your work.</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="debug.html"><a href="debug.html#workflow-plan-data-frames"><i class="fa fa-check"></i><b>9.2.1</b> Workflow plan data frames</a></li>
+<li class="chapter" data-level="9.2.2" data-path="debug.html"><a href="debug.html#visualize-your-workflow."><i class="fa fa-check"></i><b>9.2.2</b> Visualize your workflow.</a></li>
+<li class="chapter" data-level="9.2.3" data-path="debug.html"><a href="debug.html#check-dependency-relationships."><i class="fa fa-check"></i><b>9.2.3</b> Check dependency relationships.</a></li>
+<li class="chapter" data-level="9.2.4" data-path="debug.html"><a href="debug.html#outdated-up-to-date-and-missing-items"><i class="fa fa-check"></i><b>9.2.4</b> Outdated, up to date, and missing items</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#test-with-triggers."><i class="fa fa-check"></i><b>9.3</b> Test with triggers.</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#skipping-imports"><i class="fa fa-check"></i><b>9.4</b> Skipping imports</a></li>
+<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#impose-timeouts-and-retries"><i class="fa fa-check"></i><b>9.5</b> Impose timeouts and retries</a></li>
+<li class="chapter" data-level="9.6" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.6</b> Diagnose failures.</a><ul>
+<li class="chapter" data-level="9.6.1" data-path="debug.html"><a href="debug.html#tidy-evaluation-a-caveat-to-diagnosing-interactively"><i class="fa fa-check"></i><b>9.6.1</b> Tidy evaluation: a caveat to diagnosing interactively</a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="debug.html"><a href="debug.html#debrief-a-build-session."><i class="fa fa-check"></i><b>9.7</b> Debrief a build session.</a></li>
+<li class="chapter" data-level="9.8" data-path="debug.html"><a href="debug.html#start-tinkering."><i class="fa fa-check"></i><b>9.8</b> Start tinkering.</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing with drake</a><ul>
+<li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
+<li class="chapter" data-level="10.2" data-path="hpc.html"><a href="hpc.html#let-drake-schedule-your-targets."><i class="fa fa-check"></i><b>10.2</b> Let drake schedule your targets.</a></li>
+<li class="chapter" data-level="10.3" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>10.3</b> Parallel backends</a></li>
+<li class="chapter" data-level="10.4" data-path="hpc.html"><a href="hpc.html#local-workers"><i class="fa fa-check"></i><b>10.4</b> Local workers</a></li>
+<li class="chapter" data-level="10.5" data-path="hpc.html"><a href="hpc.html#remote-workers"><i class="fa fa-check"></i><b>10.5</b> Remote workers</a><ul>
+<li class="chapter" data-level="10.5.1" data-path="hpc.html"><a href="hpc.html#future-future_lapply-and-future_lapply_staged"><i class="fa fa-check"></i><b>10.5.1</b> <code>&quot;future&quot;</code>, <code>&quot;future_lapply&quot;</code>, and <code>&quot;future_lapply_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.2" data-path="hpc.html"><a href="hpc.html#clustermq_staged"><i class="fa fa-check"></i><b>10.5.2</b> <code>&quot;clustermq_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.3" data-path="hpc.html"><a href="hpc.html#makefile"><i class="fa fa-check"></i><b>10.5.3</b> <code>&quot;Makefile&quot;</code></a></li>
+</ul></li>
+<li class="chapter" data-level="10.6" data-path="hpc.html"><a href="hpc.html#scheduling-algorithms"><i class="fa fa-check"></i><b>10.6</b> Scheduling algorithms</a><ul>
+<li class="chapter" data-level="10.6.1" data-path="hpc.html"><a href="hpc.html#persistent-scheduling"><i class="fa fa-check"></i><b>10.6.1</b> Persistent scheduling</a></li>
+<li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#transient-scheduling"><i class="fa fa-check"></i><b>10.6.2</b> Transient scheduling</a></li>
+<li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#staged-scheduling"><i class="fa fa-check"></i><b>10.6.3</b> Staged scheduling</a></li>
+</ul></li>
+<li class="chapter" data-level="10.7" data-path="hpc.html"><a href="hpc.html#final-thoughts"><i class="fa fa-check"></i><b>10.7</b> Final thoughts</a><ul>
+<li class="chapter" data-level="10.7.1" data-path="hpc.html"><a href="hpc.html#debugging"><i class="fa fa-check"></i><b>10.7.1</b> Debugging</a></li>
+<li class="chapter" data-level="10.7.2" data-path="hpc.html"><a href="hpc.html#drake-as-an-ordinary-job-scheduler"><i class="fa fa-check"></i><b>10.7.2</b> Drake as an ordinary job scheduler</a></li>
+<li class="chapter" data-level="10.7.3" data-path="hpc.html"><a href="hpc.html#more-resources"><i class="fa fa-check"></i><b>10.7.3</b> More resources</a></li>
+</ul></li>
+<li class="chapter" data-level="10.8" data-path="hpc.html"><a href="hpc.html#footnotes"><i class="fa fa-check"></i><b>10.8</b> Footnotes</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>11</b> Time: logging, prediction, and strategy</a><ul>
+<li class="chapter" data-level="11.1" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>11.1</b> Predict total runtime</a></li>
+<li class="chapter" data-level="11.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>11.2</b> Strategize your high-performance computing</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>12</b> Storage</a><ul>
+<li class="chapter" data-level="12.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>12.1</b> Caches</a></li>
+<li class="chapter" data-level="12.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>12.2</b> Hash algorithms</a></li>
+<li class="chapter" data-level="12.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>12.3</b> Which hash algorithm should you choose?</a></li>
+<li class="chapter" data-level="12.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>12.4</b> Select the hash algorithms of the cache</a></li>
+<li class="chapter" data-level="12.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>12.5</b> Using <code>storr</code> directly</a></li>
+<li class="chapter" data-level="12.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>12.6</b> Cleaning up</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="caution.html"><a href="caution.html"><i class="fa fa-check"></i><b>13</b> Cautionary notes</a><ul>
+<li class="chapter" data-level="13.1" data-path="caution.html"><a href="caution.html#projects-built-with-drake-4.4.0-are-not-back-compatible-with-drake-4.4.0."><i class="fa fa-check"></i><b>13.1</b> Projects built with drake &lt;= 4.4.0 are not back compatible with drake &gt; 4.4.0.</a></li>
+<li class="chapter" data-level="13.2" data-path="caution.html"><a href="caution.html#workflow-plans"><i class="fa fa-check"></i><b>13.2</b> Workflow plans</a><ul>
+<li class="chapter" data-level="13.2.1" data-path="caution.html"><a href="caution.html#externalizing-commands-in-r-script-files"><i class="fa fa-check"></i><b>13.2.1</b> Externalizing commands in R script files</a></li>
+<li class="chapter" data-level="13.2.2" data-path="caution.html"><a href="caution.html#commands-are-not-perfectly-flexible."><i class="fa fa-check"></i><b>13.2.2</b> Commands are NOT perfectly flexible.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="caution.html"><a href="caution.html#execution"><i class="fa fa-check"></i><b>13.3</b> Execution</a><ul>
+<li class="chapter" data-level="13.3.1" data-path="caution.html"><a href="caution.html#install-drake-properly."><i class="fa fa-check"></i><b>13.3.1</b> Install <code>drake</code> properly.</a></li>
+<li class="chapter" data-level="13.3.2" data-path="caution.html"><a href="caution.html#install-all-your-packages."><i class="fa fa-check"></i><b>13.3.2</b> Install all your packages.</a></li>
+<li class="chapter" data-level="13.3.3" data-path="caution.html"><a href="caution.html#a-note-on-tidy-evaluation-1"><i class="fa fa-check"></i><b>13.3.3</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="13.3.4" data-path="caution.html"><a href="caution.html#find-and-diagnose-your-errors."><i class="fa fa-check"></i><b>13.3.4</b> Find and diagnose your errors.</a></li>
+<li class="chapter" data-level="13.3.5" data-path="caution.html"><a href="caution.html#refresh-the-drake_config-list-early-and-often."><i class="fa fa-check"></i><b>13.3.5</b> Refresh the <code>drake_config()</code> list early and often.</a></li>
+<li class="chapter" data-level="13.3.6" data-path="caution.html"><a href="caution.html#workflows-as-r-packages."><i class="fa fa-check"></i><b>13.3.6</b> Workflows as R packages.</a></li>
+<li class="chapter" data-level="13.3.7" data-path="caution.html"><a href="caution.html#the-lazy_load-flag-does-not-work-with-parlapply-parallelism."><i class="fa fa-check"></i><b>13.3.7</b> The <code>lazy_load</code> flag does not work with <code>&quot;parLapply&quot;</code> parallelism.</a></li>
+<li class="chapter" data-level="13.3.8" data-path="caution.html"><a href="caution.html#timeouts-may-be-unreliable."><i class="fa fa-check"></i><b>13.3.8</b> Timeouts may be unreliable.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.4" data-path="caution.html"><a href="caution.html#dependencies"><i class="fa fa-check"></i><b>13.4</b> Dependencies</a><ul>
+<li class="chapter" data-level="13.4.1" data-path="caution.html"><a href="caution.html#objects-that-contain-functions-may-trigger-unwanted-builds"><i class="fa fa-check"></i><b>13.4.1</b> Objects that contain functions may trigger unwanted builds</a></li>
+<li class="chapter" data-level="13.4.2" data-path="caution.html"><a href="caution.html#the-magrittr-dot-.-is-always-ignored."><i class="fa fa-check"></i><b>13.4.2</b> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</a></li>
+<li class="chapter" data-level="13.4.3" data-path="caution.html"><a href="caution.html#triggers-and-skipped-imports"><i class="fa fa-check"></i><b>13.4.3</b> Triggers and skipped imports</a></li>
+<li class="chapter" data-level="13.4.4" data-path="caution.html"><a href="caution.html#dependencies-are-not-tracked-in-some-edge-cases."><i class="fa fa-check"></i><b>13.4.4</b> Dependencies are not tracked in some edge cases.</a></li>
+<li class="chapter" data-level="13.4.5" data-path="caution.html"><a href="caution.html#dependencies-of-knitr-reports"><i class="fa fa-check"></i><b>13.4.5</b> Dependencies of <code>knitr</code> reports</a></li>
+<li class="chapter" data-level="13.4.6" data-path="caution.html"><a href="caution.html#knitr-inputs-and-file-outputs-in-imported-functions."><i class="fa fa-check"></i><b>13.4.6</b> Knitr inputs and file outputs in imported functions.</a></li>
+<li class="chapter" data-level="13.4.7" data-path="caution.html"><a href="caution.html#functions-produced-by-vectorize"><i class="fa fa-check"></i><b>13.4.7</b> Functions produced by <code>Vectorize()</code></a></li>
+<li class="chapter" data-level="13.4.8" data-path="caution.html"><a href="caution.html#compiled-code-is-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.8</b> Compiled code is not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.9" data-path="caution.html"><a href="caution.html#directories-folders-are-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.9</b> Directories (folders) are not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.10" data-path="caution.html"><a href="caution.html#packages-are-not-tracked-as-dependencies."><i class="fa fa-check"></i><b>13.4.10</b> Packages are not tracked as dependencies.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.5" data-path="caution.html"><a href="caution.html#high-performance-computing"><i class="fa fa-check"></i><b>13.5</b> High-performance computing</a><ul>
+<li class="chapter" data-level="13.5.1" data-path="caution.html"><a href="caution.html#the-practical-utility-of-parallel-computing"><i class="fa fa-check"></i><b>13.5.1</b> The practical utility of parallel computing</a></li>
+<li class="chapter" data-level="13.5.2" data-path="caution.html"><a href="caution.html#maximum-number-of-simultaneous-jobs"><i class="fa fa-check"></i><b>13.5.2</b> Maximum number of simultaneous jobs</a></li>
+<li class="chapter" data-level="13.5.3" data-path="caution.html"><a href="caution.html#parallel-computing-on-windows"><i class="fa fa-check"></i><b>13.5.3</b> Parallel computing on Windows</a></li>
+<li class="chapter" data-level="13.5.4" data-path="caution.html"><a href="caution.html#configuring-futurebatchtools-parallelism-for-clusters"><i class="fa fa-check"></i><b>13.5.4</b> Configuring <a href="https://github.com/HenrikBengtsson/future">future</a>/<a href="https://github.com/mllg/batchtools">batchtools</a> parallelism for clusters</a></li>
+<li class="chapter" data-level="13.5.5" data-path="caution.html"><a href="caution.html#proper-makefiles-are-not-standalone."><i class="fa fa-check"></i><b>13.5.5</b> Proper Makefiles are not standalone.</a></li>
+<li class="chapter" data-level="13.5.6" data-path="caution.html"><a href="caution.html#makefile-level-parallelism-for-imported-objects-and-files"><i class="fa fa-check"></i><b>13.5.6</b> Makefile-level parallelism for imported objects and files</a></li>
+<li class="chapter" data-level="13.5.7" data-path="caution.html"><a href="caution.html#zombie-processes"><i class="fa fa-check"></i><b>13.5.7</b> Zombie processes</a></li>
+</ul></li>
+<li class="chapter" data-level="13.6" data-path="caution.html"><a href="caution.html#storage"><i class="fa fa-check"></i><b>13.6</b> Storage</a><ul>
+<li class="chapter" data-level="13.6.1" data-path="caution.html"><a href="caution.html#projects-hosted-on-dropbox-and-similar-platforms"><i class="fa fa-check"></i><b>13.6.1</b> Projects hosted on Dropbox and similar platforms</a></li>
+<li class="chapter" data-level="13.6.2" data-path="caution.html"><a href="caution.html#cache-customization-is-limited"><i class="fa fa-check"></i><b>13.6.2</b> Cache customization is limited</a></li>
+<li class="chapter" data-level="13.6.3" data-path="caution.html"><a href="caution.html#runtime-predictions"><i class="fa fa-check"></i><b>13.6.3</b> Runtime predictions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>14</b> Frequently-asked questions</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The drake R Package User Manual</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="mtcars" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> The mtcars example and workflow plan generation</h1>
+<p>This chapter is a walkthrough of <code>drake</code>’s main functionality based on the mtcars example. It sets up the project and runs it repeatedly to demonstrate <code>drake</code>’s most important functionality.</p>
+<div id="get-the-code.-2" class="section level2">
+<h2><span class="header-section-number">6.1</span> Get the code.</h2>
+<p>Write the code files to your workspace.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;mtcars&quot;</span>)</code></pre>
+<p>The new <code>mtcars</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/ropensci/drake/tree/master/inst/examples/mtcars">online here</a>.</p>
+</div>
+<div id="quick-examples" class="section level2">
+<h2><span class="header-section-number">6.2</span> Quick examples</h2>
+<p>Inspect and run your project.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+<span class="kw">load_mtcars_example</span>()            <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan) <span class="co"># Master configuration list</span>
+<span class="kw">vis_drake_graph</span>(config)         <span class="co"># Hover, click, drag, zoom, pan.</span>
+<span class="kw">make</span>(my_plan)                   <span class="co"># Run the workflow.</span>
+<span class="kw">outdated</span>(config)                <span class="co"># Everything is up to date.</span></code></pre>
+<p>Debug errors.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">failed</span>()                   <span class="co"># Targets that failed in the most recent `make()`</span>
+context &lt;-<span class="st"> </span><span class="kw">diagnose</span>(large) <span class="co"># Diagnostic metadata: errors, warnings, etc.</span>
+error &lt;-<span class="st"> </span>context<span class="op">$</span>error
+<span class="kw">str</span>(error)                 <span class="co"># Object of class &quot;error&quot;</span>
+error<span class="op">$</span>message
+error<span class="op">$</span>call
+error<span class="op">$</span>calls                <span class="co"># Full traceback of nested calls leading up to the error. # nolint</span></code></pre>
+<p>Dive deeper into the built-in examples.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;mtcars&quot;</span>) <span class="co"># Write the code files.</span>
+<span class="kw">drake_examples</span>()        <span class="co"># List the other examples.</span></code></pre>
+</div>
+<div id="the-motivation-of-the-mtcars-example" class="section level2">
+<h2><span class="header-section-number">6.3</span> The motivation of the mtcars example</h2>
+<p>Is there an association between the weight and the fuel efficiency of cars? To find out, we use the <code>mtcars</code> dataset from the <code>datasets</code> package. The <code>mtcars</code> dataset originally came from the 1974 Motor Trend US magazine, and it contains design and performance data on 32 models of automobile.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## ?mtcars # more info
+<span class="kw">head</span>(mtcars)
+##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
+<p>Here, <code>wt</code> is weight in tons, and <code>mpg</code> is fuel efficiency in miles per gallon. We want to figure out if there is an association between <code>wt</code> and <code>mpg</code>. The <code>mtcars</code> dataset itself only has 32 rows, so we generate two larger bootstrapped datasets and then analyze them with regression models. We summarize the regression models to see if there is an association.</p>
+</div>
+<div id="set-up-the-mtcars-example" class="section level2">
+<h2><span class="header-section-number">6.4</span> Set up the mtcars example</h2>
+<p>Before you run your project, you need to set up the workspace. In other words, you need to gather the “imports”: functions, pre-loaded data objects, and saved files that you want to be available before the real work begins.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(knitr) <span class="co"># Drake knows which packages you load.</span>
+<span class="kw">library</span>(drake)</code></pre>
+<p>We need a function to bootstrap larger datasets from <code>mtcars</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Pick a random subset of n rows from a dataset
+random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
+  data[<span class="kw">sample.int</span>(<span class="dt">n =</span> <span class="kw">nrow</span>(data), <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>), ]
+}
+
+## Bootstrapped datasets from mtcars.
+simulate &lt;-<span class="st"> </span><span class="cf">function</span>(n){
+  <span class="co"># Pick a random set of cars to bootstrap from the mtcars data.</span>
+  data &lt;-<span class="st"> </span><span class="kw">random_rows</span>(<span class="dt">data =</span> mtcars, <span class="dt">n =</span> n)
+
+  <span class="co"># x is the car&#39;s weight, and y is the fuel efficiency.</span>
+  <span class="kw">data.frame</span>(
+    <span class="dt">x =</span> data<span class="op">$</span>wt,
+    <span class="dt">y =</span> data<span class="op">$</span>mpg
+  )
+}</code></pre>
+<p>We also need functions to apply the regression models we need for detecting associations.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Is fuel efficiency linearly related to weight?
+reg1 &lt;-<span class="st"> </span><span class="cf">function</span>(d){
+  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span><span class="op">+</span><span class="st"> </span>x, <span class="dt">data =</span> d)
+}
+
+## Is fuel efficiency related to the SQUARE of the weight?
+reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){
+  d<span class="op">$</span>x2 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">2</span>
+  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x2, <span class="dt">data =</span> d)
+}</code></pre>
+<p>We want to summarize the final results in an R Markdown report, so we need the following <code>report.Rmd</code> source file.</p>
+<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;report.Rmd&quot;</span>)
+report_file &lt;-<span class="st"> </span><span class="kw">system.file</span>(path, <span class="dt">package =</span> <span class="st">&quot;drake&quot;</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)
+<span class="kw">file.copy</span>(<span class="dt">from =</span> report_file, <span class="dt">to =</span> <span class="kw">getwd</span>(), <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+## [1] TRUE</code></pre>
+<p>Here are the contents of the report. It will serve as a final summary of our work, and we will process it at the very end. Admittedly, some of the text spoils the punch line.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+## ---
+## title: &quot;Final results report for the mtcars example&quot;
+## author: You
+## output: html_document
+## ---
+## 
+## # The weight and fuel efficiency of cars
+## 
+## Is there an association between the weight and the fuel efficiency of cars? To find out, we use the `mtcars` dataset from the `datasets` package. The `mtcars` data originally came from the 1974 Motor Trend US magazine, and it contains design and performance data on 32 models of automobile.
+## 
+## ```{r showmtcars}
+## # ?mtcars # more info
+## head(mtcars)
+## ```
+## 
+## Here, `wt` is weight in tons, and `mpg` is fuel efficiency in miles per gallon. We want to figure out if there is an association between `wt` and `mpg`. The `mtcars` dataset itself only has 32 rows, so we generated two larger bootstrapped datasets. We called them `small` and `large`.
+## 
+## ```{r example_chunk}
+## library(drake)
+## head(readd(small)) # 48 rows
+## loadd(large)       # 64 rows
+## head(large)
+## ```
+## 
+## Then, we fit a couple regression models to the `small` and `large` to try to detect an association between `wt` and `mpg`. Here are the coefficients and p-values from one of the model fits.
+## 
+## ```{r second_example_chunk}
+## readd(coef_regression2_small)
+## ```
+## 
+## Since the p-value on `x2` is so small, there may be an association between weight and fuel efficiency after all.
+## 
+## # A note on knitr reports in drake projects.
+## 
+## Because of the calls to `readd()` and `loadd()`, `drake` knows that `small`, `large`, and `coef_regression2_small` are dependencies of this R Markdown report. This dependency relationship is what causes the report to be processed at the very end.</code></pre>
+<p>Now, all our imports are set up. When the real work begins, <code>drake</code> will import functions and data objects from your R session environment</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ls</span>()
+##  [1] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
+##  [4] &quot;create_plot&quot;        &quot;dat&quot;                &quot;data_plan&quot;         
+##  [7] &quot;get_rmspe&quot;          &quot;hard_plan&quot;          &quot;hist&quot;              
+## [10] &quot;local&quot;              &quot;make_my_plot&quot;       &quot;make_my_table&quot;     
+## [13] &quot;methods&quot;            &quot;model_plan&quot;         &quot;my_analyses&quot;       
+## [16] &quot;my_datasets&quot;        &quot;my_plan&quot;            &quot;output_plan&quot;       
+## [19] &quot;output_types&quot;       &quot;package_list&quot;       &quot;path&quot;              
+## [22] &quot;plan&quot;               &quot;plan_template&quot;      &quot;plot_rmspe&quot;        
+## [25] &quot;predictors&quot;         &quot;Produc&quot;             &quot;random_rows&quot;       
+## [28] &quot;reg1&quot;               &quot;reg2&quot;               &quot;report_file&quot;       
+## [31] &quot;report_plan&quot;        &quot;reportfile&quot;         &quot;results&quot;           
+## [34] &quot;rmd&quot;                &quot;rmspe_plan&quot;         &quot;rmspe_results_plan&quot;
+## [37] &quot;simulate&quot;           &quot;summary_types&quot;      &quot;targets&quot;           
+## [40] &quot;tmp&quot;                &quot;whole_plan&quot;</code></pre>
+<p>and saved files from your file system.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">list.files</span>()
+##  [1] &quot;_book&quot;                   &quot;_bookdown.yml&quot;          
+##  [3] &quot;02-example-main.Rmd&quot;     &quot;03-plans.Rmd&quot;           
+##  [5] &quot;04-example-packages.Rmd&quot; &quot;05-example-gsp.Rmd&quot;     
+##  [7] &quot;06-example-mtcars.Rmd&quot;   &quot;07-best-practices.Rmd&quot;  
+##  [9] &quot;08-vis.Rmd&quot;              &quot;09-debug.Rmd&quot;           
+## [11] &quot;10-hpc.Rmd&quot;              &quot;11-time.Rmd&quot;            
+## [13] &quot;12-store.Rmd&quot;            &quot;13-caution.Rmd&quot;         
+## [15] &quot;14-faq.Rmd&quot;              &quot;build.R&quot;                
+## [17] &quot;deploy.sh&quot;               &quot;DESCRIPTION&quot;            
+## [19] &quot;docs&quot;                    &quot;drake-manual_files&quot;     
+## [21] &quot;drake-manual.Rmd&quot;        &quot;drake-manual.Rproj&quot;     
+## [23] &quot;faq-stub.md&quot;             &quot;faq.R&quot;                  
+## [25] &quot;images&quot;                  &quot;index.Rmd&quot;              
+## [27] &quot;LICENSE&quot;                 &quot;README.md&quot;              
+## [29] &quot;report.Rmd&quot;</code></pre>
+</div>
+<div id="the-workflow-plan-data-frame" class="section level2">
+<h2><span class="header-section-number">6.5</span> The workflow plan data frame</h2>
+<p>Now that your workspace of imports is prepared, we can outline the real work step by step in a workflow plan data frame.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
+my_plan
+## # A tibble: 15 x 2
+##    target                 command                                         
+##    &lt;chr&gt;                  &lt;chr&gt;                                           
+##  1 &quot;&quot;                     &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;repo…
+##  2 small                  simulate(48)                                    
+##  3 large                  simulate(64)                                    
+##  4 regression1_small      reg1(small)                                     
+##  5 regression1_large      reg1(large)                                     
+##  6 regression2_small      reg2(small)                                     
+##  7 regression2_large      reg2(large)                                     
+##  8 summ_regression1_small suppressWarnings(summary(regression1_small$resi…
+##  9 summ_regression1_large suppressWarnings(summary(regression1_large$resi…
+## 10 summ_regression2_small suppressWarnings(summary(regression2_small$resi…
+## 11 summ_regression2_large suppressWarnings(summary(regression2_large$resi…
+## 12 coef_regression1_small suppressWarnings(summary(regression1_small))$co…
+## 13 coef_regression1_large suppressWarnings(summary(regression1_large))$co…
+## 14 coef_regression2_small suppressWarnings(summary(regression2_small))$co…
+## 15 coef_regression2_large suppressWarnings(summary(regression2_large))$co…</code></pre>
+<p>Each row is an intermediate step, and each <strong>command</strong> generates a single <strong>target</strong>. A target is an output R object (cached when generated) or an output file (specified with single quotes), and a command just an ordinary piece of R code (not necessarily a single function call). Commands make use of R objects imported from your workspace, targets generated by other commands, and initial input files. These dependencies give your project an underlying network representation.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Hover, click, drag, zoom, and pan.
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan)
+<span class="kw">vis_drake_graph</span>(config, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;500px&quot;</span>) <span class="co"># Also drake_graph()</span></code></pre>
+<div id="htmlwidget-8e993214f8820cacc6c0" style="width:100%;height:500px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8e993214f8820cacc6c0">{"x":{"nodes":{"id":["\"report.md\"","\"report.Rmd\"","coef_regression1_large","coef_regression1_small","coef_regression2_large","coef_regression2_small","data.frame","knit","large","lm","mtcars","nrow","random_rows","reg1","reg2","regression1_large","regression1_small","regression2_large","regression2_small","sample.int","simulate","small","summ_regression1_large","summ_regression1_small","summ_regression2_large","summ_regression2_small","summary","suppressWarnings"],"label":["\"report.md\"","\"report.Rmd\"\n0.002s","coef_regression1_large","coef_regression1_small","coef_regression2_large","coef_regression2_small","data.frame\n0.045s","knit\n0.055s","large","lm\n0.022s","mtcars\n0.004s","nrow\n0.009s","random_rows\n0.002s","reg1\n0.003s","reg2\n0.003s","regression1_large","regression1_small","regression2_large","regression2_small","sample.int\n0.01s","simulate\n0.003s","small","summ_regression1_large","summ_regression1_small","summ_regression2_large","summ_regression2_small","summary\n0.009s","suppressWarnings\n0.009s"],"command":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)",null,"suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients",null,null,"simulate(64)",null,null,null,null,null,null,"reg1(large)","reg1(small)","reg2(large)","reg2(small)",null,null,"simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))",null,null],"status":["outdated","imported","outdated","outdated","outdated","outdated","imported","imported","outdated","imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","imported","imported","outdated","outdated","outdated","outdated","outdated","imported","imported"],"type":["file","file","object","object","object","object","function","function","object","function","object","function","function","function","function","object","object","object","object","function","function","object","object","object","object","object","function","function"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#1874CD","#000000","#000000","#000000","#000000","#1874CD","#1874CD","#000000","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#1874CD","#1874CD"],"shape":["square","square","dot","dot","dot","dot","triangle","triangle","dot","triangle","dot","triangle","triangle","triangle","triangle","dot","dot","dot","dot","triangle","triangle","dot","dot","dot","dot","dot","triangle","triangle"],"level":[7,1,6,6,6,6,1,1,4,1,1,1,2,2,2,5,5,5,5,1,3,4,6,6,6,6,1,1],"hover_label":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)","---\ntitle: \"Final results report for the mtcars example\"\nauthor: You\noutput: html_document\n---\n\n# The weight and fuel efficiency of cars\n\nIs there an association between the weight and the fuel efficiency of cars? To find out, we use the `mtcars` ...","suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients","function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE, \n    fix.empty.names = TRUE, stringsAsFactors = default.stringsAsFactors()) \n{\n    data.row.names <- if (check.rows && is.null(row.names)) \n        function(current, new, i) ...","function (input, output = NULL, tangle = FALSE, text = NULL, \n    quiet = FALSE, envir = parent.frame(), encoding = getOption(\"encoding\")) \n{\n    in.file = !missing(input) && (is.character(input) || prod(inherits(input, \n        c(\"file\", \"connect...","simulate(64)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","mtcars","function (x) \ndim(x)[1L]","function (data, n) \n{\n    data[sample.int(n = nrow(data), size = n, replace = TRUE), \n        ]\n}","function (d) \n{\n    lm(y ~ +x, data = d)\n}","function (d) \n{\n    d$x2 <- d$x^2\n    lm(y ~ x2, data = d)\n}","reg1(large)","reg1(small)","reg2(large)","reg2(small)","function (n, size = n, replace = FALSE, prob = NULL, useHash = (!replace && \n    is.null(prob) && size <= n/2 && n > 1e+07)) \n{\n    if (useHash) \n        .Internal(sample2(n, size))\n    else .Internal(sample(n, size, replace, prob))\n}","function (n) \n{\n    data <- random_rows(data = mtcars, n = n)\n    data.frame(x = data$wt, y = data$mpg)\n}","simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))","function (object, ...) \nUseMethod(\"summary\")","function (expr) \n{\n    ops <- options(warn = -1)\n    on.exit(options(ops))\n    withCallingHandlers(expr, warning = function(w) invokeRestart(\"muffleWarning\"))\n}"],"x":[-1,-0.826086956521739,0.826086956521739,0.347826086956522,-0.391304347826087,-0.521739130434783,-0.478260869565217,-0.739130434782609,-0.347826086956522,0.0869565217391304,-0.391304347826087,-0.565217391304348,-0.347826086956522,0.739130434782609,-0.478260869565217,0.782608695652174,0.652173913043478,-0.391304347826087,-0.260869565217391,-0.652173913043478,-0.260869565217391,-0.217391304347826,0.652173913043478,1,-0.0869565217391305,0.434782608695652,0.608695652173913,0.521739130434783],"y":[1,-1,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1,0,-1,-1,-1,-0.666666666666667,-0.666666666666667,-0.666666666666667,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,-1,-0.333333333333333,0,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1]},"edges":{"from":["nrow","sample.int","data.frame","mtcars","random_rows","lm","lm","summary","summary","summary","summary","summary","summary","summary","summary","\"report.Rmd\"","coef_regression2_small","knit","large","large","large","small","small","small","simulate","simulate","reg1","reg1","reg2","reg2","regression1_small","regression1_small","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","regression1_large","regression1_large","regression2_small","regression2_small","regression2_large","regression2_large"],"to":["random_rows","random_rows","simulate","simulate","simulate","reg1","reg2","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","\"report.md\"","\"report.md\"","\"report.md\"","regression1_large","regression2_large","\"report.md\"","regression1_small","regression2_small","\"report.md\"","large","small","regression1_small","regression1_large","regression2_small","regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","summ_regression1_large","coef_regression1_large","coef_regression2_small","summ_regression2_small","summ_regression2_large","coef_regression2_large"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":"100%","height":"500px","idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","In progress","Failed","Imported","Missing","Object","Function","File"],"color":["#228B22","#000000","#FF7221","#AA0000","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20,20,20,20],"id":[1,2,3,4,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>You can also check the dependencies of individual targets and imported functions.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_code</span>(reg2)
+## [1] &quot;lm&quot;
+
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="dv">1</span>]) <span class="co"># Files like report.Rmd are single-quoted.</span>
+## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
+## [3] &quot;coef_regression2_small&quot; &quot;knit&quot;                  
+## [5] &quot;large&quot;                  &quot;small&quot;
+
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="kw">nrow</span>(my_plan)])
+## [1] &quot;regression2_large&quot; &quot;summary&quot;           &quot;suppressWarnings&quot;</code></pre>
+<p>List all the reproducibly-tracked objects and files.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(my_plan, <span class="dt">targets =</span> <span class="st">&quot;small&quot;</span>)
+## [1] &quot;nrow&quot;        &quot;sample.int&quot;  &quot;data.frame&quot;  &quot;mtcars&quot;      &quot;random_rows&quot;
+## [6] &quot;small&quot;       &quot;simulate&quot;
+
+<span class="kw">tracked</span>(my_plan)
+##  [1] &quot;nrow&quot;                   &quot;sample.int&quot;            
+##  [3] &quot;data.frame&quot;             &quot;mtcars&quot;                
+##  [5] &quot;random_rows&quot;            &quot;lm&quot;                    
+##  [7] &quot;summary&quot;                &quot;\&quot;report.Rmd\&quot;&quot;        
+##  [9] &quot;coef_regression2_small&quot; &quot;knit&quot;                  
+## [11] &quot;large&quot;                  &quot;small&quot;                 
+## [13] &quot;simulate&quot;               &quot;reg1&quot;                  
+## [15] &quot;reg2&quot;                   &quot;regression1_small&quot;     
+## [17] &quot;suppressWarnings&quot;       &quot;regression1_large&quot;     
+## [19] &quot;regression2_small&quot;      &quot;regression2_large&quot;     
+## [21] &quot;\&quot;report.md\&quot;&quot;          &quot;summ_regression1_small&quot;
+## [23] &quot;summ_regression1_large&quot; &quot;summ_regression2_small&quot;
+## [25] &quot;summ_regression2_large&quot; &quot;coef_regression1_small&quot;
+## [27] &quot;coef_regression1_large&quot; &quot;coef_regression2_large&quot;</code></pre>
+<p>Check for circular reasoning, missing input files, and other pitfalls.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_plan</span>(my_plan)</code></pre>
+</div>
+<div id="generate-the-workflow-plan" class="section level2">
+<h2><span class="header-section-number">6.6</span> Generate the workflow plan</h2>
+<p>The workflow plan data frame <code>my_plan</code> would be a pain to write by hand, so <code>drake</code> has functions to help you. Here are the commands to generate the bootstrapped datasets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_datasets &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
+  <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>))
+my_datasets
+## # A tibble: 2 x 2
+##   target command     
+## * &lt;chr&gt;  &lt;chr&gt;       
+## 1 small  simulate(48)
+## 2 large  simulate(64)</code></pre>
+<p>For multiple replicates:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">expand_plan</span>(my_datasets, <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;rep1&quot;</span>, <span class="st">&quot;rep2&quot;</span>))
+## # A tibble: 4 x 2
+##   target     command     
+## * &lt;chr&gt;      &lt;chr&gt;       
+## 1 small_rep1 simulate(48)
+## 2 small_rep2 simulate(48)
+## 3 large_rep1 simulate(64)
+## 4 large_rep2 simulate(64)</code></pre>
+<p>Here is a template for applying our regression models to our bootstrapped datasets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">methods &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">regression1 =</span> <span class="kw">reg1</span>(dataset__),
+  <span class="dt">regression2 =</span> <span class="kw">reg2</span>(dataset__))
+methods
+## # A tibble: 2 x 2
+##   target      command        
+## * &lt;chr&gt;       &lt;chr&gt;          
+## 1 regression1 reg1(dataset__)
+## 2 regression2 reg2(dataset__)</code></pre>
+<p>We evaluate the <code>dataset__</code> wildcard to generate all the regression commands we need.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_analyses &lt;-<span class="st"> </span><span class="kw">plan_analyses</span>(methods, <span class="dt">data =</span> my_datasets)
+my_analyses
+## # A tibble: 4 x 2
+##   target            command    
+## * &lt;chr&gt;             &lt;chr&gt;      
+## 1 regression1_small reg1(small)
+## 2 regression1_large reg1(large)
+## 3 regression2_small reg2(small)
+## 4 regression2_large reg2(large)</code></pre>
+<p>Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.</p>
+<pre class="sourceCode r"><code class="sourceCode r">summary_types &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">summ =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__<span class="op">$</span>residuals)),
+  <span class="dt">coef =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__))<span class="op">$</span>coefficients
+)
+summary_types
+## # A tibble: 2 x 2
+##   target command                                           
+## * &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 summ   suppressWarnings(summary(analysis__$residuals))   
+## 2 coef   suppressWarnings(summary(analysis__))$coefficients
+
+results &lt;-<span class="st"> </span><span class="kw">plan_summaries</span>(summary_types, <span class="dt">analyses =</span> my_analyses,
+  <span class="dt">datasets =</span> my_datasets, <span class="dt">gather =</span> <span class="ot">NULL</span>)
+results
+## # A tibble: 8 x 2
+##   target                 command                                          
+##   &lt;chr&gt;                  &lt;chr&gt;                                            
+## 1 summ_regression1_small suppressWarnings(summary(regression1_small$resid…
+## 2 summ_regression1_large suppressWarnings(summary(regression1_large$resid…
+## 3 summ_regression2_small suppressWarnings(summary(regression2_small$resid…
+## 4 summ_regression2_large suppressWarnings(summary(regression2_large$resid…
+## 5 coef_regression1_small suppressWarnings(summary(regression1_small))$coe…
+## 6 coef_regression1_large suppressWarnings(summary(regression1_large))$coe…
+## 7 coef_regression2_small suppressWarnings(summary(regression2_small))$coe…
+## 8 coef_regression2_large suppressWarnings(summary(regression2_large))$coe…</code></pre>
+<p>The <code>gather</code> feature reduces a collection of targets to a single target. The resulting commands are long, so gathering is deactivated for the sake of readability.</p>
+<p>For your <code>knitr</code> reports, use <code>knitr_in()</code> in your commands so that <code>report.Rmd</code> is a dependency and targets loaded with <code>loadd()</code> and <code>readd()</code> in active code chunks are also dependencies. Use <code>file_out()</code> to tell <code>drake</code> that the target is a file output. If the file is an output, you do not need to name the target. The target name will be the name of the output file in quotes.</p>
+<pre class="sourceCode r"><code class="sourceCode r">report &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)
+)
+report
+## # A tibble: 1 x 2
+##   target          command                                                 
+## * &lt;chr&gt;           &lt;chr&gt;                                                   
+## 1 &quot;\&quot;report.md\&quot;&quot; &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\&quot;)…</code></pre>
+<p>Finally, consolidate your workflow using <code>rbind()</code>. Row order does not matter.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(report, my_datasets, my_analyses, results)
+my_plan
+## # A tibble: 15 x 2
+##    target                 command                                         
+##    &lt;chr&gt;                  &lt;chr&gt;                                           
+##  1 &quot;\&quot;report.md\&quot;&quot;        &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;repo…
+##  2 small                  simulate(48)                                    
+##  3 large                  simulate(64)                                    
+##  4 regression1_small      reg1(small)                                     
+##  5 regression1_large      reg1(large)                                     
+##  6 regression2_small      reg2(small)                                     
+##  7 regression2_large      reg2(large)                                     
+##  8 summ_regression1_small suppressWarnings(summary(regression1_small$resi…
+##  9 summ_regression1_large suppressWarnings(summary(regression1_large$resi…
+## 10 summ_regression2_small suppressWarnings(summary(regression2_small$resi…
+## 11 summ_regression2_large suppressWarnings(summary(regression2_large$resi…
+## 12 coef_regression1_small suppressWarnings(summary(regression1_small))$co…
+## 13 coef_regression1_large suppressWarnings(summary(regression1_large))$co…
+## 14 coef_regression2_small suppressWarnings(summary(regression2_small))$co…
+## 15 coef_regression2_large suppressWarnings(summary(regression2_large))$co…</code></pre>
+</div>
+<div id="flexible-workflow-plan-generation" class="section level2">
+<h2><span class="header-section-number">6.7</span> Flexible workflow plan generation</h2>
+<p>If your workflow does not fit the rigid datasets/analyses/summaries framework, consider using functions <code>expand_plan()</code>, <code>evaluate_plan()</code>, <code>gather_plan()</code>, and <code>reduce_plan()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">data =</span> <span class="kw">simulate</span>(<span class="dt">center =</span> MU, <span class="dt">scale =</span> SIGMA))
+df
+## # A tibble: 1 x 2
+##   target command                             
+## * &lt;chr&gt;  &lt;chr&gt;                               
+## 1 data   simulate(center = MU, scale = SIGMA)
+
+df &lt;-<span class="st"> </span><span class="kw">expand_plan</span>(df, <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;rep1&quot;</span>, <span class="st">&quot;rep2&quot;</span>))
+df
+## # A tibble: 2 x 2
+##   target    command                             
+## * &lt;chr&gt;     &lt;chr&gt;                               
+## 1 data_rep1 simulate(center = MU, scale = SIGMA)
+## 2 data_rep2 simulate(center = MU, scale = SIGMA)
+
+<span class="kw">evaluate_plan</span>(df, <span class="dt">wildcard =</span> <span class="st">&quot;MU&quot;</span>, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)
+## # A tibble: 4 x 2
+##   target      command                            
+## * &lt;chr&gt;       &lt;chr&gt;                              
+## 1 data_rep1_1 simulate(center = 1, scale = SIGMA)
+## 2 data_rep1_2 simulate(center = 2, scale = SIGMA)
+## 3 data_rep2_1 simulate(center = 1, scale = SIGMA)
+## 4 data_rep2_2 simulate(center = 2, scale = SIGMA)
+
+<span class="kw">evaluate_plan</span>(df, <span class="dt">wildcard =</span> <span class="st">&quot;MU&quot;</span>, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">expand =</span> <span class="ot">FALSE</span>)
+## # A tibble: 2 x 2
+##   target    command                            
+## * &lt;chr&gt;     &lt;chr&gt;                              
+## 1 data_rep1 simulate(center = 1, scale = SIGMA)
+## 2 data_rep2 simulate(center = 2, scale = SIGMA)
+
+<span class="kw">evaluate_plan</span>(df, <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">MU =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">SIGMA =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="dv">1</span>)), <span class="dt">expand =</span> <span class="ot">FALSE</span>)
+## # A tibble: 2 x 2
+##   target    command                          
+## * &lt;chr&gt;     &lt;chr&gt;                            
+## 1 data_rep1 simulate(center = 1, scale = 0.1)
+## 2 data_rep2 simulate(center = 2, scale = 1)
+
+<span class="kw">evaluate_plan</span>(df, <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">MU =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">SIGMA =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>)))
+## # A tibble: 12 x 2
+##    target          command                          
+##  * &lt;chr&gt;           &lt;chr&gt;                            
+##  1 data_rep1_1_0.1 simulate(center = 1, scale = 0.1)
+##  2 data_rep1_1_1   simulate(center = 1, scale = 1)  
+##  3 data_rep1_1_10  simulate(center = 1, scale = 10) 
+##  4 data_rep1_2_0.1 simulate(center = 2, scale = 0.1)
+##  5 data_rep1_2_1   simulate(center = 2, scale = 1)  
+##  6 data_rep1_2_10  simulate(center = 2, scale = 10) 
+##  7 data_rep2_1_0.1 simulate(center = 1, scale = 0.1)
+##  8 data_rep2_1_1   simulate(center = 1, scale = 1)  
+##  9 data_rep2_1_10  simulate(center = 1, scale = 10) 
+## 10 data_rep2_2_0.1 simulate(center = 2, scale = 0.1)
+## 11 data_rep2_2_1   simulate(center = 2, scale = 1)  
+## 12 data_rep2_2_10  simulate(center = 2, scale = 10)
+
+<span class="kw">gather_plan</span>(df)
+## # A tibble: 1 x 2
+##   target command                                           
+##   &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 target list(data_rep1 = data_rep1, data_rep2 = data_rep2)
+
+<span class="kw">gather_plan</span>(df, <span class="dt">target =</span> <span class="st">&quot;my_summaries&quot;</span>, <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>)
+## # A tibble: 1 x 2
+##   target       command                                            
+##   &lt;chr&gt;        &lt;chr&gt;                                              
+## 1 my_summaries rbind(data_rep1 = data_rep1, data_rep2 = data_rep2)
+
+x_plan &lt;-<span class="st"> </span><span class="kw">evaluate_plan</span>(
+  <span class="kw">drake_plan</span>(<span class="dt">x =</span> VALUE),
+  <span class="dt">wildcard =</span> <span class="st">&quot;VALUE&quot;</span>,
+  <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>
+)
+x_plan
+## # A tibble: 8 x 2
+##   target command
+## * &lt;chr&gt;  &lt;chr&gt;  
+## 1 x_1    1      
+## 2 x_2    2      
+## 3 x_3    3      
+## 4 x_4    4      
+## 5 x_5    5      
+## 6 x_6    6      
+## 7 x_7    7      
+## 8 x_8    8
+
+x_plan
+## # A tibble: 8 x 2
+##   target command
+## * &lt;chr&gt;  &lt;chr&gt;  
+## 1 x_1    1      
+## 2 x_2    2      
+## 3 x_3    3      
+## 4 x_4    4      
+## 5 x_5    5      
+## 6 x_6    6      
+## 7 x_7    7      
+## 8 x_8    8
+<span class="kw">reduce_plan</span>(
+  x_plan, <span class="dt">target =</span> <span class="st">&quot;x_sum&quot;</span>, <span class="dt">pairwise =</span> <span class="ot">TRUE</span>,
+  <span class="dt">begin =</span> <span class="st">&quot;fun(&quot;</span>, <span class="dt">op =</span> <span class="st">&quot;, &quot;</span>, <span class="dt">end =</span> <span class="st">&quot;)&quot;</span>
+)
+## # A tibble: 7 x 2
+##   target  command              
+##   &lt;chr&gt;   &lt;chr&gt;                
+## 1 x_sum_1 fun(x_1, x_2)        
+## 2 x_sum_2 fun(x_3, x_4)        
+## 3 x_sum_3 fun(x_5, x_6)        
+## 4 x_sum_4 fun(x_7, x_8)        
+## 5 x_sum_5 fun(x_sum_1, x_sum_2)
+## 6 x_sum_6 fun(x_sum_3, x_sum_4)
+## 7 x_sum   fun(x_sum_5, x_sum_6)</code></pre>
+</div>
+<div id="run-the-workflow" class="section level2">
+<h2><span class="header-section-number">6.8</span> Run the workflow</h2>
+<p>You may want to check for outdated or missing targets/imports first.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+<span class="kw">outdated</span>(config) <span class="co"># Targets that need to be (re)built.</span>
+##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;coef_regression1_large&quot;
+##  [3] &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;
+##  [5] &quot;coef_regression2_small&quot; &quot;large&quot;                 
+##  [7] &quot;regression1_large&quot;      &quot;regression1_small&quot;     
+##  [9] &quot;regression2_large&quot;      &quot;regression2_small&quot;     
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
+
+<span class="kw">missed</span>(config) <span class="co"># Checks your workspace.</span>
+## character(0)</code></pre>
+<p>Then just <code>make(my_plan)</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan)
+## target large
+## target small
+## target regression1_large
+## target regression2_large
+## target regression1_small
+## target regression2_small
+## target summ_regression1_large
+## target coef_regression1_large
+## target summ_regression2_large
+## target coef_regression2_large
+## target summ_regression1_small
+## target coef_regression1_small
+## target coef_regression2_small
+## target summ_regression2_small
+## target file &quot;report.md&quot;</code></pre>
+<p>For the <code>reg2()</code> model on the small dataset, the p-value on <code>x2</code> is so small that there may be an association between weight and fuel efficiency after all.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(coef_regression2_small)
+##              Estimate Std. Error   t value     Pr(&gt;|t|)
+## (Intercept) 27.504915 1.02496426 26.835000 9.676340e-30
+## x2          -0.708536 0.08285938 -8.551066 4.617125e-11</code></pre>
+<p>The non-file dependencies of your last target are already loaded in your workspace.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ls</span>()
+##  [1] &quot;combos&quot;             &quot;commands&quot;           &quot;config&quot;            
+##  [4] &quot;create_plot&quot;        &quot;dat&quot;                &quot;data_plan&quot;         
+##  [7] &quot;df&quot;                 &quot;get_rmspe&quot;          &quot;hard_plan&quot;         
+## [10] &quot;hist&quot;               &quot;local&quot;              &quot;make_my_plot&quot;      
+## [13] &quot;make_my_table&quot;      &quot;methods&quot;            &quot;model_plan&quot;        
+## [16] &quot;my_analyses&quot;        &quot;my_datasets&quot;        &quot;my_plan&quot;           
+## [19] &quot;output_plan&quot;        &quot;output_types&quot;       &quot;package_list&quot;      
+## [22] &quot;path&quot;               &quot;plan&quot;               &quot;plan_template&quot;     
+## [25] &quot;plot_rmspe&quot;         &quot;predictors&quot;         &quot;Produc&quot;            
+## [28] &quot;random_rows&quot;        &quot;reg1&quot;               &quot;reg2&quot;              
+## [31] &quot;report&quot;             &quot;report_file&quot;        &quot;report_plan&quot;       
+## [34] &quot;reportfile&quot;         &quot;results&quot;            &quot;rmd&quot;               
+## [37] &quot;rmspe_plan&quot;         &quot;rmspe_results_plan&quot; &quot;simulate&quot;          
+## [40] &quot;summary_types&quot;      &quot;targets&quot;            &quot;tmp&quot;               
+## [43] &quot;whole_plan&quot;         &quot;x_plan&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config) <span class="co"># Everything is up to date.</span>
+## character(0)
+
+<span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">4</span>) <span class="co"># How long did it take to make each target?</span>
+## # A tibble: 28 x 5
+##    item                   type   elapsed        user           system     
+##  * &lt;chr&gt;                  &lt;chr&gt;  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Durat&gt;
+##  1 &quot;\&quot;report.md\&quot;&quot;        target 0.076s         0.068s         0.008s     
+##  2 &quot;\&quot;report.Rmd\&quot;&quot;       import 0.002s         0.002s         0s         
+##  3 coef_regression1_large target 0.008s         0.008s         0s         
+##  4 coef_regression1_small target 0.008s         0.008s         0s         
+##  5 coef_regression2_large target 0.008s         0.008s         0s         
+##  6 coef_regression2_small target 0.007s         0.007s         0s         
+##  7 data.frame             import 0.041s         0.041s         0s         
+##  8 knit                   import 0.036s         0.036s         0s         
+##  9 large                  target 0.008s         0.008s         0s         
+## 10 lm                     import 0.017s         0.017s         0s         
+## # ... with 18 more rows</code></pre>
+<p>See also <code>predict_runtime()</code> and <code>rate_limiting_times()</code>.</p>
+<p>In the new graph, the black nodes from before are now green.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Hover, click, drag, zoom, and explore.
+<span class="kw">vis_drake_graph</span>(config, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;500px&quot;</span>)</code></pre>
+<div id="htmlwidget-86e259a3bc4931fa8aec" style="width:100%;height:500px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-86e259a3bc4931fa8aec">{"x":{"nodes":{"id":["\"report.md\"","\"report.Rmd\"","coef_regression1_large","coef_regression1_small","coef_regression2_large","coef_regression2_small","data.frame","knit","large","lm","mtcars","nrow","random_rows","reg1","reg2","regression1_large","regression1_small","regression2_large","regression2_small","sample.int","simulate","small","summ_regression1_large","summ_regression1_small","summ_regression2_large","summ_regression2_small","summary","suppressWarnings"],"label":["\"report.md\"\n0.076s","\"report.Rmd\"\n0.001s","coef_regression1_large\n0.008s","coef_regression1_small\n0.008s","coef_regression2_large\n0.008s","coef_regression2_small\n0.007s","data.frame\n0.041s","knit\n0.036s","large\n0.008s","lm\n0.017s","mtcars\n0.001s","nrow\n0.009s","random_rows\n0.002s","reg1\n0.002s","reg2\n0.003s","regression1_large\n0.009s","regression1_small\n0.01s","regression2_large\n0.058s","regression2_small\n0.012s","sample.int\n0.01s","simulate\n0.002s","small\n0.013s","summ_regression1_large\n0.008s","summ_regression1_small\n0.008s","summ_regression2_large\n0.008s","summ_regression2_small\n0.007s","summary\n0.011s","suppressWarnings\n0.009s"],"command":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)",null,"suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients",null,null,"simulate(64)",null,null,null,null,null,null,"reg1(large)","reg1(small)","reg2(large)","reg2(small)",null,null,"simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))",null,null],"status":["up to date","imported","up to date","up to date","up to date","up to date","imported","imported","up to date","imported","imported","imported","imported","imported","imported","up to date","up to date","up to date","up to date","imported","imported","up to date","up to date","up to date","up to date","up to date","imported","imported"],"type":["file","file","object","object","object","object","function","function","object","function","object","function","function","function","function","object","object","object","object","function","function","object","object","object","object","object","function","function"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#228B22","#1874CD","#228B22","#228B22","#228B22","#228B22","#1874CD","#1874CD","#228B22","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#228B22","#1874CD","#1874CD"],"shape":["square","square","dot","dot","dot","dot","triangle","triangle","dot","triangle","dot","triangle","triangle","triangle","triangle","dot","dot","dot","dot","triangle","triangle","dot","dot","dot","dot","dot","triangle","triangle"],"level":[7,1,6,6,6,6,1,1,4,1,1,1,2,2,2,5,5,5,5,1,3,4,6,6,6,6,1,1],"hover_label":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)","---\ntitle: \"Final results report for the mtcars example\"\nauthor: You\noutput: html_document\n---\n\n# The weight and fuel efficiency of cars\n\nIs there an association between the weight and the fuel efficiency of cars? To find out, we use the `mtcars` ...","suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients","function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE, \n    fix.empty.names = TRUE, stringsAsFactors = default.stringsAsFactors()) \n{\n    data.row.names <- if (check.rows && is.null(row.names)) \n        function(current, new, i) ...","function (input, output = NULL, tangle = FALSE, text = NULL, \n    quiet = FALSE, envir = parent.frame(), encoding = getOption(\"encoding\")) \n{\n    in.file = !missing(input) && (is.character(input) || prod(inherits(input, \n        c(\"file\", \"connect...","simulate(64)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","mtcars","function (x) \ndim(x)[1L]","function (data, n) \n{\n    data[sample.int(n = nrow(data), size = n, replace = TRUE), \n        ]\n}","function (d) \n{\n    lm(y ~ +x, data = d)\n}","function (d) \n{\n    d$x2 <- d$x^2\n    lm(y ~ x2, data = d)\n}","reg1(large)","reg1(small)","reg2(large)","reg2(small)","function (n, size = n, replace = FALSE, prob = NULL, useHash = (!replace && \n    is.null(prob) && size <= n/2 && n > 1e+07)) \n{\n    if (useHash) \n        .Internal(sample2(n, size))\n    else .Internal(sample(n, size, replace, prob))\n}","function (n) \n{\n    data <- random_rows(data = mtcars, n = n)\n    data.frame(x = data$wt, y = data$mpg)\n}","simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))","function (object, ...) \nUseMethod(\"summary\")","function (expr) \n{\n    ops <- options(warn = -1)\n    on.exit(options(ops))\n    withCallingHandlers(expr, warning = function(w) invokeRestart(\"muffleWarning\"))\n}"],"x":[-1,-0.826086956521739,0.826086956521739,0.347826086956522,-0.391304347826087,-0.521739130434783,-0.478260869565217,-0.739130434782609,-0.347826086956522,0.0869565217391304,-0.391304347826087,-0.565217391304348,-0.347826086956522,0.739130434782609,-0.478260869565217,0.782608695652174,0.652173913043478,-0.391304347826087,-0.260869565217391,-0.652173913043478,-0.260869565217391,-0.217391304347826,0.652173913043478,1,-0.0869565217391305,0.434782608695652,0.608695652173913,0.521739130434783],"y":[1,-1,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1,0,-1,-1,-1,-0.666666666666667,-0.666666666666667,-0.666666666666667,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,-1,-0.333333333333333,0,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1]},"edges":{"from":["nrow","sample.int","data.frame","mtcars","random_rows","lm","lm","summary","summary","summary","summary","summary","summary","summary","summary","\"report.Rmd\"","coef_regression2_small","knit","large","large","large","small","small","small","simulate","simulate","reg1","reg1","reg2","reg2","regression1_small","regression1_small","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","regression1_large","regression1_large","regression2_small","regression2_small","regression2_large","regression2_large"],"to":["random_rows","random_rows","simulate","simulate","simulate","reg1","reg2","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","\"report.md\"","\"report.md\"","\"report.md\"","regression1_large","regression2_large","\"report.md\"","regression1_small","regression2_small","\"report.md\"","large","small","regression1_small","regression1_large","regression2_small","regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","summ_regression1_large","coef_regression1_large","coef_regression2_small","summ_regression2_small","summ_regression2_large","coef_regression2_large"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":"100%","height":"500px","idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","In progress","Failed","Imported","Missing","Object","Function","File"],"color":["#228B22","#000000","#FF7221","#AA0000","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20,20,20,20],"id":[1,2,3,4,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>Optionally, get <a href="http://datastorm-open.github.io/visNetwork/">visNetwork</a> nodes and edges so you can make your own plot with <code>visNetwork()</code> or <code>render_drake_graph()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_graph_info</span>(config)</code></pre>
+<p>Use <code>readd()</code> and <code>loadd()</code> to load targets into your workspace. (They are cached in the hidden <code>.drake/</code> folder using <a href="https://CRAN.R-project.org/package=storr">storr</a>). There are many more functions for interacting with the cache.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(coef_regression2_large)
+##               Estimate Std. Error   t value     Pr(&gt;|t|)
+## (Intercept) 26.8613175 0.82963761  32.37717 1.485222e-40
+## x2          -0.6299583 0.05501956 -11.44972 6.167412e-17
+
+<span class="kw">loadd</span>(small)
+
+<span class="kw">head</span>(small)
+##       x    y
+## 1 3.730 17.3
+## 2 5.250 10.4
+## 3 3.730 17.3
+## 4 5.345 14.7
+## 5 3.190 24.4
+## 6 3.440 17.8
+
+<span class="kw">rm</span>(small)
+<span class="kw">cached</span>(small, large)
+## small large 
+##  TRUE  TRUE
+
+<span class="kw">cached</span>()
+##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
+##  [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [7] &quot;data.frame&quot;             &quot;knit&quot;                  
+##  [9] &quot;large&quot;                  &quot;lm&quot;                    
+## [11] &quot;mtcars&quot;                 &quot;nrow&quot;                  
+## [13] &quot;random_rows&quot;            &quot;reg1&quot;                  
+## [15] &quot;reg2&quot;                   &quot;regression1_large&quot;     
+## [17] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+## [19] &quot;regression2_small&quot;      &quot;sample.int&quot;            
+## [21] &quot;simulate&quot;               &quot;small&quot;                 
+## [23] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;
+## [25] &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;
+## [27] &quot;summary&quot;                &quot;suppressWarnings&quot;
+
+<span class="kw">built</span>()
+##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;coef_regression1_large&quot;
+##  [3] &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;
+##  [5] &quot;coef_regression2_small&quot; &quot;large&quot;                 
+##  [7] &quot;regression1_large&quot;      &quot;regression1_small&quot;     
+##  [9] &quot;regression2_large&quot;      &quot;regression2_small&quot;     
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
+
+<span class="kw">imported</span>()
+##  [1] &quot;\&quot;report.Rmd\&quot;&quot;   &quot;data.frame&quot;       &quot;knit&quot;            
+##  [4] &quot;lm&quot;               &quot;mtcars&quot;           &quot;nrow&quot;            
+##  [7] &quot;random_rows&quot;      &quot;reg1&quot;             &quot;reg2&quot;            
+## [10] &quot;sample.int&quot;       &quot;simulate&quot;         &quot;summary&quot;         
+## [13] &quot;suppressWarnings&quot;
+
+<span class="kw">head</span>(<span class="kw">read_drake_plan</span>())
+## # A tibble: 6 x 2
+##   target            command                                               
+##   &lt;chr&gt;             &lt;chr&gt;                                                 
+## 1 &quot;\&quot;report.md\&quot;&quot;   &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\…
+## 2 small             simulate(48)                                          
+## 3 large             simulate(64)                                          
+## 4 regression1_small reg1(small)                                           
+## 5 regression1_large reg1(large)                                           
+## 6 regression2_small reg2(small)
+
+<span class="kw">head</span>(<span class="kw">progress</span>()) <span class="co"># See also in_progress()</span>
+##            &quot;report.md&quot;           &quot;report.Rmd&quot; coef_regression1_large 
+##             &quot;finished&quot;             &quot;finished&quot;             &quot;finished&quot; 
+## coef_regression1_small coef_regression2_large coef_regression2_small 
+##             &quot;finished&quot;             &quot;finished&quot;             &quot;finished&quot;
+
+<span class="kw">progress</span>(large)
+##      large 
+## &quot;finished&quot;
+
+## drake_session() # sessionInfo() of the last make() # nolint</code></pre>
+<p>The next time you run <code>make(my_plan)</code>, nothing will build because <code>drake</code> knows everything is already up to date.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan) <span class="co"># Will use config later. See also drake_config().</span>
+## All targets are already up to date.</code></pre>
+<p>But if you change one of your functions, commands, or other dependencies, drake will update the affected targets. Suppose we change the quadratic term to a cubic term in <code>reg2()</code>. We might want to do this if we suspect a cubic relationship between tons and miles per gallon.</p>
+<pre class="sourceCode r"><code class="sourceCode r">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d) {
+  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span>
+  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)
+}</code></pre>
+<p>The targets that depend on <code>reg2()</code> need to be rebuilt.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config)
+## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;coef_regression2_large&quot;
+## [3] &quot;coef_regression2_small&quot; &quot;regression2_large&quot;     
+## [5] &quot;regression2_small&quot;      &quot;summ_regression2_large&quot;
+## [7] &quot;summ_regression2_small&quot;</code></pre>
+<p><strong>Advanced</strong>: To find out why a target is out of date, you can load the <a href="https://github.com/richfitz/storr">storr</a> cache and compare the appropriate hash keys to the output of <code>dependency_profile()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dependency_profile</span>(<span class="dt">target =</span> <span class="st">&quot;regression2_small&quot;</span>, <span class="dt">config =</span> config)
+## $cached_command
+## [1] &quot;{\n reg2(small) \n}&quot;
+## 
+## $current_command
+## [1] &quot;{\n reg2(small) \n}&quot;
+## 
+## $cached_file_modification_time
+## NULL
+## 
+## $cached_dependency_hash
+## [1] &quot;b5124bdceef8650183170ba11007bb7b52cb8e34d3f16da33d8e429406c8dcbd&quot;
+## 
+## $current_dependency_hash
+## [1] &quot;80a7eb5288828c2f5816caf84db9ebf97d423021e4682949705d682586218012&quot;
+## 
+## $hashes_of_dependencies
+##              small               reg2 
+## &quot;7d836504e5060e6d&quot; &quot;d47109544c89ca7a&quot;
+
+config<span class="op">$</span>cache<span class="op">$</span><span class="kw">get_hash</span>(<span class="dt">key =</span> <span class="st">&quot;small&quot;</span>) <span class="co"># same</span>
+## [1] &quot;7d836504e5060e6d&quot;
+
+config<span class="op">$</span>cache<span class="op">$</span><span class="kw">get_hash</span>(<span class="dt">key =</span> <span class="st">&quot;reg2&quot;</span>) <span class="co"># different</span>
+## [1] &quot;dc1bc94c6132cede&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">## Hover, click, drag, zoom, and explore.
+<span class="kw">vis_drake_graph</span>(config, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;500px&quot;</span>)</code></pre>
+<div id="htmlwidget-3f5f98c0b8782d1c9daa" style="width:100%;height:500px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3f5f98c0b8782d1c9daa">{"x":{"nodes":{"id":["\"report.md\"","\"report.Rmd\"","coef_regression1_large","coef_regression1_small","coef_regression2_large","coef_regression2_small","data.frame","knit","large","lm","mtcars","nrow","random_rows","reg1","reg2","regression1_large","regression1_small","regression2_large","regression2_small","sample.int","simulate","small","summ_regression1_large","summ_regression1_small","summ_regression2_large","summ_regression2_small","summary","suppressWarnings"],"label":["\"report.md\"\n0.076s","\"report.Rmd\"\n0.004s","coef_regression1_large\n0.008s","coef_regression1_small\n0.008s","coef_regression2_large\n0.008s","coef_regression2_small\n0.007s","data.frame\n0.058s","knit\n0.039s","large\n0.008s","lm\n0.031s","mtcars\n0.004s","nrow\n0.01s","random_rows\n0.004s","reg1\n0.004s","reg2\n0.005s","regression1_large\n0.009s","regression1_small\n0.01s","regression2_large\n0.058s","regression2_small\n0.012s","sample.int\n0.01s","simulate\n0.005s","small\n0.013s","summ_regression1_large\n0.008s","summ_regression1_small\n0.008s","summ_regression2_large\n0.008s","summ_regression2_small\n0.007s","summary\n0.017s","suppressWarnings\n0.017s"],"command":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)",null,"suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients",null,null,"simulate(64)",null,null,null,null,null,null,"reg1(large)","reg1(small)","reg2(large)","reg2(small)",null,null,"simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))",null,null],"status":["outdated","imported","up to date","up to date","outdated","outdated","imported","imported","up to date","imported","imported","imported","imported","imported","imported","up to date","up to date","outdated","outdated","imported","imported","up to date","up to date","up to date","outdated","outdated","imported","imported"],"type":["file","file","object","object","object","object","function","function","object","function","object","function","function","function","function","object","object","object","object","function","function","object","object","object","object","object","function","function"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#1874CD","#228B22","#228B22","#000000","#000000","#1874CD","#1874CD","#228B22","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#000000","#000000","#1874CD","#1874CD","#228B22","#228B22","#228B22","#000000","#000000","#1874CD","#1874CD"],"shape":["square","square","dot","dot","dot","dot","triangle","triangle","dot","triangle","dot","triangle","triangle","triangle","triangle","dot","dot","dot","dot","triangle","triangle","dot","dot","dot","dot","dot","triangle","triangle"],"level":[7,1,6,6,6,6,1,1,4,1,1,1,2,2,2,5,5,5,5,1,3,4,6,6,6,6,1,1],"hover_label":["knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)","---\ntitle: \"Final results report for the mtcars example\"\nauthor: You\noutput: html_document\n---\n\n# The weight and fuel efficiency of cars\n\nIs there an association between the weight and the fuel efficiency of cars? To find out, we use the `mtcars` ...","suppressWarnings(summary(regression1_large))$coefficients","suppressWarnings(summary(regression1_small))$coefficients","suppressWarnings(summary(regression2_large))$coefficients","suppressWarnings(summary(regression2_small))$coefficients","function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE, \n    fix.empty.names = TRUE, stringsAsFactors = default.stringsAsFactors()) \n{\n    data.row.names <- if (check.rows && is.null(row.names)) \n        function(current, new, i) ...","function (input, output = NULL, tangle = FALSE, text = NULL, \n    quiet = FALSE, envir = parent.frame(), encoding = getOption(\"encoding\")) \n{\n    in.file = !missing(input) && (is.character(input) || prod(inherits(input, \n        c(\"file\", \"connect...","simulate(64)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","mtcars","function (x) \ndim(x)[1L]","function (data, n) \n{\n    data[sample.int(n = nrow(data), size = n, replace = TRUE), \n        ]\n}","function (d) \n{\n    lm(y ~ +x, data = d)\n}","function (d) \n{\n    d$x3 <- d$x^3\n    lm(y ~ x3, data = d)\n}","reg1(large)","reg1(small)","reg2(large)","reg2(small)","function (n, size = n, replace = FALSE, prob = NULL, useHash = (!replace && \n    is.null(prob) && size <= n/2 && n > 1e+07)) \n{\n    if (useHash) \n        .Internal(sample2(n, size))\n    else .Internal(sample(n, size, replace, prob))\n}","function (n) \n{\n    data <- random_rows(data = mtcars, n = n)\n    data.frame(x = data$wt, y = data$mpg)\n}","simulate(48)","suppressWarnings(summary(regression1_large$residuals))","suppressWarnings(summary(regression1_small$residuals))","suppressWarnings(summary(regression2_large$residuals))","suppressWarnings(summary(regression2_small$residuals))","function (object, ...) \nUseMethod(\"summary\")","function (expr) \n{\n    ops <- options(warn = -1)\n    on.exit(options(ops))\n    withCallingHandlers(expr, warning = function(w) invokeRestart(\"muffleWarning\"))\n}"],"x":[-1,-0.826086956521739,0.826086956521739,0.347826086956522,-0.391304347826087,-0.521739130434783,-0.478260869565217,-0.739130434782609,-0.347826086956522,0.0869565217391304,-0.391304347826087,-0.565217391304348,-0.347826086956522,0.739130434782609,-0.478260869565217,0.782608695652174,0.652173913043478,-0.391304347826087,-0.260869565217391,-0.652173913043478,-0.260869565217391,-0.217391304347826,0.652173913043478,1,-0.0869565217391305,0.434782608695652,0.608695652173913,0.521739130434783],"y":[1,-1,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1,0,-1,-1,-1,-0.666666666666667,-0.666666666666667,-0.666666666666667,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,-1,-0.333333333333333,0,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,-1]},"edges":{"from":["nrow","sample.int","data.frame","mtcars","random_rows","lm","lm","summary","summary","summary","summary","summary","summary","summary","summary","\"report.Rmd\"","coef_regression2_small","knit","large","large","large","small","small","small","simulate","simulate","reg1","reg1","reg2","reg2","regression1_small","regression1_small","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","suppressWarnings","regression1_large","regression1_large","regression2_small","regression2_small","regression2_large","regression2_large"],"to":["random_rows","random_rows","simulate","simulate","simulate","reg1","reg2","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","\"report.md\"","\"report.md\"","\"report.md\"","regression1_large","regression2_large","\"report.md\"","regression1_small","regression2_small","\"report.md\"","large","small","regression1_small","regression1_large","regression2_small","regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression1_small","summ_regression1_large","summ_regression2_small","summ_regression2_large","coef_regression1_small","coef_regression1_large","coef_regression2_large","summ_regression1_large","coef_regression1_large","coef_regression2_small","summ_regression2_small","summ_regression2_large","coef_regression2_large"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":"100%","height":"500px","idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","In progress","Failed","Imported","Missing","Object","Function","File"],"color":["#228B22","#000000","#FF7221","#AA0000","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20,20,20,20],"id":[1,2,3,4,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>The next <code>make()</code> will rebuild the targets depending on <code>reg2()</code> and leave everything else alone.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan)
+## target regression2_large
+## target regression2_small
+## target summ_regression2_large
+## target coef_regression2_large
+## target coef_regression2_small
+## target summ_regression2_small
+## target file &quot;report.md&quot;</code></pre>
+<p>Trivial changes to whitespace and comments are totally ignored.</p>
+<pre class="sourceCode r"><code class="sourceCode r">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d) {
+  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span>
+    <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d) <span class="co"># I indented here.</span>
+}
+<span class="kw">outdated</span>(config) <span class="co"># Everything is up to date.</span>
+## character(0)</code></pre>
+<p>Drake cares about nested functions too: nontrivial changes to <code>random_rows()</code> will propagate to <code>simulate()</code> and all the downstream targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
+  n &lt;-<span class="st"> </span>n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+  data[<span class="kw">sample.int</span>(<span class="dt">n =</span> <span class="kw">nrow</span>(data), <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>), ]
+}
+
+<span class="kw">outdated</span>(config)
+##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;coef_regression1_large&quot;
+##  [3] &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;
+##  [5] &quot;coef_regression2_small&quot; &quot;large&quot;                 
+##  [7] &quot;regression1_large&quot;      &quot;regression1_small&quot;     
+##  [9] &quot;regression2_large&quot;      &quot;regression2_small&quot;     
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
+
+<span class="kw">make</span>(my_plan)
+## target large
+## target small
+## target regression1_large
+## target regression2_large
+## target regression1_small
+## target regression2_small
+## target summ_regression1_large
+## target coef_regression1_large
+## target summ_regression2_large
+## target coef_regression2_large
+## target summ_regression1_small
+## target coef_regression1_small
+## target coef_regression2_small
+## target summ_regression2_small
+## target file &quot;report.md&quot;</code></pre>
+<p>Need to add new work on the fly? Just append rows to the workflow plan. If the rest of your workflow is up to date, only the new work is run.</p>
+<pre class="sourceCode r"><code class="sourceCode r">new_simulation &lt;-<span class="st"> </span><span class="cf">function</span>(n){
+  <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(n), <span class="dt">y =</span> <span class="kw">rnorm</span>(n))
+}
+
+additions &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">new_data =</span> <span class="kw">new_simulation</span>(<span class="dv">36</span>) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">10</span>))
+additions
+## # A tibble: 1 x 2
+##   target   command                      
+## * &lt;chr&gt;    &lt;chr&gt;                        
+## 1 new_data new_simulation(36) + sqrt(10)
+
+my_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(my_plan, additions)
+my_plan
+## # A tibble: 16 x 2
+##    target                 command                                         
+##    &lt;chr&gt;                  &lt;chr&gt;                                           
+##  1 &quot;\&quot;report.md\&quot;&quot;        &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;repo…
+##  2 small                  simulate(48)                                    
+##  3 large                  simulate(64)                                    
+##  4 regression1_small      reg1(small)                                     
+##  5 regression1_large      reg1(large)                                     
+##  6 regression2_small      reg2(small)                                     
+##  7 regression2_large      reg2(large)                                     
+##  8 summ_regression1_small suppressWarnings(summary(regression1_small$resi…
+##  9 summ_regression1_large suppressWarnings(summary(regression1_large$resi…
+## 10 summ_regression2_small suppressWarnings(summary(regression2_small$resi…
+## 11 summ_regression2_large suppressWarnings(summary(regression2_large$resi…
+## 12 coef_regression1_small suppressWarnings(summary(regression1_small))$co…
+## 13 coef_regression1_large suppressWarnings(summary(regression1_large))$co…
+## 14 coef_regression2_small suppressWarnings(summary(regression2_small))$co…
+## 15 coef_regression2_large suppressWarnings(summary(regression2_large))$co…
+## 16 new_data               new_simulation(36) + sqrt(10)
+
+<span class="kw">make</span>(my_plan)
+## target new_data</code></pre>
+<p>If you ever need to erase your work, use <code>clean()</code>. The next <code>make()</code> will rebuild any cleaned targets, so be careful. You may notice that by default, the size of the cache does not go down very much. To purge old data, you could use <code>clean(garbage_collection = TRUE, purge = TRUE)</code>. To do garbage collection without removing any important targets, use <code>drake_gc()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Uncaches individual targets and imported objects.
+<span class="kw">clean</span>(small, reg1, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+<span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># Cleans all targets out of the cache.</span>
+<span class="kw">drake_gc</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># Just garbage collection.</span>
+<span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>, <span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># removes the cache entirely</span></code></pre>
+</div>
+<div id="automatic-watching-for-changed-dependencies" class="section level2">
+<h2><span class="header-section-number">6.9</span> Automatic watching for changed dependencies</h2>
+<p>As you have seen with <code>reg2()</code>, <code>drake</code> reacts to changes in dependencies. In other words, <code>make()</code> notices when your dependencies are different from last time, rebuilds any affected targets, and continues downstream. In particular, <code>drake</code> watches for nontrivial changes to the following items as long as they are connected to your workflow.</p>
+<ol style="list-style-type: decimal">
+<li>The output values of targets in your workflow plan.</li>
+<li>The commands themselves.</li>
+<li>External files, if their names are enclosed in single quotes in commands.</li>
+<li>R objects mentioned in the commands, including but not limited to user-defined functions and functions from packages.</li>
+<li>R objects (but not files) nested inside user-defined functions.</li>
+<li>For packages exposed with <code>expose_imports()</code>, R objects (but not files) nested inside package functions.</li>
+<li>Files declared with <code>file_in()</code> inside your commands or custom functions.</li>
+<li><code>knitr</code> reports declared with <code>knitr_in()</code> in your commands, along with any targets explicitly loaded in active code chunks with <code>loadd()</code> or <code>readd()</code>. Do not use <code>knitr_in()</code> inside your imported functions.</li>
+<li>Files declared with <code>file_out()</code> in your commands. Do not use <code>file_out()</code> inside your imported functions.</li>
+</ol>
+<p>To enhance reproducibility beyond the scope of drake, you might consider <a href="https://rstudio.github.io/packrat">packrat</a> and a container tool (such as <a href="http://singularity.lbl.gov/">Singularity</a> or <a href="https://www.docker.com/">Docker</a>. <a href="https://rstudio.github.io/packrat">Packrat</a> creates a tightly-controlled local library of packages to extend the shelf life of your project. And with containerization, you can execute your project on a <a href="https://en.wikipedia.org/wiki/Virtual_machine">virtual machine</a> to ensure platform independence. Together, <a href="https://rstudio.github.io/packrat">packrat</a> and containers can help others reproduce your work even if they have different software and hardware.</p>
+</div>
+<div id="a-note-on-tidy-evaluation" class="section level2">
+<h2><span class="header-section-number">6.10</span> A note on tidy evaluation</h2>
+<p>Running commands in your R console is not always exactly like running them with <code>make()</code>. That’s because <code>make()</code> uses tidy evaluation as implemented in the <a href="https://github.com/tidyverse/rlang"><code>rlang</code> package</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## This workflow plan uses rlang&#39;s quasiquotation operator `!!`.
+my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">list =</span> <span class="kw">c</span>(
+  <span class="dt">little_b =</span> <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">b</span><span class="ch">\&quot;</span><span class="st">&quot;</span>,
+  <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span>
+))
+my_plan
+## # A tibble: 2 x 2
+##   target   command   
+## * &lt;chr&gt;    &lt;chr&gt;     
+## 1 little_b &quot;\&quot;b\&quot;&quot;   
+## 2 letter   !!little_b
+<span class="kw">make</span>(my_plan)
+## target little_b
+## target letter
+<span class="kw">readd</span>(letter)
+## [1] &quot;b&quot;</code></pre>
+<p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_evaluation = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_variable &lt;-<span class="st"> </span><span class="dv">5</span>
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="op">!!</span>my_variable,
+  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)
+)
+## # A tibble: 3 x 2
+##   target command      
+## * &lt;chr&gt;  &lt;chr&gt;        
+## 1 a      5            
+## 2 b      5 + 1        
+## 3 d      !!my_variable
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="op">!!</span>my_variable,
+  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),
+  <span class="dt">tidy_evaluation =</span> <span class="ot">FALSE</span>
+)
+## # A tibble: 3 x 2
+##   target command          
+## * &lt;chr&gt;  &lt;chr&gt;            
+## 1 a      !!my_variable    
+## 2 b      !!my_variable + 1
+## 3 d      !!my_variable</code></pre>
+<p>For instances of <code>!!</code> that remain in the workflow plan, <code>make()</code> will run these commands in tidy fashion, evaluating the <code>!!</code> operator using the environment you provided.</p>
+</div>
+<div id="need-more-speed" class="section level2">
+<h2><span class="header-section-number">6.11</span> Need more speed?</h2>
+<p><code>Drake</code> has extensive high-performance computing support, from local multicore processing to serious distributed computing across multiple nodes of a cluster. See the <a href="hpc.html#hpc">high-performance computing chapter</a> for detailed instructions.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="example-gsp.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="best-practices.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

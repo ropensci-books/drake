@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>The drake R Package User Manual</title>
+  <meta name="description" content="The drake R Package User Manual">
+  <meta name="generator" content="bookdown 0.7.13 and GitBook 2.6.7">
+
+  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The drake R Package User Manual" />
+  
+  
+  
+
+<meta name="author" content="Will Landau, Alex Axthelm, Jasper Clarkberg, Kirill Müller, Lorenz Walthert, Ben Marwick, and Peter Slaughter">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="example-main.html">
+<link rel="next" href="example-packages.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.4/visNetwork.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.1</b> The drake R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.2</b> Installation</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.3</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.3.1</b> What gets done stays done.</a></li>
+<li class="chapter" data-level="1.3.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.3.2</b> Reproducibility with confidence</a></li>
+<li class="chapter" data-level="1.3.3" data-path="index.html"><a href="index.html#aggressively-scale-up."><i class="fa fa-check"></i><b>1.3.3</b> Aggressively scale up.</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.4</b> Documentation</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="index.html"><a href="index.html#cheat-sheet"><i class="fa fa-check"></i><b>1.4.1</b> Cheat sheet</a></li>
+<li class="chapter" data-level="1.4.2" data-path="index.html"><a href="index.html#frequently-asked-questions"><i class="fa fa-check"></i><b>1.4.2</b> Frequently asked questions</a></li>
+<li class="chapter" data-level="1.4.3" data-path="index.html"><a href="index.html#function-reference"><i class="fa fa-check"></i><b>1.4.3</b> Function reference</a></li>
+<li class="chapter" data-level="1.4.4" data-path="index.html"><a href="index.html#tutorials"><i class="fa fa-check"></i><b>1.4.4</b> Tutorials</a></li>
+<li class="chapter" data-level="1.4.5" data-path="index.html"><a href="index.html#examples"><i class="fa fa-check"></i><b>1.4.5</b> Examples</a></li>
+<li class="chapter" data-level="1.4.6" data-path="index.html"><a href="index.html#presentations"><i class="fa fa-check"></i><b>1.4.6</b> Presentations</a></li>
+<li class="chapter" data-level="1.4.7" data-path="index.html"><a href="index.html#real-example-projects"><i class="fa fa-check"></i><b>1.4.7</b> Real example projects</a></li>
+<li class="chapter" data-level="1.4.8" data-path="index.html"><a href="index.html#context-and-history"><i class="fa fa-check"></i><b>1.4.8</b> Context and history</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.5</b> Help and troubleshooting</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#similar-work"><i class="fa fa-check"></i><b>1.6</b> Similar work</a><ul>
+<li class="chapter" data-level="1.6.1" data-path="index.html"><a href="index.html#gnu-make"><i class="fa fa-check"></i><b>1.6.1</b> GNU Make</a></li>
+<li class="chapter" data-level="1.6.2" data-path="index.html"><a href="index.html#remake"><i class="fa fa-check"></i><b>1.6.2</b> Remake</a></li>
+<li class="chapter" data-level="1.6.3" data-path="index.html"><a href="index.html#memoise"><i class="fa fa-check"></i><b>1.6.3</b> Memoise</a></li>
+<li class="chapter" data-level="1.6.4" data-path="index.html"><a href="index.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>1.6.4</b> Knitr and R Markdown</a></li>
+<li class="chapter" data-level="1.6.5" data-path="index.html"><a href="index.html#factuals-drake"><i class="fa fa-check"></i><b>1.6.5</b> Factual’s Drake</a></li>
+<li class="chapter" data-level="1.6.6" data-path="index.html"><a href="index.html#other-pipeline-toolkits"><i class="fa fa-check"></i><b>1.6.6</b> Other pipeline toolkits</a></li>
+</ul></li>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>1.7</b> Acknowledgements</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="example-main.html"><a href="example-main.html"><i class="fa fa-check"></i><b>2</b> The main example</a><ul>
+<li class="chapter" data-level="2.1" data-path="example-main.html"><a href="example-main.html#set-the-stage."><i class="fa fa-check"></i><b>2.1</b> Set the stage.</a></li>
+<li class="chapter" data-level="2.2" data-path="example-main.html"><a href="example-main.html#make-your-results."><i class="fa fa-check"></i><b>2.2</b> Make your results.</a></li>
+<li class="chapter" data-level="2.3" data-path="example-main.html"><a href="example-main.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>2.3</b> Go back and fix things.</a></li>
+<li class="chapter" data-level="2.4" data-path="example-main.html"><a href="example-main.html#try-it-yourself"><i class="fa fa-check"></i><b>2.4</b> Try it yourself!</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>3</b> Workflow data frames</a><ul>
+<li class="chapter" data-level="3.1" data-path="plans.html"><a href="plans.html#what-is-a-workflow-plan-data-frame"><i class="fa fa-check"></i><b>3.1</b> What is a workflow plan data frame?</a></li>
+<li class="chapter" data-level="3.2" data-path="plans.html"><a href="plans.html#rationale"><i class="fa fa-check"></i><b>3.2</b> Rationale</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="plans.html"><a href="plans.html#you-can-skip-up-to-date-work."><i class="fa fa-check"></i><b>3.2.1</b> You can skip up-to-date work.</a></li>
+<li class="chapter" data-level="3.2.2" data-path="plans.html"><a href="plans.html#you-do-not-need-to-worry-about-which-targets-run-first."><i class="fa fa-check"></i><b>3.2.2</b> You do not need to worry about which targets run first.</a></li>
+<li class="chapter" data-level="3.2.3" data-path="plans.html"><a href="plans.html#data-frames-scale-well."><i class="fa fa-check"></i><b>3.2.3</b> Data frames scale well.</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="plans.html"><a href="plans.html#generating-large-workflow-plans"><i class="fa fa-check"></i><b>3.3</b> Generating large workflow plans</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="plans.html"><a href="plans.html#wildcard-templating"><i class="fa fa-check"></i><b>3.3.1</b> Wildcard templating</a></li>
+<li class="chapter" data-level="3.3.2" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>3.3.2</b> Specialized wildcard functionality</a></li>
+<li class="chapter" data-level="3.3.3" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>3.3.3</b> Non-wildcard functions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>3.4</b> Optional columns in your plan.</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="example-packages.html"><a href="example-packages.html"><i class="fa fa-check"></i><b>4</b> Example: R package download trends</a><ul>
+<li class="chapter" data-level="4.1" data-path="example-packages.html"><a href="example-packages.html#get-the-code."><i class="fa fa-check"></i><b>4.1</b> Get the code.</a></li>
+<li class="chapter" data-level="4.2" data-path="example-packages.html"><a href="example-packages.html#overview"><i class="fa fa-check"></i><b>4.2</b> Overview</a></li>
+<li class="chapter" data-level="4.3" data-path="example-packages.html"><a href="example-packages.html#analysis"><i class="fa fa-check"></i><b>4.3</b> Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="example-packages.html"><a href="example-packages.html#what-remote-data-sources-in-general"><i class="fa fa-check"></i><b>4.4</b> What remote data sources in general?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="example-gsp.html"><a href="example-gsp.html"><i class="fa fa-check"></i><b>5</b> Example: gross state products</a><ul>
+<li class="chapter" data-level="5.1" data-path="example-gsp.html"><a href="example-gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
+<li class="chapter" data-level="5.2" data-path="example-gsp.html"><a href="example-gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>5.2</b> Objective and methods</a></li>
+<li class="chapter" data-level="5.3" data-path="example-gsp.html"><a href="example-gsp.html#data"><i class="fa fa-check"></i><b>5.3</b> Data</a></li>
+<li class="chapter" data-level="5.4" data-path="example-gsp.html"><a href="example-gsp.html#analysis-1"><i class="fa fa-check"></i><b>5.4</b> Analysis</a></li>
+<li class="chapter" data-level="5.5" data-path="example-gsp.html"><a href="example-gsp.html#results"><i class="fa fa-check"></i><b>5.5</b> Results</a></li>
+<li class="chapter" data-level="5.6" data-path="example-gsp.html"><a href="example-gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>5.6</b> Comparison with GNU Make</a></li>
+<li class="chapter" data-level="5.7" data-path="example-gsp.html"><a href="example-gsp.html#references"><i class="fa fa-check"></i><b>5.7</b> References</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>6</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="6.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>6.1</b> Get the code.</a></li>
+<li class="chapter" data-level="6.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>6.2</b> Quick examples</a></li>
+<li class="chapter" data-level="6.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>6.3</b> The motivation of the mtcars example</a></li>
+<li class="chapter" data-level="6.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>6.4</b> Set up the mtcars example</a></li>
+<li class="chapter" data-level="6.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>6.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="6.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-workflow-plan"><i class="fa fa-check"></i><b>6.6</b> Generate the workflow plan</a></li>
+<li class="chapter" data-level="6.7" data-path="mtcars.html"><a href="mtcars.html#flexible-workflow-plan-generation"><i class="fa fa-check"></i><b>6.7</b> Flexible workflow plan generation</a></li>
+<li class="chapter" data-level="6.8" data-path="mtcars.html"><a href="mtcars.html#run-the-workflow"><i class="fa fa-check"></i><b>6.8</b> Run the workflow</a></li>
+<li class="chapter" data-level="6.9" data-path="mtcars.html"><a href="mtcars.html#automatic-watching-for-changed-dependencies"><i class="fa fa-check"></i><b>6.9</b> Automatic watching for changed dependencies</a></li>
+<li class="chapter" data-level="6.10" data-path="mtcars.html"><a href="mtcars.html#a-note-on-tidy-evaluation"><i class="fa fa-check"></i><b>6.10</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="6.11" data-path="mtcars.html"><a href="mtcars.html#need-more-speed"><i class="fa fa-check"></i><b>6.11</b> Need more speed?</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="best-practices.html"><a href="best-practices.html"><i class="fa fa-check"></i><b>7</b> General best practices for drake projects</a><ul>
+<li class="chapter" data-level="7.1" data-path="best-practices.html"><a href="best-practices.html#how-to-organize-your-files"><i class="fa fa-check"></i><b>7.1</b> How to organize your files</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="best-practices.html"><a href="best-practices.html#examples-1"><i class="fa fa-check"></i><b>7.1.1</b> Examples</a></li>
+<li class="chapter" data-level="7.1.2" data-path="best-practices.html"><a href="best-practices.html#where-do-you-put-your-code"><i class="fa fa-check"></i><b>7.1.2</b> Where do you put your code?</a></li>
+<li class="chapter" data-level="7.1.3" data-path="best-practices.html"><a href="best-practices.html#remember-your-commands-are-code-chunks-not-r-scripts"><i class="fa fa-check"></i><b>7.1.3</b> Remember: your commands are code chunks, not R scripts</a></li>
+<li class="chapter" data-level="7.1.4" data-path="best-practices.html"><a href="best-practices.html#file-output-targets"><i class="fa fa-check"></i><b>7.1.4</b> File output targets</a></li>
+<li class="chapter" data-level="7.1.5" data-path="best-practices.html"><a href="best-practices.html#r-markdown-and-knitr-reports"><i class="fa fa-check"></i><b>7.1.5</b> R Markdown and knitr reports</a></li>
+<li class="chapter" data-level="7.1.6" data-path="best-practices.html"><a href="best-practices.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.1.6</b> Workflows as R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="best-practices.html"><a href="best-practices.html#remote-data-sources"><i class="fa fa-check"></i><b>7.2</b> Remote data sources</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="vis.html"><a href="vis.html"><i class="fa fa-check"></i><b>8</b> Visualization with drake</a><ul>
+<li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#dependency-reactivity"><i class="fa fa-check"></i><b>8.1</b> Dependency reactivity</a></li>
+<li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.2</b> Subgraphs</a></li>
+<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.3</b> Control the legend.</a></li>
+<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#more-flexibility"><i class="fa fa-check"></i><b>8.4</b> More flexibility</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="debug.html"><a href="debug.html"><i class="fa fa-check"></i><b>9</b> Debugging and testing drake projects</a><ul>
+<li class="chapter" data-level="9.1" data-path="debug.html"><a href="debug.html#the-configuration-list"><i class="fa fa-check"></i><b>9.1</b> The configuration list</a></li>
+<li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#plan-your-work."><i class="fa fa-check"></i><b>9.2</b> Plan your work.</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="debug.html"><a href="debug.html#workflow-plan-data-frames"><i class="fa fa-check"></i><b>9.2.1</b> Workflow plan data frames</a></li>
+<li class="chapter" data-level="9.2.2" data-path="debug.html"><a href="debug.html#visualize-your-workflow."><i class="fa fa-check"></i><b>9.2.2</b> Visualize your workflow.</a></li>
+<li class="chapter" data-level="9.2.3" data-path="debug.html"><a href="debug.html#check-dependency-relationships."><i class="fa fa-check"></i><b>9.2.3</b> Check dependency relationships.</a></li>
+<li class="chapter" data-level="9.2.4" data-path="debug.html"><a href="debug.html#outdated-up-to-date-and-missing-items"><i class="fa fa-check"></i><b>9.2.4</b> Outdated, up to date, and missing items</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#test-with-triggers."><i class="fa fa-check"></i><b>9.3</b> Test with triggers.</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#skipping-imports"><i class="fa fa-check"></i><b>9.4</b> Skipping imports</a></li>
+<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#impose-timeouts-and-retries"><i class="fa fa-check"></i><b>9.5</b> Impose timeouts and retries</a></li>
+<li class="chapter" data-level="9.6" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.6</b> Diagnose failures.</a><ul>
+<li class="chapter" data-level="9.6.1" data-path="debug.html"><a href="debug.html#tidy-evaluation-a-caveat-to-diagnosing-interactively"><i class="fa fa-check"></i><b>9.6.1</b> Tidy evaluation: a caveat to diagnosing interactively</a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="debug.html"><a href="debug.html#debrief-a-build-session."><i class="fa fa-check"></i><b>9.7</b> Debrief a build session.</a></li>
+<li class="chapter" data-level="9.8" data-path="debug.html"><a href="debug.html#start-tinkering."><i class="fa fa-check"></i><b>9.8</b> Start tinkering.</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing with drake</a><ul>
+<li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
+<li class="chapter" data-level="10.2" data-path="hpc.html"><a href="hpc.html#let-drake-schedule-your-targets."><i class="fa fa-check"></i><b>10.2</b> Let drake schedule your targets.</a></li>
+<li class="chapter" data-level="10.3" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>10.3</b> Parallel backends</a></li>
+<li class="chapter" data-level="10.4" data-path="hpc.html"><a href="hpc.html#local-workers"><i class="fa fa-check"></i><b>10.4</b> Local workers</a></li>
+<li class="chapter" data-level="10.5" data-path="hpc.html"><a href="hpc.html#remote-workers"><i class="fa fa-check"></i><b>10.5</b> Remote workers</a><ul>
+<li class="chapter" data-level="10.5.1" data-path="hpc.html"><a href="hpc.html#future-future_lapply-and-future_lapply_staged"><i class="fa fa-check"></i><b>10.5.1</b> <code>&quot;future&quot;</code>, <code>&quot;future_lapply&quot;</code>, and <code>&quot;future_lapply_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.2" data-path="hpc.html"><a href="hpc.html#clustermq_staged"><i class="fa fa-check"></i><b>10.5.2</b> <code>&quot;clustermq_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.3" data-path="hpc.html"><a href="hpc.html#makefile"><i class="fa fa-check"></i><b>10.5.3</b> <code>&quot;Makefile&quot;</code></a></li>
+</ul></li>
+<li class="chapter" data-level="10.6" data-path="hpc.html"><a href="hpc.html#scheduling-algorithms"><i class="fa fa-check"></i><b>10.6</b> Scheduling algorithms</a><ul>
+<li class="chapter" data-level="10.6.1" data-path="hpc.html"><a href="hpc.html#persistent-scheduling"><i class="fa fa-check"></i><b>10.6.1</b> Persistent scheduling</a></li>
+<li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#transient-scheduling"><i class="fa fa-check"></i><b>10.6.2</b> Transient scheduling</a></li>
+<li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#staged-scheduling"><i class="fa fa-check"></i><b>10.6.3</b> Staged scheduling</a></li>
+</ul></li>
+<li class="chapter" data-level="10.7" data-path="hpc.html"><a href="hpc.html#final-thoughts"><i class="fa fa-check"></i><b>10.7</b> Final thoughts</a><ul>
+<li class="chapter" data-level="10.7.1" data-path="hpc.html"><a href="hpc.html#debugging"><i class="fa fa-check"></i><b>10.7.1</b> Debugging</a></li>
+<li class="chapter" data-level="10.7.2" data-path="hpc.html"><a href="hpc.html#drake-as-an-ordinary-job-scheduler"><i class="fa fa-check"></i><b>10.7.2</b> Drake as an ordinary job scheduler</a></li>
+<li class="chapter" data-level="10.7.3" data-path="hpc.html"><a href="hpc.html#more-resources"><i class="fa fa-check"></i><b>10.7.3</b> More resources</a></li>
+</ul></li>
+<li class="chapter" data-level="10.8" data-path="hpc.html"><a href="hpc.html#footnotes"><i class="fa fa-check"></i><b>10.8</b> Footnotes</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>11</b> Time: logging, prediction, and strategy</a><ul>
+<li class="chapter" data-level="11.1" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>11.1</b> Predict total runtime</a></li>
+<li class="chapter" data-level="11.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>11.2</b> Strategize your high-performance computing</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>12</b> Storage</a><ul>
+<li class="chapter" data-level="12.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>12.1</b> Caches</a></li>
+<li class="chapter" data-level="12.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>12.2</b> Hash algorithms</a></li>
+<li class="chapter" data-level="12.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>12.3</b> Which hash algorithm should you choose?</a></li>
+<li class="chapter" data-level="12.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>12.4</b> Select the hash algorithms of the cache</a></li>
+<li class="chapter" data-level="12.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>12.5</b> Using <code>storr</code> directly</a></li>
+<li class="chapter" data-level="12.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>12.6</b> Cleaning up</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="caution.html"><a href="caution.html"><i class="fa fa-check"></i><b>13</b> Cautionary notes</a><ul>
+<li class="chapter" data-level="13.1" data-path="caution.html"><a href="caution.html#projects-built-with-drake-4.4.0-are-not-back-compatible-with-drake-4.4.0."><i class="fa fa-check"></i><b>13.1</b> Projects built with drake &lt;= 4.4.0 are not back compatible with drake &gt; 4.4.0.</a></li>
+<li class="chapter" data-level="13.2" data-path="caution.html"><a href="caution.html#workflow-plans"><i class="fa fa-check"></i><b>13.2</b> Workflow plans</a><ul>
+<li class="chapter" data-level="13.2.1" data-path="caution.html"><a href="caution.html#externalizing-commands-in-r-script-files"><i class="fa fa-check"></i><b>13.2.1</b> Externalizing commands in R script files</a></li>
+<li class="chapter" data-level="13.2.2" data-path="caution.html"><a href="caution.html#commands-are-not-perfectly-flexible."><i class="fa fa-check"></i><b>13.2.2</b> Commands are NOT perfectly flexible.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="caution.html"><a href="caution.html#execution"><i class="fa fa-check"></i><b>13.3</b> Execution</a><ul>
+<li class="chapter" data-level="13.3.1" data-path="caution.html"><a href="caution.html#install-drake-properly."><i class="fa fa-check"></i><b>13.3.1</b> Install <code>drake</code> properly.</a></li>
+<li class="chapter" data-level="13.3.2" data-path="caution.html"><a href="caution.html#install-all-your-packages."><i class="fa fa-check"></i><b>13.3.2</b> Install all your packages.</a></li>
+<li class="chapter" data-level="13.3.3" data-path="caution.html"><a href="caution.html#a-note-on-tidy-evaluation-1"><i class="fa fa-check"></i><b>13.3.3</b> A note on tidy evaluation</a></li>
+<li class="chapter" data-level="13.3.4" data-path="caution.html"><a href="caution.html#find-and-diagnose-your-errors."><i class="fa fa-check"></i><b>13.3.4</b> Find and diagnose your errors.</a></li>
+<li class="chapter" data-level="13.3.5" data-path="caution.html"><a href="caution.html#refresh-the-drake_config-list-early-and-often."><i class="fa fa-check"></i><b>13.3.5</b> Refresh the <code>drake_config()</code> list early and often.</a></li>
+<li class="chapter" data-level="13.3.6" data-path="caution.html"><a href="caution.html#workflows-as-r-packages."><i class="fa fa-check"></i><b>13.3.6</b> Workflows as R packages.</a></li>
+<li class="chapter" data-level="13.3.7" data-path="caution.html"><a href="caution.html#the-lazy_load-flag-does-not-work-with-parlapply-parallelism."><i class="fa fa-check"></i><b>13.3.7</b> The <code>lazy_load</code> flag does not work with <code>&quot;parLapply&quot;</code> parallelism.</a></li>
+<li class="chapter" data-level="13.3.8" data-path="caution.html"><a href="caution.html#timeouts-may-be-unreliable."><i class="fa fa-check"></i><b>13.3.8</b> Timeouts may be unreliable.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.4" data-path="caution.html"><a href="caution.html#dependencies"><i class="fa fa-check"></i><b>13.4</b> Dependencies</a><ul>
+<li class="chapter" data-level="13.4.1" data-path="caution.html"><a href="caution.html#objects-that-contain-functions-may-trigger-unwanted-builds"><i class="fa fa-check"></i><b>13.4.1</b> Objects that contain functions may trigger unwanted builds</a></li>
+<li class="chapter" data-level="13.4.2" data-path="caution.html"><a href="caution.html#the-magrittr-dot-.-is-always-ignored."><i class="fa fa-check"></i><b>13.4.2</b> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</a></li>
+<li class="chapter" data-level="13.4.3" data-path="caution.html"><a href="caution.html#triggers-and-skipped-imports"><i class="fa fa-check"></i><b>13.4.3</b> Triggers and skipped imports</a></li>
+<li class="chapter" data-level="13.4.4" data-path="caution.html"><a href="caution.html#dependencies-are-not-tracked-in-some-edge-cases."><i class="fa fa-check"></i><b>13.4.4</b> Dependencies are not tracked in some edge cases.</a></li>
+<li class="chapter" data-level="13.4.5" data-path="caution.html"><a href="caution.html#dependencies-of-knitr-reports"><i class="fa fa-check"></i><b>13.4.5</b> Dependencies of <code>knitr</code> reports</a></li>
+<li class="chapter" data-level="13.4.6" data-path="caution.html"><a href="caution.html#knitr-inputs-and-file-outputs-in-imported-functions."><i class="fa fa-check"></i><b>13.4.6</b> Knitr inputs and file outputs in imported functions.</a></li>
+<li class="chapter" data-level="13.4.7" data-path="caution.html"><a href="caution.html#functions-produced-by-vectorize"><i class="fa fa-check"></i><b>13.4.7</b> Functions produced by <code>Vectorize()</code></a></li>
+<li class="chapter" data-level="13.4.8" data-path="caution.html"><a href="caution.html#compiled-code-is-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.8</b> Compiled code is not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.9" data-path="caution.html"><a href="caution.html#directories-folders-are-not-reproducibly-tracked."><i class="fa fa-check"></i><b>13.4.9</b> Directories (folders) are not reproducibly tracked.</a></li>
+<li class="chapter" data-level="13.4.10" data-path="caution.html"><a href="caution.html#packages-are-not-tracked-as-dependencies."><i class="fa fa-check"></i><b>13.4.10</b> Packages are not tracked as dependencies.</a></li>
+</ul></li>
+<li class="chapter" data-level="13.5" data-path="caution.html"><a href="caution.html#high-performance-computing"><i class="fa fa-check"></i><b>13.5</b> High-performance computing</a><ul>
+<li class="chapter" data-level="13.5.1" data-path="caution.html"><a href="caution.html#the-practical-utility-of-parallel-computing"><i class="fa fa-check"></i><b>13.5.1</b> The practical utility of parallel computing</a></li>
+<li class="chapter" data-level="13.5.2" data-path="caution.html"><a href="caution.html#maximum-number-of-simultaneous-jobs"><i class="fa fa-check"></i><b>13.5.2</b> Maximum number of simultaneous jobs</a></li>
+<li class="chapter" data-level="13.5.3" data-path="caution.html"><a href="caution.html#parallel-computing-on-windows"><i class="fa fa-check"></i><b>13.5.3</b> Parallel computing on Windows</a></li>
+<li class="chapter" data-level="13.5.4" data-path="caution.html"><a href="caution.html#configuring-futurebatchtools-parallelism-for-clusters"><i class="fa fa-check"></i><b>13.5.4</b> Configuring <a href="https://github.com/HenrikBengtsson/future">future</a>/<a href="https://github.com/mllg/batchtools">batchtools</a> parallelism for clusters</a></li>
+<li class="chapter" data-level="13.5.5" data-path="caution.html"><a href="caution.html#proper-makefiles-are-not-standalone."><i class="fa fa-check"></i><b>13.5.5</b> Proper Makefiles are not standalone.</a></li>
+<li class="chapter" data-level="13.5.6" data-path="caution.html"><a href="caution.html#makefile-level-parallelism-for-imported-objects-and-files"><i class="fa fa-check"></i><b>13.5.6</b> Makefile-level parallelism for imported objects and files</a></li>
+<li class="chapter" data-level="13.5.7" data-path="caution.html"><a href="caution.html#zombie-processes"><i class="fa fa-check"></i><b>13.5.7</b> Zombie processes</a></li>
+</ul></li>
+<li class="chapter" data-level="13.6" data-path="caution.html"><a href="caution.html#storage"><i class="fa fa-check"></i><b>13.6</b> Storage</a><ul>
+<li class="chapter" data-level="13.6.1" data-path="caution.html"><a href="caution.html#projects-hosted-on-dropbox-and-similar-platforms"><i class="fa fa-check"></i><b>13.6.1</b> Projects hosted on Dropbox and similar platforms</a></li>
+<li class="chapter" data-level="13.6.2" data-path="caution.html"><a href="caution.html#cache-customization-is-limited"><i class="fa fa-check"></i><b>13.6.2</b> Cache customization is limited</a></li>
+<li class="chapter" data-level="13.6.3" data-path="caution.html"><a href="caution.html#runtime-predictions"><i class="fa fa-check"></i><b>13.6.3</b> Runtime predictions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>14</b> Frequently-asked questions</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The drake R Package User Manual</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="plans" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Workflow data frames</h1>
+<div id="what-is-a-workflow-plan-data-frame" class="section level2">
+<h2><span class="header-section-number">3.1</span> What is a workflow plan data frame?</h2>
+<p>Your workflow plan data frame is the object where you declare all the objects and files you are going to produce when you run your project. It enumerates each output item, or <em>target</em>, and the R <em>command</em> that will produce it. Here is the workflow plan from our <a href="hpc.html#hpc">previous example</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),
+  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),
+  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),
+  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),
+  rmarkdown<span class="op">::</span><span class="kw">render</span>(
+    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+    <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+  )
+)
+plan
+## # A tibble: 5 x 2
+##   target            command                                               
+## * &lt;chr&gt;             &lt;chr&gt;                                                 
+## 1 raw_data          &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;      
+## 2 data              &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(S…
+## 3 hist              create_plot(data)                                     
+## 4 fit               lm(Sepal.Width ~ Petal.Width + Species, data)         
+## 5 &quot;\&quot;report.html\&quot;&quot; &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_f…</code></pre>
+<p>When you run <code>make(plan)</code>, <code>drake</code> will produce targets <code>raw_data</code>, <code>data</code>, <code>hist</code>, <code>fit</code>, and <code>report.Rmd</code>.</p>
+</div>
+<div id="rationale" class="section level2">
+<h2><span class="header-section-number">3.2</span> Rationale</h2>
+<p>The workflow plan may seem like a burden to set up, and the use of data frames may seem counterintuitive at first, but the rewards are worth the effort.</p>
+<div id="you-can-skip-up-to-date-work." class="section level3">
+<h3><span class="header-section-number">3.2.1</span> You can skip up-to-date work.</h3>
+<p>As we saw in our <a href="hpc.html#hpc">previous example</a>, repeated <code>make()</code>s skip work that is already up to date. The reason <code>drake</code> can skip things is that you declared all the skippable steps as targets in the workflow plan. Thus, workflow plans are vital to the time savings <code>drake</code> brings to large projects.</p>
+<p>This approach of declaring targets in advance has stood the test of time. The idea dates at least as far back as <a href="https://www.gnu.org/software/make/">GNU Make</a>, which uses <code>Makefile</code>s to declare targets and dependencies. <code>drake</code>’s predecessor <a href="https://github.com/richfitz/remake"><code>remake</code></a> uses <a href="http://yaml.org/"><code>YAML</code></a> files in a similar way.</p>
+</div>
+<div id="you-do-not-need-to-worry-about-which-targets-run-first." class="section level3">
+<h3><span class="header-section-number">3.2.2</span> You do not need to worry about which targets run first.</h3>
+<p>When you call <code>make()</code> on the plan above, <code>drake</code> takes care of <code>&quot;raw_data.xlsx&quot;</code>, then <code>raw_data</code>, and then <code>data</code> in sequence. Once <code>data</code> completes, <code>fit</code> and <code>hist</code> can start in any order, and then <code>&quot;report.md&quot;</code> begins once everything else is done. Because <code>drake</code> analyzes your commands for dependencies, it always builds your targets in this correct order. That means you can rearrange the rows of the workflow plan in any way you want, which is not the case with lines in an R script or code chunks in a <code>knitr</code> report.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),
+  rmarkdown<span class="op">::</span><span class="kw">render</span>(
+    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+    <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+  ),
+  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),
+  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),
+  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>))
+)
+## # A tibble: 5 x 2
+##   target            command                                               
+## * &lt;chr&gt;             &lt;chr&gt;                                                 
+## 1 fit               lm(Sepal.Width ~ Petal.Width + Species, data)         
+## 2 &quot;\&quot;report.html\&quot;&quot; &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_f…
+## 3 hist              create_plot(data)                                     
+## 4 data              &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(S…
+## 5 raw_data          &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;</code></pre>
+</div>
+<div id="data-frames-scale-well." class="section level3">
+<h3><span class="header-section-number">3.2.3</span> Data frames scale well.</h3>
+<p><code>Makefile</code>s are successful for <a href="https://www.gnu.org/software/make/">Make</a> because they accommodate software written in multiple languages. However, such external configuration files are not the best solution for R. Maintaining a <code>Makefile</code> or a <a href="https://github.com/richfitz/remake"><code>remake</code></a> <a href="http://yaml.org/"><code>YAML</code></a> file requires a lot of manual typing. But with <code>drake</code> plans, you can use the usual data frame manipulation tools to expand, generate, and piece together large projets. The <a href="example-gsp.html#example-gsp">gsp example</a> shows how <code>expand.grid()</code> and <code>rbind()</code> to automatically create plans with hundreds of targets. In addition, <code>drake</code> has a wildcard templating mechanism to generate large plans.</p>
+</div>
+</div>
+<div id="generating-large-workflow-plans" class="section level2">
+<h2><span class="header-section-number">3.3</span> Generating large workflow plans</h2>
+<p><code>drake</code> provides many more utilites that increase the flexibility of workflow plan generation beyond <code>expand.grid()</code>.</p>
+<ul>
+<li><code>drake_plan()</code></li>
+<li><code>evaluate_plan()</code></li>
+<li><code>plan_analyses()</code></li>
+<li><code>plan_summaries()</code></li>
+<li><code>expand_plan()</code></li>
+<li><code>gather_plan()</code></li>
+<li><code>reduce_plan()</code></li>
+</ul>
+<div id="wildcard-templating" class="section level3">
+<h3><span class="header-section-number">3.3.1</span> Wildcard templating</h3>
+<p>In <code>drake</code>, you can write plans with wildcards. These wilrdards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let’s say you are running a simulation study, and you need to generate sets of random numbers from different distributions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
+)</code></pre>
+<p>If you need to generate many datasets with different means, you may wish to write out each target individually.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal_0 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_1 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_2 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_3 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_4 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">4</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_5 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">5</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_6 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">6</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_7 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">7</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_8 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">8</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_9 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">9</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
+)</code></pre>
+<p>But writing all that code manually is a pain and prone to human error. Instead, use <code>evaluate_plan()</code></p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> <span class="dv">1</span>)
+)
+<span class="kw">evaluate_plan</span>(plan, <span class="dt">wildcard =</span> <span class="st">&quot;mean__&quot;</span>, <span class="dt">values =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)
+## # A tibble: 11 x 2
+##    target   command                      
+##  * &lt;chr&gt;    &lt;chr&gt;                        
+##  1 t        rt(1000, df = 5)             
+##  2 normal_0 runif(1000, mean = 0, sd = 1)
+##  3 normal_1 runif(1000, mean = 1, sd = 1)
+##  4 normal_2 runif(1000, mean = 2, sd = 1)
+##  5 normal_3 runif(1000, mean = 3, sd = 1)
+##  6 normal_4 runif(1000, mean = 4, sd = 1)
+##  7 normal_5 runif(1000, mean = 5, sd = 1)
+##  8 normal_6 runif(1000, mean = 6, sd = 1)
+##  9 normal_7 runif(1000, mean = 7, sd = 1)
+## 10 normal_8 runif(1000, mean = 8, sd = 1)
+## 11 normal_9 runif(1000, mean = 9, sd = 1)</code></pre>
+<p>You can specify multiple wildcards at once. If multiple wildcards appear in the same command, you will get a new target for each unique combination of values.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> df__),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> sd__)
+)
+<span class="kw">evaluate_plan</span>(
+  plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
+    <span class="dt">sd__ =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>),
+    <span class="dt">df__ =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span>
+  )
+)
+## # A tibble: 7 x 2
+##   target     command                      
+## * &lt;chr&gt;      &lt;chr&gt;                        
+## 1 t_5        rt(1000, df = 5)             
+## 2 t_6        rt(1000, df = 6)             
+## 3 t_7        rt(1000, df = 7)             
+## 4 normal_0_3 runif(1000, mean = 0, sd = 3)
+## 5 normal_0_4 runif(1000, mean = 0, sd = 4)
+## 6 normal_1_3 runif(1000, mean = 1, sd = 3)
+## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</code></pre>
+<p>Set <code>expand</code> to <code>FALSE</code> to disable expansion.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rpois</span>(samples__, <span class="dt">lambda =</span> mean__),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(samples__, <span class="dt">mean =</span> mean__)
+)
+<span class="kw">evaluate_plan</span>(
+  plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">samples__ =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">100</span>),
+    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)
+  ),
+  <span class="dt">expand =</span> <span class="ot">FALSE</span>
+)
+## # A tibble: 2 x 2
+##   target command              
+## * &lt;chr&gt;  &lt;chr&gt;                
+## 1 t      rpois(50, lambda = 1)
+## 2 normal runif(100, mean = 5)</code></pre>
+<p>Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.</p>
+<pre class="sourceCode r"><code class="sourceCode r">hard_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(school__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(school__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(school__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(school__)
+)
+
+<span class="kw">evaluate_plan</span>(
+  hard_plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>, <span class="st">&quot;schoolC&quot;</span>))
+)
+## # A tibble: 12 x 2
+##    target               command                      
+##  * &lt;chr&gt;                &lt;chr&gt;                        
+##  1 credits_schoolA      check_credit_hours(schoolA)  
+##  2 credits_schoolB      check_credit_hours(schoolB)  
+##  3 credits_schoolC      check_credit_hours(schoolC)  
+##  4 students_schoolA     check_students(schoolA)      
+##  5 students_schoolB     check_students(schoolB)      
+##  6 students_schoolC     check_students(schoolC)      
+##  7 grads_schoolA        check_graduations(schoolA)   
+##  8 grads_schoolB        check_graduations(schoolB)   
+##  9 grads_schoolC        check_graduations(schoolC)   
+## 10 public_funds_schoolA check_public_funding(schoolA)
+## 11 public_funds_schoolB check_public_funding(schoolB)
+## 12 public_funds_schoolC check_public_funding(schoolC)</code></pre>
+<p>But what if some metrics do not make sense? For example, what if <code>schoolC</code> is a completely privately-funded school? With no public funds, <code>check_public_funds(schoolC)</code> may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)
+)
+<span class="kw">evaluate_plan</span>(
+  <span class="dt">plan =</span> plan_template,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>, <span class="st">&quot;schoolC&quot;</span>),
+    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>)
+  )
+)
+## # A tibble: 11 x 2
+##    target               command                      
+##  * &lt;chr&gt;                &lt;chr&gt;                        
+##  1 credits_schoolA      check_credit_hours(schoolA)  
+##  2 credits_schoolB      check_credit_hours(schoolB)  
+##  3 credits_schoolC      check_credit_hours(schoolC)  
+##  4 students_schoolA     check_students(schoolA)      
+##  5 students_schoolB     check_students(schoolB)      
+##  6 students_schoolC     check_students(schoolC)      
+##  7 grads_schoolA        check_graduations(schoolA)   
+##  8 grads_schoolB        check_graduations(schoolB)   
+##  9 grads_schoolC        check_graduations(schoolC)   
+## 10 public_funds_schoolA check_public_funding(schoolA)
+## 11 public_funds_schoolB check_public_funding(schoolB)</code></pre>
+<p>Thanks to <a href="https://github.com/AlexAxthelm">Alex Axthelm</a> for this use case in <a href="https://github.com/ropensci/drake/issues/235">issue 235</a>.</p>
+</div>
+<div id="specialized-wildcard-functionality" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Specialized wildcard functionality</h3>
+<p>In the <a href="#example-mtcars"><code>mtcars</code> example</a>, we will analyze bootstrapped versions of the <code>mtcars</code> dataset to look for an association between the weight and the fuel efficiency of cars. This example uses <code>plan_analyses()</code> and <code>plan_summaries()</code>, two specialized applications of <code>evaluate_plan()</code>. First, we generate the plan for the bootstrapped datasets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_datasets &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
+  <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>))
+my_datasets
+## # A tibble: 2 x 2
+##   target command     
+## * &lt;chr&gt;  &lt;chr&gt;       
+## 1 small  simulate(48)
+## 2 large  simulate(64)</code></pre>
+<p>We want to analyze each dataset with one of two regression models.</p>
+<pre class="sourceCode r"><code class="sourceCode r">methods &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">regression1 =</span> <span class="kw">reg1</span>(dataset__),
+  <span class="dt">regression2 =</span> <span class="kw">reg2</span>(dataset__))
+methods
+## # A tibble: 2 x 2
+##   target      command        
+## * &lt;chr&gt;       &lt;chr&gt;          
+## 1 regression1 reg1(dataset__)
+## 2 regression2 reg2(dataset__)</code></pre>
+<p>We evaluate the <code>dataset__</code> wildcard to generate all the regression commands we will need.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_analyses &lt;-<span class="st"> </span><span class="kw">plan_analyses</span>(methods, <span class="dt">datasets =</span> my_datasets)
+my_analyses
+## # A tibble: 4 x 2
+##   target            command    
+## * &lt;chr&gt;             &lt;chr&gt;      
+## 1 regression1_small reg1(small)
+## 2 regression1_large reg1(large)
+## 3 regression2_small reg2(small)
+## 4 regression2_large reg2(large)</code></pre>
+<p>Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.</p>
+<pre class="sourceCode r"><code class="sourceCode r">summary_types &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">summ =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__<span class="op">$</span>residuals)),
+  <span class="dt">coef =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__))<span class="op">$</span>coefficients
+)
+summary_types
+## # A tibble: 2 x 2
+##   target command                                           
+## * &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 summ   suppressWarnings(summary(analysis__$residuals))   
+## 2 coef   suppressWarnings(summary(analysis__))$coefficients
+
+results &lt;-<span class="st"> </span><span class="kw">plan_summaries</span>(summary_types, <span class="dt">analyses =</span> my_analyses,
+  <span class="dt">datasets =</span> my_datasets, <span class="dt">gather =</span> <span class="ot">NULL</span>) <span class="co"># Gathering is suppressed here.</span>
+results
+## # A tibble: 8 x 2
+##   target                 command                                          
+##   &lt;chr&gt;                  &lt;chr&gt;                                            
+## 1 summ_regression1_small suppressWarnings(summary(regression1_small$resid…
+## 2 summ_regression1_large suppressWarnings(summary(regression1_large$resid…
+## 3 summ_regression2_small suppressWarnings(summary(regression2_small$resid…
+## 4 summ_regression2_large suppressWarnings(summary(regression2_large$resid…
+## 5 coef_regression1_small suppressWarnings(summary(regression1_small))$coe…
+## 6 coef_regression1_large suppressWarnings(summary(regression1_large))$coe…
+## 7 coef_regression2_small suppressWarnings(summary(regression2_small))$coe…
+## 8 coef_regression2_large suppressWarnings(summary(regression2_large))$coe…</code></pre>
+<p>Next, we bind all the rows together for a single plan that we can later supply to <code>make()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(my_datasets, my_analyses, results)
+my_plan
+## # A tibble: 14 x 2
+##    target                 command                                         
+##    &lt;chr&gt;                  &lt;chr&gt;                                           
+##  1 small                  simulate(48)                                    
+##  2 large                  simulate(64)                                    
+##  3 regression1_small      reg1(small)                                     
+##  4 regression1_large      reg1(large)                                     
+##  5 regression2_small      reg2(small)                                     
+##  6 regression2_large      reg2(large)                                     
+##  7 summ_regression1_small suppressWarnings(summary(regression1_small$resi…
+##  8 summ_regression1_large suppressWarnings(summary(regression1_large$resi…
+##  9 summ_regression2_small suppressWarnings(summary(regression2_small$resi…
+## 10 summ_regression2_large suppressWarnings(summary(regression2_large$resi…
+## 11 coef_regression1_small suppressWarnings(summary(regression1_small))$co…
+## 12 coef_regression1_large suppressWarnings(summary(regression1_large))$co…
+## 13 coef_regression2_small suppressWarnings(summary(regression2_small))$co…
+## 14 coef_regression2_large suppressWarnings(summary(regression2_large))$co…</code></pre>
+</div>
+<div id="non-wildcard-functions" class="section level3">
+<h3><span class="header-section-number">3.3.3</span> Non-wildcard functions</h3>
+<div id="expand_plan" class="section level4">
+<h4><span class="header-section-number">3.3.3.1</span> <code>expand_plan()</code></h4>
+<p>Sometimes, you just want multiple replicates of the same targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">fake_data =</span> <span class="kw">simulate_from_model</span>(),
+  <span class="dt">bootstrapped_data =</span> <span class="kw">bootstrap_from_real_data</span>(real_data)
+)
+<span class="kw">expand_plan</span>(plan, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+## # A tibble: 6 x 2
+##   target              command                            
+## * &lt;chr&gt;               &lt;chr&gt;                              
+## 1 fake_data_1         simulate_from_model()              
+## 2 fake_data_2         simulate_from_model()              
+## 3 fake_data_3         simulate_from_model()              
+## 4 bootstrapped_data_1 bootstrap_from_real_data(real_data)
+## 5 bootstrapped_data_2 bootstrap_from_real_data(real_data)
+## 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</code></pre>
+</div>
+<div id="gather_plan" class="section level4">
+<h4><span class="header-section-number">3.3.3.2</span> <code>gather_plan()</code></h4>
+<p>Other times, you want to combine multiple targets into one.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>)),
+  <span class="dt">large =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;large&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>))
+)
+<span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>)
+## # A tibble: 1 x 2
+##   target   command                           
+##   &lt;chr&gt;    &lt;chr&gt;                             
+## 1 combined list(small = small, large = large)</code></pre>
+<p>In this case, <code>small</code> and <code>large</code> are data frames, so it may be more convenient to combine the rows together.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>, <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>)
+## # A tibble: 1 x 2
+##   target   command                            
+##   &lt;chr&gt;    &lt;chr&gt;                              
+## 1 combined rbind(small = small, large = large)</code></pre>
+</div>
+<div id="reduce_plan" class="section level4">
+<h4><span class="header-section-number">3.3.3.3</span> <code>reduce_plan()</code></h4>
+<p><code>reduce_plan()</code> is similar to <code>gather_plan()</code>, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="dv">1</span>,
+  <span class="dt">b =</span> <span class="dv">2</span>,
+  <span class="dt">c =</span> <span class="dv">3</span>,
+  <span class="dt">d =</span> <span class="dv">4</span>
+)
+<span class="kw">reduce_plan</span>(plan)
+## # A tibble: 3 x 2
+##   target   command            
+##   &lt;chr&gt;    &lt;chr&gt;              
+## 1 target_1 a + b              
+## 2 target_2 c + d              
+## 3 target   target_1 + target_2</code></pre>
+<p>You can control how each pair of targets gets combined.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reduce_plan</span>(plan, <span class="dt">begin =</span> <span class="st">&quot;c(&quot;</span>, <span class="dt">op =</span> <span class="st">&quot;, &quot;</span>, <span class="dt">end =</span> <span class="st">&quot;)&quot;</span>)
+## # A tibble: 3 x 2
+##   target   command              
+##   &lt;chr&gt;    &lt;chr&gt;                
+## 1 target_1 c(a, b)              
+## 2 target_2 c(c, d)              
+## 3 target   c(target_1, target_2)</code></pre>
+</div>
+</div>
+</div>
+<div id="optional-columns-in-your-plan." class="section level2">
+<h2><span class="header-section-number">3.4</span> Optional columns in your plan.</h2>
+<p>Besides the usual columns <code>target</code> and <code>command</code>, there are other columns you can add.</p>
+<ul>
+<li><code>cpu</code>, <code>elapsed</code>, and <code>timeout</code>: number of seconds to wait for the target to build before timing out (<code>timeout</code> for a general upper bound, <code>cpu</code> for CPU time, and <code>elapsed</code> for elapsed time).</li>
+<li><code>priority</code>: for <a href="hpc.html#hpc">paralllel computing</a>, optionally rank the targets according to priority. That way, when two targets become ready to build at the same time, <code>drake</code> will pick the one with the dominant priority first.</li>
+<li><code>retries</code>: number of times to retry building a target in the event of an error.</li>
+<li><code>trigger</code>: choose the criterion that <code>drake</code> uses to decide whether to build the target. See <code>?triggers</code> to learn more.</li>
+<li><code>worker</code>: for <a href="hpc.html#hpc">paralllel computing</a>, optionally name the preferred worker to assign to each target.</li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="example-main.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="example-packages.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
