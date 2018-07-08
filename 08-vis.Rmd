@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 ```
 
-`Drake` has powerful visuals to help you plan your project. You can generate an interactive workflow network with either `drake_graph()` or `vis_drake_graph()`. Then click, drag, hover, zoom, and pan. Use either the mouse or the green buttons near the bottom.
+`Drake` has powerful visuals to help you plan your project. You can generate an interactive workflow network with `vis_drake_graph()`. Then click, drag, hover, zoom, and pan. Use either the mouse or the green buttons near the bottom.
 
 ## Dependency reactivity
 
@@ -40,6 +40,8 @@ reg2 <- function(d){
 }
 vis_drake_graph(config)
 ```
+
+The `vis_drake_graph()` and `render_drake_graph()` are based on the [`visNetwork`](http://datastorm-open.github.io/visNetwork/) package. [`visNetwork`](http://datastorm-open.github.io/visNetwork/) have layers of customization options, which you can read about [here](http://datastorm-open.github.io/visNetwork/).
 
 ## Subgraphs
 
@@ -156,11 +158,20 @@ vis_drake_graph(
 )
 ```
 
-## More flexibility
+## Static graphs
 
-We have only scratched the surface of `vis_drake_graph()`. The help files (`?vis_drake_graph`) document much more functionality. In particular, the `drake_graph_info()` and `render_drake_graph()` functions let you customize your own [visNetwork graph](http://datastorm-open.github.io/visNetwork/).
+It is often useful to construct static non-interactive graphs to save plot files, construct reproducible examples, etc. Use `static_drake_graph()` to produce a [`ggplot2`](https://ggplot2.tidyverse.org/)/[`ggraph`](https://github.com/thomasp85/ggraph) version of your graph, which you can then augment with further layers, plot in your console, or save with `ggsave()`.
 
-```{r enddrakevis, echo = FALSE}
-drake::clean(destroy = TRUE)
-unlink("report.Rmd")
+```{r static}
+static_drake_graph(config)
 ```
+
+## Node and edge data frames
+
+`drake_graph_info()` is used in both `vis_drake_graph()` and `static_drake_graph()` to obtain data frames of nodes and edges before rendering. The functions `render_drake_graph()` and `render_static_drake_graph()` accept this graph info object directly, which could speed up the construction of new visuals.
+
+```{r drakegraphinfo34908234}
+str(drake_graph_info(config))
+```
+
+
