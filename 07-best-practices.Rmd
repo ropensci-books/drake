@@ -278,7 +278,8 @@ f <- function(x){
 plan <- drake_plan(x = f(1))
 
 ## Here are the reproducibly tracked objects in the workflow.
-tracked(plan)
+config <- drake_config(plan)
+tracked(config)
 
 ## But the `digest()` function has dependencies too.
 ## Because `drake` knows `digest()` is from a package,
@@ -292,7 +293,8 @@ To force `drake` to dive deeper into the nested functions in a package, you must
 
 ```{r nestingsolution}
 expose_imports(digest)
-new_objects <- tracked(plan)
+config <- drake_config(plan)
+new_objects <- tracked(config)
 head(new_objects, 10)
 length(new_objects)
 
