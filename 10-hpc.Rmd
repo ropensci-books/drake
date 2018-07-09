@@ -151,6 +151,13 @@ make(my_plan, parallelism = "future", jobs = 2)
 make(my_plan, parallelism = "future_lapply", jobs = 2)
 ```
 
+For `"future_lapply_staged"` parallelism, the `jobs` argument is ignored, and you must instead specify the number of workers in `future::plan()`.
+
+```{r future1b, eval = FALSE}
+future::plan(multisession, workers = 2)
+make(my_plan, parallelism = "future_lapply_staged")
+```
+
 To deploy to a cluster (say, a [SLURM](https://slurm.schedmd.com/) cluster), you need the [`batchtools`](https://github.com/mllg/batchtools) and [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) packages.
 
 ```{r futurebatchtools, eval = FALSE}
@@ -170,7 +177,13 @@ future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
 make(my_plan, parallelism = "future", jobs = 2)
 ## Same technology, different scheduling options:
 make(my_plan, parallelism = "future_lapply", jobs = 2)
-make(my_plan, parallelism = "future_lapply_staged", jobs = 2)
+```
+
+And as before, `"future_lapply_staged"` uses the `workers` argument from `future::plan()` rather than `jobs` in `make()`.
+
+```{r futurebatchtools2a, eval = FALSE}
+future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl", workers = 2)
+make(my_plan, parallelism = "future_lapply_staged")
 ```
 
 See packages [`future`](https://github.com/HenrikBengtsson/future), [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools), and [`batchtools`](https://github.com/mllg/batchtools) for more options. For example, the alternatives for `future::plan()` are listed [here](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) and [here](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend).

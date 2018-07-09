@@ -1,9 +1,10 @@
 #!/bin/sh
-echo "begin deploying"
+echo "Begin deploying."
 set -e
 
 [ -z "${GITHUB_PAT}" ] && exit 0
 [ "${TRAVIS_BRANCH}" != "master" ] && exit 0
+echo "Found gh token and on master branch."
 
 git config --global user.email "will.landau@gmail.com"
 git config --global user.name "wlandau"
@@ -14,4 +15,4 @@ cp -r ../_book/* ./
 git add --all *
 git commit -m "Update the manual" || true
 git push -q origin gh-pages
-echo "done deploying"
+echo "Done deploying."
