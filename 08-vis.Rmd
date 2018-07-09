@@ -160,9 +160,12 @@ vis_drake_graph(
 
 ## Static graphs
 
-It is often useful to construct static non-interactive graphs to save plot files, construct reproducible examples, etc. Use `static_drake_graph()` to produce a [`ggplot2`](https://ggplot2.tidyverse.org/)/[`ggraph`](https://github.com/thomasp85/ggraph) version of your graph, which you can then augment with further layers, plot in your console, or save with `ggsave()`.
+For small projects and minimal reproducible examples, it is often useful to construct static (non-interactive) graphs. Use `static_drake_graph()` to produce a [`ggplot2`](https://ggplot2.tidyverse.org/)/[`ggraph`](https://github.com/thomasp85/ggraph) version of your graph, which you can then augment with further layers, plot in your console, or save with `ggsave()`.
 
 ```{r static}
+plan <- drake_plan(data = get_data(), model = data, plot = data)
+get_data <- function(){}
+config <- drake_config(plan)
 static_drake_graph(config)
 ```
 
@@ -172,4 +175,9 @@ static_drake_graph(config)
 
 ```{r drakegraphinfo34908234}
 str(drake_graph_info(config))
+```
+
+```{r viscleanup}
+drake::clean(destroy = TRUE)
+unlink("report.Rmd")
 ```
