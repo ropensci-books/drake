@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>The drake R Package User Manual</title>
   <meta name="description" content="The drake R Package User Manual">
-  <meta name="generator" content="bookdown 0.7.13 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7.14 and GitBook 2.6.7">
 
   <meta property="og:title" content="The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -220,12 +220,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2" data-path="best-practices.html"><a href="best-practices.html#remote-data-sources"><i class="fa fa-check"></i><b>7.2</b> Remote data sources</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="vis.html"><a href="vis.html"><i class="fa fa-check"></i><b>8</b> Visualization with drake</a><ul>
-<li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#dependency-reactivity"><i class="fa fa-check"></i><b>8.1</b> Dependency reactivity</a></li>
-<li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.2</b> Subgraphs</a></li>
-<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#control-the-legend."><i class="fa fa-check"></i><b>8.3</b> Control the legend.</a></li>
-<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#clusters"><i class="fa fa-check"></i><b>8.4</b> Clusters</a></li>
-<li class="chapter" data-level="8.5" data-path="vis.html"><a href="vis.html#static-graphs"><i class="fa fa-check"></i><b>8.5</b> Static graphs</a></li>
-<li class="chapter" data-level="8.6" data-path="vis.html"><a href="vis.html#node-and-edge-data-frames"><i class="fa fa-check"></i><b>8.6</b> Node and edge data frames</a></li>
+<li class="chapter" data-level="8.0.1" data-path="vis.html"><a href="vis.html#vis_drake_graph"><i class="fa fa-check"></i><b>8.0.1</b> <code>vis_drake_graph()</code></a></li>
+<li class="chapter" data-level="8.0.2" data-path="vis.html"><a href="vis.html#sankey_drake_graph"><i class="fa fa-check"></i><b>8.0.2</b> <code>sankey_drake_graph()</code></a></li>
+<li class="chapter" data-level="8.0.3" data-path="vis.html"><a href="vis.html#static_drake_graph"><i class="fa fa-check"></i><b>8.0.3</b> <code>static_drake_graph()</code></a></li>
+<li class="chapter" data-level="8.1" data-path="vis.html"><a href="vis.html#underlying-graph-data-node-and-edge-data-frames"><i class="fa fa-check"></i><b>8.1</b> Underlying graph data: node and edge data frames</a></li>
+<li class="chapter" data-level="8.2" data-path="vis.html"><a href="vis.html#visualizing-target-status"><i class="fa fa-check"></i><b>8.2</b> Visualizing target status</a></li>
+<li class="chapter" data-level="8.3" data-path="vis.html"><a href="vis.html#subgraphs"><i class="fa fa-check"></i><b>8.3</b> Subgraphs</a></li>
+<li class="chapter" data-level="8.4" data-path="vis.html"><a href="vis.html#control-the-vis_drake_graph-legend."><i class="fa fa-check"></i><b>8.4</b> Control the <code>vis_drake_graph()</code> legend.</a></li>
+<li class="chapter" data-level="8.5" data-path="vis.html"><a href="vis.html#clusters"><i class="fa fa-check"></i><b>8.5</b> Clusters</a></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="debug.html"><a href="debug.html"><i class="fa fa-check"></i><b>9</b> Debugging and testing drake projects</a><ul>
 <li class="chapter" data-level="9.1" data-path="debug.html"><a href="debug.html#the-configuration-list"><i class="fa fa-check"></i><b>9.1</b> The configuration list</a></li>
@@ -538,10 +540,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;35cb20cbb7f1a6068cfc649702d42fe2&quot;
+## [1] &quot;2bb79fec09ed0766c0c70227aba0d08d&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;93059f4a31f673467f45ce18d5c315d0&quot;
+## [1] &quot;63f9369b0e56464e67b6ff5b39d1a15e&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
