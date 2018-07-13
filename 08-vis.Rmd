@@ -2,6 +2,8 @@
 
 ```{r vissetup, echo = FALSE}
 suppressMessages(suppressWarnings(library(drake)))
+suppressMessages(suppressWarnings(library(visNetwork)))
+clean(destroy = TRUE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   error = TRUE,
@@ -10,42 +12,78 @@ knitr::opts_chunk$set(
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 ```
 
-`Drake` has powerful visuals to help you plan your project. You can generate an interactive workflow network with `vis_drake_graph()`. Then click, drag, hover, zoom, and pan. Use either the mouse or the green buttons near the bottom.
+Data analysis projects have complicated networks of dependencies, and `drake` can help you visualize them with `vis_drake_graph()`, `sankey_drake_graph()`, and `static_drake_graph()`.
 
-## Dependency reactivity
+### `vis_drake_graph()`
 
-Initially, your entire project is out of date.
+Powered by [`visNetwork`](http://datastorm-open.github.io/visNetwork/), these graphs are interactive. Hover, click, and drag the nodes, and zoom and pan the whole graph. Colors represent target status, and shapes represent data type.
 
-```{r graphoutdated}
+```{r visnetworkgraph}
 library(drake)
 load_mtcars_example() # Get the code with drake_example("mtcars").
 config <- drake_config(my_plan)
-vis_drake_graph(config) # Same as drake_graph()
-```
-
-After `make()`, the whole project is all caught up.
-
-```{r graphmake}
-config <- make(my_plan, jobs = 4, verbose = FALSE)
 vis_drake_graph(config)
 ```
 
+### `sankey_drake_graph()`
 
-But when you change a dependency, some targets are out of date until the next `make(my_plan)`.
+These interactive [`networkD3`](https://github.com/christophergandrud/networkD3) [Sankey diagrams](https://en.wikipedia.org/wiki/Sankey_diagram) have more nuance: the height of each node is proportional to its number of connections. In other words, the taller the node, the more targets it puts out of date when its value or dependencies change.
+
+```{r sankeygraph}
+sankey_drake_graph(config)
+```
+
+Unfortunately, a legend is [not yet available for Sankey diagrams](https://github.com/ropensci/drake/pull/467), but `drake` exposes a separate legend for the colors and shapes.
+
+```{r showlegend}
+library(visNetwork)
+legend_nodes()
+visNetwork(nodes = legend_nodes())
+```
+
+### `static_drake_graph()`
+
+Powered by [`ggraph`](https://github.com/thomasp85/ggraph), these graphs are not interactive. However, they are useful for [reproducible examples](https://github.com/tidyverse/reprex), you can customize the output with additional [`ggplot2`](https://github.com/tidyverse/ggplot2) layers, and you can save them with `ggsave()`.
+
+```{r static}
+plan <- drake_plan(data = get_data(), model = data, plot = data)
+plan
+get_data <- function(){}
+config <- drake_config(plan)
+static_drake_graph(config)
+```
+
+## Underlying graph data: node and edge data frames
+
+`drake_graph_info()` is used behind the scenes in `vis_drake_graph()`, `sankey_drake_graph()`, and `static_drake_graph()` to get the graph information ready for rendering. To save time, you can call `drake_graph_info()` to get these internals and then call `render_drake_graph()`, `render_sankey_drake_graph()`, or  `render_static_drake_graph()`.
+
+```{r drakegraphinfo34908234}
+str(drake_graph_info(config))
+```
+
+## Visualizing target status
+
+`drake`'s visuals tell you which targets are up to date and which are outdated.
+
+```{r graphmake}
+config <- make(my_plan, jobs = 4, verbose = FALSE)
+outdated(config)
+sankey_drake_graph(config)
+```
+
+When you change a dependency, some targets fall out of date (black nodes).
 
 ```{r reg2graphvisual}
 reg2 <- function(d){
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
 }
-vis_drake_graph(config)
+sankey_drake_graph(config)
 ```
-
-The `vis_drake_graph()` and `render_drake_graph()` are based on the [`visNetwork`](http://datastorm-open.github.io/visNetwork/) package. [`visNetwork`](http://datastorm-open.github.io/visNetwork/) have layers of customization options, which you can read about [here](http://datastorm-open.github.io/visNetwork/).
 
 ## Subgraphs
 
-Graphs can grow enormous for serious projects, so there are multiple ways to focus on a manageable subgraph. The most brute-force way is to just pick a manual `subset` of nodes. However, with the `subset` argument, `vis_drake_graph()` may drop intermediate nodes and edges.
+Graphs can grow enormous for serious projects, so there are multiple ways to focus on a manageable subgraph. The most brute-force way is to just pick a manual `subset` of nodes. However, with the `subset` argument, the graphing functions can drop intermediate nodes and edges.
 
 ```{r subsetgraph}
 vis_drake_graph(
@@ -74,14 +112,13 @@ vis_drake_graph(config, from = "small", mode = "in")
 
 In fact, let us just take a small neighborhood around a target in both directions.
 
-
 ```{r fromall}
 vis_drake_graph(config, from = "small", mode = "all", order = 1)
 ```
 
-## Control the legend.
+## Control the `vis_drake_graph()` legend.
 
-To remove superfluous information from the legend, set the `full_legend` argument to `FALSE`.
+To remove superfluous information from the `vis_drake_graph()` legend, set the `full_legend` argument to `FALSE`.
 
 ```{r smalllegend}
 vis_drake_graph(config, full_legend = FALSE)
@@ -95,7 +132,7 @@ vis_drake_graph(config, ncol_legend = 0)
 
 ## Clusters
 
-With the `group` and `clusters` arguments to `vis_drake_graph()` and `drake_graph_info()`, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [workflow plan guide](#plans). Our plan was generated with `evaluate_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
+With the `group` and `clusters` arguments to the graphing functions, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [workflow plan guide](#plans). Our plan was generated with `evaluate_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
 
 ```{r tracevisgraph1}
 plan_template <- drake_plan(
@@ -129,8 +166,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument of `vis_drake_graph()`, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(config)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
-
+For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument to the graphing functions, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(config)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
 
 ```{r tracevisgraph2}
 config <- drake_config(plan)
@@ -158,26 +194,8 @@ vis_drake_graph(
 )
 ```
 
-## Static graphs
-
-For small projects and minimal reproducible examples, it is often useful to construct static (non-interactive) graphs. Use `static_drake_graph()` to produce a [`ggplot2`](https://ggplot2.tidyverse.org/)/[`ggraph`](https://github.com/thomasp85/ggraph) version of your graph, which you can then augment with further layers, plot in your console, or save with `ggsave()`.
-
-```{r static}
-plan <- drake_plan(data = get_data(), model = data, plot = data)
-get_data <- function(){}
-config <- drake_config(plan)
-static_drake_graph(config)
-```
-
-## Node and edge data frames
-
-`drake_graph_info()` is used in both `vis_drake_graph()` and `static_drake_graph()` to obtain data frames of nodes and edges before rendering. The functions `render_drake_graph()` and `render_static_drake_graph()` accept this graph info object directly, which could speed up the construction of new visuals.
-
-```{r drakegraphinfo34908234}
-str(drake_graph_info(config))
-```
-
-```{r viscleanup}
-drake::clean(destroy = TRUE)
-unlink("report.Rmd")
+```{r endofline_vis, echo = F}
+clean(destroy = TRUE, verbose = FALSE)
+unlink(c(
+  "*.lock", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 ```
