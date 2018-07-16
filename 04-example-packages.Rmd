@@ -7,6 +7,7 @@ suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(ggplot2)))
 suppressMessages(suppressWarnings(library(knitr)))
 suppressMessages(suppressWarnings(library(magrittr)))
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 knitr::opts_chunk$set(
@@ -82,8 +83,7 @@ data_plan <- drake_plan(
       when = "last-month"
     ),
     trigger = "always"
-  ),
-  strings_in_dots = "literals"
+  )
 )
 
 data_plan
@@ -138,7 +138,7 @@ in a dynamic knitr report.
 
 ```{r reportplanpackages}
 report_plan <- drake_plan(
-  knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
+  report = knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
 )
 
 report_plan

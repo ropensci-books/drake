@@ -3,12 +3,23 @@
 ```{r loaddrake14, echo = FALSE}
 suppressPackageStartupMessages(library(drake))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
-tmp <- file.create("report.Rmd")
+dat <- system.file(
+  file.path("examples", "main", "raw_data.xlsx"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = dat, to = "raw_data.xlsx")
+rmd <- system.file(
+  file.path("examples", "main", "report.Rmd"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = rmd, to = "report.Rmd")
 ```
 
 ## What is a workflow plan data frame?
 
-Your workflow plan data frame is the object where you declare all the objects and files you are going to produce when you run your project. It enumerates each output item, or *target*, and the R *command* that will produce it. Here is the workflow plan from our [previous example](#hpc).
+Your workflow plan data frame is the object where you declare all the objects and files you are going to produce when you run your project. It enumerates each output R object, or *target*, and the *command* that will produce it. Here is the workflow plan from our [previous example](#hpc).
 
 ```{r firstexampleplan}
 plan <- drake_plan(
@@ -18,7 +29,7 @@ plan <- drake_plan(
     select(-X__1),
   hist = create_plot(data),
   fit = lm(Sepal.Width ~ Petal.Width + Species, data),
-  rmarkdown::render(
+  report = rmarkdown::render(
     knitr_in("report.Rmd"),
     output_file = file_out("report.html"),
     quiet = TRUE
@@ -27,7 +38,7 @@ plan <- drake_plan(
 plan
 ```
 
-When you run `make(plan)`, `drake` will produce targets `raw_data`, `data`, `hist`, `fit`, and `report.Rmd`.
+When you run `make(plan)`, `drake` will produce targets `raw_data`, `data`, `hist`, `fit`, and `report`. 
 
 ## Rationale
 
@@ -39,14 +50,18 @@ As we saw in our [previous example](#hpc), repeated `make()`s skip work that is 
 
 This approach of declaring targets in advance has stood the test of time. The idea dates at least as far back as [GNU Make](https://www.gnu.org/software/make/), which uses  `Makefile`s to declare targets and dependencies. `drake`'s predecessor [`remake`](https://github.com/richfitz/remake) uses [`YAML`](http://yaml.org/) files in a similar way.
 
+### Data frames scale well.
+
+`Makefile`s are successful for [Make](https://www.gnu.org/software/make/) because they accommodate software written in multiple languages. However, such external configuration files are not the best solution for R. Maintaining a `Makefile` or a [`remake`](https://github.com/richfitz/remake) [`YAML`](http://yaml.org/) file requires a lot of manual typing. But with `drake` plans, you can use the usual data frame manipulation tools to expand, generate, and piece together large projets. The [gsp example](#example-gsp) shows how `expand.grid()` and `rbind()` to automatically create plans with hundreds of targets. In addition, `drake` has a wildcard templating mechanism to generate large plans.
+
 ### You do not need to worry about which targets run first.
 
-When you call `make()` on the plan above, `drake` takes care of `"raw_data.xlsx"`, then `raw_data`, and then `data` in sequence. Once `data` completes, `fit` and `hist` can start in any order, and then `"report.md"` begins once everything else is done. Because `drake` analyzes your commands for dependencies, it always builds your targets in this correct order. That means you can rearrange the rows of the workflow plan in any way you want, which is not the case with lines in an R script or code chunks in a `knitr` report.
+When you call `make()` on the plan above, `drake` takes care of `"raw_data.xlsx"`, then `raw_data`, and then `data` in sequence. Once `data` completes, `fit` and `hist` can start in any order, and then `report` begins once everything else is done. The execution does not depend on the order of the rows in your plan. In other words, the following plan is equivalent.
 
 ```{r firstexampleplan2}
 drake_plan(
   fit = lm(Sepal.Width ~ Petal.Width + Species, data),
-  rmarkdown::render(
+  report = rmarkdown::render(
     knitr_in("report.Rmd"),
     output_file = file_out("report.html"),
     quiet = TRUE
@@ -59,11 +74,65 @@ drake_plan(
 )
 ```
 
+## Automatic dependency detection
 
-### Data frames scale well.
+Why can you safely scramble the rows of a `drake` plan? Why is row order irrelevant to execution order? Because `drake` analyzes commands for dependencies, and `make()` processes those dependencies before moving on to downstream targets. To detect dependencies, `drake` walks through the [abstract syntax tree](http://adv-r.had.co.nz/Expressions.html#ast-funs) of every piece of code to find the objects and files relevant to the workflow pipeline.
 
-`Makefile`s are successful for [Make](https://www.gnu.org/software/make/) because they accommodate software written in multiple languages. However, such external configuration files are not the best solution for R. Maintaining a `Makefile` or a [`remake`](https://github.com/richfitz/remake) [`YAML`](http://yaml.org/) file requires a lot of manual typing. But with `drake` plans, you can use the usual data frame manipulation tools to expand, generate, and piece together large projets. The [gsp example](#example-gsp) shows how `expand.grid()` and `rbind()` to automatically create plans with hundreds of targets. In addition, `drake` has a wildcard templating mechanism to generate large plans.
+```{r depscode_plans}
+create_plot <- function(data) {
+  ggplot(data, aes_string(x = "Petal.Width", fill = "Species")) +
+    geom_histogram()
+}
 
+deps_code(create_plot)
+
+deps_code(
+  quote({
+    some_function_i_wrote(data)
+    rmarkdown::render(
+      knitr_in("report.Rmd"),
+      output_file = file_out("report.html"),
+      quiet = TRUE
+    )
+  })
+)
+```
+
+`drake` detects dependencies without actually running the command.
+
+```{r depscode_plans2}
+file.exists("report.html")
+```
+
+R objects and functions are detected implicitly, and you can specify multiple file inputs and outputs per command with the `file_in()`, `knitr_in()`, and `file_out()` functions. With `knitr_in()` R Markdown reports like `report.Rmd` ([online here](https://github.com/ropensci/drake/blob/master/inst/examples/main/report.Rmd)), `drake` scans active code chunks for objects mentioned with `loadd()` and `readd()`. So when `fit` or `hist` change, `drake` rebuilds the `report` target to produce the file `report.html`.
+
+Output files declared with `file_out()` do not appear in `vis_drake_graph()`, but targets can depend on one another through `file_in()`/`file_out()` connections.
+
+```{r fileinfileout_plans}
+saveRDS(1, "start.rds")
+
+write_files <- function(){
+  x <- readRDS(file_in("start.rds"))
+  for (file in letters[1:3]){
+    saveRDS(x, file)
+  }
+}
+
+small_plan <- drake_plan(
+  x = {
+    write_files()
+    file_out("a", "b", "c")
+  },
+  y = readRDS(file_in("a"))
+)
+
+config <- drake_config(small_plan)
+vis_drake_graph(config)
+```
+
+So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` knows to rebuild target `y`.
+
+And remember, `drake` also takes into account imported functions and imported files. If there are nontrivial changes to `start.rds`, `letters`, `readRDS()`, or `saveRDS()`, `drake` will rebuild targets `x` and/or `y` as appropriate.
 
 ## Generating large workflow plans
 
@@ -346,7 +415,8 @@ Besides the usual columns `target` and `command`, there are other columns you ca
 - `worker`: for [paralllel computing](#hpc), optionally name the preferred worker to assign to each target. 
 
 
-```{r enddrake14, echo = FALSE}
-drake::clean(destroy = TRUE)
-unlink("report.Rmd")
+```{r endofline_plans, echo = FALSE}
+clean(destroy = TRUE, verbose = FALSE)
+unlink(
+  c("start.rds", "report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"))
 ```

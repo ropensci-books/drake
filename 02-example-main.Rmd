@@ -73,7 +73,7 @@ plan <- drake_plan(
     select(-X__1),
   hist = create_plot(data),
   fit = lm(Sepal.Width ~ Petal.Width + Species, data),
-  rmarkdown::render(
+  report = rmarkdown::render(
     knitr_in("report.Rmd"),
     output_file = file_out("report.html"),
     quiet = TRUE
@@ -97,7 +97,7 @@ So far, we have just been setting the stage. Use `make()` to do the real work. T
 make(plan)
 ```
 
-Except for files like `report.html`, your output is stored in a hidden `.drake/` folder. Reading it back is easy.
+Except for output files like `report.html`, your output is stored in a hidden `.drake/` folder. Reading it back is easy.
 
 ```{r readddata1}
 readd(data) # See also loadd().
@@ -133,7 +133,7 @@ create_plot <- function(data) {
 vis_drake_graph(config)
 ```
 
-The next `make()` just builds `hist` and `report.html`. No point in wasting time on the data or model.
+The next `make()` just builds `hist` and `report`. No point in wasting time on the data or model.
 
 ```{r justhistetc}
 make(plan)

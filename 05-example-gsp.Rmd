@@ -5,6 +5,7 @@ suppressPackageStartupMessages(library(drake))
 suppressPackageStartupMessages(library(Ecdat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(knitr))
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
 unlink(".drake", recursive = TRUE)
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
@@ -127,11 +128,13 @@ At the end, let's generate a pdf plot of the RMSPE scores and a [knitr](https://
 
 ```{r masterknitrreport}
 output_plan <- drake_plan(
-  ggsave(
+  plot = ggsave(
     filename = file_out("rmspe.pdf"),
-    plot = plot_rmspe(rmspe)
+    plot = plot_rmspe(rmspe),
+    width = 7,
+    height = 7
   ),
-  knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
+  report = knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
 )
 
 head(output_plan)
