@@ -25,7 +25,7 @@ titles <- combine_fields(faq, "title")
 urls <- combine_fields(faq, "html_url")
 links <- paste0("- [", titles, "](", urls, ")")
 
-dest <- "14-faq.Rmd"
+dest <- "faq.Rmd"
 file.copy(from = "faq-stub.md", to = dest, overwrite = TRUE)
 
 con <- file(dest, "a")
