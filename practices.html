@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-
-<link rel="next" href="main.html">
+<link rel="prev" href="plans.html">
+<link rel="next" href="vis.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -346,268 +346,257 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">The drake R Package User Manual</h1>
-<p class="author"><em>Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert</em></p>
+<div id="practices" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> General best practices for drake projects</h1>
+<p>This chapter describes general best practices for creating, configuring, and running <code>drake</code> projects. It answers frequently asked questions and clears up common misconceptions, and it will continuously develop in response to community feedback.</p>
+<div id="how-to-organize-your-files" class="section level2">
+<h2><span class="header-section-number">7.1</span> How to organize your files</h2>
+<div id="examples-1" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> Examples</h3>
+<p>For examples of how to structure your code files, see the beginner oriented example projects:</p>
+<ul>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/mtcars">mtcars</a></li>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/gsp">gsp</a></li>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/packages">packages</a></li>
+</ul>
+<p>Write the code directly with the <code>drake_example()</code> function.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;mtcars&quot;</span>)
+<span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)
+<span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</code></pre>
+<p>In practice, you do not need to organize your files the way the examples do, but it does happen to be a reasonable way of doing things.</p>
 </div>
-<div id="intro" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
-<center>
-<img src="https://ropensci.github.io/drake/images/logo.svg" align="center" alt="logo" width="240" height = "278" style = "border: none">
-</center>
-<div id="the-drake-r-package" class="section level2">
-<h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p><code>drake</code> — or, Data Frames in R for Make — is a general-purpose workflow manager for data-driven tasks. It rebuilds intermediate data objects when their dependencies change, and it skips work when the results are already up to date. Not every runthrough starts from scratch, and completed workflows have tangible evidence of reproducibility. <code>Drake</code> is more scalable than <a href="https://github.com/yihui/knitr"><code>knitr</code></a>, more thorough than <a href="https://github.com/r-lib/memoise">memoization</a>, and more R-focused than <a href="https://github.com/pditommaso/awesome-pipeline">other pipeline toolkits</a> such as <a href="https://www.gnu.org/software/make/">GNU Make</a>, <a href="https://github.com/richfitz/remake"><code>remake</code></a>, and <a href="https://snakemake.readthedocs.io">snakemake</a>.</p>
-</div>
-<div id="installation" class="section level2">
-<h2><span class="header-section-number">1.2</span> Installation</h2>
-<p>You can choose among different versions of <code>drake</code>. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install the latest stable release from CRAN.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)
+<div id="where-do-you-put-your-code" class="section level3">
+<h3><span class="header-section-number">7.1.2</span> Where do you put your code?</h3>
+<p>It is best to write your code as a bunch of functions. You can save those functions in R scripts and then <code>source()</code> them before doing anything else.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Load functions get_data(), analyze_data, and summarize_results()
+<span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>)</code></pre>
+<p>Then, set up your workflow plan data frame.</p>
+<pre class="sourceCode r"><code class="sourceCode r">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span>
+  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),
+  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)
+)
 
-<span class="co"># Alternatively, install the development version from GitHub.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
-<span class="kw">library</span>(devtools)
-<span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre>
+good_plan
+## # A tibble: 3 x 2
+##   target       command                                
+## * &lt;chr&gt;        &lt;chr&gt;                                  
+## 1 my_data      &quot;get_data(file_in(\&quot;data.csv\&quot;))&quot;      
+## 2 my_analysis  analyze_data(my_data)                  
+## 3 my_summaries summarize_results(my_data, my_analysis)</code></pre>
+<p><code>Drake</code> knows that <code>my_analysis</code> depends on <code>my_data</code> because <code>my_data</code> is an argument to <code>analyze_data()</code>, which is part of the command for <code>my_analysis</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(good_plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-dda5858bd620d236e22c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["\"data.csv\"","analyze_data","get_data","my_analysis","my_data","my_summaries","summarize_results"],"input_files":[null,null,null,null,"\"data.csv\"",null,null],"label":["\"data.csv\"\n0.002s","analyze_data\n0.002s","get_data\n0.002s","my_analysis","my_data","my_summaries","summarize_results\n0.002s"],"command":[null,null,null,"analyze_data(my_data)","get_data(file_in(\"data.csv\"))","summarize_results(my_data, my_analysis)",null],"status":["imported","imported","imported","outdated","outdated","outdated","imported"],"type":["file","function","function","object","object","object","function"],"font.size":[20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#1874CD"],"shape":["square","triangle","triangle","dot","dot","dot","triangle"],"level":[1,1,1,3,2,4,1],"hover_label":["","function () \n{\n}","function () \n{\n}","analyze_data(my_data)","get_data(file_in(\"data.csv\"))","summarize_results(my_data, my_analysis)","function () \n{\n}"],"x":[-1,0.333333333333333,-0.333333333333333,0.333333333333333,-0.666666666666667,0.333333333333333,1],"y":[-1,-1,-1,0.333333333333333,-0.333333333333333,1,-1]},"edges":{"from":["analyze_data","get_data","summarize_results","\"data.csv\"","my_data","my_data","my_analysis"],"to":["my_analysis","my_data","my_summaries","my_data","my_analysis","my_summaries","my_summaries"],"arrows":["to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>Now, you can call <code>make()</code> to build the targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(good_plan)</code></pre>
+<p>If your commands are really long, just put them in larger functions. <code>Drake</code> analyzes imported functions for non-file dependencies.</p>
 </div>
-<div id="why-drake" class="section level2">
-<h2><span class="header-section-number">1.3</span> Why drake?</h2>
-<div id="what-gets-done-stays-done." class="section level3">
-<h3><span class="header-section-number">1.3.1</span> What gets done stays done.</h3>
-<p>Too many data science projects follow a <a href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphean loop</a>:</p>
-<ol style="list-style-type: decimal">
-<li>Launch the code.</li>
-<li>Wait while it runs.</li>
-<li>Discover an issue.</li>
-<li>Restart from scratch.</li>
-</ol>
-<p>Have you ever tried to manually salvage old results for a new runthrough?
-<br></p>
-<center>
-<a href="https://twitter.com/fossilosophy/status/966408174470299648">
-<img src="https://ropensci.github.io/drake/images/tweet.png" alt="tweet" align="center" style = "border: none; float: center;">
-</a>
-</center>
-<p><br></p>
-<p>With <code>drake</code>, you can automatically</p>
-<ol style="list-style-type: decimal">
-<li>Launch the parts that changed since last time.</li>
-<li>Skip the rest.</li>
-</ol>
-</div>
-<div id="reproducibility-with-confidence" class="section level3">
-<h3><span class="header-section-number">1.3.2</span> Reproducibility with confidence</h3>
-<p>The R community emphasizes reproducibility. Traditional themes include <a href="https://en.wikipedia.org/wiki/Replication_crisis">scientific replicability</a>, literate programming with <a href="https://yihui.name/knitr/">knitr</a>, and version control with <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">git</a>. But internal consistency is important too. Reproducibility carries the promise that your output matches the code and data you say you used.</p>
-<div id="evidence" class="section level4">
-<h4><span class="header-section-number">1.3.2.1</span> Evidence</h4>
-<p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
+<div id="remember-your-commands-are-code-chunks-not-r-scripts" class="section level3">
+<h3><span class="header-section-number">7.1.3</span> Remember: your commands are code chunks, not R scripts</h3>
+<p>Some people are accustomed to dividing their work into R scripts and then calling <code>source()</code> to run each step of the analysis. For example you might have the following files.</p>
+<ul>
+<li><code>get_data.R</code></li>
+<li><code>analyze_data.R</code></li>
+<li><code>summarize_results.R</code></li>
+</ul>
+<p>If you migrate to <code>drake</code>, you may be tempted to set up a workflow plan like this.</p>
+<pre class="sourceCode r"><code class="sourceCode r">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),
+  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),
+  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))
+)
 
+bad_plan
+## # A tibble: 3 x 2
+##   target       command                                
+## * &lt;chr&gt;        &lt;chr&gt;                                  
+## 1 my_data      &quot;source(file_in(\&quot;get_data.R\&quot;))&quot;      
+## 2 my_analysis  &quot;source(file_in(\&quot;analyze_data.R\&quot;))&quot;  
+## 3 my_summaries &quot;source(file_in(\&quot;summarize_data.R\&quot;))&quot;</code></pre>
+<p>But now, the dependency structure of your work is broken. Your R script files are dependencies, but since <code>my_data</code> is not mentioned in a function or command, <code>drake</code> does not know that <code>my_analysis</code> depends on it.</p>
+<pre><code>## [[1]]
+## [1] TRUE
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] TRUE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(bad_plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-e9f90e3194077d960e00" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e9f90e3194077d960e00">{"x":{"nodes":{"id":["\"analyze_data.R\"","\"get_data.R\"","\"summarize_data.R\"","my_analysis","my_data","my_summaries","source"],"input_files":[null,null,null,"\"analyze_data.R\"","\"get_data.R\"","\"summarize_data.R\"",null],"label":["\"analyze_data.R\"\n0.002s","\"get_data.R\"\n0.002s","\"summarize_data.R\"\n0.002s","my_analysis","my_data","my_summaries","source\n0.04s"],"command":[null,null,null,"source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))",null],"status":["imported","imported","imported","outdated","outdated","outdated","imported"],"type":["file","file","file","object","object","object","function"],"font.size":[20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#1874CD"],"shape":["square","square","square","dot","dot","dot","triangle"],"level":[1,1,1,2,2,2,1],"hover_label":["","","","source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))","function (file, local = FALSE, echo = verbose, print.eval = echo, \n    exprs, spaced = use_file, verbose = getOption(\"verbose\"), \n    prompt.echo = getOption(\"prompt\"), max.deparse.length = 150, \n    width.cutoff = 60L, deparseCtrl = \"showAttribut..."],"x":[-1,-0.333333333333333,1,-1,0,1,0.333333333333333],"y":[-1,-1,-1,1,1,1,-1]},"edges":{"from":["\"get_data.R\"","source","source","source","\"analyze_data.R\"","\"summarize_data.R\""],"to":["my_data","my_data","my_analysis","my_summaries","my_analysis","my_summaries"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<pre><code>## [[1]]
+## [1] TRUE
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] TRUE</code></pre>
+<p>Dangers:</p>
+<ol style="list-style-type: decimal">
+<li>In the first <code>make(bad_plan, jobs = 2)</code>, <code>drake</code> will try to build <code>my_data</code> and <code>my_analysis</code> at the same time even though <code>my_data</code> must finish before <code>my_analysis</code> begins.</li>
+<li><code>Drake</code> is oblivious to <code>data.csv</code> since it is not explicitly mentioned in a workflow plan command. So when <code>data.csv</code> changes, <code>make(bad_plan)</code> will not rebuild <code>my_data</code>.</li>
+<li><code>my_analysis</code> will not update when <code>my_data</code> changes.</li>
+<li>The return value of <code>source()</code> is formatted counter-intuitively. If <code>source(file_in(&quot;get_data.R&quot;))</code> is the command for <code>my_data</code>, then <code>my_data</code> will always be a list with elements <code>&quot;value&quot;</code> and <code>&quot;visible&quot;</code>. In other words, <code>source(file_in(&quot;get_data.R&quot;))$value</code> is really what you would want.</li>
+</ol>
+<p>In addition, this <code>source()</code>-based approach is simply inconvenient. <code>Drake</code> rebuilds <code>my_data</code> every time <code>get_data.R</code> changes, even when those changes are just extra comments or blank lines. On the other hand, in the previous plan that uses <code>my_data = get_data()</code>, <code>drake</code> does not trigger rebuilds when comments or whitespace in <code>get_data()</code> are modified. <code>Drake</code> is R-focused, not file-focused. If you embrace this viewpoint, your work will be easier.</p>
+</div>
+<div id="workflows-as-r-packages" class="section level3">
+<h3><span class="header-section-number">7.1.4</span> Workflows as R packages</h3>
+<p>The R package structure is a great way to organize the files of your project. Writing your own package to contain your data science workflow is a good idea, but you will need to</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>expose_imports()</code> to properly account for all your nested function dependencies, and</li>
+<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code>.</li>
+</ol>
+<p>Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a> for the workaround behind <code>expose_imports()</code>.</p>
+<div id="advantages-of-putting-workflows-in-r-packages" class="section level4">
+<h4><span class="header-section-number">7.1.4.1</span> Advantages of putting workflows in R packages</h4>
+<ul>
+<li>The file organization of R packages is a well-understood community standard. If you follow it, your work may be more readable and thus reproducible.</li>
+<li>R package installation is a standard process. The system makes it easier for others to obtain and run your code.</li>
+<li>You get development and quality control tools for free: <a href="https://github.com/hadley/devtools">helpers for loading code and creating files</a>, <a href="http://r-pkgs.had.co.nz/tests.html">unit testing</a>, <a href="http://r-pkgs.had.co.nz/check.html">package checks</a>, <a href="https://github.com/r-lib/covr">code coverage</a>, and <a href="https://ipub.com/continuous-integration-for-r/">continuous integration</a>.</li>
+</ul>
+</div>
+<div id="the-problem" class="section level4">
+<h4><span class="header-section-number">7.1.4.2</span> The problem</h4>
+<p>For <code>drake</code>, there is one problem: nested functions. <code>Drake</code> always looks for imported functions nested in other imported functions, but only in your environment. When it sees a function from a package, it does not look in its body for other imports.</p>
+<p>To see this, consider the <code>digest()</code> function from the <a href="https://github.com/eddelbuettel/digest"><code>digest</code> package</a>. <a href="https://github.com/eddelbuettel/digest"><code>Digest</code> package</a> is a utility for computing hashes, not a data science workflow, but I will use it to demonstrate how <code>drake</code> treats imports from packages.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(digest)
+g &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">digest</span>(x)
+}
+f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">g</span>(x)
+}
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">f</span>(<span class="dv">1</span>))
+
+## Here are the reproducibly tracked objects in the workflow.
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
-<span class="kw">outdated</span>(config)</code></pre>
-<p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
-</div>
-<div id="ease" class="section level4">
-<h4><span class="header-section-number">1.3.2.2</span> Ease</h4>
-<p>When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()       <span class="co"># Remove the original author&#39;s results.</span>
-<span class="kw">make</span>(plan) <span class="co"># Independently re-create the results from the code and input data.</span></code></pre>
-</div>
-<div id="independent-replication" class="section level4">
-<h4><span class="header-section-number">1.3.2.3</span> Independent replication</h4>
-<p>With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic <code>drake</code> functions such as <code>make()</code>, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author’s methodology. In other words, <code>drake</code> could potentially improve the integrity of independent replication.</p>
-</div>
-<div id="readability-and-transparency" class="section level4">
-<h4><span class="header-section-number">1.3.2.4</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>Drake</code> helps in several ways.</p>
-<ul>
-<li>The <a href="https://ropensci.github.io/drake/reference/drake_plan.html">workflow plan data frame</a> explicitly outlines the steps of the analysis, and <a href="https://ropensci.github.io/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>Drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
-<li>You can <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
-</ul>
-</div>
-</div>
-<div id="aggressively-scale-up." class="section level3">
-<h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>Drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the spare cores on your local machine.</span>
-<span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)
+<span class="kw">tracked</span>(config)
+## [1] &quot;digest&quot; &quot;f&quot;      &quot;g&quot;      &quot;x&quot;
 
-<span class="co"># Or scale up to a supercomputer.</span>
-<span class="kw">drake_batchtools_tmpl_file</span>(<span class="st">&quot;slurm&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span>
-<span class="kw">library</span>(future.batchtools)
-future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;batchtools.slurm.tmpl&quot;</span>, <span class="dt">workers =</span> <span class="dv">100</span>)
-<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</code></pre>
+## But the `digest()` function has dependencies too.
+## Because `drake` knows `digest()` is from a package,
+## it ignores these dependencies by default.
+<span class="kw">head</span>(<span class="kw">deps_code</span>(digest), <span class="dv">10</span>)
+## $globals
+##  [1] &quot;match.arg&quot;    &quot;stop&quot;         &quot;warning&quot;      &quot;return&quot;      
+##  [5] &quot;invisible&quot;    &quot;is.infinite&quot;  &quot;is.character&quot; &quot;missing&quot;     
+##  [9] &quot;names&quot;        &quot;formals&quot;      &quot;any&quot;          &quot;is.na&quot;       
+## [13] &quot;pmatch&quot;       &quot;which&quot;        &quot;as.raw&quot;       &quot;inherits&quot;    
+## [17] &quot;paste&quot;        &quot;switch&quot;       &quot;path.expand&quot;  &quot;file.exists&quot; 
+## [21] &quot;isTRUE&quot;       &quot;file.info&quot;    &quot;file.access&quot;  &quot;.Call&quot;       
+## [25] &quot;digest_impl&quot;  &quot;as.integer&quot;  
+## 
+## $namespaced
+## [1] &quot;base::serialize&quot;</code></pre>
+</div>
+<div id="the-solution" class="section level4">
+<h4><span class="header-section-number">7.1.4.3</span> The solution</h4>
+<p>To force <code>drake</code> to dive deeper into the nested functions in a package, you must use <code>expose_imports()</code>. Again, I demonstrate with the <a href="https://github.com/eddelbuettel/digest"><code>digest</code> package</a> package, but you should really only do this with a package you write yourself to contain your workflow. For external packages, <a href="https://rstudio.github.io/packrat/">packrat</a> is a much better solution for package reproducibility.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">expose_imports</span>(digest)
+## &lt;environment: R_GlobalEnv&gt;
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+new_objects &lt;-<span class="st"> </span><span class="kw">tracked</span>(config)
+<span class="kw">head</span>(new_objects, <span class="dv">10</span>)
+##  [1] &quot;.Call&quot;           &quot;any&quot;             &quot;as.integer&quot;     
+##  [4] &quot;as.raw&quot;          &quot;base::serialize&quot; &quot;digest&quot;         
+##  [7] &quot;digest_impl&quot;     &quot;f&quot;               &quot;file.access&quot;    
+## [10] &quot;file.exists&quot;
+<span class="kw">length</span>(new_objects)
+## [1] 31
+
+## Now when you call `make()`, `drake` will dive into `digest`
+## to import dependencies.
+
+cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_environment</span>() <span class="co"># just for examples</span>
+<span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)
+## target x
+<span class="kw">head</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache), <span class="dv">10</span>)
+##  [1] &quot;any&quot;             &quot;as.integer&quot;      &quot;as.raw&quot;         
+##  [4] &quot;base::serialize&quot; &quot;digest&quot;          &quot;digest_impl&quot;    
+##  [7] &quot;f&quot;               &quot;file.access&quot;     &quot;file.exists&quot;    
+## [10] &quot;file.info&quot;
+<span class="kw">length</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache))
+## [1] 30</code></pre>
+<pre><code>## Warning in file.remove(&quot;report.Rmd&quot;): cannot remove file &#39;report.Rmd&#39;,
+## reason &#39;No such file or directory&#39;
+## [1] FALSE</code></pre>
 </div>
 </div>
-<div id="documentation" class="section level2">
-<h2><span class="header-section-number">1.4</span> Documentation</h2>
-<p>The main resources to learn <code>drake</code> are</p>
-<ol style="list-style-type: decimal">
-<li>The <a href="https://ropenscilabs.github.io/drake-manual/">user manual</a>, which contains a friendly introduction and several long-form tutorials.</li>
-<li>The <a href="https://ropensci.github.io/drake/">documentation website</a>, which serves as a quicker reference.</li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a>’s <a href="https://github.com/krlmlr/drake-sib-zurich"><code>drake</code> workshop from March 5, 2018</a>.</li>
-</ol>
-<div id="cheat-sheet" class="section level3">
-<h3><span class="header-section-number">1.4.1</span> Cheat sheet</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for preparing a <a href="https://github.com/krlmlr/drake-sib-zurich/blob/master/cheat-sheet.pdf"><code>drake</code> cheat sheet</a> for the <a href="https://github.com/krlmlr/drake-sib-zurich">workshop</a>.</p>
 </div>
-<div id="frequently-asked-questions" class="section level3">
-<h3><span class="header-section-number">1.4.2</span> Frequently asked questions</h3>
-<p>The <a href="https://ropenscilabs.github.io/drake-manual/faq.html">FAQ page</a> is an index of links to <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">appropriately-labeled issues on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled as a frequently asked question.</p>
-</div>
-<div id="function-reference" class="section level3">
-<h3><span class="header-section-number">1.4.3</span> Function reference</h3>
-<p>The <a href="https://ropensci.github.io/drake/reference/index.html">reference section</a> lists all the available functions. Here are the most important ones.</p>
-<ul>
-<li><code>drake_plan()</code>: create a workflow data frame (like <code>my_plan</code>).</li>
-<li><code>make()</code>: build your project.</li>
-<li><code>loadd()</code>: load one or more built targets into your R session.</li>
-<li><code>readd()</code>: read and return a built target.</li>
-<li><code>drake_config()</code>: create a master configuration list for other user-side functions.</li>
-<li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
-<li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
-<li><code>deps()</code>: check the dependencies of a command or function.</li>
-<li><code>failed()</code>: list the targets that failed to build in the last <code>make()</code>.</li>
-<li><code>diagnose()</code>: return the full context of a build, including errors, warnings, and messages.</li>
-</ul>
-</div>
-<div id="tutorials" class="section level3">
-<h3><span class="header-section-number">1.4.4</span> Tutorials</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for constructing two interactive <a href="https://rstudio.github.io/learnr/"><code>learnr</code></a> tutorials: <a href="https://krlmlr.shinyapps.io/cooking-drake-tutorial/">one supporting <code>drake</code> itself</a>, and a <a href="https://krlmlr.shinyapps.io/cooking-tutorial/">prerequisite walkthrough</a> of the <a href="https://github.com/krlmlr/cooking"><code>cooking</code> package</a>.</p>
-</div>
-<div id="examples" class="section level3">
-<h3><span class="header-section-number">1.4.5</span> Examples</h3>
-<p><code>Drake</code> also has built-in example projects with code files <a href="https://github.com/ropensci/drake/tree/master/inst/examples">available here</a>. You can generate the files for a project with <code>drake_example()</code> (e.g. <code>drake_example(&quot;gsp&quot;)</code>), and you can list the available projects with <code>drake_examples()</code>. The beginner-oriented examples are listed below. They help you learn <code>drake</code>’s main features, and they show one way to organize the files of <code>drake</code> projects.</p>
-<ul>
-<li><code>main</code>: <code>drake</code>’s main example, based on <a href="https://krlmlr.github.io/drake-pitch/">Kirill Müller’s <code>drake</code> pitch</a>. This is the most accessible example for beginners.</li>
-<li><code>gsp</code>: A concrete example using real econometrics data. It explores the relationships between gross state product and other quantities, and it shows off <code>drake</code>’s ability to generate lots of reproducibly-tracked tasks with ease.</li>
-<li><code>packages</code>: A concrete example using data on R package downloads. It demonstrates how <code>drake</code> can refresh a project based on new incoming data without restarting everything from scratch.</li>
-<li><code>mtcars</code>: An old example that demonstrates how to generate large workflow plan data frames using wildcard templating. Use <code>load_mtcars_example()</code> to set up the project in your workspace.</li>
-</ul>
-</div>
-<div id="presentations" class="section level3">
-<h3><span class="header-section-number">1.4.6</span> Presentations</h3>
-<ul>
-<li><a href="https://krlmlr.github.io/drake-pitch">Kirill’s <code>drake</code> pitch</a></li>
-<li><a href="https://krlmlr.github.io/slides/drake-sib-zurich"><code>drake</code> + cooking with Kirill</a></li>
-<li><a href="https://krlmlr.github.io/slides/drake-sib-zurich/cooking.html"><code>drake</code> + cooking exercises</a></li>
-<li><a href="https://github.com/cstawitz">Christine Stawitz</a>’s <a href="https://github.com/cstawitz/RLadies_Sea_Drake">R-Ladies Seattle talk on June 25, 2018</a></li>
-</ul>
-</div>
-<div id="real-example-projects" class="section level3">
-<h3><span class="header-section-number">1.4.7</span> Real example projects</h3>
-<p>Here are some real-world applications of <code>drake</code> in the wild.</p>
-<ul>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-<p>If you have a project of your own, we would love to add it. <a href="https://github.com/ropensci/drake/edit/master/README.Rmd">Click here to edit the <code>README.Rmd</code> file</a>.</p>
-</div>
-<div id="context-and-history" class="section level3">
-<h3><span class="header-section-number">1.4.8</span> Context and history</h3>
-<p>For context and history, check out <a href="https://ropensci.org/blog/2018/02/06/drake/">this post on the rOpenSci blog</a> and <a href="https://www.r-podcast.org/episode/022-diving-in-to-drake-with-will-landau/">episode 22 of the R Podcast</a>.</p>
-</div>
-</div>
-<div id="help-and-troubleshooting" class="section level2">
-<h2><span class="header-section-number">1.5</span> Help and troubleshooting</h2>
-<p>The following resources document many known issues and challenges.</p>
-<ul>
-<li><a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22Frequently+Asked+Question%22">Frequently-asked questions</a>.</li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/caution.html">Cautionary notes and edge cases</a></li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/debug.html">Debugging and testing drake projects</a></li>
-<li><a href="https://github.com/ropensci/drake/issues">Other known issues</a> (please search both open and closed ones).</li>
-</ul>
-<p>If you are still having trouble, please submit a <a href="https://github.com/ropensci/drake/issues/new">new issue</a> with a bug report or feature request, along with a minimal reproducible example where appropriate.</p>
-<p>The GitHub issue tracker is mainly intended for bug reports and feature requests. While questions about usage etc. are also highly encouraged, you may alternatively wish to post to <a href="https://stackoverflow.com">Stack Overflow</a> and use the <a href="https://stackoverflow.com/tags/drake-r-package"><code>drake-r-package</code> tag</a>.</p>
-</div>
-<div id="similar-work" class="section level2">
-<h2><span class="header-section-number">1.6</span> Similar work</h2>
-<div id="gnu-make" class="section level3">
-<h3><span class="header-section-number">1.6.1</span> GNU Make</h3>
-<p>The original idea of a time-saving reproducible build system extends back at least as far as <a href="https://www.gnu.org/software/make/">GNU Make</a>, which still aids the work of <a href="http://blog.kaggle.com/2012/10/15/make-for-data-scientists/">data scientists</a> as well as the original user base of complied language programmers. In fact, the name “drake” stands for “Data Frames in R for Make”. <a href="http://kbroman.org/minimal_make/">Make</a> is used widely in reproducible research. Below are some examples from <a href="http://kbroman.org/minimal_make/">Karl Broman’s website</a>.</p>
-<ul>
-<li>Bostock, Mike (2013). “A map of flowlines from NHDPlus.” <a href="https://github.com/mbostock/us-rivers" class="uri">https://github.com/mbostock/us-rivers</a>. Powered by the Makefile at <a href="https://github.com/mbostock/us-rivers/blob/master/Makefile" class="uri">https://github.com/mbostock/us-rivers/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W (2012). “Halotype Probabilities in Advanced Intercross Populations.” <em>G3</em> 2(2), 199-202.Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/ailProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/ailProbPaper/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W (2012). “Genotype Probabilities at Intermediate Generations in the Construction of Recombinant Inbred Lines.” *Genetics 190(2), 403-412. Powered by the Makefile at <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/preCCProbPaper/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W and Kim, Sungjin and Sen, Saunak and Ane, Cecile and Payseur, Bret A (2012). “Mapping Quantitative Trait Loci onto a Phylogenetic Tree.” <em>Genetics</em> 192(2), 267-279. Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile" class="uri">https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile</a>.</li>
-</ul>
-<p>There are several reasons for R users to prefer <code>drake</code> instead.</p>
-<ul>
-<li><code>Drake</code> already has a <a href="http://kbroman.org/minimal_make/">Make</a>-powered parallel backend. Just run <code>make(..., parallelism = &quot;Makefile&quot;, jobs = 2)</code> to enjoy most of the original benefits of <a href="http://kbroman.org/minimal_make/">Make</a> itself.</li>
-<li>Improved scalability. With <a href="http://kbroman.org/minimal_make/">Make</a>, you must write a potentially large and cumbersome <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile">Makefile</a> by hand. But with <code>drake</code>, you can use <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">wildcard templating</a> to automatically generate massive collections of targets with minimal code.</li>
-<li>Lower overhead for light-weight tasks. For each <a href="http://kbroman.org/minimal_make/">Make</a> target that uses R, a brand new R session must spawn. For projects with thousands of small targets, that means more time may be spent loading R sessions than doing the actual work. With <code>make(..., parallelism = &quot;mclapply, jobs = 4&quot;)</code>, <code>drake</code> launches 4 persistent workers up front and efficiently processes the targets in R.</li>
-<li>Convenient organization of output. With <a href="http://kbroman.org/minimal_make/">Make</a>, the user must save each target as a file. <code>Drake</code> saves all the results for you automatically in a <a href="https://github.com/richfitz/storr">storr cache</a> so you do not have to micromanage the results.</li>
-</ul>
-</div>
-<div id="remake" class="section level3">
-<h3><span class="header-section-number">1.6.2</span> Remake</h3>
-<p><a href="https://github.com/ropensci/drake">Drake</a> overlaps with its direct predecessor, <a href="https://github.com/richfitz/remake">remake</a>. In fact, <a href="https://github.com/ropensci/drake">drake</a> owes its core ideas to <a href="https://github.com/richfitz/remake">remake</a> and <a href="https://github.com/richfitz/remake">Rich Fitzjohn</a>. <a href="https://github.com/richfitz/remake">Remake</a>’s development repository lists several <a href="https://github.com/richfitz/remake/blob/master/README.md#real-world-examples">real-world applications</a>. <a href="https://github.com/ropensci/drake">Drake</a> surpasses <a href="https://github.com/richfitz/remake">remake</a> in several important ways, including but not limited to the following.</p>
-<ol style="list-style-type: decimal">
-<li>High-performance computing. <a href="https://github.com/richfitz/remake">Remake</a> has no native parallel computing support. <a href="https://github.com/ropensci/drake">Drake</a>, on the other hand, has a thorough selection of parallel computing technologies and scheduling algorithms. Thanks to <a href="github.com/HenrikBengtsson/future">future</a>, <a href="github.com/HenrikBengtsson/future.batchtools">future.batchtools</a>, and <a href="github.com/mllg/batchtools">batchtools</a>, it is straightforward to configure a <a href="https://github.com/ropensci/drake">drake</a> project for most popular job schedulers, such as <a href="https://github.com/ropensci/drake/tree/master/inst/examples/slurm">SLURM</a>, <a href="https://github.com/ropensci/drake/tree/master/inst/examples/torque">TORQUE</a>, and the <a href="https://github.com/ropensci/drake/tree/master/inst/examples/sge">Sun/Univa Grid Engine</a>, as well as systems contained in <a href="https://github.com/ropensci/drake/tree/master/inst/examples/Docker-psock">Docker images</a>.</li>
-<li>A friendly interface. In <a href="https://github.com/richfitz/remake">remake</a>, the user must manually write a <a href="https://github.com/richfitz/remake/blob/master/doc/remake.yml">YAML</a> configuration file to arrange the steps of a workflow, which leads to some of the same scalability problems as <a href="https://www.gnu.org/software/make/">Make</a>. <a href="https://github.com/ropensci/drake">Drake</a>’s data-frame-based interface and <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">wildcard templating functionality</a> easily generate workflows at scale.</li>
-<li>Thorough documentation. <a href="https://github.com/ropensci/drake">Drake</a> contains <a href="https://ropenscilabs.github.io/drake-manual/">thorough user manual</a>, a <a href="https://ropensci.github.io/drake/">reference website</a>, a <a href="https://github.com/ropensci/drake/blob/master/README.md">comprehensive README</a>, examples in the help files of user-side functions, and <a href="https://github.com/ropensci/drake/tree/master/inst/examples">accessible example code</a> that users can write with <code>drake::example_drake()</code>.</li>
-<li>Active maintenance. <a href="https://github.com/ropensci/drake">Drake</a> is actively developed and maintained, and <a href="https://github.com/ropensci/drake/issues">issues</a> are usually addressed promptly.</li>
-<li>Presence on CRAN. At the time of writing, <a href="https://github.com/ropensci/drake">drake</a> is <a href="https://cran.r-project.org/package=drake">available on CRAN</a>, but <a href="https://github.com/richfitz/remake">remake</a> is not.</li>
-</ol>
-</div>
-<div id="memoise" class="section level3">
-<h3><span class="header-section-number">1.6.3</span> Memoise</h3>
-<p>Memoization is the strategic caching of the return values of functions. Every time a memoized function is called with a new set of arguments, the return value is saved for future use. Later, whenever the same function is called with the same arguments, the previous return value is salvaged, and the function call is skipped to save time. The <a href="https://github.com/r-lib/memoise">memoise package</a> is an excellent implementation of memoization in R.</p>
-<p>However, memoization does not go far enough. In reality, the return value of a function depends not only on the function body and the arguments, but also on any nested functions and global variables, the dependencies of those dependencies, and so on upstream. <code>Drake</code> surpasses <a href="https://github.com/r-lib/memoise">memoise</a> because it uses the <em>entire dependency network graph</em> of a project to decide which pieces need to be rebuilt and which ones can be skipped.</p>
-</div>
-<div id="knitr-and-r-markdown" class="section level3">
-<h3><span class="header-section-number">1.6.4</span> Knitr and R Markdown</h3>
-<p>Much of the R community uses <a href="https://yihui.name/knitr/">knitr</a> and <a href="https://rmarkdown.rstudio.com/">R Markdown</a> for reproducible research. The idea is to intersperse code chunks in an <a href="http://rmarkdown.rstudio.com/">R Markdown</a> or <code>*.Rnw</code> file and then generate a dynamic report that weaves together code, output, and prose. <a href="https://yihui.name/knitr/">Knitr</a> is not designed to be a serious <a href="https://github.com/pditommaso/awesome-pipeline">pipeline toolkit</a>, and it should not be the primary computational engine for medium to large data analysis projects.</p>
-<ol style="list-style-type: decimal">
-<li><a href="https://yihui.name/knitr/">Knitr</a> scales far worse than <a href="https://www.gnu.org/software/make/">Make</a> or <a href="https://github.com/richfitz/remake">remake</a>. The whole point is to consolidate output and prose, so it deliberately lacks the essential modularity.</li>
-<li>There is no obvious high-performance computing support.</li>
-<li>While there is a way to skip chunks that are already up to date (with code chunk options <code>cache</code> and <code>autodep</code>), this functionality is not the focus of <a href="https://yihui.name/knitr/">knitr</a>. It is deactivated by default, and <a href="https://github.com/richfitz/remake">remake</a> and <code>drake</code> are more dependable ways to skip work that is already up to date.</li>
-</ol>
-<p><code>Drake</code> was designed to manage the entire workflow with <a href="https://yihui.name/knitr/">knitr</a> reports as targets. The strategy is analogous for <a href="https://yihui.name/knitr/">knitr</a> reports within <a href="https://github.com/richfitz/remake">remake</a> projects.</p>
-</div>
-<div id="factuals-drake" class="section level3">
-<h3><span class="header-section-number">1.6.5</span> Factual’s Drake</h3>
-<p><a href="https://github.com/Factual/drake">Factual’s Drake</a> is similar in concept, but the development effort is completely unrelated to the <a href="https://github.com/ropensci/drake">drake R package</a>.</p>
-</div>
-<div id="other-pipeline-toolkits" class="section level3">
-<h3><span class="header-section-number">1.6.6</span> Other pipeline toolkits</h3>
-<p>There are <a href="https://github.com/pditommaso/awesome-pipeline">countless other successful pipeline toolkits</a>. The <code>drake</code> package distinguishes itself with its R-focused approach, Tidyverse-friendly interface, and a <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">thorough selection of parallel computing technologies and scheduling algorithms</a>.</p>
-</div>
-</div>
-<div id="acknowledgements" class="section level2">
-<h2><span class="header-section-number">1.7</span> Acknowledgements</h2>
-<p>Special thanks to <a href="http://www.jarad.me/">Jarad Niemi</a>, my advisor from <a href="http://stat.iastate.edu/">graduate school</a>, for first introducing me to the idea of <a href="https://www.gnu.org/software/make/">Makefiles</a> for research. He originally set me down the path that led to <code>drake</code>.</p>
-<p>Many thanks to <a href="https://github.com/jules32">Julia Lowndes</a>, <a href="https://github.com/benmarwick">Ben Marwick</a>, and <a href="https://github.com/gothub">Peter Slaughter</a> for <a href="https://github.com/ropensci/onboarding/issues/156">reviewing drake for rOpenSci</a>, and to <a href="https://github.com/maelle">Maëlle Salmon</a> for such active involvement as the editor. Thanks also to the following people for contributing early in development.</p>
-<ul>
-<li><a href="https://github.com/AlexAxthelm">Alex Axthelm</a></li>
-<li><a href="https://github.com/mrchypark">Chan-Yub Park</a></li>
-<li><a href="https://github.com/dfalster">Daniel Falster</a></li>
-<li><a href="https://github.com/thercast">Eric Nantz</a></li>
-<li><a href="https://github.com/HenrikBengtsson">Henrik Bengtsson</a></li>
-<li><a href="https://github.com/IanAWatson">Ian Watson</a></li>
-<li><a href="https://github.com/dapperjapper">Jasper Clarkberg</a></li>
-<li><a href="https://github.com/kendonB">Kendon Bell</a></li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a></li>
-</ul>
-<p>Credit for images is <a href="https://github.com/ropensci/drake/blob/master/images/image-credit.md">attributed here</a>.</p>
-<p><a href="https://ropensci.org"><img src="http://ropensci.org/public_images/github_footer.png" alt="ropensci_footer" /></a></p>
+<div id="remote-data-sources" class="section level2">
+<h2><span class="header-section-number">7.2</span> Remote data sources</h2>
+<p>Some workflows rely on remote data from the internet, and the workflow needs to refresh when the datasets change. As an example, let us consider the download logs of <a href="https://cran.r-project.org/">CRAN packages</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+<span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span>
+<span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span>
+<span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span>
+
+url &lt;-<span class="st"> &quot;http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz&quot;</span></code></pre>
+<p>How do we know when the data at the URL changed? We get the time that the file was last modified. (Alternatively, we could use an HTTP ETag.)</p>
+<pre class="sourceCode r"><code class="sourceCode r">query &lt;-<span class="st"> </span><span class="kw">HEAD</span>(url)
+timestamp &lt;-<span class="st"> </span>query<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]
+timestamp
+## [1] &quot;Mon, 12 Feb 2018 16:34:48 GMT&quot;</code></pre>
+<p>In our workflow plan, the timestamp is a target and a dependency. When the timestamp changes, so does everything downstream.</p>
+<pre class="sourceCode r"><code class="sourceCode r">cranlogs_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">timestamp =</span> <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]],
+  <span class="dt">logs =</span> <span class="kw">get_logs</span>(url, timestamp),
+  <span class="dt">strings_in_dots =</span> <span class="st">&quot;literals&quot;</span>
+)
+cranlogs_plan
+## # A tibble: 2 x 2
+##   target    command                                 
+## * &lt;chr&gt;     &lt;chr&gt;                                   
+## 1 timestamp &quot;HEAD(url)$headers[[\&quot;last-modified\&quot;]]&quot;
+## 2 logs      get_logs(url, timestamp)</code></pre>
+<p>To make sure we always have the latest timestamp, we use the <code>&quot;always&quot;</code> trigger. (For more on triggers, see the <a href="debug.html#debug">guide to debugging and testing drake projects</a>.)</p>
+<pre class="sourceCode r"><code class="sourceCode r">cranlogs_plan<span class="op">$</span>trigger &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;always&quot;</span>, <span class="st">&quot;any&quot;</span>)
+cranlogs_plan
+## # A tibble: 2 x 3
+##   target    command                                  trigger
+## * &lt;chr&gt;     &lt;chr&gt;                                    &lt;chr&gt;  
+## 1 timestamp &quot;HEAD(url)$headers[[\&quot;last-modified\&quot;]]&quot; always 
+## 2 logs      get_logs(url, timestamp)                 any</code></pre>
+<p>Lastly, we define the <code>get_logs()</code> function, which actually downloads the data.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## The ... is just so we can write dependencies as function arguments
+## in the workflow plan.
+get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url, ...){
+  <span class="kw">curl_download</span>(url, <span class="st">&quot;logs.csv.gz&quot;</span>)       <span class="co"># Get a big file.</span>
+  <span class="kw">gunzip</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>) <span class="co"># Unzip it.</span>
+  out &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;logs.csv&quot;</span>, <span class="dt">nrows =</span> <span class="dv">4</span>)  <span class="co"># Extract the data you need.</span>
+  <span class="kw">unlink</span>(<span class="kw">c</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="st">&quot;logs.csv&quot;</span>))    <span class="co"># Remove the big files</span>
+  out                                     <span class="co"># Value of the target.</span>
+}</code></pre>
+<p>When we are ready, we run the workflow.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(cranlogs_plan)
+## Unloading targets from environment:
+##   timestamp
+## target timestamp: trigger &quot;always&quot;
+## target logs
+## Used non-default triggers. Some targets may not be up to date.
+
+<span class="kw">readd</span>(logs)
+##         date     time     size version  os country ip_id
+## 1 2018-02-09 13:01:13 82375220   3.4.3 win      RO     1
+## 2 2018-02-09 13:02:06 74286541   3.3.3 win      US     2
+## 3 2018-02-09 13:02:10 82375216   3.4.3 win      US     3
+## 4 2018-02-09 13:03:30 82375220   3.4.3 win      IS     4</code></pre>
 
 </div>
-</div>
-
-
-
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="main.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="plans.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="vis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-
-<link rel="next" href="main.html">
+<link rel="prev" href="index.html">
+<link rel="next" href="packages.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -346,268 +346,124 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">The drake R Package User Manual</h1>
-<p class="author"><em>Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert</em></p>
+<div id="main" class="section level1">
+<h1><span class="header-section-number">Chapter 2</span> The main example</h1>
+<p>A typical data analysis workflow is a sequence of data transformations. Raw data becomes tidy data, then turns into fitted models, summaries, and reports.</p>
+<p><img src="images/tidydag.png" alt="tidydag" align="center" style = "border: none; float: center;" width = "500px"></p>
+<p>Other analyses are usually variations of this pattern, and <code>drake</code> can easily accommodate them.</p>
+<div id="set-the-stage." class="section level2">
+<h2><span class="header-section-number">2.1</span> Set the stage.</h2>
+<p>To set up a project, load your packages,</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(ggplot2)</code></pre>
+<p>load your custom functions,</p>
+<pre class="sourceCode r"><code class="sourceCode r">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {
+  <span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Width, <span class="dt">fill =</span> Species)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_histogram</span>()
+}</code></pre>
+<p>check any supporting files (optional),</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Get the files with drake_example(&quot;main&quot;).
+<span class="kw">file.exists</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)
+## [1] TRUE
+<span class="kw">file.exists</span>(<span class="st">&quot;report.Rmd&quot;</span>)
+## [1] TRUE</code></pre>
+<p>and plan what you are going to do.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),
+  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),
+  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),
+  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),
+  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(
+    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+    <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+  )
+)
+plan
+## # A tibble: 5 x 2
+##   target   command                                                        
+## * &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               
+## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …
+## 3 hist     create_plot(data)                                              
+## 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  
+## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</code></pre>
+<p>Optionally, visualize your workflow to make sure you set it up correctly. The graph is interactive, so you can click, drag, hover, zoom, and explore.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-ec897849c5c50a6f7846" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ec897849c5c50a6f7846">{"x":{"nodes":{"id":["\"raw_data.xlsx\"","\"report.Rmd\"","aes","create_plot","data","fit","forcats::fct_inorder","geom_histogram","ggplot","hist","lm","mutate","Petal.Width","raw_data","readxl::read_excel","report","rmarkdown::render","select","Species","X__1"],"output_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"\"report.html\"",null,null,null,null],"input_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,"\"raw_data.xlsx\"",null,"\"report.Rmd\"",null,null,null,null],"label":["\"raw_data.xlsx\"\n0.002s","\"report.Rmd\"\n0.002s","aes\n0.01s","create_plot\n0.003s","data","fit","forcats::fct_inorder\n0.008s","geom_histogram\n0.007s","ggplot\n0.005s","hist","lm\n0.017s","mutate\n0.004s","Petal.Width\n0.002s","raw_data","readxl::read_excel\n0.012s","report","rmarkdown::render\n0.135s","select\n0.004s","Species\n0.001s","X__1\n0.001s"],"command":[null,null,null,null,"raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>% \n    select(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)",null,null,null,"create_plot(data)",null,null,null,"readxl::read_excel(file_in(\"raw_data.xlsx\"))",null,"rmarkdown::render(knitr_in(\"report.Rmd\"), output_file = file_out(\"report.html\"), \n    quiet = TRUE)",null,null,null,null],"status":["imported","imported","imported","imported","outdated","outdated","imported","imported","imported","outdated","imported","imported","missing","outdated","imported","outdated","imported","imported","missing","missing"],"type":["file","file","function","function","object","object","function","function","function","object","function","function","object","object","function","object","function","function","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#1874CD","#1874CD","#1874CD","#000000","#1874CD","#1874CD","#9A32CD","#000000","#1874CD","#000000","#1874CD","#1874CD","#9A32CD","#9A32CD"],"shape":["square","square","triangle","triangle","dot","dot","triangle","triangle","triangle","dot","triangle","triangle","dot","dot","triangle","dot","triangle","triangle","dot","dot"],"level":[1,1,1,2,3,4,1,1,1,4,1,1,1,2,1,5,1,1,1,1],"hover_label":["\"raw_data.xlsx\"","---\ntitle: \"Example R Markdown drake file target\"\nauthor: Will Landau and Kirill Müller\noutput: html_document\n---\n\nRun `make.R` to generate the output `report.pdf` and its dependencies. Because we use `loadd()` and `readd()` below, `drake` knows `...","function (x, y, ...) \n{\n    exprs <- rlang::enquos(x = x, y = y, ...)\n    is_missing <- vapply(exprs, rlang::quo_is_missing, logical(1))\n    aes <- new_aes(exprs[!is_missing], env = parent.frame())\n    rename_aes(aes)\n}","function (data) \n{\n    ggplot(data, aes(x = Petal.Width, fill = Species)) + geom_histogram()\n}","raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>%\nselect(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)","function (f, ordered = NA) \n{\n    f <- check_factor(f)\n    idx <- as.integer(f)[!duplicated(f)]\n    idx <- idx[!is.na(idx)]\n    lvls_reorder(f, idx, ordered = ordered)\n}","function (mapping = NULL, data = NULL, stat = \"bin\", position = \"stack\", \n    ..., binwidth = NULL, bins = NULL, na.rm = FALSE, show.legend = NA, \n    inherit.aes = TRUE) \n{\n    layer(data = data, mapping = mapping, stat = stat, geom = GeomBar, \n ...","function (data = NULL, mapping = aes(), ..., environment = parent.frame()) \n{\n    UseMethod(\"ggplot\")\n}","create_plot(data)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","function (.data, ...) \n{\n    UseMethod(\"mutate\")\n}","Petal.Width","readxl::read_excel(file_in(\"raw_data.xlsx\"))","function (path, sheet = NULL, range = NULL, col_names = TRUE, \n    col_types = NULL, na = \"\", trim_ws = TRUE, skip = 0, n_max = Inf, \n    guess_max = min(1000, n_max)) \n{\n    path <- check_file(path)\n    format <- check_format(path)\n    read_excel...","rmarkdown::render(knitr_in(\"report.Rmd\"), output_file =\nfile_out(\"report.html\"), quiet = TRUE)","function (input, output_format = NULL, output_file = NULL, output_dir = NULL, \n    output_options = NULL, intermediates_dir = NULL, knit_root_dir = NULL, \n    runtime = c(\"auto\", \"static\", \"shiny\", \"shiny_prerendered\"), \n    clean = TRUE, params =...","function (.data, ...) \n{\n    UseMethod(\"select\")\n}","Species","X__1"],"x":[-0.384615384615385,-1,0.692307692307692,0.538461538461539,-0.153846153846154,-0.461538461538462,-0.230769230769231,0.538461538461539,0.384615384615385,0.153846153846154,-0.846153846153846,-0.0769230769230769,0.846153846153846,-0.461538461538462,-0.538461538461538,0.153846153846154,1,-0.692307692307692,0.0769230769230769,0.230769230769231],"y":[-1,-1,-1,-0.5,0,0.5,-1,-1,-1,0.5,-1,-1,-1,-0.5,-1,1,-1,-1,-1,-1]},"edges":{"from":["aes","geom_histogram","ggplot","Petal.Width","Species","Species","\"raw_data.xlsx\"","readxl::read_excel","forcats::fct_inorder","mutate","raw_data","select","X__1","create_plot","data","data","lm","\"report.Rmd\"","fit","hist","rmarkdown::render"],"to":["create_plot","create_plot","create_plot","create_plot","create_plot","data","raw_data","raw_data","data","data","data","data","data","hist","fit","hist","fit","report","report","report","report"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Missing","Object","Function","File"],"color":["#000000","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[2,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
 </div>
-<div id="intro" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
-<center>
-<img src="https://ropensci.github.io/drake/images/logo.svg" align="center" alt="logo" width="240" height = "278" style = "border: none">
-</center>
-<div id="the-drake-r-package" class="section level2">
-<h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p><code>drake</code> — or, Data Frames in R for Make — is a general-purpose workflow manager for data-driven tasks. It rebuilds intermediate data objects when their dependencies change, and it skips work when the results are already up to date. Not every runthrough starts from scratch, and completed workflows have tangible evidence of reproducibility. <code>Drake</code> is more scalable than <a href="https://github.com/yihui/knitr"><code>knitr</code></a>, more thorough than <a href="https://github.com/r-lib/memoise">memoization</a>, and more R-focused than <a href="https://github.com/pditommaso/awesome-pipeline">other pipeline toolkits</a> such as <a href="https://www.gnu.org/software/make/">GNU Make</a>, <a href="https://github.com/richfitz/remake"><code>remake</code></a>, and <a href="https://snakemake.readthedocs.io">snakemake</a>.</p>
-</div>
-<div id="installation" class="section level2">
-<h2><span class="header-section-number">1.2</span> Installation</h2>
-<p>You can choose among different versions of <code>drake</code>. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install the latest stable release from CRAN.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)
-
-<span class="co"># Alternatively, install the development version from GitHub.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
-<span class="kw">library</span>(devtools)
-<span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre>
-</div>
-<div id="why-drake" class="section level2">
-<h2><span class="header-section-number">1.3</span> Why drake?</h2>
-<div id="what-gets-done-stays-done." class="section level3">
-<h3><span class="header-section-number">1.3.1</span> What gets done stays done.</h3>
-<p>Too many data science projects follow a <a href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphean loop</a>:</p>
-<ol style="list-style-type: decimal">
-<li>Launch the code.</li>
-<li>Wait while it runs.</li>
-<li>Discover an issue.</li>
-<li>Restart from scratch.</li>
-</ol>
-<p>Have you ever tried to manually salvage old results for a new runthrough?
-<br></p>
-<center>
-<a href="https://twitter.com/fossilosophy/status/966408174470299648">
-<img src="https://ropensci.github.io/drake/images/tweet.png" alt="tweet" align="center" style = "border: none; float: center;">
-</a>
-</center>
-<p><br></p>
-<p>With <code>drake</code>, you can automatically</p>
-<ol style="list-style-type: decimal">
-<li>Launch the parts that changed since last time.</li>
-<li>Skip the rest.</li>
-</ol>
-</div>
-<div id="reproducibility-with-confidence" class="section level3">
-<h3><span class="header-section-number">1.3.2</span> Reproducibility with confidence</h3>
-<p>The R community emphasizes reproducibility. Traditional themes include <a href="https://en.wikipedia.org/wiki/Replication_crisis">scientific replicability</a>, literate programming with <a href="https://yihui.name/knitr/">knitr</a>, and version control with <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">git</a>. But internal consistency is important too. Reproducibility carries the promise that your output matches the code and data you say you used.</p>
-<div id="evidence" class="section level4">
-<h4><span class="header-section-number">1.3.2.1</span> Evidence</h4>
-<p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
+<div id="make-your-results." class="section level2">
+<h2><span class="header-section-number">2.2</span> Make your results.</h2>
+<p>So far, we have just been setting the stage. Use <code>make()</code> to do the real work. Targets are built in the correct order regardless of the row order of <code>plan</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-
-config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
-<span class="kw">outdated</span>(config)</code></pre>
-<p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
+## target raw_data
+## target data
+## target fit
+## target hist
+## target report</code></pre>
+<p>Except for output files like <code>report.html</code>, your output is stored in a hidden <code>.drake/</code> folder. Reading it back is easy.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(data) <span class="co"># See also loadd().</span>
+## # A tibble: 150 x 5
+##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+##  1          5.1         3.5          1.4         0.2 setosa 
+##  2          4.9         3            1.4         0.2 setosa 
+##  3          4.7         3.2          1.3         0.2 setosa 
+##  4          4.6         3.1          1.5         0.2 setosa 
+##  5          5           3.6          1.4         0.2 setosa 
+##  6          5.4         3.9          1.7         0.4 setosa 
+##  7          4.6         3.4          1.4         0.3 setosa 
+##  8          5           3.4          1.5         0.2 setosa 
+##  9          4.4         2.9          1.4         0.2 setosa 
+## 10          4.9         3.1          1.5         0.1 setosa 
+## # ... with 140 more rows</code></pre>
+<p>The graph shows everything up to date.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-ac00066e7f6365b7f0d3" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ac00066e7f6365b7f0d3">{"x":{"nodes":{"id":["\"raw_data.xlsx\"","\"report.Rmd\"","aes","create_plot","data","fit","forcats::fct_inorder","geom_histogram","ggplot","hist","lm","mutate","Petal.Width","raw_data","readxl::read_excel","report","rmarkdown::render","select","Species","X__1"],"output_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"\"report.html\"",null,null,null,null],"input_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,"\"raw_data.xlsx\"",null,"\"report.Rmd\"",null,null,null,null],"label":["\"raw_data.xlsx\"\n0.002s","\"report.Rmd\"\n0.001s","aes\n0.006s","create_plot\n0.003s","data\n0.01s","fit\n0.015s","forcats::fct_inorder\n0.003s","geom_histogram\n0.005s","ggplot\n0.004s","hist\n0.032s","lm\n0.014s","mutate\n0.003s","Petal.Width\n0.002s","raw_data\n0.018s","readxl::read_excel\n0.002s","report\n0.972s","rmarkdown::render\n0.071s","select\n0.004s","Species\n0.002s","X__1\n0.002s"],"command":[null,null,null,null,"raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>% \n    select(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)",null,null,null,"create_plot(data)",null,null,null,"readxl::read_excel(file_in(\"raw_data.xlsx\"))",null,"rmarkdown::render(knitr_in(\"report.Rmd\"), output_file = file_out(\"report.html\"), \n    quiet = TRUE)",null,null,null,null],"status":["imported","imported","imported","imported","up to date","up to date","imported","imported","imported","up to date","imported","imported","missing","up to date","imported","up to date","imported","imported","missing","missing"],"type":["file","file","function","function","object","object","function","function","function","object","function","function","object","object","function","object","function","function","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#1874CD","#1874CD","#1874CD","#228B22","#1874CD","#1874CD","#9A32CD","#228B22","#1874CD","#228B22","#1874CD","#1874CD","#9A32CD","#9A32CD"],"shape":["square","square","triangle","triangle","dot","dot","triangle","triangle","triangle","dot","triangle","triangle","dot","dot","triangle","dot","triangle","triangle","dot","dot"],"level":[1,1,1,2,3,4,1,1,1,4,1,1,1,2,1,5,1,1,1,1],"hover_label":["\"raw_data.xlsx\"","---\ntitle: \"Example R Markdown drake file target\"\nauthor: Will Landau and Kirill Müller\noutput: html_document\n---\n\nRun `make.R` to generate the output `report.pdf` and its dependencies. Because we use `loadd()` and `readd()` below, `drake` knows `...","function (x, y, ...) \n{\n    exprs <- rlang::enquos(x = x, y = y, ...)\n    is_missing <- vapply(exprs, rlang::quo_is_missing, logical(1))\n    aes <- new_aes(exprs[!is_missing], env = parent.frame())\n    rename_aes(aes)\n}","function (data) \n{\n    ggplot(data, aes(x = Petal.Width, fill = Species)) + geom_histogram()\n}","raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>%\nselect(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)","function (f, ordered = NA) \n{\n    f <- check_factor(f)\n    idx <- as.integer(f)[!duplicated(f)]\n    idx <- idx[!is.na(idx)]\n    lvls_reorder(f, idx, ordered = ordered)\n}","function (mapping = NULL, data = NULL, stat = \"bin\", position = \"stack\", \n    ..., binwidth = NULL, bins = NULL, na.rm = FALSE, show.legend = NA, \n    inherit.aes = TRUE) \n{\n    layer(data = data, mapping = mapping, stat = stat, geom = GeomBar, \n ...","function (data = NULL, mapping = aes(), ..., environment = parent.frame()) \n{\n    UseMethod(\"ggplot\")\n}","create_plot(data)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","function (.data, ...) \n{\n    UseMethod(\"mutate\")\n}","Petal.Width","readxl::read_excel(file_in(\"raw_data.xlsx\"))","function (path, sheet = NULL, range = NULL, col_names = TRUE, \n    col_types = NULL, na = \"\", trim_ws = TRUE, skip = 0, n_max = Inf, \n    guess_max = min(1000, n_max)) \n{\n    path <- check_file(path)\n    format <- check_format(path)\n    read_excel...","rmarkdown::render(knitr_in(\"report.Rmd\"), output_file =\nfile_out(\"report.html\"), quiet = TRUE)","function (input, output_format = NULL, output_file = NULL, output_dir = NULL, \n    output_options = NULL, intermediates_dir = NULL, knit_root_dir = NULL, \n    runtime = c(\"auto\", \"static\", \"shiny\", \"shiny_prerendered\"), \n    clean = TRUE, params =...","function (.data, ...) \n{\n    UseMethod(\"select\")\n}","Species","X__1"],"x":[-0.384615384615385,-1,0.692307692307692,0.538461538461539,-0.153846153846154,-0.461538461538462,-0.230769230769231,0.538461538461539,0.384615384615385,0.153846153846154,-0.846153846153846,-0.0769230769230769,0.846153846153846,-0.461538461538462,-0.538461538461538,0.153846153846154,1,-0.692307692307692,0.0769230769230769,0.230769230769231],"y":[-1,-1,-1,-0.5,0,0.5,-1,-1,-1,0.5,-1,-1,-1,-0.5,-1,1,-1,-1,-1,-1]},"edges":{"from":["aes","geom_histogram","ggplot","Petal.Width","Species","Species","\"raw_data.xlsx\"","readxl::read_excel","forcats::fct_inorder","mutate","raw_data","select","X__1","create_plot","data","data","lm","\"report.Rmd\"","fit","hist","rmarkdown::render"],"to":["create_plot","create_plot","create_plot","create_plot","create_plot","data","raw_data","raw_data","data","data","data","data","data","hist","fit","hist","fit","report","report","report","report"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Missing","Object","Function","File"],"color":["#228B22","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
 </div>
-<div id="ease" class="section level4">
-<h4><span class="header-section-number">1.3.2.2</span> Ease</h4>
-<p>When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()       <span class="co"># Remove the original author&#39;s results.</span>
-<span class="kw">make</span>(plan) <span class="co"># Independently re-create the results from the code and input data.</span></code></pre>
+<div id="go-back-and-fix-things." class="section level2">
+<h2><span class="header-section-number">2.3</span> Go back and fix things.</h2>
+<p>You may look back on your work and see room for improvement, but it’s all good! The whole point of <code>drake</code> is to help you go back and change things quickly and painlessly. For example, we forgot to give our histogram a bin width.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(hist)
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="drake-manual_files/figure-html/loaddhist-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>So let’s fix the plotting function.</p>
+<pre class="sourceCode r"><code class="sourceCode r">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {
+  <span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Width, <span class="dt">fill =</span> Species)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">0.25</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">20</span>)
+}</code></pre>
+<p><code>Drake</code> knows which results are affected.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-a261f1c13aea9e511342" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a261f1c13aea9e511342">{"x":{"nodes":{"id":["\"raw_data.xlsx\"","\"report.Rmd\"","aes","create_plot","data","fit","forcats::fct_inorder","geom_histogram","ggplot","hist","lm","mutate","Petal.Width","raw_data","readxl::read_excel","report","rmarkdown::render","select","Species","X__1"],"output_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"\"report.html\"",null,null,null,null],"input_files":[null,null,null,null,null,null,null,null,null,null,null,null,null,"\"raw_data.xlsx\"",null,"\"report.Rmd\"",null,null,null,null],"label":["\"raw_data.xlsx\"\n0.002s","\"report.Rmd\"\n0.002s","aes\n0.005s","create_plot\n0.003s","data\n0.01s","fit\n0.015s","forcats::fct_inorder\n0.002s","geom_histogram\n0.004s","ggplot\n0.004s","hist\n0.032s","lm\n0.014s","mutate\n0.003s","Petal.Width\n0.002s","raw_data\n0.018s","readxl::read_excel\n0.002s","report\n0.972s","rmarkdown::render\n0.066s","select\n0.004s","Species\n0.001s","X__1\n0.002s"],"command":[null,null,null,null,"raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>% \n    select(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)",null,null,null,"create_plot(data)",null,null,null,"readxl::read_excel(file_in(\"raw_data.xlsx\"))",null,"rmarkdown::render(knitr_in(\"report.Rmd\"), output_file = file_out(\"report.html\"), \n    quiet = TRUE)",null,null,null,null],"status":["imported","imported","imported","imported","up to date","up to date","imported","imported","imported","outdated","imported","imported","missing","up to date","imported","outdated","imported","imported","missing","missing"],"type":["file","file","function","function","object","object","function","function","function","object","function","function","object","object","function","object","function","function","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#1874CD","#1874CD","#1874CD","#000000","#1874CD","#1874CD","#9A32CD","#228B22","#1874CD","#000000","#1874CD","#1874CD","#9A32CD","#9A32CD"],"shape":["square","square","triangle","triangle","dot","dot","triangle","triangle","triangle","dot","triangle","triangle","dot","dot","triangle","dot","triangle","triangle","dot","dot"],"level":[1,1,1,2,3,4,1,1,1,4,1,1,1,2,1,5,1,1,1,1],"hover_label":["\"raw_data.xlsx\"","---\ntitle: \"Example R Markdown drake file target\"\nauthor: Will Landau and Kirill Müller\noutput: html_document\n---\n\nRun `make.R` to generate the output `report.pdf` and its dependencies. Because we use `loadd()` and `readd()` below, `drake` knows `...","function (x, y, ...) \n{\n    exprs <- rlang::enquos(x = x, y = y, ...)\n    is_missing <- vapply(exprs, rlang::quo_is_missing, logical(1))\n    aes <- new_aes(exprs[!is_missing], env = parent.frame())\n    rename_aes(aes)\n}","function (data) \n{\n    ggplot(data, aes(x = Petal.Width, fill = Species)) + geom_histogram(binwidth = 0.25) + \n        theme_gray(20)\n}","raw_data %>% mutate(Species = forcats::fct_inorder(Species)) %>%\nselect(-X__1)","lm(Sepal.Width ~ Petal.Width + Species, data)","function (f, ordered = NA) \n{\n    f <- check_factor(f)\n    idx <- as.integer(f)[!duplicated(f)]\n    idx <- idx[!is.na(idx)]\n    lvls_reorder(f, idx, ordered = ordered)\n}","function (mapping = NULL, data = NULL, stat = \"bin\", position = \"stack\", \n    ..., binwidth = NULL, bins = NULL, na.rm = FALSE, show.legend = NA, \n    inherit.aes = TRUE) \n{\n    layer(data = data, mapping = mapping, stat = stat, geom = GeomBar, \n ...","function (data = NULL, mapping = aes(), ..., environment = parent.frame()) \n{\n    UseMethod(\"ggplot\")\n}","create_plot(data)","function (formula, data, subset, weights, na.action, method = \"qr\", \n    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, \n    contrasts = NULL, offset, ...) \n{\n    ret.x <- x\n    ret.y <- y\n    cl <- match.call()\n    mf <- match...","function (.data, ...) \n{\n    UseMethod(\"mutate\")\n}","Petal.Width","readxl::read_excel(file_in(\"raw_data.xlsx\"))","function (path, sheet = NULL, range = NULL, col_names = TRUE, \n    col_types = NULL, na = \"\", trim_ws = TRUE, skip = 0, n_max = Inf, \n    guess_max = min(1000, n_max)) \n{\n    path <- check_file(path)\n    format <- check_format(path)\n    read_excel...","rmarkdown::render(knitr_in(\"report.Rmd\"), output_file =\nfile_out(\"report.html\"), quiet = TRUE)","function (input, output_format = NULL, output_file = NULL, output_dir = NULL, \n    output_options = NULL, intermediates_dir = NULL, knit_root_dir = NULL, \n    runtime = c(\"auto\", \"static\", \"shiny\", \"shiny_prerendered\"), \n    clean = TRUE, params =...","function (.data, ...) \n{\n    UseMethod(\"select\")\n}","Species","X__1"],"x":[-0.384615384615385,-1,0.692307692307692,0.538461538461539,-0.153846153846154,-0.461538461538462,-0.230769230769231,0.538461538461539,0.384615384615385,0.153846153846154,-0.846153846153846,-0.0769230769230769,0.846153846153846,-0.461538461538462,-0.538461538461538,0.153846153846154,1,-0.692307692307692,0.0769230769230769,0.230769230769231],"y":[-1,-1,-1,-0.5,0,0.5,-1,-1,-1,0.5,-1,-1,-1,-0.5,-1,1,-1,-1,-1,-1]},"edges":{"from":["aes","geom_histogram","ggplot","Petal.Width","Species","Species","\"raw_data.xlsx\"","readxl::read_excel","forcats::fct_inorder","mutate","raw_data","select","X__1","create_plot","data","data","lm","\"report.Rmd\"","fit","hist","rmarkdown::render"],"to":["create_plot","create_plot","create_plot","create_plot","create_plot","data","raw_data","raw_data","data","data","data","data","data","hist","fit","hist","fit","report","report","report","report"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Missing","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#9A32CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20,20],"id":[1,2,5,6,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>The next <code>make()</code> just builds <code>hist</code> and <code>report</code>. No point in wasting time on the data or model.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
+## target hist
+## target report</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">loadd</span>(hist)
+hist</code></pre>
+<p><img src="drake-manual_files/figure-html/hist2-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
-<div id="independent-replication" class="section level4">
-<h4><span class="header-section-number">1.3.2.3</span> Independent replication</h4>
-<p>With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic <code>drake</code> functions such as <code>make()</code>, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author’s methodology. In other words, <code>drake</code> could potentially improve the integrity of independent replication.</p>
-</div>
-<div id="readability-and-transparency" class="section level4">
-<h4><span class="header-section-number">1.3.2.4</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>Drake</code> helps in several ways.</p>
-<ul>
-<li>The <a href="https://ropensci.github.io/drake/reference/drake_plan.html">workflow plan data frame</a> explicitly outlines the steps of the analysis, and <a href="https://ropensci.github.io/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>Drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
-<li>You can <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
-</ul>
-</div>
-</div>
-<div id="aggressively-scale-up." class="section level3">
-<h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>Drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the spare cores on your local machine.</span>
-<span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)
-
-<span class="co"># Or scale up to a supercomputer.</span>
-<span class="kw">drake_batchtools_tmpl_file</span>(<span class="st">&quot;slurm&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span>
-<span class="kw">library</span>(future.batchtools)
-future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;batchtools.slurm.tmpl&quot;</span>, <span class="dt">workers =</span> <span class="dv">100</span>)
-<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</code></pre>
-</div>
-</div>
-<div id="documentation" class="section level2">
-<h2><span class="header-section-number">1.4</span> Documentation</h2>
-<p>The main resources to learn <code>drake</code> are</p>
-<ol style="list-style-type: decimal">
-<li>The <a href="https://ropenscilabs.github.io/drake-manual/">user manual</a>, which contains a friendly introduction and several long-form tutorials.</li>
-<li>The <a href="https://ropensci.github.io/drake/">documentation website</a>, which serves as a quicker reference.</li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a>’s <a href="https://github.com/krlmlr/drake-sib-zurich"><code>drake</code> workshop from March 5, 2018</a>.</li>
-</ol>
-<div id="cheat-sheet" class="section level3">
-<h3><span class="header-section-number">1.4.1</span> Cheat sheet</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for preparing a <a href="https://github.com/krlmlr/drake-sib-zurich/blob/master/cheat-sheet.pdf"><code>drake</code> cheat sheet</a> for the <a href="https://github.com/krlmlr/drake-sib-zurich">workshop</a>.</p>
-</div>
-<div id="frequently-asked-questions" class="section level3">
-<h3><span class="header-section-number">1.4.2</span> Frequently asked questions</h3>
-<p>The <a href="https://ropenscilabs.github.io/drake-manual/faq.html">FAQ page</a> is an index of links to <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">appropriately-labeled issues on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled as a frequently asked question.</p>
-</div>
-<div id="function-reference" class="section level3">
-<h3><span class="header-section-number">1.4.3</span> Function reference</h3>
-<p>The <a href="https://ropensci.github.io/drake/reference/index.html">reference section</a> lists all the available functions. Here are the most important ones.</p>
-<ul>
-<li><code>drake_plan()</code>: create a workflow data frame (like <code>my_plan</code>).</li>
-<li><code>make()</code>: build your project.</li>
-<li><code>loadd()</code>: load one or more built targets into your R session.</li>
-<li><code>readd()</code>: read and return a built target.</li>
-<li><code>drake_config()</code>: create a master configuration list for other user-side functions.</li>
-<li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
-<li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
-<li><code>deps()</code>: check the dependencies of a command or function.</li>
-<li><code>failed()</code>: list the targets that failed to build in the last <code>make()</code>.</li>
-<li><code>diagnose()</code>: return the full context of a build, including errors, warnings, and messages.</li>
-</ul>
-</div>
-<div id="tutorials" class="section level3">
-<h3><span class="header-section-number">1.4.4</span> Tutorials</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for constructing two interactive <a href="https://rstudio.github.io/learnr/"><code>learnr</code></a> tutorials: <a href="https://krlmlr.shinyapps.io/cooking-drake-tutorial/">one supporting <code>drake</code> itself</a>, and a <a href="https://krlmlr.shinyapps.io/cooking-tutorial/">prerequisite walkthrough</a> of the <a href="https://github.com/krlmlr/cooking"><code>cooking</code> package</a>.</p>
-</div>
-<div id="examples" class="section level3">
-<h3><span class="header-section-number">1.4.5</span> Examples</h3>
-<p><code>Drake</code> also has built-in example projects with code files <a href="https://github.com/ropensci/drake/tree/master/inst/examples">available here</a>. You can generate the files for a project with <code>drake_example()</code> (e.g. <code>drake_example(&quot;gsp&quot;)</code>), and you can list the available projects with <code>drake_examples()</code>. The beginner-oriented examples are listed below. They help you learn <code>drake</code>’s main features, and they show one way to organize the files of <code>drake</code> projects.</p>
-<ul>
-<li><code>main</code>: <code>drake</code>’s main example, based on <a href="https://krlmlr.github.io/drake-pitch/">Kirill Müller’s <code>drake</code> pitch</a>. This is the most accessible example for beginners.</li>
-<li><code>gsp</code>: A concrete example using real econometrics data. It explores the relationships between gross state product and other quantities, and it shows off <code>drake</code>’s ability to generate lots of reproducibly-tracked tasks with ease.</li>
-<li><code>packages</code>: A concrete example using data on R package downloads. It demonstrates how <code>drake</code> can refresh a project based on new incoming data without restarting everything from scratch.</li>
-<li><code>mtcars</code>: An old example that demonstrates how to generate large workflow plan data frames using wildcard templating. Use <code>load_mtcars_example()</code> to set up the project in your workspace.</li>
-</ul>
-</div>
-<div id="presentations" class="section level3">
-<h3><span class="header-section-number">1.4.6</span> Presentations</h3>
-<ul>
-<li><a href="https://krlmlr.github.io/drake-pitch">Kirill’s <code>drake</code> pitch</a></li>
-<li><a href="https://krlmlr.github.io/slides/drake-sib-zurich"><code>drake</code> + cooking with Kirill</a></li>
-<li><a href="https://krlmlr.github.io/slides/drake-sib-zurich/cooking.html"><code>drake</code> + cooking exercises</a></li>
-<li><a href="https://github.com/cstawitz">Christine Stawitz</a>’s <a href="https://github.com/cstawitz/RLadies_Sea_Drake">R-Ladies Seattle talk on June 25, 2018</a></li>
-</ul>
-</div>
-<div id="real-example-projects" class="section level3">
-<h3><span class="header-section-number">1.4.7</span> Real example projects</h3>
-<p>Here are some real-world applications of <code>drake</code> in the wild.</p>
-<ul>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-<p>If you have a project of your own, we would love to add it. <a href="https://github.com/ropensci/drake/edit/master/README.Rmd">Click here to edit the <code>README.Rmd</code> file</a>.</p>
-</div>
-<div id="context-and-history" class="section level3">
-<h3><span class="header-section-number">1.4.8</span> Context and history</h3>
-<p>For context and history, check out <a href="https://ropensci.org/blog/2018/02/06/drake/">this post on the rOpenSci blog</a> and <a href="https://www.r-podcast.org/episode/022-diving-in-to-drake-with-will-landau/">episode 22 of the R Podcast</a>.</p>
-</div>
-</div>
-<div id="help-and-troubleshooting" class="section level2">
-<h2><span class="header-section-number">1.5</span> Help and troubleshooting</h2>
-<p>The following resources document many known issues and challenges.</p>
-<ul>
-<li><a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22Frequently+Asked+Question%22">Frequently-asked questions</a>.</li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/caution.html">Cautionary notes and edge cases</a></li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/debug.html">Debugging and testing drake projects</a></li>
-<li><a href="https://github.com/ropensci/drake/issues">Other known issues</a> (please search both open and closed ones).</li>
-</ul>
-<p>If you are still having trouble, please submit a <a href="https://github.com/ropensci/drake/issues/new">new issue</a> with a bug report or feature request, along with a minimal reproducible example where appropriate.</p>
-<p>The GitHub issue tracker is mainly intended for bug reports and feature requests. While questions about usage etc. are also highly encouraged, you may alternatively wish to post to <a href="https://stackoverflow.com">Stack Overflow</a> and use the <a href="https://stackoverflow.com/tags/drake-r-package"><code>drake-r-package</code> tag</a>.</p>
-</div>
-<div id="similar-work" class="section level2">
-<h2><span class="header-section-number">1.6</span> Similar work</h2>
-<div id="gnu-make" class="section level3">
-<h3><span class="header-section-number">1.6.1</span> GNU Make</h3>
-<p>The original idea of a time-saving reproducible build system extends back at least as far as <a href="https://www.gnu.org/software/make/">GNU Make</a>, which still aids the work of <a href="http://blog.kaggle.com/2012/10/15/make-for-data-scientists/">data scientists</a> as well as the original user base of complied language programmers. In fact, the name “drake” stands for “Data Frames in R for Make”. <a href="http://kbroman.org/minimal_make/">Make</a> is used widely in reproducible research. Below are some examples from <a href="http://kbroman.org/minimal_make/">Karl Broman’s website</a>.</p>
-<ul>
-<li>Bostock, Mike (2013). “A map of flowlines from NHDPlus.” <a href="https://github.com/mbostock/us-rivers" class="uri">https://github.com/mbostock/us-rivers</a>. Powered by the Makefile at <a href="https://github.com/mbostock/us-rivers/blob/master/Makefile" class="uri">https://github.com/mbostock/us-rivers/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W (2012). “Halotype Probabilities in Advanced Intercross Populations.” <em>G3</em> 2(2), 199-202.Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/ailProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/ailProbPaper/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W (2012). “Genotype Probabilities at Intermediate Generations in the Construction of Recombinant Inbred Lines.” *Genetics 190(2), 403-412. Powered by the Makefile at <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/preCCProbPaper/blob/master/Makefile</a>.</li>
-<li>Broman, Karl W and Kim, Sungjin and Sen, Saunak and Ane, Cecile and Payseur, Bret A (2012). “Mapping Quantitative Trait Loci onto a Phylogenetic Tree.” <em>Genetics</em> 192(2), 267-279. Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile" class="uri">https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile</a>.</li>
-</ul>
-<p>There are several reasons for R users to prefer <code>drake</code> instead.</p>
-<ul>
-<li><code>Drake</code> already has a <a href="http://kbroman.org/minimal_make/">Make</a>-powered parallel backend. Just run <code>make(..., parallelism = &quot;Makefile&quot;, jobs = 2)</code> to enjoy most of the original benefits of <a href="http://kbroman.org/minimal_make/">Make</a> itself.</li>
-<li>Improved scalability. With <a href="http://kbroman.org/minimal_make/">Make</a>, you must write a potentially large and cumbersome <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile">Makefile</a> by hand. But with <code>drake</code>, you can use <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">wildcard templating</a> to automatically generate massive collections of targets with minimal code.</li>
-<li>Lower overhead for light-weight tasks. For each <a href="http://kbroman.org/minimal_make/">Make</a> target that uses R, a brand new R session must spawn. For projects with thousands of small targets, that means more time may be spent loading R sessions than doing the actual work. With <code>make(..., parallelism = &quot;mclapply, jobs = 4&quot;)</code>, <code>drake</code> launches 4 persistent workers up front and efficiently processes the targets in R.</li>
-<li>Convenient organization of output. With <a href="http://kbroman.org/minimal_make/">Make</a>, the user must save each target as a file. <code>Drake</code> saves all the results for you automatically in a <a href="https://github.com/richfitz/storr">storr cache</a> so you do not have to micromanage the results.</li>
-</ul>
-</div>
-<div id="remake" class="section level3">
-<h3><span class="header-section-number">1.6.2</span> Remake</h3>
-<p><a href="https://github.com/ropensci/drake">Drake</a> overlaps with its direct predecessor, <a href="https://github.com/richfitz/remake">remake</a>. In fact, <a href="https://github.com/ropensci/drake">drake</a> owes its core ideas to <a href="https://github.com/richfitz/remake">remake</a> and <a href="https://github.com/richfitz/remake">Rich Fitzjohn</a>. <a href="https://github.com/richfitz/remake">Remake</a>’s development repository lists several <a href="https://github.com/richfitz/remake/blob/master/README.md#real-world-examples">real-world applications</a>. <a href="https://github.com/ropensci/drake">Drake</a> surpasses <a href="https://github.com/richfitz/remake">remake</a> in several important ways, including but not limited to the following.</p>
-<ol style="list-style-type: decimal">
-<li>High-performance computing. <a href="https://github.com/richfitz/remake">Remake</a> has no native parallel computing support. <a href="https://github.com/ropensci/drake">Drake</a>, on the other hand, has a thorough selection of parallel computing technologies and scheduling algorithms. Thanks to <a href="github.com/HenrikBengtsson/future">future</a>, <a href="github.com/HenrikBengtsson/future.batchtools">future.batchtools</a>, and <a href="github.com/mllg/batchtools">batchtools</a>, it is straightforward to configure a <a href="https://github.com/ropensci/drake">drake</a> project for most popular job schedulers, such as <a href="https://github.com/ropensci/drake/tree/master/inst/examples/slurm">SLURM</a>, <a href="https://github.com/ropensci/drake/tree/master/inst/examples/torque">TORQUE</a>, and the <a href="https://github.com/ropensci/drake/tree/master/inst/examples/sge">Sun/Univa Grid Engine</a>, as well as systems contained in <a href="https://github.com/ropensci/drake/tree/master/inst/examples/Docker-psock">Docker images</a>.</li>
-<li>A friendly interface. In <a href="https://github.com/richfitz/remake">remake</a>, the user must manually write a <a href="https://github.com/richfitz/remake/blob/master/doc/remake.yml">YAML</a> configuration file to arrange the steps of a workflow, which leads to some of the same scalability problems as <a href="https://www.gnu.org/software/make/">Make</a>. <a href="https://github.com/ropensci/drake">Drake</a>’s data-frame-based interface and <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">wildcard templating functionality</a> easily generate workflows at scale.</li>
-<li>Thorough documentation. <a href="https://github.com/ropensci/drake">Drake</a> contains <a href="https://ropenscilabs.github.io/drake-manual/">thorough user manual</a>, a <a href="https://ropensci.github.io/drake/">reference website</a>, a <a href="https://github.com/ropensci/drake/blob/master/README.md">comprehensive README</a>, examples in the help files of user-side functions, and <a href="https://github.com/ropensci/drake/tree/master/inst/examples">accessible example code</a> that users can write with <code>drake::example_drake()</code>.</li>
-<li>Active maintenance. <a href="https://github.com/ropensci/drake">Drake</a> is actively developed and maintained, and <a href="https://github.com/ropensci/drake/issues">issues</a> are usually addressed promptly.</li>
-<li>Presence on CRAN. At the time of writing, <a href="https://github.com/ropensci/drake">drake</a> is <a href="https://cran.r-project.org/package=drake">available on CRAN</a>, but <a href="https://github.com/richfitz/remake">remake</a> is not.</li>
-</ol>
-</div>
-<div id="memoise" class="section level3">
-<h3><span class="header-section-number">1.6.3</span> Memoise</h3>
-<p>Memoization is the strategic caching of the return values of functions. Every time a memoized function is called with a new set of arguments, the return value is saved for future use. Later, whenever the same function is called with the same arguments, the previous return value is salvaged, and the function call is skipped to save time. The <a href="https://github.com/r-lib/memoise">memoise package</a> is an excellent implementation of memoization in R.</p>
-<p>However, memoization does not go far enough. In reality, the return value of a function depends not only on the function body and the arguments, but also on any nested functions and global variables, the dependencies of those dependencies, and so on upstream. <code>Drake</code> surpasses <a href="https://github.com/r-lib/memoise">memoise</a> because it uses the <em>entire dependency network graph</em> of a project to decide which pieces need to be rebuilt and which ones can be skipped.</p>
-</div>
-<div id="knitr-and-r-markdown" class="section level3">
-<h3><span class="header-section-number">1.6.4</span> Knitr and R Markdown</h3>
-<p>Much of the R community uses <a href="https://yihui.name/knitr/">knitr</a> and <a href="https://rmarkdown.rstudio.com/">R Markdown</a> for reproducible research. The idea is to intersperse code chunks in an <a href="http://rmarkdown.rstudio.com/">R Markdown</a> or <code>*.Rnw</code> file and then generate a dynamic report that weaves together code, output, and prose. <a href="https://yihui.name/knitr/">Knitr</a> is not designed to be a serious <a href="https://github.com/pditommaso/awesome-pipeline">pipeline toolkit</a>, and it should not be the primary computational engine for medium to large data analysis projects.</p>
-<ol style="list-style-type: decimal">
-<li><a href="https://yihui.name/knitr/">Knitr</a> scales far worse than <a href="https://www.gnu.org/software/make/">Make</a> or <a href="https://github.com/richfitz/remake">remake</a>. The whole point is to consolidate output and prose, so it deliberately lacks the essential modularity.</li>
-<li>There is no obvious high-performance computing support.</li>
-<li>While there is a way to skip chunks that are already up to date (with code chunk options <code>cache</code> and <code>autodep</code>), this functionality is not the focus of <a href="https://yihui.name/knitr/">knitr</a>. It is deactivated by default, and <a href="https://github.com/richfitz/remake">remake</a> and <code>drake</code> are more dependable ways to skip work that is already up to date.</li>
-</ol>
-<p><code>Drake</code> was designed to manage the entire workflow with <a href="https://yihui.name/knitr/">knitr</a> reports as targets. The strategy is analogous for <a href="https://yihui.name/knitr/">knitr</a> reports within <a href="https://github.com/richfitz/remake">remake</a> projects.</p>
-</div>
-<div id="factuals-drake" class="section level3">
-<h3><span class="header-section-number">1.6.5</span> Factual’s Drake</h3>
-<p><a href="https://github.com/Factual/drake">Factual’s Drake</a> is similar in concept, but the development effort is completely unrelated to the <a href="https://github.com/ropensci/drake">drake R package</a>.</p>
-</div>
-<div id="other-pipeline-toolkits" class="section level3">
-<h3><span class="header-section-number">1.6.6</span> Other pipeline toolkits</h3>
-<p>There are <a href="https://github.com/pditommaso/awesome-pipeline">countless other successful pipeline toolkits</a>. The <code>drake</code> package distinguishes itself with its R-focused approach, Tidyverse-friendly interface, and a <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">thorough selection of parallel computing technologies and scheduling algorithms</a>.</p>
-</div>
-</div>
-<div id="acknowledgements" class="section level2">
-<h2><span class="header-section-number">1.7</span> Acknowledgements</h2>
-<p>Special thanks to <a href="http://www.jarad.me/">Jarad Niemi</a>, my advisor from <a href="http://stat.iastate.edu/">graduate school</a>, for first introducing me to the idea of <a href="https://www.gnu.org/software/make/">Makefiles</a> for research. He originally set me down the path that led to <code>drake</code>.</p>
-<p>Many thanks to <a href="https://github.com/jules32">Julia Lowndes</a>, <a href="https://github.com/benmarwick">Ben Marwick</a>, and <a href="https://github.com/gothub">Peter Slaughter</a> for <a href="https://github.com/ropensci/onboarding/issues/156">reviewing drake for rOpenSci</a>, and to <a href="https://github.com/maelle">Maëlle Salmon</a> for such active involvement as the editor. Thanks also to the following people for contributing early in development.</p>
-<ul>
-<li><a href="https://github.com/AlexAxthelm">Alex Axthelm</a></li>
-<li><a href="https://github.com/mrchypark">Chan-Yub Park</a></li>
-<li><a href="https://github.com/dfalster">Daniel Falster</a></li>
-<li><a href="https://github.com/thercast">Eric Nantz</a></li>
-<li><a href="https://github.com/HenrikBengtsson">Henrik Bengtsson</a></li>
-<li><a href="https://github.com/IanAWatson">Ian Watson</a></li>
-<li><a href="https://github.com/dapperjapper">Jasper Clarkberg</a></li>
-<li><a href="https://github.com/kendonB">Kendon Bell</a></li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a></li>
-</ul>
-<p>Credit for images is <a href="https://github.com/ropensci/drake/blob/master/images/image-credit.md">attributed here</a>.</p>
-<p><a href="https://ropensci.org"><img src="http://ropensci.org/public_images/github_footer.png" alt="ropensci_footer" /></a></p>
+<div id="try-it-yourself" class="section level2">
+<h2><span class="header-section-number">2.4</span> Try it yourself!</h2>
+<p>Use <code>drake_example(&quot;main&quot;)</code> to get all the materials.</p>
 
 </div>
-</div>
-
-
-
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="main.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="packages.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
