@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="store.html">
-<link rel="next" href="caution.html">
+<link rel="prev" href="plans.html">
+<link rel="next" href="vis.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -345,39 +345,195 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="faq" class="section level1">
-<h1><span class="header-section-number">A</span> Frequently-asked questions</h1>
-<p>This FAQ is a compendium of <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">pedagogically useful issues tagged on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled a frequently asked question.</p>
+<div id="organize" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> How to organize the files of drake projects</h1>
+<p>This chapter describes general best practices for organizing the files of <code>drake</code> projects.</p>
+<div id="examples-1" class="section level2">
+<h2><span class="header-section-number">7.1</span> Examples</h2>
+<p>For examples of how to structure your code files, see the beginner oriented example projects:</p>
 <ul>
-<li><a href="https://github.com/ropensci/drake/issues/471">Best practices for including a drake workflow in a package</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/462">Can you have multiple drake plans?</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/451">Metaprogramming Difficulties (vignette potentially helpful)</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/367">How to propagate wild cards into future steps</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/366">How to speed up construction of a (very) large plan?</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/353">evaluate <code>file.path</code> and variables in <code>file_out</code> and friends</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/349">Working with HPC time limits</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/331">How to debug file targets</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/325">Gather without loading all dependencies at the same time</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/313">Reproducibility with random numbers</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/297">output file as target</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/277">How should I mix non-R code (e.g. Python and shell scripts) in a large drake workflow?</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/257">Helper function for creating file targets with multiple files</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/252">Reproducible remote data sources</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/245">Command that writes a file always runs</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/199">Using strings as wildcards?</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/198">Trouble with caches sent through Dropbox</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/193">How to add .R files to drake_plan()</a></li>
-<li><a href="https://github.com/ropensci/drake/issues/106">evaluate_plan() with file targets</a></li>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/mtcars">mtcars</a></li>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/gsp">gsp</a></li>
+<li><a href="https://github.com/ropensci/drake/tree/master/inst/examples/packages">packages</a></li>
 </ul>
+<p>Write the code directly with the <code>drake_example()</code> function.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;mtcars&quot;</span>)
+<span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)
+<span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</code></pre>
+<p>In practice, you do not need to organize your files the way the examples do, but it does happen to be a reasonable way of doing things.</p>
+</div>
+<div id="where-do-you-put-your-code" class="section level2">
+<h2><span class="header-section-number">7.2</span> Where do you put your code?</h2>
+<p>It is best to write your code as a bunch of functions. You can save those functions in R scripts and then <code>source()</code> them before doing anything else.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## Load functions get_data(), analyze_data, and summarize_results()
+<span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>)</code></pre>
+<p>Then, set up your workflow plan data frame.</p>
+<pre class="sourceCode r"><code class="sourceCode r">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span>
+  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),
+  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)
+)
 
+good_plan
+## # A tibble: 3 x 2
+##   target       command                                
+## * &lt;chr&gt;        &lt;chr&gt;                                  
+## 1 my_data      &quot;get_data(file_in(\&quot;data.csv\&quot;))&quot;      
+## 2 my_analysis  analyze_data(my_data)                  
+## 3 my_summaries summarize_results(my_data, my_analysis)</code></pre>
+<p><code>Drake</code> knows that <code>my_analysis</code> depends on <code>my_data</code> because <code>my_data</code> is an argument to <code>analyze_data()</code>, which is part of the command for <code>my_analysis</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(good_plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-dda5858bd620d236e22c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["\"data.csv\"","analyze_data","get_data","my_analysis","my_data","my_summaries","summarize_results"],"input_files":[null,null,null,null,"\"data.csv\"",null,null],"label":["\"data.csv\"\n0.002s","analyze_data\n0.002s","get_data\n0.002s","my_analysis","my_data","my_summaries","summarize_results\n0.002s"],"command":[null,null,null,"analyze_data(my_data)","get_data(file_in(\"data.csv\"))","summarize_results(my_data, my_analysis)",null],"status":["imported","imported","imported","outdated","outdated","outdated","imported"],"type":["file","function","function","object","object","object","function"],"font.size":[20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#1874CD"],"shape":["square","triangle","triangle","dot","dot","dot","triangle"],"level":[1,1,1,3,2,4,1],"hover_label":["","function () \n{\n}","function () \n{\n}","analyze_data(my_data)","get_data(file_in(\"data.csv\"))","summarize_results(my_data, my_analysis)","function () \n{\n}"],"x":[-1,0.333333333333333,-0.333333333333333,0.333333333333333,-0.666666666666667,0.333333333333333,1],"y":[-1,-1,-1,0.333333333333333,-0.333333333333333,1,-1]},"edges":{"from":["analyze_data","get_data","summarize_results","\"data.csv\"","my_data","my_data","my_analysis"],"to":["my_analysis","my_data","my_summaries","my_data","my_analysis","my_summaries","my_summaries"],"arrows":["to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>Now, you can call <code>make()</code> to build the targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(good_plan)</code></pre>
+<p>If your commands are really long, just put them in larger functions. <code>Drake</code> analyzes imported functions for non-file dependencies.</p>
+</div>
+<div id="your-commands-are-code-chunks-not-r-scripts" class="section level2">
+<h2><span class="header-section-number">7.3</span> Your commands are code chunks, not R scripts</h2>
+<p>Some people are accustomed to dividing their work into R scripts and then calling <code>source()</code> to run each step of the analysis. For example you might have the following files.</p>
+<ul>
+<li><code>get_data.R</code></li>
+<li><code>analyze_data.R</code></li>
+<li><code>summarize_results.R</code></li>
+</ul>
+<p>If you migrate to <code>drake</code>, you may be tempted to set up a workflow plan like this.</p>
+<pre class="sourceCode r"><code class="sourceCode r">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),
+  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),
+  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))
+)
+
+bad_plan
+## # A tibble: 3 x 2
+##   target       command                                
+## * &lt;chr&gt;        &lt;chr&gt;                                  
+## 1 my_data      &quot;source(file_in(\&quot;get_data.R\&quot;))&quot;      
+## 2 my_analysis  &quot;source(file_in(\&quot;analyze_data.R\&quot;))&quot;  
+## 3 my_summaries &quot;source(file_in(\&quot;summarize_data.R\&quot;))&quot;</code></pre>
+<p>But now, the dependency structure of your work is broken. Your R script files are dependencies, but since <code>my_data</code> is not mentioned in a function or command, <code>drake</code> does not know that <code>my_analysis</code> depends on it.</p>
+<pre><code>## [[1]]
+## [1] TRUE
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] TRUE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(bad_plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-e9f90e3194077d960e00" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e9f90e3194077d960e00">{"x":{"nodes":{"id":["\"analyze_data.R\"","\"get_data.R\"","\"summarize_data.R\"","my_analysis","my_data","my_summaries","source"],"input_files":[null,null,null,"\"analyze_data.R\"","\"get_data.R\"","\"summarize_data.R\"",null],"label":["\"analyze_data.R\"\n0.002s","\"get_data.R\"\n0.002s","\"summarize_data.R\"\n0.001s","my_analysis","my_data","my_summaries","source\n0.041s"],"command":[null,null,null,"source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))",null],"status":["imported","imported","imported","outdated","outdated","outdated","imported"],"type":["file","file","file","object","object","object","function"],"font.size":[20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#1874CD"],"shape":["square","square","square","dot","dot","dot","triangle"],"level":[1,1,1,2,2,2,1],"hover_label":["","","","source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))","function (file, local = FALSE, echo = verbose, print.eval = echo, \n    exprs, spaced = use_file, verbose = getOption(\"verbose\"), \n    prompt.echo = getOption(\"prompt\"), max.deparse.length = 150, \n    width.cutoff = 60L, deparseCtrl = \"showAttribut..."],"x":[-1,-0.333333333333333,1,-1,0,1,0.333333333333333],"y":[-1,-1,-1,1,1,1,-1]},"edges":{"from":["\"get_data.R\"","source","source","source","\"analyze_data.R\"","\"summarize_data.R\""],"to":["my_data","my_data","my_analysis","my_summaries","my_analysis","my_summaries"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<pre><code>## [[1]]
+## [1] TRUE
+## 
+## [[2]]
+## [1] TRUE
+## 
+## [[3]]
+## [1] TRUE</code></pre>
+<p>Dangers:</p>
+<ol style="list-style-type: decimal">
+<li>In the first <code>make(bad_plan, jobs = 2)</code>, <code>drake</code> will try to build <code>my_data</code> and <code>my_analysis</code> at the same time even though <code>my_data</code> must finish before <code>my_analysis</code> begins.</li>
+<li><code>Drake</code> is oblivious to <code>data.csv</code> since it is not explicitly mentioned in a workflow plan command. So when <code>data.csv</code> changes, <code>make(bad_plan)</code> will not rebuild <code>my_data</code>.</li>
+<li><code>my_analysis</code> will not update when <code>my_data</code> changes.</li>
+<li>The return value of <code>source()</code> is formatted counter-intuitively. If <code>source(file_in(&quot;get_data.R&quot;))</code> is the command for <code>my_data</code>, then <code>my_data</code> will always be a list with elements <code>&quot;value&quot;</code> and <code>&quot;visible&quot;</code>. In other words, <code>source(file_in(&quot;get_data.R&quot;))$value</code> is really what you would want.</li>
+</ol>
+<p>In addition, this <code>source()</code>-based approach is simply inconvenient. <code>Drake</code> rebuilds <code>my_data</code> every time <code>get_data.R</code> changes, even when those changes are just extra comments or blank lines. On the other hand, in the previous plan that uses <code>my_data = get_data()</code>, <code>drake</code> does not trigger rebuilds when comments or whitespace in <code>get_data()</code> are modified. <code>Drake</code> is R-focused, not file-focused. If you embrace this viewpoint, your work will be easier.</p>
+</div>
+<div id="workflows-as-r-packages" class="section level2">
+<h2><span class="header-section-number">7.4</span> Workflows as R packages</h2>
+<p>The R package structure is a great way to organize the files of your project. Writing your own package to contain your data science workflow is a good idea, but you will need to</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>expose_imports()</code> to properly account for all your nested function dependencies, and</li>
+<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code>.</li>
+</ol>
+<p>Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a> for the workaround behind <code>expose_imports()</code>.</p>
+<div id="advantages-of-putting-workflows-in-r-packages" class="section level3">
+<h3><span class="header-section-number">7.4.1</span> Advantages of putting workflows in R packages</h3>
+<ul>
+<li>The file organization of R packages is a well-understood community standard. If you follow it, your work may be more readable and thus reproducible.</li>
+<li>R package installation is a standard process. The system makes it easier for others to obtain and run your code.</li>
+<li>You get development and quality control tools for free: <a href="https://github.com/hadley/devtools">helpers for loading code and creating files</a>, <a href="http://r-pkgs.had.co.nz/tests.html">unit testing</a>, <a href="http://r-pkgs.had.co.nz/check.html">package checks</a>, <a href="https://github.com/r-lib/covr">code coverage</a>, and <a href="https://ipub.com/continuous-integration-for-r/">continuous integration</a>.</li>
+</ul>
+</div>
+<div id="the-problem" class="section level3">
+<h3><span class="header-section-number">7.4.2</span> The problem</h3>
+<p>For <code>drake</code>, there is one problem: nested functions. <code>Drake</code> always looks for imported functions nested in other imported functions, but only in your environment. When it sees a function from a package, it does not look in its body for other imports.</p>
+<p>To see this, consider the <code>digest()</code> function from the <a href="https://github.com/eddelbuettel/digest"><code>digest</code> package</a>. <a href="https://github.com/eddelbuettel/digest"><code>Digest</code> package</a> is a utility for computing hashes, not a data science workflow, but I will use it to demonstrate how <code>drake</code> treats imports from packages.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(digest)
+g &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">digest</span>(x)
+}
+f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">g</span>(x)
+}
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">f</span>(<span class="dv">1</span>))
+
+## Here are the reproducibly tracked objects in the workflow.
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">tracked</span>(config)
+## [1] &quot;digest&quot; &quot;f&quot;      &quot;g&quot;      &quot;x&quot;
+
+## But the `digest()` function has dependencies too.
+## Because `drake` knows `digest()` is from a package,
+## it ignores these dependencies by default.
+<span class="kw">head</span>(<span class="kw">deps_code</span>(digest), <span class="dv">10</span>)
+## $globals
+##  [1] &quot;match.arg&quot;    &quot;stop&quot;         &quot;warning&quot;      &quot;return&quot;      
+##  [5] &quot;invisible&quot;    &quot;is.infinite&quot;  &quot;is.character&quot; &quot;missing&quot;     
+##  [9] &quot;names&quot;        &quot;formals&quot;      &quot;any&quot;          &quot;is.na&quot;       
+## [13] &quot;pmatch&quot;       &quot;which&quot;        &quot;as.raw&quot;       &quot;inherits&quot;    
+## [17] &quot;paste&quot;        &quot;switch&quot;       &quot;path.expand&quot;  &quot;file.exists&quot; 
+## [21] &quot;isTRUE&quot;       &quot;file.info&quot;    &quot;file.access&quot;  &quot;.Call&quot;       
+## [25] &quot;digest_impl&quot;  &quot;as.integer&quot;  
+## 
+## $namespaced
+## [1] &quot;base::serialize&quot;</code></pre>
+</div>
+<div id="the-solution" class="section level3">
+<h3><span class="header-section-number">7.4.3</span> The solution</h3>
+<p>To force <code>drake</code> to dive deeper into the nested functions in a package, you must use <code>expose_imports()</code>. Again, I demonstrate with the <a href="https://github.com/eddelbuettel/digest"><code>digest</code> package</a> package, but you should really only do this with a package you write yourself to contain your workflow. For external packages, <a href="https://rstudio.github.io/packrat/">packrat</a> is a much better solution for package reproducibility.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">expose_imports</span>(digest)
+## &lt;environment: R_GlobalEnv&gt;
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+new_objects &lt;-<span class="st"> </span><span class="kw">tracked</span>(config)
+<span class="kw">head</span>(new_objects, <span class="dv">10</span>)
+##  [1] &quot;.Call&quot;           &quot;any&quot;             &quot;as.integer&quot;     
+##  [4] &quot;as.raw&quot;          &quot;base::serialize&quot; &quot;digest&quot;         
+##  [7] &quot;digest_impl&quot;     &quot;f&quot;               &quot;file.access&quot;    
+## [10] &quot;file.exists&quot;
+<span class="kw">length</span>(new_objects)
+## [1] 31
+
+## Now when you call `make()`, `drake` will dive into `digest`
+## to import dependencies.
+
+cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_environment</span>() <span class="co"># just for examples</span>
+<span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)
+## target x
+<span class="kw">head</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache), <span class="dv">10</span>)
+##  [1] &quot;any&quot;             &quot;as.integer&quot;      &quot;as.raw&quot;         
+##  [4] &quot;base::serialize&quot; &quot;digest&quot;          &quot;digest_impl&quot;    
+##  [7] &quot;f&quot;               &quot;file.access&quot;     &quot;file.exists&quot;    
+## [10] &quot;file.info&quot;
+<span class="kw">length</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache))
+## [1] 30</code></pre>
+<pre><code>## Warning in file.remove(&quot;report.Rmd&quot;): cannot remove file &#39;report.Rmd&#39;,
+## reason &#39;No such file or directory&#39;
+## [1] FALSE</code></pre>
+
+</div>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="store.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="caution.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="plans.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="vis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
