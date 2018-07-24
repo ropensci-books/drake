@@ -407,15 +407,15 @@ vis_drake_graph(config)
 
 ### Debugging
 
-For large workflows, downsizing and debugging tools become super important. See the [guide to debugging and testing `drake` projects](#debug) for help on diagnosing problems with a workflow. Triggers and cached error logs especially speed the development and testing process.
+For large workflows, downsizing and debugging tools become super important. See the [guide to debugging and testing `drake` projects](#debug) for help on diagnosing problems with a workflow.
 
 ### Drake as an ordinary job scheduler
 
-If you do not care about reproducibility and you want `drake` to be an ordinary job scheduler, consider using alternative triggers (see `?triggers`).
+If you do not care about reproducibility and you want `drake` to be an ordinary job scheduler, consider using alternative triggers (see `?trigger`).
 
 ```{r triggerparallel, eval = FALSE}
 load_mtcars_example()
-make(my_plan, trigger = "missing") # Also consider "always".
+make(my_plan, trigger = trigger(condition = TRUE))
 ```
 
 Above, `drake` only builds the missing targets. This skips much of the time-consuming hashing that ordinarily detects which targets are out of date.

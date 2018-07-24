@@ -2,11 +2,15 @@
 
 ```{r setup, include = FALSE}
 suppressMessages(suppressWarnings(library(cranlogs)))
+suppressMessages(suppressWarnings(library(curl)))
 suppressMessages(suppressWarnings(library(drake)))
 suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(ggplot2)))
+suppressMessages(suppressWarnings(library(httr)))
 suppressMessages(suppressWarnings(library(knitr)))
 suppressMessages(suppressWarnings(library(magrittr)))
+suppressMessages(suppressWarnings(library(R.utils)))
+suppressMessages(suppressWarnings(library(rvest)))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
@@ -20,7 +24,7 @@ reportfile <- file.path("examples", "packages", "report.Rmd") %>%
 file.copy(reportfile, getwd())
 ```
 
-This chapter explores R package download trends using the `cranlogs` package.
+This chapter explores R package download trends using the `cranlogs` package, and it shows how `drake`'s custom triggers can help with workflows with remote data sources.
 
 ## Get the code.
 
@@ -45,7 +49,7 @@ Above, each count is the number of times `dplyr` was downloaded from the RStudio
 
 ## Analysis
 
-First, we load the required packages. `Drake` knows about the packages you install and load.
+First, we load the required packages. `drake` detects the packages you install and load.
 
 ```{r pkgspkgs}
 library(cranlogs)
@@ -53,6 +57,7 @@ library(drake)
 library(dplyr)
 library(ggplot2)
 library(knitr)
+library(rvest)
 ```
 
 We want to explore the daily downloads from these packages.
@@ -65,10 +70,7 @@ package_list <- c(
 )
 ```
 
-We plan to use the [cranlogs package](https://github.com/metacran/cranlogs).
-The data frames `older` and `recent` will
-contain the number of daily downloads for each package
-from the RStudio CRAN mirror.
+We will use the [`cranlogs` package](https://github.com/metacran/cranlogs) to get daily logs of package downloads from RStudio's CRAN mirror. In our `drake_plan()`, we declare targets `older` and `recent` to contain snapshots of the logs.
 
 ```{r datadataplan}
 data_plan <- drake_plan(
@@ -82,17 +84,26 @@ data_plan <- drake_plan(
       packages = package_list,
       when = "last-month"
     ),
-    trigger = "always"
+    trigger = trigger(change = latest_log_date())
   )
 )
 
 data_plan
 ```
 
-Our `data_plan` data frame has a `"trigger"` column because the latest download data needs to be refreshed every day. We use
-triggers to force `recent` to always build. For more on triggers, see the [chapter on debugging and testing](#debug). Instead of triggers, we could have just made `recent` a global variable like `package_list` instead of a formal target in `data_plan`.
+Notice the custom trigger for the target `recent`. Here, we are telling `drake` to rebuild `recent` whenever a new day's log is uploaded to [http://cran-logs.rstudio.com](http://cran-logs.rstudio.com). In other words, `drake` keeps track of the return value of `latest_log_date()` and recomputes `recent` (during `make()`) if that value changed since the last `make()`. Here, `latest_log_date()` is one of our custom imported functions. We use it to scrape [http://cran-logs.rstudio.com](http://cran-logs.rstudio.com) using the [`rvest`](https://github.com/hadley/rvest) package.
 
-We want to summarize each set of
+```{r latestlogdate}
+latest_log_date <- function(){
+  read_html("http://cran-logs.rstudio.com/") %>%
+    html_nodes("li:last-of-type") %>%
+    html_nodes("a:last-of-type") %>%
+    html_text() %>%
+    max
+}
+```
+
+Continuing with the setup, we want to summarize each set of
 download statistics a couple different ways.
 
 ```{r outputtypespackages}
@@ -146,10 +157,7 @@ report_plan
 
 Because of the mention of `knitr_in()` above, `make()` will look dependencies inside `report.Rmd` (targets mentioned with `loadd()` or `readd()` in active code chunks). That way, whenever a dependency changes, `drake` will rebuild `report.md` when you call `make()`. For that to happen, we need `report.Rmd` to exist before the call to `make()`. For this example, you can find [report.Rmd here](https://github.com/ropensci/drake/blob/master/inst/examples/packages/report.Rmd).
 
-Now, we complete the workflow plan data frame by
-concatenating the results together.
-`Drake` analyzes the plan to figure out the dependency network,
-so row order does not matter.
+Now, we complete the workflow plan data frame by concatenating the results together. `drake` uses implicit dependency relationships to resolve execution order, so row order in the plan does not matter.
 
 ```{r packageswhole_plan}
 whole_plan <- bind_plans(
@@ -177,33 +185,69 @@ readd(plot_recent)
 readd(plot_older)
 ```
 
-Because we used triggers, each `make()` rebuilds the `recent`
-target to get the latest download numbers for today.
-If the newly-downloaded data are the same as last time 
-and nothing else changes,
-`drake` skips all the other targets.
+If we run `make()` again right away, we see that everything is up to date. But if we wait until a new day's log is uploaded, `make()` will update `recent` and everything that depends on it.
 
 ```{r packagessecondmake}
 make(whole_plan)
 ```
 
-To visualize the build behavior, plot the dependency network.
-Target `recent` and everything depending on it is always
-out of date because of the `"always"` trigger.
-If you rerun the project tomorrow,
-the `recent` dataset will have shifted one day forward,
-so `make()` will refresh `averages_recent`, `plot_recent`, and
-`report.md`. Targets `averages_older` and `plot_older`
-should be unaffected, so `drake` will skip them.
+To visualize the build behavior, you can plot the dependency network.
 
 ```{r plotpackagesgraph}
 config <- drake_config(whole_plan)
 vis_drake_graph(config)
 ```
 
-## What remote data sources in general?
+## Other ways to trigger downloads
 
-When you rely on data from the internet, you should trigger a new download when the data change remotely. The [best practices guide](#practices) explains how to automatically refresh the data when the online timestamp changes.
+Sometimes, our remote data sources get revised, and web scraping may not  be the best way to detect changes. We may want to look at our remote dataset's modification time or HTTP ETag. To see how this works, consider the CRAN log file from February 9, 2018.
+
+```{r logurl}
+url <- "http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz"
+```
+
+We can track the modification date using the [`httr`](https://github.com/r-lib/httr) package.
+
+```{r logs2}
+library(httr)    # For querying websites.
+HEAD(url)$headers[["last-modified"]]
+```
+
+In our workflow plan, we can track this timestamp and trigger a download whenever it changes.
+
+```{r logs3}
+plan <- drake_plan(
+  logs = target(
+    get_logs(url),
+    trigger(change = HEAD(url)$headers[["last-modified"]])
+  )
+)
+plan
+```
+
+where
+
+```{r logs5}
+library(R.utils) # For unzipping the files we download.
+library(curl)    # For downloading data.
+get_logs <- function(url){
+  curl_download(url, "logs.csv.gz")       # Get a big file.
+  gunzip("logs.csv.gz", overwrite = TRUE) # Unzip it.
+  out <- read.csv("logs.csv", nrows = 4)  # Extract the data you need.
+  unlink(c("logs.csv.gz", "logs.csv"))    # Remove the big files
+  out                                     # Value of the target.
+}
+```
+
+When we are ready, we run the workflow.
+
+```{r logs6}
+make(plan)
+
+readd(logs)
+```
+
+If the log file at the `url` ever changes, the timestamp will update remotely, and `make()` will download the file again.
 
 ```{r rmfiles_main02, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)

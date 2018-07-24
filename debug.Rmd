@@ -148,52 +148,12 @@ str(diagnose("\"report.md\""))
 
 If your target's last build succeeded, then `diagnose(your_target)` has the most current information from that build. But if your target failed, then only `diagnose(your_target)$error`, `diagnose(your_target)$warnings`, and `diagnose(your_target)$messages` correspond to the failure, and all the other metadata correspond to the last build that completed without an error.
 
-## Test with triggers.
-
-To track dependencies and make decisions about what needs building, `make()` store the fingerprint, or hash, of each target. Hashing is great for detecting the right changes in targets, but if all you want to do is test and debug a workflow, the full rigor can be time-consuming.
-
-Fortunately, you can change the triggers that tell `drake` when to (re)build each target. Below, `drake` disregards outdatedness and just builds the targets that are missing.
-
-```{r rushdebug}
-clean(verbose = FALSE) # Start from scratch
-config <- make(my_plan, trigger = "missing")
-```
-
-You can choose from any of the following triggers for all targets or for each target individually.
-
-- `always`: Always build the target regardless of the circumstance, even if the target is already up to date. 
-- `any`: Apply all the triggers below (default). In other words, trigger a build if the `command` trigger, `depends` trigger, `file` trigger, or `missing` trigger is activated.
-- `command`: Build if the workflow plan command changed since the last `make()` or the target is missing.
-- `depends`: Build if any of the target's dependencies changed since the last `make()` or if the target is missing.
-- `file`: Build if the target is an output file and the file is either missing or corrupted. Also build if the file's hash is missing from the cache.
-- `missing`: Build if and only if the target is missing.
-
-To select triggers for individual targets, create an optional `trigger` column in the workflow plan data frame. Entries in this column override the `trigger` argument to `make()`
-
-```{r indivtrigger}
-my_plan$trigger <- "command"
-my_plan$trigger[1] <- "file"
-my_plan
-
-## Change an imported dependency:
-reg2
-
-reg2 <- function(d) {
-  d$x3 <- d$x ^ 3
-  lm(y ~ x3, data = d)
-}
-make(my_plan, trigger = "any") # Nothing changes!
-```
-
-The `outdated()` function responds to triggers. For example, even if `outdated(my_plan)` shows all targets up to date, `outdated(my_plan, trigger = "always")` will claim that all the targets are outdated.
-
 ## Skipping imports
 
-Similar to triggers, you can also to skip the processing of imported objects and files. However, *you should only use this for testing purposes*. If some of your imports are not already cached and up to date, any built targets will be out of sync. In other words, `outdated()` is more likely to be wrong, and your project may no longer be reproducible.
+It may be time-consuming to process all the imported objects and files, so for testing purposes, if you processed the imports once, you can choose to jump straight to the targets. This is not recommended for the production version
 
 ```{r skipimports}
 clean(verbose = FALSE)
-my_plan$trigger <- NULL
 
 make(my_plan, skip_imports = TRUE)
 ```
