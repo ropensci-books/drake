@@ -33,12 +33,13 @@ rmd <- system.file(
 tmp <- file.copy(from = rmd, to = "report.Rmd")
 ```
 
-When you call `make()`, `drake` tries to skip all the targets it can get away with skipping. If it thinks a command will output the same value as last time, it does not bother running it. In other words, `drake` is lazy, and laziness saves you time.
+When you call `make()`, `drake` tries to skip as many targets as possible. If it thinks a command will output the same value as last time, it does not bother running it. In other words, `drake` is lazy, and laziness saves you time.
 
 To figure out whether it can skip a target, `drake` goes through an intricate checklist of **triggers**.
 
 1. Do we already have the target's value from a previous `make()`?
-2. 
+2. Did the command in the plan change since last time?
+3. Did any of the command's dependencies change since last time?
 
 
 
