@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 ```
 
-Data analysis projects have complicated networks of dependencies, and `drake` can help you visualize them with `vis_drake_graph()`, `sankey_drake_graph()`, and `static_drake_graph()`.
+Data analysis projects have complicated networks of dependencies, and `drake` can help you visualize them with `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` (note the two g's).
 
 ### `vis_drake_graph()`
 
@@ -25,12 +25,31 @@ config <- drake_config(my_plan)
 vis_drake_graph(config)
 ```
 
+To save this interactive widget for later, just supply the name of an HTML file.
+
+```{r htmlfile, eval = FALSE}
+vis_drake_graph(config, file = "graph.html")
+```
+
+To save a static image file, supply a file name that ends in `".png"`, `".pdf"`, `".jpeg"`, or `".jpg"`.
+
+```{r imgfile, eval = FALSE}
+vis_drake_graph(config, file = "graph.png")
+```
+
 ### `sankey_drake_graph()`
 
 These interactive [`networkD3`](https://github.com/christophergandrud/networkD3) [Sankey diagrams](https://en.wikipedia.org/wiki/Sankey_diagram) have more nuance: the height of each node is proportional to its number of connections. Nodes with many incoming connnections tend to fall out of date more often, and nodes with many outgoing connections can invalidate bigger chunks of the downstream pipeline.
 
 ```{r sankeygraph}
 sankey_drake_graph(config)
+```
+
+Saving the graphs is the same as before.
+
+```{r savegraphsankey, eval = FALSE}
+sankey_drake_graph(config, file = "graph.html") # Interactive HTML widget
+sankey_drake_graph(config, file = "graph.png")  # Static image file
 ```
 
 Unfortunately, a legend is [not yet available for Sankey diagrams](https://github.com/ropensci/drake/pull/467), but `drake` exposes a separate legend for the colors and shapes.
@@ -41,21 +60,21 @@ legend_nodes()
 visNetwork(nodes = legend_nodes())
 ```
 
-### `static_drake_graph()`
+### `drake_ggraph()`
 
-Powered by [`ggraph`](https://github.com/thomasp85/ggraph), these graphs are not interactive. However, they are useful for [reproducible examples](https://github.com/tidyverse/reprex), you can customize the output with additional [`ggplot2`](https://github.com/tidyverse/ggplot2) layers, and you can save them with `ggsave()`.
+Powered by [`ggraph`](https://github.com/thomasp85/ggraph), these graphs are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`.
 
 ```{r static}
 plan <- drake_plan(data = get_data(), model = data, plot = data)
 plan
 get_data <- function(){}
 config <- drake_config(plan)
-static_drake_graph(config)
+drake_ggraph(config)
 ```
 
 ## Underlying graph data: node and edge data frames
 
-`drake_graph_info()` is used behind the scenes in `vis_drake_graph()`, `sankey_drake_graph()`, and `static_drake_graph()` to get the graph information ready for rendering. To save time, you can call `drake_graph_info()` to get these internals and then call `render_drake_graph()`, `render_sankey_drake_graph()`, or  `render_static_drake_graph()`.
+`drake_graph_info()` is used behind the scenes in `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` to get the graph information ready for rendering. To save time, you can call `drake_graph_info()` to get these internals and then call `render_drake_graph()`, `render_sankey_drake_graph()`, or  `render_drake_ggraph()`.
 
 ```{r drakegraphinfo34908234}
 str(drake_graph_info(config))
