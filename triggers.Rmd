@@ -1,0 +1,46 @@
+# Triggers: decision rules for building targets {#triggers}
+
+```{r setup_triggers, include = FALSE}
+suppressMessages(suppressWarnings(library(cranlogs)))
+suppressMessages(suppressWarnings(library(curl)))
+suppressMessages(suppressWarnings(library(drake)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+suppressMessages(suppressWarnings(library(httr)))
+suppressMessages(suppressWarnings(library(knitr)))
+suppressMessages(suppressWarnings(library(magrittr)))
+suppressMessages(suppressWarnings(library(R.utils)))
+suppressMessages(suppressWarnings(library(rvest)))
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
+clean(destroy = TRUE, verbose = FALSE)
+unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  error = TRUE,
+  warning = TRUE
+)
+dat <- system.file(
+  file.path("examples", "main", "raw_data.xlsx"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = dat, to = "raw_data.xlsx")
+rmd <- system.file(
+  file.path("examples", "main", "report.Rmd"),
+  package = "drake",
+  mustWork = TRUE
+)
+tmp <- file.copy(from = rmd, to = "report.Rmd")
+```
+
+When you call `make()`, `drake` looks for targets it can safely skip. It goes through an intricate checklist:
+
+1. Is the target's value already in the cache?
+2. 
+
+
+
+```{r endofline_triggers, echo = FALSE}
+clean(destroy = TRUE, verbose = FALSE)
+unlink(c("report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"))
+```
