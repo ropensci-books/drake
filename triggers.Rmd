@@ -1,16 +1,9 @@
 # Triggers: decision rules for building targets {#triggers}
 
 ```{r setup_triggers, include = FALSE}
-suppressMessages(suppressWarnings(library(cranlogs)))
-suppressMessages(suppressWarnings(library(curl)))
 suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-suppressMessages(suppressWarnings(library(httr)))
-suppressMessages(suppressWarnings(library(knitr)))
-suppressMessages(suppressWarnings(library(magrittr)))
-suppressMessages(suppressWarnings(library(R.utils)))
-suppressMessages(suppressWarnings(library(rvest)))
+suppressMessages(suppressWarnings(library(rwunderground)))
+suppressMessages(suppressWarnings(library(tidyverse)))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
@@ -33,39 +26,144 @@ rmd <- system.file(
 tmp <- file.copy(from = rmd, to = "report.Rmd")
 ```
 
-When you call `make()`, `drake` tries to skip as many targets as possible. If it thinks a command will output the same value as last time, it does not bother running it. In other words, `drake` is lazy, and laziness saves you time.
+When you call `make()`, `drake` tries to skip as many targets as possible. If it thinks a command will return the same value as last time, it does not bother running it. In other words, `drake` is lazy, and laziness saves you time.
 
 ## What are triggers?
 
 To figure out whether it can skip a target, `drake` goes through an intricate checklist of **triggers**:
 
-1. The "missing" trigger: do we already have the target's value from a previous `make()`, or is it missing from the cache?
-2. The "condition" trigger: user-defined (details later).
-3. The "command" trigger: did the command in the workflow plan data frame change since the last `make()`?
-4. The "depend" trigger: did any non-file dependencies change since the last `make()`? These could be
-    - other targets,
-    - imported objects,
-    - imported functions,
-    - any dependencies of imported functions,
-    - any dependencies of dependencies of imported functions, and so on.
-5. The "file" trigger: did any file inputs or file outputs change since the last `make()`?
-6. The "change" trigger: user-defined (details later).
+1. The **missing** trigger: do we already have the target's value from a previous `make()`, or is it missing from the cache?
+2. The **command** trigger: did the command in the workflow plan data frame change nontrivially since the last `make()`? Changes to spacing, formatting, and comments are ignored.
+3. The **depend** trigger: did any non-file dependencies change since the last `make()`? These could be:
+    - Other targets.
+    - Imported objects.
+    - Imported functions (ignoring changes to spacing, formatting, and comments).
+    - Any dependencies of imported functions.
+    - Any dependencies of dependencies of imported functions, and so on.
+4. The **file** trigger: did any file inputs or file outputs change since the last `make()`? These files are the ones explicitly declared in the command with `file_in()`, `knitr_in()`, and `file_out()`.
+5. The **condition** trigger: an optional user-defined piece of code that evaluates to a `TRUE`/`FALSE` value. The target builds if the value is `TRUE`.
+6. The **change** trigger:  an optional user-defined piece of code that evaluates to any value (preferably small and quick to compute). The target builds if the value changed since the last `make()`.
 
-If *any* of these triggers detects something wrong or different about the target or its dependencies, `drake` runs the command to rebuidl the target.
+If *any* trigger detects something wrong or different with the target or its dependencies, the next `make()` will run the command and (re)build the target.
 
 ## Customization
 
-With the exception of the "missing" trigger, 
+With the `trigger()` function, you can create your own customized checklist of triggers. Let's run a simple workflow with just the **missing** trigger. We deactivate the **command**, **depend**, and **file** triggers by setting the respective `command`, `depend`, and `file` arguments to `FALSE`.
 
-## The "command" trigger
+```{r missingtrigger1}
+plan <- drake_plan(
+  psi_1 = (sqrt(5) + 1) / 2,
+  psi_2 = (sqrt(5) - 1) / 2
+)
+make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
+```
 
-## The "depend" trigger
+Now, even if you wreck all the commands, nothing rebuilds.
 
-## The "file" trigger
+```{r missingtrigger2}
+plan <- drake_plan(
+  psi_1 = (sqrt(5) + 1) / 2 + 9999999999999,
+  psi_2 = (sqrt(5) - 1) / 2 - 9999999999999
+)
+make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
+```
 
-## The "condition" trigger
+You can also give different targets to different triggers. Triggers in the workflow plan data frame override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if the output value is missing beforehand.
 
-## The "change" trigger
+```{r missingtrigger3}
+plan <- drake_plan(
+  psi_1 = (sqrt(5) + 1) / 2 + 9999999999999,
+  psi_2 = target(
+    command = (sqrt(5) - 1) / 2 - 9999999999999,
+    trigger = trigger(condition = psi_1 > 0)
+  )
+)
+plan
+make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
+make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
+```
+
+Interestingly, `psi_2` now depends on `psi_1`. Since `psi_1` is part of the because of the **condition** trigger, it needs to be up to date before we attempt `psi_2`. However, since `psi_1` is not part of the command, changing it will not trip the other triggers such as **depend**.
+
+```{r missingtrigger4}
+vis_drake_graph(drake_config(plan))
+```
+
+In the next toy example below, `drake` flips a coin to decide whether to build `x`. Try it out.
+
+```{r randomcondition}
+set.seed(0)
+plan <- drake_plan(
+  x = target(
+    1 + 1,
+    trigger(condition = runif(1) > 0.5)
+  )
+)
+make(plan)
+make(plan)
+make(plan)
+make(plan)
+make(plan)
+```
+
+In a real project with remote data sources, you may want to use the **condition** trigger to limit your builds to times when enough bandwidth is available for a large download. For example,
+
+```{r tuesday, eval = FALSE}
+drake_plan(
+  x = target(
+    command = download_large_dataset(),
+    trigger = trigger(condition = is_enough_bandwidth())
+  )
+)
+```
+
+Since the **change** trigger can return any value, it is often easier to use than the **condition** trigger.
+
+```{r changetrigger}
+plan <- drake_plan(
+  x = target(
+    command = 1 + 1,
+    trigger = trigger(change = sqrt(y))
+  )
+)
+y <- 1
+make(plan)
+make(plan)
+y <- 2
+make(plan)
+```
+
+In practice, you may want to use the **change** trigger to check a large remote before downloading it.
+
+```{r scrapetrigger, eval = FALSE}
+drake_plan(
+  x = target(
+    command = download_large_dataset(),
+    trigger = trigger(
+      condition = is_enough_bandwidth(),
+      change = date_last_modified()
+    )
+  )
+)
+```
+
+A word of caution: every non-`NULL` **change** trigger is always evaluated, and its value is always stored in the target's quick-lookup internal metadata (recoverable with `diagnose()`). So if you are not careful, heavy use of the **change** trigger could slow down your workflow. Please take care to make these triggers quick to check, and please keep their return values small. You may want to return a fingerprint of your trigger value rather than the value itself. See the [`digest`](https://github.com/eddelbuettel/digest) package for more information.
+
+```{r scrapetrigger2, eval = FALSE}
+library(digest)
+drake_plan(
+  x = target(
+    command = download_large_dataset(),
+    trigger = trigger(
+      change = digest(download_medium_dataset())
+    )
+  )
+)
+```
+
+## A more practical example
+
+See the ["packages" example](#packages) for a more practical demonstration of triggers and their usefulness.
 
 ```{r endofline_triggers, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
