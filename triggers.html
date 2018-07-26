@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="packages.html">
-<link rel="next" href="mtcars.html">
+<link rel="prev" href="hpc.html">
+<link rel="next" href="time.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -350,217 +350,137 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="gsp" class="section level1">
-<h1><span class="header-section-number">Chapter 4</span> Finding the best model of gross state product</h1>
-<p>The following data analysis workflow shows off <code>drake</code>’s ability to generate lots of reproducibly-tracked tasks with ease. The same technique would be cumbersome, even intractable, with <a href="https://www.gnu.org/software/make/">GNU Make</a>.</p>
-<div id="get-the-code.-1" class="section level2">
-<h2><span class="header-section-number">4.1</span> Get the code.</h2>
-<p>Write the code files to your workspace.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</code></pre>
-<p>The new <code>gsp</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/ropensci/drake/tree/master/inst/examples/gsp">online here</a>.</p>
-</div>
-<div id="objective-and-methods" class="section level2">
-<h2><span class="header-section-number">4.2</span> Objective and methods</h2>
-<p>The goal is to search for factors closely associated with the productivity of states in the USA around the 1970s and 1980s. For the sake of simplicity, we use gross state product as a metric of productivity, and we restrict ourselves to multiple linear regression models with three variables. For each of the 84 possible models, we fit the data and then evaluate the root mean squared prediction error (RMSPE).</p>
-<p><span class="math display">\[
-\begin{aligned}
-\text{RMSPE} = \sqrt{(\text{y} - \widehat{y})^T(y - \widehat{y})}
-\end{aligned}
-\]</span>
-Here, <span class="math inline">\(y\)</span> is the vector of observed gross state products in the data, and <span class="math inline">\(\widehat{y}\)</span> is the vector of predicted gross state products under one of the models. We take the best variables to be the triplet in the model with the lowest RMSPE.</p>
-</div>
-<div id="data" class="section level2">
-<h2><span class="header-section-number">4.3</span> Data</h2>
-<p>The <code>Produc</code> dataset from the <a href="https://cran.r-project.org/package=Ecdat">Ecdat package</a> contains data on the Gross State Product from 1970 to 1986. Each row is a single observation on a single state for a single year. The dataset has the following variables as columns. See the references later in this report for more details.</p>
-<ul>
-<li><code>gsp</code>: gross state product.</li>
-<li><code>state</code>: the state.</li>
-<li><code>year</code>: the year.</li>
-<li><code>pcap</code>: private capital stock.</li>
-<li><code>hwy</code>: highway and streets.</li>
-<li><code>water</code>: water and sewer facilities.</li>
-<li><code>util</code>: other public buildings and structures.</li>
-<li><code>pc</code>: public capital.</li>
-<li><code>emp</code>: labor input measured by the employment in non-agricultural payrolls.</li>
-<li><code>unemp</code>: state unemployment rate.</li>
-</ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Ecdat)
-<span class="kw">data</span>(Produc)
-<span class="kw">head</span>(Produc)
-##     state year     pcap     hwy   water    util       pc   gsp    emp
-## 1 ALABAMA 1970 15032.67 7325.80 1655.68 6051.20 35793.80 28418 1010.5
-## 2 ALABAMA 1971 15501.94 7525.94 1721.02 6254.98 37299.91 29375 1021.9
-## 3 ALABAMA 1972 15972.41 7765.42 1764.75 6442.23 38670.30 31303 1072.3
-## 4 ALABAMA 1973 16406.26 7907.66 1742.41 6756.19 40084.01 33430 1135.5
-## 5 ALABAMA 1974 16762.67 8025.52 1734.85 7002.29 42057.31 33749 1169.8
-## 6 ALABAMA 1975 17316.26 8158.23 1752.27 7405.76 43971.71 33604 1155.4
-##   unemp
-## 1   4.7
-## 2   5.2
-## 3   4.7
-## 4   3.9
-## 5   5.5
-## 6   7.7</code></pre>
-</div>
-<div id="analysis-1" class="section level2">
-<h2><span class="header-section-number">4.4</span> Analysis</h2>
-<p>First, we load the required packages. <code>Drake</code> is aware of all the packages you load with <code>library()</code> or <code>require()</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
-<span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span>
-<span class="kw">library</span>(knitr)
-<span class="kw">library</span>(ggplot2)</code></pre>
-<p>Next, set up our workflow plan data frame in stages. We start with the models. Each model has 3 predictors, and we try all 84 possible models.</p>
-<pre class="sourceCode r"><code class="sourceCode r">predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)
-combos &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">combn</span>(predictors, <span class="dv">3</span>))
-<span class="kw">head</span>(combos)
-##      [,1]    [,2]   [,3]   
-## [1,] &quot;state&quot; &quot;year&quot; &quot;pcap&quot; 
-## [2,] &quot;state&quot; &quot;year&quot; &quot;hwy&quot;  
-## [3,] &quot;state&quot; &quot;year&quot; &quot;water&quot;
-## [4,] &quot;state&quot; &quot;year&quot; &quot;util&quot; 
-## [5,] &quot;state&quot; &quot;year&quot; &quot;pc&quot;   
-## [6,] &quot;state&quot; &quot;year&quot; &quot;emp&quot;
-targets &lt;-<span class="st"> </span><span class="kw">apply</span>(combos, <span class="dv">1</span>, paste, <span class="dt">collapse =</span> <span class="st">&quot;_&quot;</span>)
-commands &lt;-<span class="st"> </span><span class="kw">apply</span>(combos, <span class="dv">1</span>, <span class="cf">function</span>(row){
-  covariates &lt;-<span class="st"> </span><span class="kw">paste</span>(row, <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)
-  formula &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;as.formula(</span><span class="ch">\&quot;</span><span class="st">gsp ~ &quot;</span>, covariates, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">)&quot;</span>)
-  command &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;lm(&quot;</span>, formula, <span class="st">&quot;, data = Produc)&quot;</span>)
-})
-model_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">target =</span> targets, <span class="dt">command =</span> commands)
-
-<span class="kw">head</span>(model_plan)
-##             target
-## 1  state_year_pcap
-## 2   state_year_hwy
-## 3 state_year_water
-## 4  state_year_util
-## 5    state_year_pc
-## 6   state_year_emp
-##                                                       command
-## 1  lm(as.formula(&quot;gsp ~ state + year + pcap&quot;), data = Produc)
-## 2   lm(as.formula(&quot;gsp ~ state + year + hwy&quot;), data = Produc)
-## 3 lm(as.formula(&quot;gsp ~ state + year + water&quot;), data = Produc)
-## 4  lm(as.formula(&quot;gsp ~ state + year + util&quot;), data = Produc)
-## 5    lm(as.formula(&quot;gsp ~ state + year + pc&quot;), data = Produc)
-## 6   lm(as.formula(&quot;gsp ~ state + year + emp&quot;), data = Produc)</code></pre>
-<p>Next, we make a plan to judge each model based on its root mean squared prediction error (RMSPE).</p>
-<pre class="sourceCode r"><code class="sourceCode r">commands &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;get_rmspe(&quot;</span>, targets, <span class="st">&quot;, data = Produc)&quot;</span>)
-targets &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;rmspe_&quot;</span>, targets)
-rmspe_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">target =</span> targets, <span class="dt">command =</span> commands)
-
-<span class="kw">head</span>(rmspe_plan)
-##                   target                                    command
-## 1  rmspe_state_year_pcap  get_rmspe(state_year_pcap, data = Produc)
-## 2   rmspe_state_year_hwy   get_rmspe(state_year_hwy, data = Produc)
-## 3 rmspe_state_year_water get_rmspe(state_year_water, data = Produc)
-## 4  rmspe_state_year_util  get_rmspe(state_year_util, data = Produc)
-## 5    rmspe_state_year_pc    get_rmspe(state_year_pc, data = Produc)
-## 6   rmspe_state_year_emp   get_rmspe(state_year_emp, data = Produc)</code></pre>
-<p>We need to define a function to get the RMSPE for each model.</p>
-<pre class="sourceCode r"><code class="sourceCode r">get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(lm_fit, data){
-  y &lt;-<span class="st"> </span>data<span class="op">$</span>gsp
-  yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(lm_fit, <span class="dt">data =</span> data)
-  terms &lt;-<span class="st"> </span><span class="kw">attr</span>(<span class="kw">summary</span>(lm_fit)<span class="op">$</span>terms, <span class="st">&quot;term.labels&quot;</span>)
-  <span class="kw">data.frame</span>(
-    <span class="dt">rmspe =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>((y <span class="op">-</span><span class="st"> </span>yhat)<span class="op">^</span><span class="dv">2</span>)), <span class="co"># nolint</span>
-    <span class="dt">X1 =</span> terms[<span class="dv">1</span>],
-    <span class="dt">X2 =</span> terms[<span class="dv">2</span>],
-    <span class="dt">X3 =</span> terms[<span class="dv">3</span>]
-  )
-}</code></pre>
-<p>In our current plan, RMSPE is distributed over 84 targets (one for each model). Let’s plan to combine them all together in a single data frame.</p>
-<pre class="sourceCode r"><code class="sourceCode r">rmspe_results_plan &lt;-<span class="st"> </span><span class="kw">gather_plan</span>(
-  <span class="dt">plan =</span> rmspe_plan,
-  <span class="dt">target =</span> <span class="st">&quot;rmspe&quot;</span>,
-  <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>
-)</code></pre>
-<p>At the end, let’s generate a pdf plot of the RMSPE scores and a <a href="https://yihui.name/knitr/">knitr</a> report.</p>
-<pre class="sourceCode r"><code class="sourceCode r">output_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">plot =</span> <span class="kw">ggsave</span>(
-    <span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>),
-    <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe),
-    <span class="dt">width =</span> <span class="dv">7</span>,
-    <span class="dt">height =</span> <span class="dv">7</span>
-  ),
-  <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)
-)
-
-<span class="kw">head</span>(output_plan)
-## # A tibble: 2 x 2
-##   target command                                                          
-##   &lt;chr&gt;  &lt;chr&gt;                                                            
-## 1 plot   &quot;ggsave(filename = file_out(\&quot;rmspe.pdf\&quot;), plot = plot_rmspe(rm…
-## 2 report &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\&quot;), quiet =…</code></pre>
-<p>We see warnings above because our R Markdown report <code>report.Rmd</code> does not exist yet. You can find it <a href="https://github.com/ropensci/drake/blob/master/inst/examples/gsp/report.Rmd">here</a>, and the code below generates it.</p>
-<pre class="sourceCode r"><code class="sourceCode r">local &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;gsp&quot;</span>, <span class="st">&quot;report.Rmd&quot;</span>)
-path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">path =</span> local, <span class="dt">package =</span> <span class="st">&quot;drake&quot;</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)
-<span class="kw">file.copy</span>(<span class="dt">from =</span> path, <span class="dt">to =</span> <span class="st">&quot;report.Rmd&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
-## [1] TRUE</code></pre>
-<p>At this point, we can gather together the whole workflow plan.</p>
-<pre class="sourceCode r"><code class="sourceCode r">whole_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(model_plan, rmspe_plan, rmspe_results_plan, output_plan)</code></pre>
-<p>Before we run the project, we need to define the <code>plot_rmspe()</code> function.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){
-  <span class="kw">ggplot</span>(rmspe) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">30</span>)
-}</code></pre>
-<p>Now, we can run the project</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(whole_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre>
-</div>
-<div id="results" class="section level2">
-<h2><span class="header-section-number">4.5</span> Results</h2>
-<p>Here are the root mean squared prediction errors of all the models.</p>
-<pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)
-
-<span class="kw">loadd</span>(plot_rmspe)
-
-<span class="kw">library</span>(ggplot2)
-<span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</code></pre>
-<p><img src="drake-manual_files/figure-html/masterrmspeplot-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>And here are the best models. The best variables are in the top row under <code>X1</code>, <code>X2</code>, and <code>X3</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(results[<span class="kw">order</span>(results<span class="op">$</span>rmspe, <span class="dt">decreasing =</span> <span class="ot">FALSE</span>), ])
-##                          rmspe    X1    X2    X3
-## rmspe_state_hwy_emp   2613.669 state   hwy   emp
-## rmspe_state_water_emp 2664.842 state water   emp
-## rmspe_state_util_emp  2665.744 state  util   emp
-## rmspe_state_pc_emp    2666.058 state    pc   emp
-## rmspe_state_pcap_emp  2675.336 state  pcap   emp
-## rmspe_state_emp_unemp 2692.687 state   emp unemp</code></pre>
-</div>
-<div id="comparison-with-gnu-make" class="section level2">
-<h2><span class="header-section-number">4.6</span> Comparison with GNU Make</h2>
-<p>If we were using <a href="https://www.gnu.org/software/make/">Make</a> instead of <code>drake</code> with the same set of targets, the analogous <a href="https://www.gnu.org/software/make/">Makefile</a> would look something like this pseudo-code sketch.</p>
-<pre><code>models = model_state_year_pcap.rds model_state_year_hwy.rds ... # 84 of these
-
-model_%
-    Rscript -e 'saveRDS(lm(...), ...)'
-
-rmspe_%: model_%
-    Rscript -e 'saveRDS(get_rmspe(...), ...)'
-
-rmspe.rds: rmspe_%
-    Rscript -e 'saveRDS(rbind(...), ...)'
-
-rmspe.pdf: rmspe.rds
-    Rscript -e 'ggplot2::ggsave(plot_rmspe(readRDS("rmspe.rds")), "rmspe.pdf")'
-
-report.md: report.Rmd
-    Rscript -e 'knitr::knit("report.Rmd")'
-</code></pre>
-<p>There are three main disadvantages to this approach.</p>
+<div id="triggers" class="section level1">
+<h1><span class="header-section-number">Chapter 11</span> Triggers: decision rules for building targets</h1>
+<p>When you call <code>make()</code>, <code>drake</code> tries to skip as many targets as possible. If it thinks a command will return the same value as last time, it does not bother running it. In other words, <code>drake</code> is lazy, and laziness saves you time.</p>
+<div id="what-are-triggers" class="section level2">
+<h2><span class="header-section-number">11.1</span> What are triggers?</h2>
+<p>To figure out whether it can skip a target, <code>drake</code> goes through an intricate checklist of <strong>triggers</strong>:</p>
 <ol style="list-style-type: decimal">
-<li>Every target requires a new call to <code>Rscript</code>, which means that more time is spent initializing R sessions than doing the actual work.</li>
-<li>The user must micromanage nearly one hundred output files (in this case, <code>*.rds</code> files), which is cumbersome, messy, and inconvenient. <code>Drake</code>, on the other hand, automatically manages storage using a <a href="https://github.com/richfitz/storr">storr cache</a>.</li>
-<li>The user needs to write the names of the 84 <code>models</code> near the top of the <code>Makefile</code>, which is less convenient than maintaining a data frame in R.</li>
-</ol>
-</div>
-<div id="references" class="section level2">
-<h2><span class="header-section-number">4.7</span> References</h2>
+<li>The <strong>missing</strong> trigger: do we already have the target’s value from a previous <code>make()</code>, or is it missing from the cache?</li>
+<li>The <strong>command</strong> trigger: did the command in the workflow plan data frame change nontrivially since the last <code>make()</code>? Changes to spacing, formatting, and comments are ignored.</li>
+<li>The <strong>depend</strong> trigger: did any non-file dependencies change since the last <code>make()</code>? These could be:
 <ul>
-<li>Baltagi, Badi H (2003). Econometric analysis of panel data, John Wiley and sons, <a href="http://www.wiley.com/legacy/wileychi/baltagi/" class="uri">http://www.wiley.com/legacy/wileychi/baltagi/</a>.</li>
-<li>Baltagi, B. H. and N. Pinnoi (1995). “Public capital stock and state productivity growth: further evidence”, Empirical Economics, 20, 351-359.</li>
-<li>Munnell, A. (1990). “Why has productivity growth declined? Productivity and public investment”&quot;, New England Economic Review, 3-22.</li>
-<li>Yves Croissant (2016). Ecdat: Data Sets for Econometrics. R package version 0.3-1. <a href="https://CRAN.R-project.org/package=Ecdat" class="uri">https://CRAN.R-project.org/package=Ecdat</a>.</li>
-</ul>
+<li>Other targets.</li>
+<li>Imported objects.</li>
+<li>Imported functions (ignoring changes to spacing, formatting, and comments).</li>
+<li>Any dependencies of imported functions.</li>
+<li>Any dependencies of dependencies of imported functions, and so on.</li>
+</ul></li>
+<li>The <strong>file</strong> trigger: did any file inputs or file outputs change since the last <code>make()</code>? These files are the ones explicitly declared in the command with <code>file_in()</code>, <code>knitr_in()</code>, and <code>file_out()</code>.</li>
+<li>The <strong>condition</strong> trigger: an optional user-defined piece of code that evaluates to a <code>TRUE</code>/<code>FALSE</code> value. The target builds if the value is <code>TRUE</code>.</li>
+<li>The <strong>change</strong> trigger: an optional user-defined piece of code that evaluates to any value (preferably small and quick to compute). The target builds if the value changed since the last <code>make()</code>.</li>
+</ol>
+<p>If <em>any</em> trigger detects something wrong or different with the target or its dependencies, the next <code>make()</code> will run the command and (re)build the target.</p>
+</div>
+<div id="customization" class="section level2">
+<h2><span class="header-section-number">11.2</span> Customization</h2>
+<p>With the <code>trigger()</code> function, you can create your own customized checklist of triggers. Let’s run a simple workflow with just the <strong>missing</strong> trigger. We deactivate the <strong>command</strong>, <strong>depend</strong>, and <strong>file</strong> triggers by setting the respective <code>command</code>, <code>depend</code>, and <code>file</code> arguments to <code>FALSE</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,
+  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>
+)
+<span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
+## target psi_1
+## target psi_2
+## Used non-default triggers. Some targets may not be up to date.</code></pre>
+<p>Now, even if you wreck all the commands, nothing rebuilds.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,
+  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span>
+)
+<span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
+## Used non-default triggers. Some targets may not be up to date.</code></pre>
+<p>You can also give different targets to different triggers. Triggers in the workflow plan data frame override the <code>trigger</code> argument to <code>make()</code>. Below, <code>psi_2</code> always builds, but <code>psi_1</code> only builds if the output value is missing beforehand.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,
+  <span class="dt">psi_2 =</span> <span class="kw">target</span>(
+    <span class="dt">command =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span>,
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> psi_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
+  )
+)
+plan
+## # A tibble: 2 x 3
+##   target command                         trigger                       
+## * &lt;chr&gt;  &lt;chr&gt;                           &lt;chr&gt;                         
+## 1 psi_1  (sqrt(5) + 1)/2 + 9999999999999 &lt;NA&gt;                          
+## 2 psi_2  (sqrt(5) - 1)/2 - 9999999999999 trigger(condition = psi_1 &gt; 0)
+<span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
+## target psi_2
+## Used non-default triggers. Some targets may not be up to date.
+<span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
+## target psi_2
+## Used non-default triggers. Some targets may not be up to date.</code></pre>
+<p>Interestingly, <code>psi_2</code> now depends on <code>psi_1</code>. Since <code>psi_1</code> is part of the because of the <strong>condition</strong> trigger, it needs to be up to date before we attempt <code>psi_2</code>. However, since <code>psi_1</code> is not part of the command, changing it will not trip the other triggers such as <strong>depend</strong>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</code></pre>
+<div id="htmlwidget-515e675aba6a2f31e4ec" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-515e675aba6a2f31e4ec">{"x":{"nodes":{"id":["psi_1","psi_2","sqrt"],"ignore_changes":[null,"psi_1",null],"label":["psi_1\n0.015s","psi_2\n0.007s","sqrt\n0.002s"],"command":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999",null],"trigger":[null,"trigger(condition = psi_1 > 0)",null],"status":["outdated","outdated","imported"],"type":["object","object","function"],"font.size":[20,20,20],"color":["#000000","#000000","#1874CD"],"shape":["dot","dot","triangle"],"level":[2,3,1],"hover_label":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999",".Primitive(\"sqrt\")"],"x":[-1,1,1],"y":[0,1,-1]},"edges":{"from":["sqrt","sqrt","psi_1"],"to":["psi_1","psi_2","psi_2"],"arrows":["to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true,"hover":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","triangle"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,8]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","events":{"hoverNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }","blurNode":"function(e){\n        var label_info = this.body.data.nodes.get({\n          fields: ['label', 'hover_label'],\n          filter: function (item) {\n            return item.id === e.node\n          },\n          returnType :'Array'\n        });\n        this.body.data.nodes.update({\n          id: e.node,\n          label : label_info[0].hover_label,\n          hover_label : label_info[0].label\n        });\n      }"}},"evals":["events.hoverNode","events.blurNode"],"jsHooks":[]}</script>
+<p>In the next toy example below, <code>drake</code> flips a coin to decide whether to build <code>x</code>. Try it out.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">0</span>)
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+    <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">runif</span>(<span class="dv">1</span>) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>)
+  )
+)
+<span class="kw">make</span>(plan)
+## Unloading targets from environment:
+##   x
+## target x
+<span class="kw">make</span>(plan)
+## target x
+<span class="kw">make</span>(plan)
+## All targets are already up to date.
+<span class="kw">make</span>(plan)
+## All targets are already up to date.
+<span class="kw">make</span>(plan)
+## target x</code></pre>
+<p>In a real project with remote data sources, you may want to use the <strong>condition</strong> trigger to limit your builds to times when enough bandwidth is available for a large download. For example,</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>())
+  )
+)</code></pre>
+<p>Since the <strong>change</strong> trigger can return any value, it is often easier to use than the <strong>condition</strong> trigger.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="dt">command =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">sqrt</span>(y))
+  )
+)
+y &lt;-<span class="st"> </span><span class="dv">1</span>
+<span class="kw">make</span>(plan)
+## target x
+<span class="kw">make</span>(plan)
+## All targets are already up to date.
+y &lt;-<span class="st"> </span><span class="dv">2</span>
+<span class="kw">make</span>(plan)
+## target x</code></pre>
+<p>In practice, you may want to use the <strong>change</strong> trigger to check a large remote before downloading it.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(
+      <span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>(),
+      <span class="dt">change =</span> <span class="kw">date_last_modified</span>()
+    )
+  )
+)</code></pre>
+<p>A word of caution: every non-<code>NULL</code> <strong>change</strong> trigger is always evaluated, and its value is always stored in the target’s quick-lookup internal metadata (recoverable with <code>diagnose()</code>). So if you are not careful, heavy use of the <strong>change</strong> trigger could slow down your workflow. Please take care to make these triggers quick to check, and please keep their return values small. You may want to return a fingerprint of your trigger value rather than the value itself. See the <a href="https://github.com/eddelbuettel/digest"><code>digest</code></a> package for more information.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(digest)
+<span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(
+      <span class="dt">change =</span> <span class="kw">digest</span>(<span class="kw">download_medium_dataset</span>())
+    )
+  )
+)</code></pre>
+</div>
+<div id="a-more-practical-example" class="section level2">
+<h2><span class="header-section-number">11.3</span> A more practical example</h2>
+<p>See the <a href="packages.html#packages">“packages” example</a> for a more practical demonstration of triggers and their usefulness.</p>
 
 </div>
 </div>
@@ -569,8 +489,8 @@ report.md: report.Rmd
           </div>
         </div>
       </div>
-<a href="packages.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="mtcars.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="hpc.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="time.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

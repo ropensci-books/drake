@@ -272,17 +272,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="10.8" data-path="hpc.html"><a href="hpc.html#footnotes"><i class="fa fa-check"></i><b>10.8</b> Footnotes</a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>11</b> Time: logging, prediction, and strategy</a><ul>
-<li class="chapter" data-level="11.1" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>11.1</b> Predict total runtime</a></li>
-<li class="chapter" data-level="11.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>11.2</b> Strategize your high-performance computing</a></li>
+<li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
+<li class="chapter" data-level="11.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>11.1</b> What are triggers?</a></li>
+<li class="chapter" data-level="11.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>11.2</b> Customization</a></li>
+<li class="chapter" data-level="11.3" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>11.3</b> A more practical example</a></li>
 </ul></li>
-<li class="chapter" data-level="12" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>12</b> Storage</a><ul>
-<li class="chapter" data-level="12.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>12.1</b> Caches</a></li>
-<li class="chapter" data-level="12.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>12.2</b> Hash algorithms</a></li>
-<li class="chapter" data-level="12.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>12.3</b> Which hash algorithm should you choose?</a></li>
-<li class="chapter" data-level="12.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>12.4</b> Select the hash algorithms of the cache</a></li>
-<li class="chapter" data-level="12.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>12.5</b> Using <code>storr</code> directly</a></li>
-<li class="chapter" data-level="12.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>12.6</b> Cleaning up</a></li>
+<li class="chapter" data-level="12" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>12</b> Time: logging, prediction, and strategy</a><ul>
+<li class="chapter" data-level="12.1" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>12.1</b> Predict total runtime</a></li>
+<li class="chapter" data-level="12.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>12.2</b> Strategize your high-performance computing</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>13</b> Storage</a><ul>
+<li class="chapter" data-level="13.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>13.1</b> Caches</a></li>
+<li class="chapter" data-level="13.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>13.2</b> Hash algorithms</a></li>
+<li class="chapter" data-level="13.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>13.3</b> Which hash algorithm should you choose?</a></li>
+<li class="chapter" data-level="13.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>13.4</b> Select the hash algorithms of the cache</a></li>
+<li class="chapter" data-level="13.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>13.5</b> Using <code>storr</code> directly</a></li>
+<li class="chapter" data-level="13.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>13.6</b> Cleaning up</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
@@ -458,13 +463,41 @@ error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<spa
 ## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 error<span class="op">$</span>message
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found
+## [1] &quot;`x` cannot be negative.&quot;
 
 error<span class="op">$</span>call
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found
+## f(b)
 
 error<span class="op">$</span>calls <span class="co"># View the traceback.</span>
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found</code></pre>
+## [[1]]
+## local({
+##     f(b)
+## })
+## 
+## [[2]]
+## eval.parent(substitute(eval(quote(expr), envir)))
+## 
+## [[3]]
+## eval(expr, p)
+## 
+## [[4]]
+## eval(expr, p)
+## 
+## [[5]]
+## eval(quote({
+##     f(b)
+## }), new.env())
+## 
+## [[6]]
+## eval(quote({
+##     f(b)
+## }), new.env())
+## 
+## [[7]]
+## f(b)
+## 
+## [[8]]
+## stop(&quot;`x` cannot be negative.&quot;)</code></pre>
 </div>
 <div id="refresh-the-drake_config-list-early-and-often." class="section level3">
 <h3><span class="header-section-number">B.3.5</span> Refresh the <code>drake_config()</code> list early and often.</h3>
@@ -516,10 +549,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;664f0725f87d29dca56f867e5b94d5c5&quot;
+## [1] &quot;0913a4dd3239d9dd92689abfc13e8275&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;a6d2768132c243d4bea0173af86780a6&quot;
+## [1] &quot;44ca473bb87258612abe35743cceb054&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
