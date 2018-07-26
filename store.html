@@ -640,9 +640,12 @@ other_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <p>In theory, it should be possible to leverage serious databases using <code>storr_dbi()</code>. However, if you use such caches, please heed the following.</p>
 <ol style="list-style-type: decimal">
 <li>Be sure you have <a href="https://github.com/richfitz/storr">storr</a> version 1.1.3 or greater installed.</li>
-<li>Be careful about parallel computing. For example the <code>storr::storr_dbi()</code> cache is not thread-safe. Either use no parallel computing at all or set <code>parallelism = &quot;future&quot;</code> with <code>caching = &quot;master&quot;</code>. The <code>&quot;future&quot;</code> backend is currently experimental, but it allows the master process to do all the caching in order to avoid race conditions.</li>
+<li><p>Be careful about parallel computing. For example the <code>storr::storr_dbi()</code> cache is not thread-safe. Either</p></li>
+<li>Set <code>parallelism = &quot;clustermq_staged&quot;</code> in <code>make()</code>, or</li>
+<li>Set <code>parallelism = &quot;future&quot;</code> with <code>caching = &quot;master&quot;</code> in <code>make()</code>, or</li>
+<li><p>Use no parallel computing at all.</p></li>
 </ol>
-<p>The following example requires the <code>DBI</code> and <code>RSQLite</code> packages.</p>
+<p>The following example demonstrates the use of the DBI cahce, and it requires the <code>DBI</code> and <code>RSQLite</code> packages.</p>
 <pre class="sourceCode r"><code class="sourceCode r">mydb &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), <span class="st">&quot;my-db.sqlite&quot;</span>)
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_dbi</span>(
   <span class="dt">tbl_data =</span> <span class="st">&quot;data&quot;</span>,
