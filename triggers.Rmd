@@ -31,7 +31,7 @@ When you call `make()`, `drake` tries to skip as many targets as possible. If it
 
 To figure out whether it can skip a target, `drake` goes through an intricate checklist of **triggers**:
 
-1. The **missing** trigger: do we already have the target's value from a previous `make()`, or is it missing from the cache?
+1. The **missing** trigger: Do we lack a return value from a previous `make()`? Maybe you are building the target for the first time or you removed it from the cache with `clean()`.
 2. The **command** trigger: did the command in the workflow plan data frame change nontrivially since the last `make()`? Changes to spacing, formatting, and comments are ignored.
 3. The **depend** trigger: did any non-file dependencies change since the last `make()`? These could be:
     - Other targets.
@@ -67,7 +67,7 @@ plan <- drake_plan(
 make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
 ```
 
-You can also give different targets to different triggers. Triggers in the workflow plan data frame override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if the output value is missing beforehand.
+You can also give different targets to different triggers. Triggers in the workflow plan data frame override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if it has never been built before.
 
 ```{r missingtrigger3}
 plan <- drake_plan(
@@ -146,7 +146,7 @@ drake_plan(
 )
 ```
 
-A word of caution: every non-`NULL` **change** trigger is always evaluated, and its value is always stored in the target's quick-lookup internal metadata (recoverable with `diagnose()`). So if you are not careful, heavy use of the **change** trigger could slow down your workflow. Please take care to make these triggers quick to check, and please keep their return values small. You may want to return a fingerprint of your trigger value rather than the value itself. See the [`digest`](https://github.com/eddelbuettel/digest) package for more information.
+A word of caution: every non-`NULL` **change** trigger is always evaluated, and its value is carried around in memory throughout `make()`. So if you are not careful, heavy use of the **change** trigger could slow down your workflow and consume extra resources. The **change** trigger should return small values (and should ideally be quick to evaluate). To reduce memory consumption, you may want to return a fingerprint of your trigger value rather than the value itself. See the [`digest`](https://github.com/eddelbuettel/digest) package for more information.
 
 ```{r scrapetrigger2, eval = FALSE}
 library(digest)
