@@ -406,7 +406,11 @@ drake_gc(cache)
 
 ### Cache customization is limited
 
-The [storage guide](#store) describes how storage works in `drake`. As explained near the end of that chapter, you can plug custom [storr](https://github.com/richfitz/storr) caches into `make()`. However, non-RDS caches such as `storr_dbi()` may not work with most forms of parallel computing. The `storr::storr_dbi()` cache and many others are not thread-safe. Either use no parallel computing at all or set `parallelism = "future"` with `caching = "master"`. The `"future"` backend is currently experimental, but it allows the master process to do all the caching in order to avoid race conditions.
+The [storage guide](#store) describes how storage works in `drake`. As explained near the end of that chapter, you can plug custom [storr](https://github.com/richfitz/storr) caches into `make()`. However, non-RDS caches such as `storr_dbi()` may not work with most forms of parallel computing. The `storr::storr_dbi()` cache and many others are not thread-safe. Either
+
+1. Set `parallelism = "clustermq_staged"` in `make()`, or
+2. Set `parallelism = "future"` with `caching = "master"` in `make()`, or
+3. Use no parallel computing at all.
 
 ### Runtime predictions
 
