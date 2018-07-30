@@ -2,6 +2,9 @@
 
 ```{r loaddrake14, echo = FALSE}
 suppressPackageStartupMessages(library(drake))
+suppressPackageStartupMessages(library(glue))
+suppressPackageStartupMessages(library(rlang))
+suppressPackageStartupMessages(library(tidyverse))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 dat <- system.file(
   file.path("examples", "main", "raw_data.xlsx"),
@@ -402,6 +405,96 @@ You can control how each pair of targets gets combined.
 reduce_plan(plan, begin = "c(", op = ", ", end = ")")
 ```
 
+### Custom metaprogramming
+
+The workflow plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don't even need the `drake_plan()` function.
+
+As an example, consider a file-based workflow that runs system commands to process multiple input and output files. Here, our targets execute Linux commands to process input files and create output files.
+
+<pre><code>cat in1.txt > out1.txt
+cat in2.txt > out2.txt
+</code></pre>
+
+The [`glue`](https://github.com/tidyverse/glue) package can automatically generate these Linux commands.
+
+```{r systemcmdglue}
+library(glue)
+glue_data(
+  list(
+    inputs = c("in1.txt", "in2.txt"), 
+    outputs = c("out1.txt", "out2.txt")
+  ),
+  "cat {inputs} > {outputs}"
+)
+```
+
+Our `drake` commands could use `system()` to execute the Linux commands that [`glue`](https://github.com/tidyverse/glue) generates.
+
+```{r hypotheticaldrakeplan}
+library(tidyverse)
+drake_plan(
+  glue_data(
+    list(
+      inputs = file_in(c("in1.txt", "in2.txt")), 
+      outputs = file_out(c("out1.txt", "out2.txt"))
+    ),
+    "cat {inputs} > {outputs}"
+  ) %>%
+    lapply(FUN = system)
+)
+```
+
+But what if we want to *generate* these [`glue`](https://github.com/tidyverse/glue) commands instead of writing them literally in our plan? This is a job for custom metaprogramming with [tidy evaluation](https://www.youtube.com/watch?v=nERXS3ssntw). First, we create a function to generate the `drake` command of an arbitrary target.
+
+```{r tidyevalplan1}
+library(rlang) # for tidy evaluation
+write_command <- function(cmd, inputs = NULL , outputs = NULL){
+  inputs <- enexpr(inputs)
+  outputs <- enexpr(outputs)
+  expr({
+    glue_data(
+      list(
+        inputs = file_in(!!inputs),
+        outputs = file_out(!!outputs)
+      ),
+      !!cmd
+    ) %>%
+      lapply(FUN = system)
+  }) %>%
+    expr_text
+}
+
+write_command(
+  cmd = "cat {inputs} > {outputs}",
+  inputs = c("in1.txt", "in2.txt"),
+  outputs = c("out1.txt", "out2.txt")
+) %>%
+  cat
+```
+
+Then, we lay out all the arguments we will pass to `write_command()`.
+
+```{r tidyevalplan2}
+meta_plan <- tribble(
+  ~cmd, ~inputs, ~outputs,
+  "cat {inputs} > {outputs}", c("in1.txt", "in2.txt"), c("out1.txt", "out2.txt"),
+  "cat {inputs} {inputs} > {outputs}", c("out1.txt", "out2.txt"), c("out3.txt", "out4.txt")
+) %>%
+  print
+```
+
+Finally, create our workflow plan without any built-in `drake` functions.
+
+```{r tidyevalplan3}
+plan <- tibble(
+  target = paste0("target_", seq_len(nrow(meta_plan))),
+  command = pmap_chr(meta_plan, write_command)
+) %>%
+  print
+writeLines("in1", "in1.txt")
+writeLines("in2", "in2.txt")
+vis_drake_graph(drake_config(plan))
+```
 
 ## Optional columns in your plan.
 
@@ -410,12 +503,14 @@ Besides the usual columns `target` and `command`, there are other columns you ca
 - `cpu`, `elapsed`, and `timeout`: number of seconds to wait for the target to build before timing out (`timeout` for a general upper bound, `cpu` for CPU time, and `elapsed` for elapsed time).
 - `priority`: for [paralllel computing](#hpc), optionally rank the targets according to priority. That way, when two targets become ready to build at the same time, `drake` will pick the one with the dominant priority first.
 - `retries`: number of times to retry building a target in the event of an error.
-- `trigger`: choose the criterion that `drake` uses to decide whether to build the target. See `?trigger` or read the chapter of this manual on triggers to learn more.
+- `trigger`: choose the criterion that `drake` uses to decide whether to build the target. See `?trigger` or read the [trigger chapter](#triggers) to learn more.
 - `worker`: for [paralllel computing](#hpc), optionally name the preferred worker to assign to each target. 
 
 
 ```{r endofline_plans, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
-  c("start.rds", "report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"))
+  c("start.rds", "report.Rmd", "raw_data.xlsx",
+    "STDIN.o*", "Thumbs.db", "in1.txt", "in2.txt")
+)
 ```
