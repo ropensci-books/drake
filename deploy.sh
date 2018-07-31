@@ -1,6 +1,14 @@
 #!/bin/bash
 [ -z "${GITHUB_PAT}" ] && exit 0
-if [[ "${TRAVIS_BRANCH}" == "master" ]]
+echo "Your path is ${TRAVIS_BRANCH}"
+echo "You are on branch ${TRAVIS_BRANCH}"
+echo "The TRAVIS_PULL_REQUEST_BRANCH is ${TRAVIS_PULL_REQUEST_BRANCH}"
+if [[ "${TRAVIS_PULL_REQUEST_BRANCH}" != "" ]]
+then
+  echo "Deploying Netlify preview."
+  cd _book
+  netlify deploy -t ${NETLIFYKEY} --draft
+elif [[ "${TRAVIS_BRANCH}" == "master" ]]
 then
   echo "Deploying to production."
   git config --global user.email "will.landau@gmail.com"
@@ -11,9 +19,4 @@ then
   git add --all *
   git commit -m "Update the manual" || true
   git push -q origin gh-pages
-elif [[ "${TRAVIS_PULL_REQUEST_BRANCH}" != "" ]]
-then
-  echo "Deploying Netlify preview."
-  cp -r ../_book/* ./
-  netlify deploy -t ${NETLIFYKEY} --draft
 fi
