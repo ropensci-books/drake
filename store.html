@@ -359,50 +359,38 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">13.1</span> Caches</h2>
 <p>When you run <code>make()</code>, <code>drake</code> stores your imports and targets in a hidden cache.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
-<span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
+<span class="kw">load_mtcars_example</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
+## Error in load_mtcars_example(verbose = FALSE): unused argument (verbose = FALSE)
 config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan)
-## target large
-## target small
-## target regression1_large
-## target regression2_large
-## target regression1_small
-## target regression2_small
-## target summ_regression1_large
-## target coef_regression1_large
-## target summ_regression2_large
-## target coef_regression2_large
-## target summ_regression1_small
-## target coef_regression1_small
-## target coef_regression2_small
-## target summ_regression2_small
-## target report</code></pre>
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
+## Warning: missing input files:
+##   report.Rmd
+## target report
+## Warning in readLines(if (is.character(input2)) {: cannot open file
+## &#39;report.Rmd&#39;: No such file or directory
+## Warning: Missing files for target report:
+##   &quot;report.md&quot;
+## Warning: target report warnings:
+##   cannot open file &#39;report.Rmd&#39;: No such file or directory
+## fail report
+## Error: Target `report` failed. Call `diagnose(report)` for details. Error message:
+##   cannot open the connection</code></pre>
 <p>You can explore your cached data using functions <code>loadd()</code>, <code>readd()</code>, <code>cached()</code>, and others.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">cached</span>())
-## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-## [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-## [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [1] &quot;\&quot;report.Rmd\&quot;&quot; &quot;data.frame&quot;     &quot;knit&quot;           &quot;lm&quot;            
+## [5] &quot;mtcars&quot;         &quot;nrow&quot;
 
 <span class="kw">head</span>(<span class="kw">readd</span>(small))
-##       x    y
-## 1 3.730 17.3
-## 2 5.250 10.4
-## 3 3.730 17.3
-## 4 5.345 14.7
-## 5 3.190 24.4
-## 6 3.440 17.8
+## Error: key &#39;small&#39; (&#39;objects&#39;) not found
 
 <span class="kw">loadd</span>(large)
 
 <span class="kw">head</span>(large)
-##       x    y
-## 1 3.780 15.2
-## 2 3.170 15.8
-## 3 5.424 10.4
-## 4 5.250 10.4
-## 5 3.780 15.2
-## 6 3.570 14.3
+## Error in head(large): object &#39;large&#39; not found
 
-<span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></code></pre>
+<span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span>
+## Warning in rm(large): object &#39;large&#39; not found</code></pre>
 <p>By default, these objects live in a hidden <code>.drake</code> folder in your working directory.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">find_cache</span>()
 ### [1] &quot;/home/you/project/.drake&quot;
@@ -413,65 +401,40 @@ config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan)
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>()
 
 cache<span class="op">$</span><span class="kw">list</span>()
-##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-##  [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-##  [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
-##  [7] &quot;data.frame&quot;             &quot;knit&quot;                  
-##  [9] &quot;large&quot;                  &quot;lm&quot;                    
-## [11] &quot;mtcars&quot;                 &quot;nrow&quot;                  
-## [13] &quot;random_rows&quot;            &quot;reg1&quot;                  
-## [15] &quot;reg2&quot;                   &quot;regression1_large&quot;     
-## [17] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
-## [19] &quot;regression2_small&quot;      &quot;report&quot;                
-## [21] &quot;sample.int&quot;             &quot;simulate&quot;              
-## [23] &quot;small&quot;                  &quot;summ_regression1_large&quot;
-## [25] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
-## [27] &quot;summ_regression2_small&quot; &quot;summary&quot;               
-## [29] &quot;suppressWarnings&quot;
+##  [1] &quot;\&quot;report.Rmd\&quot;&quot;   &quot;data.frame&quot;       &quot;knit&quot;            
+##  [4] &quot;lm&quot;               &quot;mtcars&quot;           &quot;nrow&quot;            
+##  [7] &quot;random_rows&quot;      &quot;reg1&quot;             &quot;reg2&quot;            
+## [10] &quot;sample.int&quot;       &quot;summary&quot;          &quot;suppressWarnings&quot;
 
 <span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))
-##       x    y
-## 1 3.730 17.3
-## 2 5.250 10.4
-## 3 3.730 17.3
-## 4 5.345 14.7
-## 5 3.190 24.4
-## 6 3.440 17.8
+## Error: key &#39;small&#39; (&#39;objects&#39;) not found
 
 <span class="kw">tail</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>, <span class="dt">namespace =</span> <span class="st">&quot;meta&quot;</span>))
-## $dependency_hash
-## [1] &quot;eb89933a9211e556671c06c5018dcdb7efdad4593b4adff4f88ee6a34de61f7f&quot;
-## 
-## $input_file_hash
-## [1] &quot;01234566814cd2a2b3cd7c19c907964b4a4f018a19ec224788d9edb74d7376df&quot;
-## 
-## $output_file_hash
-## [1] &quot;01234566814cd2a2b3cd7c19c907964b4a4f018a19ec224788d9edb74d7376df&quot;
-## 
-## $start
-##    user  system elapsed 
-## 124.088  18.008 143.744 
-## 
-## $time_command
-##    item   type elapsed user system
-## 1 small target       0    0      0
-## 
-## $time_build
-##    item   type elapsed  user system
-## 1 small target   0.009 0.012      0
+## Error: key &#39;small&#39; (&#39;meta&#39;) not found
 
 cache<span class="op">$</span><span class="kw">list_namespaces</span>()
-## [1] &quot;attempt&quot;  &quot;common&quot;   &quot;config&quot;   &quot;kernels&quot;  &quot;meta&quot;     &quot;objects&quot; 
-## [7] &quot;progress&quot; &quot;session&quot;</code></pre>
+## [1] &quot;common&quot;   &quot;config&quot;   &quot;kernels&quot;  &quot;meta&quot;     &quot;objects&quot;  &quot;progress&quot;
+## [7] &quot;session&quot;</code></pre>
 <p>Create a new cache of your own with <code>new_cache()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="dt">path =</span> <span class="st">&quot;cache2&quot;</span>)
 <span class="kw">file.exists</span>(<span class="st">&quot;cache2&quot;</span>)
 ## [1] TRUE</code></pre>
 <p>You can use multiple caches simultaneously, default and non-default alike.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config  &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">cache =</span> cache)
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
 config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">cache =</span> cache2)
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
 <span class="kw">outdated</span>(config)
-## character(0)
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
+##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+##  [9] &quot;regression2_small&quot;      &quot;report&quot;                
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
 <span class="kw">outdated</span>(config2)
 ##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
 ##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
@@ -482,23 +445,35 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span
 ## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
 ## [15] &quot;summ_regression2_small&quot;
 <span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache)
-## All targets are already up to date.
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
+## Warning: missing input files:
+##   report.Rmd
+## target report
+## Warning in readLines(if (is.character(input2)) {: cannot open file
+## &#39;report.Rmd&#39;: No such file or directory
+## Warning: Missing files for target report:
+##   &quot;report.md&quot;
+## Warning: target report warnings:
+##   cannot open file &#39;report.Rmd&#39;: No such file or directory
+## fail report
+## Error: Target `report` failed. Call `diagnose(report)` for details. Error message:
+##   cannot open the connection
 <span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache2)
-## target large
-## target small
-## target regression1_large
-## target regression2_large
-## target regression1_small
-## target regression2_small
-## target summ_regression1_large
-## target coef_regression1_large
-## target summ_regression2_large
-## target coef_regression2_large
-## target summ_regression1_small
-## target coef_regression1_small
-## target coef_regression2_small
-## target summ_regression2_small
-## target report</code></pre>
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
+## Warning: missing input files:
+##   report.Rmd
+## target report
+## Warning in readLines(if (is.character(input2)) {: cannot open file
+## &#39;report.Rmd&#39;: No such file or directory
+## Warning: Missing files for target report:
+##   &quot;report.md&quot;
+## Warning: target report warnings:
+##   cannot open file &#39;report.Rmd&#39;: No such file or directory
+## fail report
+## Error: Target `report` failed. Call `diagnose(report)` for details. Error message:
+##   cannot open the connection</code></pre>
 <p>There are a couple different ways to retrieve caches.</p>
 <ul>
 <li><code>get_cache(path = &quot;my_path&quot;)</code> assumes <code>my_path</code> is a project root containing a <code>.drake</code> folder. If it does not find a <code>.drake</code> folder in <code>my_path</code>, it searches up through the ancestors of <code>my_path</code> until it finds one.</li>
@@ -507,14 +482,12 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span
 </ul>
 <pre class="sourceCode r"><code class="sourceCode r">cache3 &lt;-<span class="st"> </span><span class="kw">get_cache</span>(<span class="dt">path =</span> <span class="kw">getwd</span>()) <span class="co"># Finds the .drake folder in your directory.</span>
 <span class="kw">head</span>(cache3<span class="op">$</span><span class="kw">list</span>())
-## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-## [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-## [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [1] &quot;\&quot;report.Rmd\&quot;&quot; &quot;data.frame&quot;     &quot;knit&quot;           &quot;lm&quot;            
+## [5] &quot;mtcars&quot;         &quot;nrow&quot;
 cache4 &lt;-<span class="st"> </span><span class="kw">this_cache</span>(<span class="dt">path =</span> <span class="st">&quot;cache2&quot;</span>) <span class="co"># The cache folder is literally called cache2.</span>
 <span class="kw">head</span>(cache4<span class="op">$</span><span class="kw">list</span>())
-## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-## [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-## [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</code></pre>
+## [1] &quot;\&quot;report.Rmd\&quot;&quot; &quot;data.frame&quot;     &quot;knit&quot;           &quot;lm&quot;            
+## [5] &quot;mtcars&quot;         &quot;nrow&quot;</code></pre>
 <p>Destroy caches to remove them from your file system.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache4<span class="op">$</span><span class="kw">destroy</span>()
 cache2<span class="op">$</span><span class="kw">list</span>() <span class="co"># Same folder as cache4.</span>
@@ -576,15 +549,34 @@ tmp &lt;-<span class="st"> </span><span class="kw">new_cache</span>(
 )
 
 config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
+## Warning: missing input files:
+##   report.Rmd
+## Warning in readLines(if (is.character(input2)) {: cannot open file
+## &#39;report.Rmd&#39;: No such file or directory
+## Warning: Missing files for target report:
+##   &quot;report.md&quot;
+## Error: Target `report` failed. Call `diagnose(report)` for details. Error message:
+##   cannot open the connection
 
 <span class="kw">short_hash</span>(config<span class="op">$</span>cache) <span class="co"># xxhash64 is the default_short_hash_algo()</span>
-## [1] &quot;crc32&quot;
+## Warning: The storr-based cache actually uses xxhash64 for the short hash
+## algorithm, but crc32 was also supplied. Reverting to xxhash64.
+## [1] &quot;xxhash64&quot;
 
 <span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># sha256 is the default_long_hash_algo()</span>
 ## [1] &quot;sha1&quot;</code></pre>
 <p>You can change the long hash algorithm without throwing away the cache, but your project will rebuild from scratch. As for the short hash, you are committed until you delete the cache and all its supporting files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config) <span class="co"># empty</span>
-## character(0)
+##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
+##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
+##  [9] &quot;regression2_small&quot;      &quot;report&quot;                
+## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
+## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
+## [15] &quot;summ_regression2_small&quot;
 
 config<span class="op">$</span>cache &lt;-<span class="st"> </span><span class="kw">configure_cache</span>(
   config<span class="op">$</span>cache,
@@ -593,6 +585,8 @@ config<span class="op">$</span>cache &lt;-<span class="st"> </span><span class="
 )</code></pre>
 <p>Below, the targets become outdated because the existing hash keys do not match the new hash algorithm.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>, <span class="dt">cache =</span> config<span class="op">$</span>cache)
+## Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be
+## inspected for dependencies.
 <span class="kw">outdated</span>(config)
 ##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
 ##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
@@ -604,9 +598,10 @@ config<span class="op">$</span>cache &lt;-<span class="st"> </span><span class="
 ## [15] &quot;summ_regression2_small&quot;
 
 config &lt;-<span class="st"> </span><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 <span class="kw">short_hash</span>(config<span class="op">$</span>cache) <span class="co"># same as before</span>
-## [1] &quot;crc32&quot;
+## [1] &quot;xxhash64&quot;
 
 <span class="kw">long_hash</span>(config<span class="op">$</span>cache) <span class="co"># different from before</span>
 ## [1] &quot;murmur32&quot;</code></pre>
@@ -667,24 +662,13 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <h2><span class="header-section-number">13.6</span> Cleaning up</h2>
 <p>If you want to start from scratch, you can <code>clean()</code> the cache. Use the <code>destroy</code> argument to remove it completely. <code>cache$del()</code> and <code>cache$destroy()</code> are also options, but they leave output file targets dangling. By contrast, <code>clean(destroy = TRUE)</code> removes file targets generated by <code>drake::make()</code>. <code>drake_gc()</code> and <code>clean(..., garbage_collection = TRUE)</code> do garbage collection, and <code>clean(purge = TRUE)</code> removes all target-level data, not just the final output values.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(small, large)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 <span class="kw">cached</span>() <span class="co"># &#39;small&#39; and &#39;large&#39; are gone</span>
-##  [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-##  [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-##  [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
-##  [7] &quot;data.frame&quot;             &quot;knit&quot;                  
-##  [9] &quot;lm&quot;                     &quot;mtcars&quot;                
-## [11] &quot;nrow&quot;                   &quot;random_rows&quot;           
-## [13] &quot;reg1&quot;                   &quot;reg2&quot;                  
-## [15] &quot;regression1_large&quot;      &quot;regression1_small&quot;     
-## [17] &quot;regression2_large&quot;      &quot;regression2_small&quot;     
-## [19] &quot;report&quot;                 &quot;sample.int&quot;            
-## [21] &quot;simulate&quot;               &quot;summ_regression1_large&quot;
-## [23] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
-## [25] &quot;summ_regression2_small&quot; &quot;summary&quot;               
-## [27] &quot;suppressWarnings&quot;
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 <span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>)
+## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 <span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>, <span class="dt">cache =</span> my_storr)</code></pre>
 
