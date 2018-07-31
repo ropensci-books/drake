@@ -1,5 +1,18 @@
 language: R
-cache: packages
+cache:
+  packages: true
+  directories:
+  - $HOME/.npm
+
+before_install:
+- npm install netlify-cli -g
+- Rscript -e 'blogdown::install_hugo()'
+
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+      - libzmq3-dev
 
 r_packages:
   - clustermq
@@ -11,12 +24,6 @@ r_packages:
   - pkgdown
   - readxl
   - visNetwork
-
-addons:
-  apt:
-    packages:
-      - libudunits2-dev
-      - libzmq3-dev
 
 before_script:
   - chmod +x ./deploy.sh
