@@ -354,7 +354,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="caution" class="section level1">
 <h1><span class="header-section-number">B</span> Cautionary notes</h1>
-<pre><code>## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
 <p>This chapter addresses <code>drake</code>’s known edge cases, pitfalls, and weaknesses that might not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the <a href="https://github.com/ropensci/drake/issues">issue tracker</a>, where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version of <code>drake</code>. For a guide to debugging and testing <code>drake</code> projects, please refer to the separate <a href="debug.html#debug">guide to debugging and testing drake projects</a>.</p>
 <div id="projects-built-with-drake-4.4.0-are-not-back-compatible-with-drake-4.4.0." class="section level2">
 <h2><span class="header-section-number">B.1</span> Projects built with drake &lt;= 4.4.0 are not back compatible with drake &gt; 4.4.0.</h2>
@@ -407,9 +406,12 @@ my_plan
 ## 1 little_b &quot;\&quot;b\&quot;&quot;   
 ## 2 letter   !!little_b
 <span class="kw">make</span>(my_plan)
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## Unloading targets from environment:
+##   little_b
+## target little_b
+## target letter
 <span class="kw">readd</span>(letter)
-## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+## [1] &quot;b&quot;</code></pre>
 <p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_evaluation = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
 <pre class="sourceCode r"><code class="sourceCode r">my_variable &lt;-<span class="st"> </span><span class="dv">5</span>
 
@@ -444,7 +446,7 @@ my_plan
 <p>When <code>make()</code> fails, use <code>failed()</code> and <code>diagnose()</code> to debug. Try the following out yourself.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## Targets with available diagnostic metadata, incluing errors, warnings, etc.
 <span class="kw">diagnose</span>()
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## [1] &quot;letter&quot;   &quot;little_b&quot;
 
 f &lt;-<span class="st"> </span><span class="cf">function</span>(){
   <span class="kw">stop</span>(<span class="st">&quot;unusual error&quot;</span>)
@@ -456,22 +458,53 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="kw">stdout</span>(),
   <span class="kw">make</span>(bad_plan)
 )
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## target target
+## fail target
+## Error: Target `target` failed. Call `diagnose(target)` for details. Error message:
+##   unusual error
+## Warning: No message sink to remove.
 
 <span class="kw">failed</span>() <span class="co"># From the last make() only</span>
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## [1] &quot;target&quot;
 
 error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<span class="op">$</span>error <span class="co"># See also warnings and messages.</span>
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
 
 error<span class="op">$</span>message
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found
+## [1] &quot;unusual error&quot;
 
 error<span class="op">$</span>call
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found
+## f()
 
 error<span class="op">$</span>calls <span class="co"># View the traceback.</span>
-## Error in eval(expr, envir, enclos): object &#39;error&#39; not found</code></pre>
+## [[1]]
+## local({
+##     f()
+## })
+## 
+## [[2]]
+## eval.parent(substitute(eval(quote(expr), envir)))
+## 
+## [[3]]
+## eval(expr, p)
+## 
+## [[4]]
+## eval(expr, p)
+## 
+## [[5]]
+## eval(quote({
+##     f()
+## }), new.env())
+## 
+## [[6]]
+## eval(quote({
+##     f()
+## }), new.env())
+## 
+## [[7]]
+## f()
+## 
+## [[8]]
+## stop(&quot;unusual error&quot;)</code></pre>
 </div>
 <div id="refresh-the-drake_config-list-early-and-often." class="section level3">
 <h3><span class="header-section-number">B.3.5</span> Refresh the <code>drake_config()</code> list early and often.</h3>
@@ -523,25 +556,24 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;f1e2c14eab5751695e94b0e264340bb9&quot;
+## [1] &quot;caab6663209b2f61808d66e059fb86e5&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;2906e7aa77ee0454cd81555d3504d30b&quot;
+## [1] &quot;7a6052a7900280e2cea034555148fef0&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
 plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">circle =</span> circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">10</span>),
   <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
 )
 <span class="kw">make</span>(plan) <span class="co"># `circle_class` changes because it is referenced.</span>
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## target circle
+## target area
 <span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span>
-## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+## target circle</code></pre>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
 new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){
   circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
     <span class="st">&quot;circle_class&quot;</span>,
@@ -562,9 +594,10 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
 )
 <span class="kw">make</span>(plan)
-## Error: hash &#39;989f3eade99b7b1b&#39; not found
+## target circle
+## target area
 <span class="kw">make</span>(plan)
-## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
+## All targets are already up to date.</code></pre>
 </div>
 <div id="the-magrittr-dot-.-is-always-ignored." class="section level3">
 <h3><span class="header-section-number">B.4.2</span> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</h3>
@@ -752,7 +785,6 @@ keys/config/c2VlZA (Sandy Sum's conflicted copy 2018-01-31)
 <div id="runtime-predictions" class="section level3">
 <h3><span class="header-section-number">B.6.3</span> Runtime predictions</h3>
 <p>In <code>predict_runtime()</code> and <code>rate_limiting_times()</code>, <code>drake</code> only accounts for the targets with logged build times. If some targets have not been timed, <code>drake</code> throws a warning and prints the untimed targets.</p>
-<pre><code>## Error: hash &#39;989f3eade99b7b1b&#39; not found</code></pre>
 
 </div>
 </div>
