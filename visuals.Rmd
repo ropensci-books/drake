@@ -85,7 +85,7 @@ str(drake_graph_info(config))
 `drake`'s visuals tell you which targets are up to date and which are outdated.
 
 ```{r graphmake}
-config <- make(my_plan, jobs = 4, verbose = FALSE)
+config <- make(my_plan, jobs = 2, verbose = FALSE)
 outdated(config)
 sankey_drake_graph(config)
 ```
@@ -129,7 +129,7 @@ Or upstream ones.
 vis_drake_graph(config, from = "small", mode = "in")
 ```
 
-In fact, let us just take a small neighborhood around a target in both directions.
+In fact, let us just take a small neighborhood around a target in both directions. For the graph below, given order is 1, but all the custom `file_out()` output files of the neighborhood's targets appear as well. This ensures consistent behavior between `show_output_files = TRUE` and `show_output_files = FALSE` (more on that later).
 
 ```{r fromall}
 vis_drake_graph(config, from = "small", mode = "all", order = 1)
@@ -213,8 +213,57 @@ vis_drake_graph(
 )
 ```
 
+## Output files
+
+`drake` can reproducibly track multiple output files per target and show them in the graph.
+
+```{r visfileplan1}
+plan <- drake_plan(
+  target1 = {
+    file.copy(file_in("in1.txt"), file_out("out1.txt"))
+    file.copy(file_in("in2.txt"), file_out("out2.txt"))
+  },
+  target2 = {
+    file.copy(file_in("out1.txt"), file_out("out3.txt"))
+    file.copy(file_in("out2.txt"), file_out("out4.txt"))
+  }
+)
+writeLines("in1", "in1.txt")
+writeLines("in2", "in2.txt")
+config <- make(plan)
+writeLines("abcdefg", "out3.txt")
+vis_drake_graph(config, targets_only = TRUE)
+```
+
+If your graph is too busy, you can hide the output files with `show_output_files = FALSE`. `drake` preserves dependency relationships induced by files, so there is now an edge from `target1` to `target2`.
+
+```{r visfileplan2}
+vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
+```
+
+If `target2` depends on the *value* of `target1` in addition to its output files, the graph adds another edge.
+
+```{r visfileplan3}
+plan <- drake_plan(
+  target1 = {
+    file.copy(file_in("in1.txt"), file_out("out1.txt"))
+    file.copy(file_in("in2.txt"), file_out("out2.txt"))
+    rnorm(5)
+  },
+  target2 = {
+    file.copy(file_in("out1.txt"), file_out("out3.txt"))
+    file.copy(file_in("out2.txt"), file_out("out4.txt"))
+    target1 + 5
+  }
+)
+config <- drake_config(plan)
+vis_drake_graph(config, targets_only = TRUE)
+```
+
 ```{r endofline_vis, echo = F}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c(
-  "*.lock", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+  "*.lock", "Makefile", "report.Rmd", "in1.txt", "in2.txt", "shell.sh",
+  "STDIN.o*", "Thumbs.db"
+))
 ```
