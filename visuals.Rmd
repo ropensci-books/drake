@@ -129,7 +129,7 @@ Or upstream ones.
 vis_drake_graph(config, from = "small", mode = "in")
 ```
 
-In fact, let us just take a small neighborhood around a target in both directions.
+In fact, let us just take a small neighborhood around a target in both directions. For the graph below, given order is 1, but all the custom `file_out()` output files of the neighborhood's targets appear as well. This ensures consistent behavior between `show_output_files = TRUE` and `show_output_files = FALSE` (more on that later).
 
 ```{r fromall}
 vis_drake_graph(config, from = "small", mode = "all", order = 1)
@@ -235,7 +235,7 @@ writeLines("abcdefg", "out3.txt")
 vis_drake_graph(config, targets_only = TRUE)
 ```
 
-If your graph is too busy, and you can hide the output files with `show_output_files = FALSE`. `drake` preserves dependency relationships induced by files, so there is now an edge from `target1` to `target2`.
+If your graph is too busy, you can hide the output files with `show_output_files = FALSE`. `drake` preserves dependency relationships induced by files, so there is now an edge from `target1` to `target2`.
 
 ```{r visfileplan2}
 vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
@@ -256,12 +256,14 @@ plan <- drake_plan(
     target1 + 5
   }
 )
-config <- drake_plan(config)
+config <- drake_config(plan)
 vis_drake_graph(config, targets_only = TRUE)
 ```
 
 ```{r endofline_vis, echo = F}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c(
-  "*.lock", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+  "*.lock", "Makefile", "report.Rmd", "in1.txt", "in2.txt", "shell.sh",
+  "STDIN.o*", "Thumbs.db"
+))
 ```
