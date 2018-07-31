@@ -1,11 +1,12 @@
 #!/bin/bash
 [ -z "${GITHUB_PAT}" ] && exit 0
+echo "Your path is ${TRAVIS_BRANCH}"
 echo "You are on branch ${TRAVIS_BRANCH}"
 echo "The TRAVIS_PULL_REQUEST_BRANCH is ${TRAVIS_PULL_REQUEST_BRANCH}"
 if [[ "${TRAVIS_PULL_REQUEST_BRANCH}" != "" ]]
 then
   echo "Deploying Netlify preview."
-  cp -r ../_book/* ./
+  cd _book
   netlify deploy -t ${NETLIFYKEY} --draft
 elif [[ "${TRAVIS_BRANCH}" == "master" ]]
 then
