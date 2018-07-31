@@ -19,6 +19,5 @@ then
 elif [[ "${TRAVIS_PULL_REQUEST_BRANCH}" != "" ]]
 then
   echo "Deploying Netlify preview."
-  cd _book
   netlify deploy -t ${NETLIFYKEY} --draft
 fi
