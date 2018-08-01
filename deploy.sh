@@ -16,8 +16,4 @@ then
   git add --all *
   git commit -m "Update the manual" || true
   git push -q origin gh-pages
-elif [[ "${TRAVIS_PULL_REQUEST_BRANCH}" != "" ]]
-then
-  echo "Deploying Netlify preview."
-  netlify deploy -t ${NETLIFYKEY} --draft
 fi
