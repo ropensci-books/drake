@@ -556,10 +556,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;ec4c7b222489c6cbc9e0817ce40c52f7&quot;
+## [1] &quot;8a5bc9cc36dc7f8f4ef75e78446677a9&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;ec4c7b222489c6cbc9e0817ce40c52f7&quot;
+## [1] &quot;4b842dd13a054280e9b18fb4946ee2c6&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -571,7 +571,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 ## target circle
 ## target area
 <span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span>
-## All targets are already up to date.</code></pre>
+## target circle</code></pre>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
 new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){
