@@ -5,6 +5,8 @@ suppressPackageStartupMessages(library(drake))
 suppressPackageStartupMessages(library(Ecdat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(tidyverse))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 unlink(".drake", recursive = TRUE)
 clean(destroy = TRUE, verbose = FALSE)
@@ -70,24 +72,58 @@ First, we load the required packages. `drake` is aware of all the packages you l
 ```{r masterpkgs}
 library(drake)
 library(Ecdat) # econometrics datasets
-library(knitr)
 library(ggplot2)
+library(knitr)
+library(purrr)
+library(tidyverse)
 ```
 
 Next, set up our workflow plan data frame in stages. We start with the models. Each model has 3 predictors, and we try all 84 possible models.
 
 ```{r mastermodels}
 predictors <- setdiff(colnames(Produc), "gsp")
-combos <- t(combn(predictors, 3))
+combos <- combn(predictors, 3) %>%
+  t() %>%
+  as.data.frame(stringsAsFactors = FALSE)
 head(combos)
-targets <- apply(combos, 1, paste, collapse = "_")
-commands <- apply(combos, 1, function(row){
-  covariates <- paste(row, collapse = " + ")
-  formula <- paste0("as.formula(\"gsp ~ ", covariates, "\")")
-  command <- paste0("lm(", formula, ", data = Produc)")
-})
-model_plan <- data.frame(target = targets, command = commands)
 
+# We use the covariate names to make the target names.
+targets <- apply(combos, 1, paste, collapse = "_")
+head(targets)
+
+# Each target will be a call to `fit_gsp_model()`
+# on 3 covariates.
+fit_gsp_model <- function(..., data){
+  c(...) %>%
+    paste(collapse = " + ") %>%
+    paste("gsp ~", .) %>%
+    as.formula() %>%
+    lm(data = data)  
+}
+fit_gsp_model("unemp", "year", "pcap", data = Produc) %>%
+  summary()
+
+# So we will generate calls to `fit_gsp_model()`
+# as commands for the model-fitting part of the plan.
+make_gsp_model_call <- function(...){
+  args <- list(..., data = quote(Produc))
+  quote(fit_gsp_model) %>%
+    c(args) %>%
+    as.call() %>%
+    rlang::expr_text()
+}
+make_gsp_model_call("state", "year", "pcap")
+
+commands <- purrr::pmap_chr(combos, make_gsp_model_call)
+head(commands)
+
+# We create the model-fitting part of our plan
+# by combining the targets and commands together in a data frame.
+model_plan <- data.frame(
+  target = targets,
+  command = commands,
+  stringsAsFactors = FALSE
+)
 head(model_plan)
 ```
 
@@ -146,9 +182,7 @@ head(output_plan)
 We see warnings above because our R Markdown report `report.Rmd` does not exist yet. You can find it [here](https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd) and download it with the code below.
 
 ```{r copyreport}
-local <- file.path("examples", "gsp", "report.Rmd")
 drake_example("gsp")
-path <- system.file(path = local, package = "drake", mustWork = TRUE)
 file.copy(from = "gsp/report.Rmd", to = ".", overwrite = TRUE)
 ```
 
@@ -179,9 +213,7 @@ Here are the root mean squared prediction errors of all the models.
 
 ```{r masterrmspeplot}
 results <- readd(rmspe)
-
 loadd(plot_rmspe)
-
 library(ggplot2)
 plot_rmspe(rmspe = results)
 ```
