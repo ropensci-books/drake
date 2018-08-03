@@ -409,27 +409,90 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <p>First, we load the required packages. <code>drake</code> is aware of all the packages you load with <code>library()</code> or <code>require()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
 <span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span>
+<span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(knitr)
-<span class="kw">library</span>(ggplot2)</code></pre>
+<span class="kw">library</span>(purrr)
+<span class="kw">library</span>(tidyverse)</code></pre>
 <p>Next, set up our workflow plan data frame in stages. We start with the models. Each model has 3 predictors, and we try all 84 possible models.</p>
 <pre class="sourceCode r"><code class="sourceCode r">predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)
-combos &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">combn</span>(predictors, <span class="dv">3</span>))
+combos &lt;-<span class="st"> </span><span class="kw">combn</span>(predictors, <span class="dv">3</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
 <span class="kw">head</span>(combos)
-##      [,1]    [,2]   [,3]   
-## [1,] &quot;state&quot; &quot;year&quot; &quot;pcap&quot; 
-## [2,] &quot;state&quot; &quot;year&quot; &quot;hwy&quot;  
-## [3,] &quot;state&quot; &quot;year&quot; &quot;water&quot;
-## [4,] &quot;state&quot; &quot;year&quot; &quot;util&quot; 
-## [5,] &quot;state&quot; &quot;year&quot; &quot;pc&quot;   
-## [6,] &quot;state&quot; &quot;year&quot; &quot;emp&quot;
-targets &lt;-<span class="st"> </span><span class="kw">apply</span>(combos, <span class="dv">1</span>, paste, <span class="dt">collapse =</span> <span class="st">&quot;_&quot;</span>)
-commands &lt;-<span class="st"> </span><span class="kw">apply</span>(combos, <span class="dv">1</span>, <span class="cf">function</span>(row){
-  covariates &lt;-<span class="st"> </span><span class="kw">paste</span>(row, <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)
-  formula &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;as.formula(</span><span class="ch">\&quot;</span><span class="st">gsp ~ &quot;</span>, covariates, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">)&quot;</span>)
-  command &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;lm(&quot;</span>, formula, <span class="st">&quot;, data = Produc)&quot;</span>)
-})
-model_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">target =</span> targets, <span class="dt">command =</span> commands)
+##      V1   V2    V3
+## 1 state year  pcap
+## 2 state year   hwy
+## 3 state year water
+## 4 state year  util
+## 5 state year    pc
+## 6 state year   emp
 
+<span class="co"># We use the covariate names to make the target names.</span>
+targets &lt;-<span class="st"> </span><span class="kw">apply</span>(combos, <span class="dv">1</span>, paste, <span class="dt">collapse =</span> <span class="st">&quot;_&quot;</span>)
+<span class="kw">head</span>(targets)
+## [1] &quot;state_year_pcap&quot;  &quot;state_year_hwy&quot;   &quot;state_year_water&quot;
+## [4] &quot;state_year_util&quot;  &quot;state_year_pc&quot;    &quot;state_year_emp&quot;
+
+<span class="co"># Each target will be a call to `fit_gsp_model()`</span>
+<span class="co"># on 3 covariates.</span>
+fit_gsp_model &lt;-<span class="st"> </span><span class="cf">function</span>(..., data){
+  <span class="kw">c</span>(...) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">paste</span>(<span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">paste</span>(<span class="st">&quot;gsp ~&quot;</span>, .) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.formula</span>() <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">lm</span>(<span class="dt">data =</span> data)  
+}
+<span class="kw">fit_gsp_model</span>(<span class="st">&quot;unemp&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;pcap&quot;</span>, <span class="dt">data =</span> Produc) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summary</span>()
+## 
+## Call:
+## lm(formula = ., data = data)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -79469  -5772   -298   4548 117119 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.625e+06  2.548e+05  -6.376 3.04e-10 ***
+## unemp       -1.575e+03  2.879e+02  -5.470 5.99e-08 ***
+## year         8.264e+02  1.292e+02   6.397 2.68e-10 ***
+## pcap         2.456e+00  2.133e-02 115.123  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 16630 on 812 degrees of freedom
+## Multiple R-squared:  0.9437, Adjusted R-squared:  0.9435 
+## F-statistic:  4541 on 3 and 812 DF,  p-value: &lt; 2.2e-16
+
+<span class="co"># So we will generate calls to `fit_gsp_model()`</span>
+<span class="co"># as commands for the model-fitting part of the plan.</span>
+make_gsp_model_call &lt;-<span class="st"> </span><span class="cf">function</span>(...){
+  args &lt;-<span class="st"> </span><span class="kw">list</span>(..., <span class="dt">data =</span> <span class="kw">quote</span>(Produc))
+  <span class="kw">quote</span>(fit_gsp_model) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">c</span>(args) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.call</span>() <span class="op">%&gt;%</span>
+<span class="st">    </span>rlang<span class="op">::</span><span class="kw">expr_text</span>()
+}
+<span class="kw">make_gsp_model_call</span>(<span class="st">&quot;state&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;pcap&quot;</span>)
+## [1] &quot;fit_gsp_model(\&quot;state\&quot;, \&quot;year\&quot;, \&quot;pcap\&quot;, data = Produc)&quot;
+
+commands &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">pmap_chr</span>(combos, make_gsp_model_call)
+<span class="kw">head</span>(commands)
+## [1] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;pcap\&quot;, data = Produc)&quot; 
+## [2] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;hwy\&quot;, data = Produc)&quot;  
+## [3] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;water\&quot;, data = Produc)&quot;
+## [4] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;util\&quot;, data = Produc)&quot; 
+## [5] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;pc\&quot;, data = Produc)&quot;   
+## [6] &quot;fit_gsp_model(V1 = \&quot;state\&quot;, V2 = \&quot;year\&quot;, V3 = \&quot;emp\&quot;, data = Produc)&quot;
+
+<span class="co"># We create the model-fitting part of our plan</span>
+<span class="co"># by combining the targets and commands together in a data frame.</span>
+model_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">target =</span> targets,
+  <span class="dt">command =</span> commands,
+  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>
+)
 <span class="kw">head</span>(model_plan)
 ##             target
 ## 1  state_year_pcap
@@ -438,13 +501,13 @@ model_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 ## 4  state_year_util
 ## 5    state_year_pc
 ## 6   state_year_emp
-##                                                       command
-## 1  lm(as.formula(&quot;gsp ~ state + year + pcap&quot;), data = Produc)
-## 2   lm(as.formula(&quot;gsp ~ state + year + hwy&quot;), data = Produc)
-## 3 lm(as.formula(&quot;gsp ~ state + year + water&quot;), data = Produc)
-## 4  lm(as.formula(&quot;gsp ~ state + year + util&quot;), data = Produc)
-## 5    lm(as.formula(&quot;gsp ~ state + year + pc&quot;), data = Produc)
-## 6   lm(as.formula(&quot;gsp ~ state + year + emp&quot;), data = Produc)</code></pre>
+##                                                                 command
+## 1  fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;pcap&quot;, data = Produc)
+## 2   fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;hwy&quot;, data = Produc)
+## 3 fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;water&quot;, data = Produc)
+## 4  fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;util&quot;, data = Produc)
+## 5    fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;pc&quot;, data = Produc)
+## 6   fit_gsp_model(V1 = &quot;state&quot;, V2 = &quot;year&quot;, V3 = &quot;emp&quot;, data = Produc)</code></pre>
 <p>Next, we make a plan to judge each model based on its root mean squared prediction error (RMSPE).</p>
 <pre class="sourceCode r"><code class="sourceCode r">commands &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;get_rmspe(&quot;</span>, targets, <span class="st">&quot;, data = Produc)&quot;</span>)
 targets &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;rmspe_&quot;</span>, targets)
@@ -494,10 +557,7 @@ rmspe_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 ## 1 plot   &quot;ggsave(filename = file_out(\&quot;rmspe.pdf\&quot;), plot = plot_rmspe(rm…
 ## 2 report &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\&quot;), quiet =…</code></pre>
 <p>We see warnings above because our R Markdown report <code>report.Rmd</code> does not exist yet. You can find it <a href="https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd">here</a> and download it with the code below.</p>
-<pre class="sourceCode r"><code class="sourceCode r">local &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;gsp&quot;</span>, <span class="st">&quot;report.Rmd&quot;</span>)
-<span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)
-path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">path =</span> local, <span class="dt">package =</span> <span class="st">&quot;drake&quot;</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)
-## Error in system.file(path = local, package = &quot;drake&quot;, mustWork = TRUE): no file found
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)
 <span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
 ## [1] TRUE</code></pre>
 <p>At this point, we can gather together the whole workflow plan.</p>
@@ -514,9 +574,7 @@ path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span cla
 <h2><span class="header-section-number">4.5</span> Results</h2>
 <p>Here are the root mean squared prediction errors of all the models.</p>
 <pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)
-
 <span class="kw">loadd</span>(plot_rmspe)
-
 <span class="kw">library</span>(ggplot2)
 <span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</code></pre>
 <p><img src="drake-manual_files/figure-html/masterrmspeplot-1.png" width="576" style="display: block; margin: auto;" /></p>
