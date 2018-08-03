@@ -363,7 +363,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </center>
 <div id="the-drake-r-package" class="section level2">
 <h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p><code>drake</code> — or, Data Frames in R for Make — is a general-purpose workflow manager for data-driven tasks. It rebuilds intermediate data objects when their dependencies change, and it skips work when the results are already up to date. Not every runthrough starts from scratch, and completed workflows have tangible evidence of reproducibility. <code>Drake</code> is more scalable than <a href="https://github.com/yihui/knitr"><code>knitr</code></a>, more thorough than <a href="https://github.com/r-lib/memoise">memoization</a>, and more R-focused than <a href="https://github.com/pditommaso/awesome-pipeline">other pipeline toolkits</a> such as <a href="https://www.gnu.org/software/make/">GNU Make</a>, <a href="https://github.com/richfitz/remake"><code>remake</code></a>, and <a href="https://snakemake.readthedocs.io">snakemake</a>.</p>
+<p><code>drake</code> — or, Data Frames in R for Make — is a general-purpose workflow manager for data-driven tasks. It rebuilds intermediate data objects when their dependencies change, and it skips work when the results are already up to date. Not every runthrough starts from scratch, and completed workflows have tangible evidence of reproducibility. <code>drake</code> is more scalable than <a href="https://github.com/yihui/knitr"><code>knitr</code></a>, more thorough than <a href="https://github.com/r-lib/memoise">memoization</a>, and more R-focused than <a href="https://github.com/pditommaso/awesome-pipeline">other pipeline toolkits</a> such as <a href="https://www.gnu.org/software/make/">GNU Make</a>, <a href="https://github.com/richfitz/remake"><code>remake</code></a>, and <a href="https://snakemake.readthedocs.io">snakemake</a>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2><span class="header-section-number">1.2</span> Installation</h2>
@@ -425,17 +425,17 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 </div>
 <div id="readability-and-transparency" class="section level4">
 <h4><span class="header-section-number">1.3.2.4</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>Drake</code> helps in several ways.</p>
+<p>Ideally, independent observers should be able to read your code and understand it. <code>drake</code> helps in several ways.</p>
 <ul>
 <li>The <a href="https://ropensci.github.io/drake/reference/drake_plan.html">workflow plan data frame</a> explicitly outlines the steps of the analysis, and <a href="https://ropensci.github.io/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>Drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
+<li><code>drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
 <li>You can <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
 </ul>
 </div>
 </div>
 <div id="aggressively-scale-up." class="section level3">
 <h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>Drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
+<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the spare cores on your local machine.</span>
 <span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)
 
@@ -539,7 +539,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 <li><code>drake</code> already has a <a href="http://kbroman.org/minimal_make/">Make</a>-powered parallel backend. Just run <code>make(..., parallelism = &quot;Makefile&quot;, jobs = 2)</code> to enjoy most of the original benefits of <a href="http://kbroman.org/minimal_make/">Make</a> itself.</li>
 <li>Improved scalability. With <a href="http://kbroman.org/minimal_make/">Make</a>, you must write a potentially large and cumbersome <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile">Makefile</a> by hand. But with <code>drake</code>, you can use <a href="https://ropenscilabs.github.io/drake-manual/mtcars.html#generate-the-workflow-plan">wildcard templating</a> to automatically generate massive collections of targets with minimal code.</li>
 <li>Lower overhead for light-weight tasks. For each <a href="http://kbroman.org/minimal_make/">Make</a> target that uses R, a brand new R session must spawn. For projects with thousands of small targets, that means more time may be spent loading R sessions than doing the actual work. With <code>make(..., parallelism = &quot;mclapply, jobs = 4&quot;)</code>, <code>drake</code> launches 4 persistent workers up front and efficiently processes the targets in R.</li>
-<li>Convenient organization of output. With <a href="http://kbroman.org/minimal_make/">Make</a>, the user must save each target as a file. <code>Drake</code> saves all the results for you automatically in a <a href="https://github.com/richfitz/storr">storr cache</a> so you do not have to micromanage the results.</li>
+<li>Convenient organization of output. With <a href="http://kbroman.org/minimal_make/">Make</a>, the user must save each target as a file. <code>drake</code> saves all the results for you automatically in a <a href="https://github.com/richfitz/storr">storr cache</a> so you do not have to micromanage the results.</li>
 </ul>
 </div>
 <div id="remake" class="section level3">
@@ -556,7 +556,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 <div id="memoise" class="section level3">
 <h3><span class="header-section-number">1.6.3</span> Memoise</h3>
 <p>Memoization is the strategic caching of the return values of functions. Every time a memoized function is called with a new set of arguments, the return value is saved for future use. Later, whenever the same function is called with the same arguments, the previous return value is salvaged, and the function call is skipped to save time. The <a href="https://github.com/r-lib/memoise">memoise package</a> is an excellent implementation of memoization in R.</p>
-<p>However, memoization does not go far enough. In reality, the return value of a function depends not only on the function body and the arguments, but also on any nested functions and global variables, the dependencies of those dependencies, and so on upstream. <code>Drake</code> surpasses <a href="https://github.com/r-lib/memoise">memoise</a> because it uses the <em>entire dependency network graph</em> of a project to decide which pieces need to be rebuilt and which ones can be skipped.</p>
+<p>However, memoization does not go far enough. In reality, the return value of a function depends not only on the function body and the arguments, but also on any nested functions and global variables, the dependencies of those dependencies, and so on upstream. <code>drake</code> surpasses <a href="https://github.com/r-lib/memoise">memoise</a> because it uses the <em>entire dependency network graph</em> of a project to decide which pieces need to be rebuilt and which ones can be skipped.</p>
 </div>
 <div id="knitr-and-r-markdown" class="section level3">
 <h3><span class="header-section-number">1.6.4</span> Knitr and R Markdown</h3>
@@ -566,7 +566,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 <li>There is no obvious high-performance computing support.</li>
 <li>While there is a way to skip chunks that are already up to date (with code chunk options <code>cache</code> and <code>autodep</code>), this functionality is not the focus of <a href="https://yihui.name/knitr/">knitr</a>. It is deactivated by default, and <a href="https://github.com/richfitz/remake">remake</a> and <code>drake</code> are more dependable ways to skip work that is already up to date.</li>
 </ol>
-<p><code>Drake</code> was designed to manage the entire workflow with <a href="https://yihui.name/knitr/">knitr</a> reports as targets. The strategy is analogous for <a href="https://yihui.name/knitr/">knitr</a> reports within <a href="https://github.com/richfitz/remake">remake</a> projects.</p>
+<p><code>drake</code> was designed to manage the entire workflow with <a href="https://yihui.name/knitr/">knitr</a> reports as targets. The strategy is analogous for <a href="https://yihui.name/knitr/">knitr</a> reports within <a href="https://github.com/richfitz/remake">remake</a> projects.</p>
 </div>
 <div id="factuals-drake" class="section level3">
 <h3><span class="header-section-number">1.6.5</span> Factual’s Drake</h3>

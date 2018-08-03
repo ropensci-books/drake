@@ -556,10 +556,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;515482c947af5e9ce2f962f79afb0390&quot;
+## [1] &quot;dec870576a0a8651bdecb944dc396626&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;f75c4e934ecdf5145724f2a4c7e51bc0&quot;
+## [1] &quot;95a508fcc440895748025123598a131d&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -618,7 +618,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <pre class="sourceCode r"><code class="sourceCode r">?deps
 ?tracked
 ?vis_drake_graph</code></pre>
-<p><code>Drake</code> can be fooled into skipping objects that should be treated as dependencies. For example:</p>
+<p><code>drake</code> can be fooled into skipping objects that should be treated as dependencies. For example:</p>
 <pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(){
   b &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">envir =</span> <span class="kw">globalenv</span>()) <span class="co"># x is incorrectly ignored</span>
   digest<span class="op">::</span><span class="kw">digest</span>(file_dependency)
@@ -641,7 +641,7 @@ command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span
 ## 
 ## $file_in
 ## [1] &quot;\&quot;input_file.rds\&quot;&quot;</code></pre>
-<p><code>Drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
+<p><code>drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
 </div>
 <div id="dependencies-of-knitr-reports" class="section level3">
 <h3><span class="header-section-number">B.4.4</span> Dependencies of <code>knitr</code> reports</h3>
@@ -683,14 +683,14 @@ dovec &lt;-<span class="st"> </span>names <span class="op">%in%</span><span clas
 </div>
 <div id="packages-are-not-tracked-as-dependencies." class="section level3">
 <h3><span class="header-section-number">B.4.9</span> Packages are not tracked as dependencies.</h3>
-<p><code>Drake</code> may import functions from packages, but the packages themselves are not tracked as dependencies. For this, you will need other tools that support reproducibility beyond the scope of <code>drake</code>. <a href="https://rstudio.github.io/packrat">Packrat</a> creates a tightly-controlled local library of packages to extend the shelf life of your project. And with <a href="https://www.docker.com/">Docker</a>, you can execute your project on a <a href="https://en.wikipedia.org/wiki/Virtual_machine">virtual machine</a> to ensure platform independence. Together, <a href="https://rstudio.github.io/packrat">packrat</a> and <a href="https://www.docker.com/">Docker</a> can help others reproduce your work even if they have different software and hardware.</p>
+<p><code>drake</code> may import functions from packages, but the packages themselves are not tracked as dependencies. For this, you will need other tools that support reproducibility beyond the scope of <code>drake</code>. <a href="https://rstudio.github.io/packrat">Packrat</a> creates a tightly-controlled local library of packages to extend the shelf life of your project. And with <a href="https://www.docker.com/">Docker</a>, you can execute your project on a <a href="https://en.wikipedia.org/wiki/Virtual_machine">virtual machine</a> to ensure platform independence. Together, <a href="https://rstudio.github.io/packrat">packrat</a> and <a href="https://www.docker.com/">Docker</a> can help others reproduce your work even if they have different software and hardware.</p>
 </div>
 </div>
 <div id="high-performance-computing" class="section level2">
 <h2><span class="header-section-number">B.5</span> High-performance computing</h2>
 <div id="the-practical-utility-of-parallel-computing" class="section level3">
 <h3><span class="header-section-number">B.5.1</span> The practical utility of parallel computing</h3>
-<p><code>Drake</code> claims that it can</p>
+<p><code>drake</code> claims that it can</p>
 <ol style="list-style-type: decimal">
 <li>Build and cache your targets in parallel (in stages).</li>
 <li>Build and cache your targets in the correct order, finishing dependencies before starting targets that depend on them.</li>
@@ -723,7 +723,7 @@ dovec &lt;-<span class="st"> </span>names <span class="op">%in%</span><span clas
 </div>
 <div id="proper-makefiles-are-not-standalone." class="section level3">
 <h3><span class="header-section-number">B.5.5</span> Proper Makefiles are not standalone.</h3>
-<p>The <a href="http://kbroman.org/minimal_make/">Makefile</a> generated by <code>make(myplan, parallelism = &quot;Makefile&quot;)</code> is not standalone. Do not run it outside of <code>drake::make()</code>. <code>Drake</code> uses dummy timestamp files to tell the <a href="http://kbroman.org/minimal_make/">Makefile</a> what to do, and running <code>make</code> in the <a href="https://www.howtogeek.com/140679/beginner-geek-how-to-start-using-the-linux-terminal/">terminal</a> will most likely give incorrect results.</p>
+<p>The <a href="http://kbroman.org/minimal_make/">Makefile</a> generated by <code>make(myplan, parallelism = &quot;Makefile&quot;)</code> is not standalone. Do not run it outside of <code>drake::make()</code>. <code>drake</code> uses dummy timestamp files to tell the <a href="http://kbroman.org/minimal_make/">Makefile</a> what to do, and running <code>make</code> in the <a href="https://www.howtogeek.com/140679/beginner-geek-how-to-start-using-the-linux-terminal/">terminal</a> will most likely give incorrect results.</p>
 </div>
 <div id="makefile-level-parallelism-for-imported-objects-and-files" class="section level3">
 <h3><span class="header-section-number">B.5.6</span> Makefile-level parallelism for imported objects and files</h3>
