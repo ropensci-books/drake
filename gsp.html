@@ -359,7 +359,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.1</span> Get the code.</h2>
 <p>Write the code files to your workspace.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</code></pre>
-<p>The new <code>gsp</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/ropensci/drake/tree/master/inst/examples/gsp">online here</a>.</p>
+<p>The new <code>gsp</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/wlandau/drake-examples/tree/master/gsp">online here</a>.</p>
 </div>
 <div id="objective-and-methods" class="section level2">
 <h2><span class="header-section-number">4.2</span> Objective and methods</h2>
@@ -493,17 +493,19 @@ rmspe_plan &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 ##   &lt;chr&gt;  &lt;chr&gt;                                                            
 ## 1 plot   &quot;ggsave(filename = file_out(\&quot;rmspe.pdf\&quot;), plot = plot_rmspe(rm…
 ## 2 report &quot;knit(knitr_in(\&quot;report.Rmd\&quot;), file_out(\&quot;report.md\&quot;), quiet =…</code></pre>
-<p>We see warnings above because our R Markdown report <code>report.Rmd</code> does not exist yet. You can find it <a href="https://github.com/ropensci/drake/blob/master/inst/examples/gsp/report.Rmd">here</a>, and the code below generates it.</p>
+<p>We see warnings above because our R Markdown report <code>report.Rmd</code> does not exist yet. You can find it <a href="https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd">here</a> and download it with the code below.</p>
 <pre class="sourceCode r"><code class="sourceCode r">local &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;gsp&quot;</span>, <span class="st">&quot;report.Rmd&quot;</span>)
+<span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)
 path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">path =</span> local, <span class="dt">package =</span> <span class="st">&quot;drake&quot;</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)
-<span class="kw">file.copy</span>(<span class="dt">from =</span> path, <span class="dt">to =</span> <span class="st">&quot;report.Rmd&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+## Error in system.file(path = local, package = &quot;drake&quot;, mustWork = TRUE): no file found
+<span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
 ## [1] TRUE</code></pre>
 <p>At this point, we can gather together the whole workflow plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r">whole_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(model_plan, rmspe_plan, rmspe_results_plan, output_plan)</code></pre>
 <p>Before we run the project, we need to define the <code>plot_rmspe()</code> function.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){
   <span class="kw">ggplot</span>(rmspe) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">30</span>)
+<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">15</span>)
 }</code></pre>
 <p>Now, we can run the project</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(whole_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre>
