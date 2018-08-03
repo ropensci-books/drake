@@ -7,6 +7,7 @@ unlink(
 )
 suppressPackageStartupMessages(library(drake))
 suppressPackageStartupMessages(library(glue))
+suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(rlang))
 suppressPackageStartupMessages(library(tidyverse))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
@@ -489,6 +490,41 @@ plan <- tibble(
 writeLines("in1", "in1.txt")
 writeLines("in2", "in2.txt")
 vis_drake_graph(drake_config(plan))
+```
+
+Alternatively, you could use `as.call()` instead of tidy evaluation to generate your plan. Use `as.call()` to construct calls to `file_in()`, `file_out()`, and custom functions in your commands.
+
+```{r alternativenontidyplan4}
+library(purrr) # pmap_chr() is particularly useful here.
+
+# A function that will be called in your commands.
+command_function <- function(cmd, inputs, outputs){
+  glue_data(
+    list(
+      inputs = inputs,
+      outputs = outputs
+    ),
+    cmd
+  ) %>%
+    purrr::walk(system)
+}
+
+# A function to generate quoted calls to command_function(),
+# which in turn contain quoted calls to file_in() and file_out().
+write_command <- function(...){
+  args <- list(...)
+  args$inputs <- as.call(list(quote(file_in), args$inputs))
+  args$outputs <- as.call(list(quote(file_out), args$outputs))
+  c(quote(command_function), args) %>%
+    as.call() %>%
+    rlang::expr_text()
+}
+
+plan <- tibble(
+  target = paste0("target_", seq_len(nrow(meta_plan))),
+  command = pmap_chr(meta_plan, write_command)
+) %>%
+  print
 ```
 
 Thanks to [Chris Hammill](https://github.com/cfhammill) for [presenting this scenario and contributing to the solution](https://github.com/ropensci/drake/issues/451).
