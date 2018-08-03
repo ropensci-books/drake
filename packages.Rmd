@@ -1,6 +1,11 @@
 # An analysis of R package download trends {#packages}
 
 ```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  error = TRUE,
+  warning = TRUE
+)
 suppressMessages(suppressWarnings(library(cranlogs)))
 suppressMessages(suppressWarnings(library(curl)))
 suppressMessages(suppressWarnings(library(drake)))
@@ -13,15 +18,15 @@ suppressMessages(suppressWarnings(library(R.utils)))
 suppressMessages(suppressWarnings(library(rvest)))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  error = TRUE,
-  warning = TRUE
+unlink(
+  c(
+    "packages", "Makefile", "report.Rmd",
+    "shell.sh", "STDIN.o*", "Thumbs.db"
+  ),
+  recursive = TRUE
 )
-reportfile <- file.path("examples", "packages", "report.Rmd") %>%
-  system.file(package = "drake", mustWork = TRUE)
-file.copy(reportfile, getwd())
+invisible(drake_example("packages", overwrite = TRUE))
+invisible(file.copy("packages/report.Rmd", ".", overwrite = TRUE))
 ```
 
 This chapter explores R package download trends using the `cranlogs` package, and it shows how `drake`'s custom triggers can help with workflows with remote data sources.
@@ -34,7 +39,7 @@ Write the code files to your workspace.
 drake_example("packages")
 ```
 
-The new `packages` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/ropensci/drake/tree/master/inst/examples/packages).
+The new `packages` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/wlandau/drake-examples/tree/master/packages).
 
 ## Overview
 
@@ -155,7 +160,7 @@ report_plan <- drake_plan(
 report_plan
 ```
 
-Because of the mention of `knitr_in()` above, `make()` will look dependencies inside `report.Rmd` (targets mentioned with `loadd()` or `readd()` in active code chunks). That way, whenever a dependency changes, `drake` will rebuild `report.md` when you call `make()`. For that to happen, we need `report.Rmd` to exist before the call to `make()`. For this example, you can find [report.Rmd here](https://github.com/ropensci/drake/blob/master/inst/examples/packages/report.Rmd).
+Because of the mention of `knitr_in()` above, `make()` will look dependencies inside `report.Rmd` (targets mentioned with `loadd()` or `readd()` in active code chunks). That way, whenever a dependency changes, `drake` will rebuild `report.md` when you call `make()`. For that to happen, we need `report.Rmd` to exist before the call to `make()`. For this example, you can find [report.Rmd here](https://github.com/wlandau/drake-examples/tree/master/packages/report.Rmd).
 
 Now, we complete the workflow plan data frame by concatenating the results together. `drake` uses implicit dependency relationships to resolve execution order, so row order in the plan does not matter.
 
@@ -252,6 +257,11 @@ If the log file at the `url` ever changes, the timestamp will update remotely, a
 ```{r rmfiles_main02, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
-  c("Makefile", "report.Rmd", "figure", "shell.sh", "STDIN.o*", "Thumbs.db"))
+  c(
+    "packages", "Makefile", "report.Rmd",
+    "shell.sh", "STDIN.o*", "Thumbs.db"
+  ),
+  recursive = TRUE
+)
 ```
 

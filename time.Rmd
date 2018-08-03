@@ -3,7 +3,13 @@
 ```{r suppression_timing, echo = F}
 suppressMessages(suppressWarnings(library(drake)))
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c(
+    "main", "Makefile", "report.Rmd",
+    "shell.sh", "STDIN.o*", "Thumbs.db"
+  ),
+  recursive = TRUE
+)
 knitr::opts_chunk$set(
   collapse = TRUE,
   error = TRUE,
@@ -94,6 +100,11 @@ A final note on predicting runtime: the output of `predict_runtime()` and `predi
 
 ```{r endofline_timing, echo = F}
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c(
-  "*.lock", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c(
+    "main", "*.lock", "Makefile",
+    "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"
+  ),
+  recursive = TRUE
+)
 ```

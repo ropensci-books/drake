@@ -6,7 +6,10 @@ suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(ggplot2)))
 unlink(".drake", recursive = TRUE)
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c("main", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
+  recursive = TRUE
+)
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = TRUE,
@@ -16,18 +19,9 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
-dat <- system.file(
-  file.path("examples", "main", "raw_data.xlsx"),
-  package = "drake",
-  mustWork = TRUE
-)
-tmp <- file.copy(from = dat, to = "raw_data.xlsx")
-rmd <- system.file(
-  file.path("examples", "main", "report.Rmd"),
-  package = "drake",
-  mustWork = TRUE
-)
-tmp <- file.copy(from = rmd, to = "report.Rmd")
+invisible(drake_example("main", overwrite = TRUE))
+invisible(file.copy("main/raw_data.xlsx", ".", overwrite = TRUE))
+invisible(file.copy("main/report.Rmd", ".", overwrite = TRUE))
 ```
 
 A typical data analysis workflow is a sequence of data transformations. Raw data becomes tidy data, then turns into fitted models, summaries, and reports.
@@ -150,5 +144,8 @@ Use `drake_example("main")` to get all the materials.
 
 ```{r endofline_main, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c("main", "report.Rmd", "raw_data.xlsx", "STDIN.o*", "Thumbs.db"),
+  recursive = TRUE
+)
 ```

@@ -3,7 +3,10 @@
 ```{r suppression04, echo = F}
 suppressMessages(suppressWarnings(library(drake)))
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c("mtcars", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
+  recursive = TRUE
+)
 knitr::opts_chunk$set(
   collapse = TRUE,
   error = TRUE,
@@ -21,7 +24,7 @@ Write the code files to your workspace.
 drake_example("mtcars")
 ```
 
-The new `mtcars` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/ropensci/drake/tree/master/inst/examples/mtcars).
+The new `mtcars` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/wlandau/drake-examples/tree/master/mtcars).
 
 ## Quick examples
 
@@ -111,12 +114,11 @@ reg2 <- function(d){
 }
 ```
 
-We want to summarize the final results in an R Markdown report, so we need the following `report.Rmd` source file.
+We want to summarize the final results in an R Markdown report, so we need the the `report.Rmd` source file. You can get it with `drake_example("mtcars")` or `load_mtcars_example()`.
 
 ```{r file}
-path <- file.path("examples", "mtcars", "report.Rmd")
-report_file <- system.file(path, package = "drake", mustWork = TRUE)
-file.copy(from = report_file, to = getwd(), overwrite = TRUE)
+drake_example("mtcars", overwrite = TRUE)
+file.copy("mtcars/report.Rmd", ".", overwrite = TRUE)
 ```
 
 Here are the contents of the report. It will serve as a final summary of our work, and we will process it at the very end. Admittedly, some of the text spoils the punch line.
@@ -505,5 +507,8 @@ For instances of `!!` that remain in the workflow plan, `make()` will run these 
 
 ```{r endofline_quickstart04, echo = F}
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c("mtcars", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
+  recursive = TRUE
+)
 ```

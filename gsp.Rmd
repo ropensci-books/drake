@@ -8,7 +8,10 @@ suppressPackageStartupMessages(library(knitr))
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 unlink(".drake", recursive = TRUE)
 clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+unlink(
+  c("gsp", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
+  recursive = TRUE
+)
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = TRUE,
@@ -26,7 +29,7 @@ Write the code files to your workspace.
 drake_example("gsp")
 ```
 
-The new `gsp` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/ropensci/drake/tree/master/inst/examples/gsp).
+The new `gsp` folder now includes a file structure of a serious `drake` project, plus an `interactive-tutorial.R` to narrate the example. The code is also [online here](https://github.com/wlandau/drake-examples/tree/master/gsp).
 
 ## Objective and methods
 
@@ -140,12 +143,13 @@ output_plan <- drake_plan(
 head(output_plan)
 ```
 
-We see warnings above because our R Markdown report `report.Rmd` does not exist yet. You can find it [here](https://github.com/ropensci/drake/blob/master/inst/examples/gsp/report.Rmd), and the code below generates it.
+We see warnings above because our R Markdown report `report.Rmd` does not exist yet. You can find it [here](https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd) and download it with the code below.
 
 ```{r copyreport}
 local <- file.path("examples", "gsp", "report.Rmd")
+drake_example("gsp")
 path <- system.file(path = local, package = "drake", mustWork = TRUE)
-file.copy(from = path, to = "report.Rmd", overwrite = TRUE)
+file.copy(from = "gsp/report.Rmd", to = ".", overwrite = TRUE)
 ```
 
 At this point, we can gather together the whole workflow plan.
@@ -159,7 +163,7 @@ Before we run the project, we need to define the `plot_rmspe()` function.
 ```{r defineplotrmspe}
 plot_rmspe <- function(rmspe){
   ggplot(rmspe) +
-    geom_histogram(aes(x = rmspe), bins = 30)
+    geom_histogram(aes(x = rmspe), bins = 15)
 }
 ```
 
@@ -226,5 +230,10 @@ There are three main disadvantages to this approach.
 ```{r rmfiles_main03, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
-  c("Makefile", "report.Rmd", "figure", "shell.sh", "STDIN.o*", "Thumbs.db"))
+  c(
+    "Makefile", "report.Rmd", "figure", "gsp",
+    "shell.sh", "STDIN.o*", "Thumbs.db"
+  ),
+  recursive = TRUE
+)
 ```
