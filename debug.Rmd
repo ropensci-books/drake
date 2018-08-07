@@ -111,29 +111,26 @@ missed(config) # Nothing is missing right now.
 outdated(config)
 ```
 
-To find out why a target is out of date, you can load the [storr](https://github.com/richfitz/storr)-based cache and compare the appropriate hash keys to the output of `dependency_profile()`. To use `dependency_profile()`, be sure to supply the master configuration list as the `config` argument. The same is true for `drake_meta()`, another alternative.
+To get a rough idea of why a target is out of date, you can use `dependency_profile()`. It will tell you if any of the following changed since the last `make()`:
+
+- The command in the workflow plan data frame.
+- At least one non-file dependency. (For this, the imports have to be up to date and cached, either with `make()`, `make(skip_targets = TRUE)`, `outdated()`, or similar.)
+- At least one input file declared with `file_in()` or `knitr_in()`.
+- At least one output file declared with `file_out()`.
 
 ```{r depprofiledebug}
 load_mtcars_example() # Get the code with drake_example("mtcars").
 config <- make(my_plan, verbose = FALSE)
-## Change a dependency.
+# regression2_small should be up to date.
+dependency_profile(target = regression2_small, config = config)
+## Change an in-memory dependency and update the cache.
 reg2 <- function(d) {
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
 }
-outdated(config)
-
-dependency_profile(target = "regression2_small", config = config)
-
-drake_meta(target = "regression2_small", config = config)
-
-config$cache$get_hash(key = "small", namespace = "kernels") # same
-
-config$cache$get_hash(key = "small") # same
-
-config$cache$get_hash(key = "reg2", namespace = "kernels") # same
-
-config$cache$get_hash(key = "reg2") # different
+make(skip_targets = TRUE)
+# The change is detected.
+dependency_profile(target = regression2_small, config = config)
 ```
 
 In `drake`, the "kernel" of a target or import is the piece of the output that is reproducibly tracked. For ordinary R objects, the kernel is just the object itself. For custom external files, it is a separate hash. But for functions, the kernel is the deparsed body of the function, together with the dependency hash if the function is imported (see `drake:::store_function()`).

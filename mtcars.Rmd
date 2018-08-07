@@ -231,7 +231,7 @@ For your `knitr` reports, use `knitr_in()` in your commands so that `report.Rmd`
 
 ```{r reportplan}
 report <- drake_plan(
-  knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
+  report = knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
 )
 report
 ```
@@ -378,14 +378,15 @@ The targets that depend on `reg2()` need to be rebuilt.
 outdated(config)
 ```
 
-**Advanced**: To find out why a target is out of date, you can load the [storr](https://github.com/richfitz/storr) cache and compare the appropriate hash keys to the output of `dependency_profile()`.
+**Advanced**: To get a rough idea of why a target is out of date, you can use `dependency_profile()`. It will tell you if any of the following changed since the last `make()`:
+
+- The command in the workflow plan data frame.
+- At least one non-file dependency. (For this, the imports have to be up to date and cached, either with `make()`, `make(skip_targets = TRUE)`, `outdated()`, or similar.)
+- At least one input file declared with `file_in()` or `knitr_in()`.
+- At least one output file declared with `file_out()`.
 
 ```{r depprofile}
-dependency_profile(target = "regression2_small", config = config)
-
-config$cache$get_hash(key = "small") # same
-
-config$cache$get_hash(key = "reg2") # different
+dependency_profile(target = regression2_small, config = config)
 ```
 
 ```{r graph3quick}
