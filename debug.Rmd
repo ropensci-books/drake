@@ -64,7 +64,7 @@ check_plan(my_plan) # No issues.
 After quality-checking your plan, you should check that you understand how the steps of your workflow are interconnected. The web of dependencies affects which targets are built and which ones are skipped during `make()`.
 
 ```{r demoplotgraphdebug}
-## Hover, click, drag, zoom, and pan. See args 'from' and 'to'.
+# Hover, click, drag, zoom, and pan. See args 'from' and 'to'.
 config <- drake_config(my_plan)
 vis_drake_graph(config, width = "100%", height = "500px")
 ```
@@ -79,9 +79,9 @@ Programmatically, several functions can help you check immediate dependencies.
 ```{r checkdepsdebug}
 deps_code(reg2)
 
-## knitr_in() makes sure your target depends on `report.Rmd`
-## and any dependencies loaded with loadd() and readd()
-## in the report's active code chunks.
+# knitr_in() makes sure your target depends on `report.Rmd`
+# and any dependencies loaded with loadd() and readd()
+# in the report's active code chunks.
 deps_code(my_plan$command[1])
 
 deps_code(my_plan$command[nrow(my_plan)])
@@ -123,7 +123,7 @@ load_mtcars_example() # Get the code with drake_example("mtcars").
 config <- make(my_plan, verbose = FALSE)
 # regression2_small should be up to date.
 dependency_profile(target = regression2_small, config = config)
-## Change an in-memory dependency and update the cache.
+# Change an in-memory dependency and update the cache.
 reg2 <- function(d) {
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
@@ -216,7 +216,7 @@ withr::with_message_sink(
 
 failed(verbose = FALSE) # from the last make() only
 
-## See also warnings and messages.
+# See also warnings and messages.
 error <- diagnose(my_target, verbose = FALSE)$error
 
 error$message
@@ -229,33 +229,33 @@ error$calls # View the traceback.
 To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call `drake_build()`. This function first calls `loadd(deps = TRUE)` to load any missing dependencies (see the `replace` argument here) and then builds your target.
 
 ```{r loaddeps}
-## Pretend we just opened a new R session.
+# Pretend we just opened a new R session.
 library(drake)
 
-## Unloads target `b`.
+# Unloads target `b`.
 config <- drake_config(plan = bad_plan)
 
-## my_target depends on b.
+# my_target depends on b.
 "b" %in% ls()
 
-## Try to build my_target until the error is fixed.
-## Skip all that pesky work checking dependencies.
+# Try to build my_target until the error is fixed.
+# Skip all that pesky work checking dependencies.
 drake_build(my_target, config = config)
 
-## The target failed, but the dependency was loaded.
+# The target failed, but the dependency was loaded.
 "b" %in% ls()
 
-## What was `b` again?
+# What was `b` again?
 b
 
-## How was `b` used?
+# How was `b` used?
 diagnose(my_target)$message
 
 diagnose(my_target)$call
 
 f
 
-## Aha! The error was in f(). Let's fix it and try again.
+# Aha! The error was in f(). Let's fix it and try again.
 f <- function(x){
   x <- abs(x)
   if (x < 0){
@@ -264,9 +264,9 @@ f <- function(x){
   x
 }
 
-## Now it works!
-## Since you called make() previously, `config` is read from the cache
-## if you do not supply it.
+# Now it works!
+# Since you called make() previously, `config` is read from the cache
+# if you do not supply it.
 drake_build(my_target)
 
 readd(my_target)
@@ -277,7 +277,7 @@ readd(my_target)
 Running commands in your R console is not always exactly like running them with `make()`. That's because `make()` uses tidy evaluation as implemented in the [`rlang` package](https://github.com/tidyverse/rlang).
 
 ```{r demotidyeval06}
-## This workflow plan uses rlang's quasiquotation operator `!!`.
+# This workflow plan uses rlang's quasiquotation operator `!!`.
 my_plan <- drake_plan(list = c(
   little_b = "\"b\"",
   letter = "!!little_b"
@@ -295,7 +295,7 @@ After your project is at least somewhat built, you can inspect and read your res
 ```{r debriefdebug}
 make(my_plan, verbose = FALSE)
 
-## drake_session(verbose = FALSE) # Prints the sessionInfo() of the last make(). # nolint
+# drake_session(verbose = FALSE) # Prints the sessionInfo() of the last make(). # nolint
 
 cached(verbose = FALSE)
 
@@ -316,9 +316,9 @@ in_progress(verbose = FALSE) # Unfinished targets
 
 There are functions to help you locate the project's cache.
 
-```{r finddebug}
-## find_project() # nolint
-## find_cache()   # nolint
+```{r finddebug, eval = FALSE}
+find_project()
+find_cache()
 ```
 
 For more information on the cache, see the [chapter on storage and caches](#store).

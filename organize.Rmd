@@ -42,7 +42,7 @@ In practice, you do not need to organize your files the way the examples do, but
 It is best to write your code as a bunch of functions. You can save those functions in R scripts and then `source()` them before doing anything else.
 
 ```{r sourcefunctions, eval = FALSE}
-## Load functions get_data(), analyze_data, and summarize_results()
+# Load functions get_data(), analyze_data, and summarize_results()
 source("my_functions.R")
 ```
 
@@ -153,13 +153,13 @@ f <- function(x){
 }
 plan <- drake_plan(x = f(1))
 
-## Here are the reproducibly tracked objects in the workflow.
+# Here are the reproducibly tracked objects in the workflow.
 config <- drake_config(plan)
 tracked(config)
 
-## But the `digest()` function has dependencies too.
-## Because `drake` knows `digest()` is from a package,
-## it ignores these dependencies by default.
+# But the `digest()` function has dependencies too.
+# Because `drake` knows `digest()` is from a package,
+# it ignores these dependencies by default.
 head(deps_code(digest), 10)
 ```
 
@@ -174,8 +174,8 @@ new_objects <- tracked(config)
 head(new_objects, 10)
 length(new_objects)
 
-## Now when you call `make()`, `drake` will dive into `digest`
-## to import dependencies.
+# Now when you call `make()`, `drake` will dive into `digest`
+# to import dependencies.
 
 cache <- storr::storr_environment() # just for examples
 make(plan, cache = cache)

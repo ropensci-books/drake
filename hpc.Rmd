@@ -147,7 +147,7 @@ The `plan()` function from the [`future`](https://github.com/HenrikBengtsson/fut
 library(future)
 future::plan(multisession)
 make(my_plan, parallelism = "future", jobs = 2)
-## Same technology, different scheduling:
+# Same technology, different scheduling:
 make(my_plan, parallelism = "future_lapply", jobs = 2)
 ```
 
@@ -175,7 +175,7 @@ Load the template file your `future::plan()` and call `make()` to run the projec
 ```{r futurebatchtools2, eval = FALSE}
 future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
 make(my_plan, parallelism = "future", jobs = 2)
-## Same technology, different scheduling options:
+# Same technology, different scheduling options:
 make(my_plan, parallelism = "future_lapply", jobs = 2)
 ```
 
@@ -317,9 +317,7 @@ make(my_plan, parallelism = "future_lapply", jobs = 2)
 
 In each of these calls to `make()`, three processes launch: two workers and one master. Whenever a worker is idle, the master assigns it the next available target (whose dependencies have been built). The workers keep running until there are no more targets to build. The following video demonstrates the concept.
 
-<div style = "text-align: center">
-<iframe width="700" height="434" src="https://www.powtoon.com/embed/bUfSIaXjrw5/" frameborder="0"></iframe>
-</div>
+<script src="https://fast.wistia.com/embed/medias/ycczhxwkjw.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_ycczhxwkjw videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/ycczhxwkjw/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 
 For staged scheduling, you can micromanage which workers can run which targets. This column can be an integer vector or a list of integer vectors. Simply set an optional `workers` column in your `drake_plan()`. Why would you wish to do this? Consider the `mtcars` example.
 
@@ -348,9 +346,7 @@ The `predict_runtime()` and `predict_load_balancing()` functions emulate persist
 
 Persistent workers are great because they minimize overhead: all the workers are created at the beginning, and then you never have to create any more for the rest of the runthrough. Unfortunately, computing clusters usually limit the amount of time each worker can stay running. That is why `drake` also supports transient workers in backends `"future"` and `"Makefile"`. Here, the master process creates a new worker for each target individually, and the worker dies after it finishes its single target. For the `"future"` backend, the master is just the existing process calling `make()`. The following video demonstrates the concept.
 
-<div style = "text-align: center">
-<iframe width="700" height="434" src="https://www.powtoon.com/embed/cHIdOqudELB/" frameborder="0"></iframe>
-</div>
+<script src="https://fast.wistia.com/embed/medias/340yvlp515.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_340yvlp515 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/340yvlp515/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div><br>
 
 ```{r transient, eval = FALSE}
 future::plan(future::multisession)
@@ -369,9 +365,7 @@ make(my_plan, parallelism = "parLapply_staged", jobs = 2)
 
 Here, the dependency network is divided into separate stages of conditionally independent targets. Within each stage, `drake` uses `mclapply()` or `parLapply()` to process the targets in parallel. Stages run one after the other, so the slowest target in the current stage needs to complete before the next stage begins. So we lose a lot of parallel efficiency. The following video demonstrates the major drawback.<sup><a href="#note1" id="note1ref">[1]</a></sup>
 
-<div style = "text-align: center">
-<iframe width="700" height="434" src="https://www.powtoon.com/embed/dQKbGttIYud/" frameborder="0"></iframe>
-</div>
+<script src="https://fast.wistia.com/embed/medias/uxzk0qgy9e.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_uxzk0qgy9e videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/uxzk0qgy9e/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 
 However, because there is no formal master process in each stage, overhead is extremely low. This lack of overhead can make staged parallelism a great choice for projects with a small number of large stages: tall dependency graphs with most of the work in the tallest stages.
 
