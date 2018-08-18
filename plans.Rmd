@@ -5,6 +5,7 @@ unlink(
   c("main", "report.Rmd", "raw_data.xlsx"),
   recursive = TRUE
 )
+knitr::opts_chunk$set(collapse = TRUE)
 suppressPackageStartupMessages(library(drake))
 suppressPackageStartupMessages(library(glue))
 suppressPackageStartupMessages(library(purrr))
@@ -133,7 +134,7 @@ So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` 
 
 And remember, `drake` also takes into account imported functions and imported files. If there are nontrivial changes to `start.rds`, `letters`, `readRDS()`, or `saveRDS()`, `drake` will rebuild targets `x` and/or `y` as appropriate.
 
-## Generating large workflow plans
+## Automatically generating workflow plans
 
 `drake` provides many more utilites that increase the flexibility of workflow plan generation beyond `expand.grid()`.
 
@@ -531,6 +532,29 @@ Metaprogramming gets much simpler if you do not need to construct literal calls 
 
 Thanks to [Chris Hammill](https://github.com/cfhammill) for [presenting this scenario and contributing to the solution](https://github.com/ropensci/drake/issues/451).
 
+### Turn scripts and reports into plans
+
+With the `code_to_plan()` function, you can turn your R scripts and `knitr` / R Markdown reports into `drake` workflow plan data frames. In your script or `knitr` / R Markdown code chunks, you can assign expressions to variables, and `code_to_plan()` will turn them into commands and targets, respectively. The `make.R` script demonstrates how this works for the script `script.R` and the report `report.Rmd`.
+
+This feature is easy to break, so there are some rules for your source files:
+
+1. Stick to ssigning a single expression to a single target at a time. For multi-line commands, please enclose the whole command in curly braces. Conversely, compound assignment is not supported (e.g. `target_1 <- target_2 <- target_3 <- get_data()`).
+2. Once you assign an expression to a variable, do not modify the variable any more. The target/command [binding](https://cs.stackexchange.com/questions/39525/what-is-the-difference-between-assignment-valuation-and-name-binding) should be permanent.
+3. Keep it simple. Please use the assignment operators rather than `assign()` and similar functions.
+
+You can [find example code and extra documentation here](https://github.com/wlandau/drake-examples/tree/master/code_to_plan), and you can download the files with `drake_exmaple()`.
+
+```{r code_to_plan}
+library(drake)
+drake_example("code_to_plan")
+plan <- code_to_plan("code_to_plan/script.R")
+plan2 <- code_to_plan("code_to_plan/report.Rmd")
+identical(plan, plan2) # should be TRUE
+print(plan)
+make(plan)
+readd(discrepancy)
+```
+
 ## Optional columns in your plan.
 
 Besides the usual columns `target` and `command`, there are other columns you can add.
@@ -545,7 +569,7 @@ Besides the usual columns `target` and `command`, there are other columns you ca
 ```{r endofline_plans, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
-  c("main", "start.rds", "report.Rmd", "raw_data.xlsx",
+  c("main", "code_to_plan", "start.rds", "report.Rmd", "raw_data.xlsx",
     "STDIN.o*", "Thumbs.db", "in1.txt", "in2.txt"),
   recursive = TRUE
 )
