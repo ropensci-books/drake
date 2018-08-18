@@ -2,24 +2,16 @@ language: R
 cache: packages
 
 r_packages:
-  - clustermq
-  - covr
-  - forcats
-  - ggplot2
-  - ggraph
-  - lintr
-  - pkgdown
-  - readxl
-  - visNetwork
+  - BiocManager
 
 addons:
   apt:
     packages:
       - libudunits2-dev
-      - libzmq3-dev
 
 before_script:
   - chmod +x ./deploy.sh
+  - Rscript -e 'BiocManager::install("CodeDepends", update = FALSE, ask = FALSE)'
 
 script:
   - Rscript faq.R
