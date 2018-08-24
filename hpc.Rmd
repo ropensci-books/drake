@@ -87,7 +87,7 @@ The backends vary widely in terms of how the workers deploy and how they are sch
 
 |                       | Deploy: local | Deploy: remote |
 | --------------------- |:-------------:| -----:|
-| Schedule: persistent | "mclapply", "parLapply" | "future_lapply" |
+| Schedule: persistent | "mclapply", "parLapply" | "clustermq", "future_lapply" |
 | Schedule: transient  | | "future", "Makefile" |
 | Schedule: staged     | "mclapply_staged", "parLapply_staged" | "clustermq_staged", "future_lapply_staged" |
 
@@ -126,18 +126,51 @@ parallelism_choices(distributed_only = TRUE)
 Testing them out is straightforward.
 
 ```{r remote1, eval = FALSE}
+make(my_plan, parallelism = "clustermq", jobs = 2)
+make(my_plan, parallelism = "clustermq_staged", jobs = 2)
 make(my_plan, parallelism = "future", jobs = 2)
 make(my_plan, parallelism = "future_lapply", jobs = 2)
+make(my_plan, parallelism = "future_lapply_staged", jobs = 2)
 make(my_plan, parallelism = "Makefile", jobs = 2)
 ```
 
 For remote workers, the all the imports are processed with one of the local worker backends before any of the targets start. You can use different numbers of workers for the imports and the targets.
 
 ```{r remote2, eval = FALSE}
-make(my_plan, parallelism = "future", jobs = c(imports = 2, targets = 4))
+make(my_plan, parallelism = "clustermq", jobs = c(imports = 2, targets = 4))
 ```
 
 By default, these backends launch the workers on your local machine. It takes extra configuring to actually deploy them to a remote cluster. The next subsections have the details.
+
+### `"clustermq"` and `"clustermq_staged"`
+
+The [`clustermq`](https://github.com/mschubert/clustermq) R package is a fast, user-friendly tool for sending R jobs to clusters, and [`clustermq`](https://github.com/mschubert/clustermq)-powered `drake` workers suffer less overhead than other remote workers. To use `drake`'s [`clustermq`](https://github.com/mschubert/clustermq) backends, you must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
+
+```{r installclustermq, eval = FALSE}
+install.packages("clustermq") # CRAN release
+# Alternatively, install the GitHub development version.
+devtools::install_github("mschubert/clustermq", ref = "develop") # "develop" is the name of a git branch.
+```
+
+[`clustermq`](https://github.com/mschubert/clustermq) detects most clusters automatically. However, you may still want to configure resources, wall time limits, etc. If so, you will need a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files). Use `drake_hpc_template_file()` to write one of the available example template files for [`clustermq`](https://github.com/mschubert/clustermq). (list with `drake_hpc_template_files()`). You will probably need to edit your tempalte file manually to match your resources and needs.
+
+```{r clustermqtemplatefile, eval = FALSE}
+drake_hpc_tempalte_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
+```
+
+Next, configure [`clustermq`](https://github.com/mschubert/clustermq) to use your scheduler and template file. [`clustermq`](https://github.com/mschubert/clustermq) has a [really nice wiki](https://github.com/mschubert/clustermq/wiki#setting-up-the-scheduler) with more detailed directions.
+
+```{r clustermqopts, eval = FALSE}
+options(clustermq.scheduler = "slurm", template = "slurm_clustermq.tmpl")
+```
+
+Tip: for a dry run on your local machine, use `options(clustermq.scheduler = "multicore")` instead. Either way, once it is time to run your project, simply call `make()` with one of the [`clustermq`](https://github.com/mschubert/clustermq) parallelism backends.
+
+```{r clustermqrun, eval = FALSE}
+make(my_plan, parallelism = "clustermq", jobs = 4)
+make(my_plan, parallelism = "clustermq_staged", jobs = 4) # Different job scheduling algorithm.
+```
+
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
@@ -187,35 +220,6 @@ make(my_plan, parallelism = "future_lapply_staged")
 ```
 
 See packages [`future`](https://github.com/HenrikBengtsson/future), [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools), and [`batchtools`](https://github.com/mllg/batchtools) for more options. For example, the alternatives for `future::plan()` are listed [here](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) and [here](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend).
-
-### `"clustermq_staged"`
-
-The [`clustermq`](https://github.com/mschubert/clustermq) R package is a fast, user-friendly tool for sending R jobs to clusters, and [`clustermq`](https://github.com/mschubert/clustermq)-powered `drake` workers suffer less overhead than other remote workers. To use `drake`'s [`clustermq`](https://github.com/mschubert/clustermq) backends, you must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
-
-```{r installclustermq, eval = FALSE}
-install.packages("clustermq") # CRAN release
-# Alternatively, install the GitHub development version.
-devtools::install_github("mschubert/clustermq")
-```
-
-[`clustermq`](https://github.com/mschubert/clustermq) detects most clusters automatically. However, you may still want to configure resources, wall time limits, etc. If so, you will need a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files). Use `drake_hpc_template_file()` to write one of the available example template files for [`clustermq`](https://github.com/mschubert/clustermq). (list with `drake_hpc_template_files()`). You will probably need to edit your tempalte file manually to match your resources and needs.
-
-```{r clustermqtemplatefile, eval = FALSE}
-drake_hpc_tempalte_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
-```
-
-Next, configure [`clustermq`](https://github.com/mschubert/clustermq) to use your scheduler and template file. [`clustermq`](https://github.com/mschubert/clustermq) has a [really nice wiki](https://github.com/mschubert/clustermq/wiki#setting-up-the-scheduler) with more detailed directions.
-
-
-```{r clustermqopts, eval = FALSE}
-options(clustermq.scheduler = "slurm", template = "slurm_clustermq.tmpl")
-```
-
-Tip: for a dry run on your local machine, use `options(clustermq.scheduler = "multicore")` instead. Either way, once it is time to run your project, simply call `make()` with one of the [`clustermq`](https://github.com/mschubert/clustermq) parallelism backends.
-
-```{r clustermqrun, eval = FALSE}
-make(my_plan, parallelism = "clustermq_staged", jobs = 4)
-```
 
 ### `"Makefile"`
 
