@@ -259,8 +259,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>10.3</b> Parallel backends</a></li>
 <li class="chapter" data-level="10.4" data-path="hpc.html"><a href="hpc.html#local-workers"><i class="fa fa-check"></i><b>10.4</b> Local workers</a></li>
 <li class="chapter" data-level="10.5" data-path="hpc.html"><a href="hpc.html#remote-workers"><i class="fa fa-check"></i><b>10.5</b> Remote workers</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="hpc.html"><a href="hpc.html#future-future_lapply-and-future_lapply_staged"><i class="fa fa-check"></i><b>10.5.1</b> <code>&quot;future&quot;</code>, <code>&quot;future_lapply&quot;</code>, and <code>&quot;future_lapply_staged&quot;</code></a></li>
-<li class="chapter" data-level="10.5.2" data-path="hpc.html"><a href="hpc.html#clustermq_staged"><i class="fa fa-check"></i><b>10.5.2</b> <code>&quot;clustermq_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.1" data-path="hpc.html"><a href="hpc.html#clustermq-and-clustermq_staged"><i class="fa fa-check"></i><b>10.5.1</b> <code>&quot;clustermq&quot;</code> and <code>&quot;clustermq_staged&quot;</code></a></li>
+<li class="chapter" data-level="10.5.2" data-path="hpc.html"><a href="hpc.html#future-future_lapply-and-future_lapply_staged"><i class="fa fa-check"></i><b>10.5.2</b> <code>&quot;future&quot;</code>, <code>&quot;future_lapply&quot;</code>, and <code>&quot;future_lapply_staged&quot;</code></a></li>
 <li class="chapter" data-level="10.5.3" data-path="hpc.html"><a href="hpc.html#makefile"><i class="fa fa-check"></i><b>10.5.3</b> <code>&quot;Makefile&quot;</code></a></li>
 </ul></li>
 <li class="chapter" data-level="10.6" data-path="hpc.html"><a href="hpc.html#scheduling-algorithms"><i class="fa fa-check"></i><b>10.6</b> Scheduling algorithms</a><ul>
@@ -557,10 +557,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;707eb9f4502708780a0f20c90eabfb60&quot;
+## [1] &quot;d92a3aefd2aa5446750df68c23da1486&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;707eb9f4502708780a0f20c90eabfb60&quot;
+## [1] &quot;cd79b9e9220263a1ba776e4f581d0eee&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -572,7 +572,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 ## target circle
 ## target area
 <span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span>
-## All targets are already up to date.</code></pre>
+## target circle</code></pre>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
 new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){
