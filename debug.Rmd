@@ -2,7 +2,7 @@
 
 ```{r debugstart, echo = F}
 suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(magrittr)))
+suppressMessages(suppressWarnings(library(tidyverse)))
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 knitr::opts_chunk$set(
@@ -87,6 +87,20 @@ outdated(config)
 
 ### But why are my targets out of date?
 
+`drake` has the option to produce a cache log with the fingerprint of every target and import.
+
+```{r cachelog}
+head(drake_cache_log())
+```
+
+We highly recommend that you automatically produce a cache log file on every `make()` and put it under [version control](https://github.com) with the rest of your project.
+
+```{r cachelog2}
+make(my_plan, cache_log_file = "cache_log.txt")
+
+read.table("cache_log.txt", nrows = 6, header = TRUE)
+```
+
 Suppose we go back and add input checking to one of our functions.
 
 ```{r changerandomrowsdebug}
@@ -98,42 +112,22 @@ random_rows <- function(data, n){
 }
 ```
 
-Then, we forget to run `make()` again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date, and we have no idea why.
+Then, we forget to run `make()` again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.
 
 ```{r whyoutdated}
 outdated(config)
 ```
 
-The `dependency_profile()` function tells us which first-order dependencies of targets in `my_plan` changed since the last time we ran `make()`. We care most about our final report, so let's start there. Why is our report out of date?
+At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to `outdated()` already re-cached the imports, so any changed imports will show up in the new log file.
 
-```{r depprofile1}
-dependency_profile("report", config)
+```{r whyoutdated2}
+drake_cache_log_file(file = "cache_log2.txt")
+
+system2("diff", "cache_log.txt cache_log2.txt", stdout = TRUE) %>%
+  cat(sep = "\n")
 ```
 
-It looks like none of the direct dependencies have different values since last time, so we need to look further upstream.
-
-```{r dependencyprofile}
-dependency_profile(coef_regression2_small, config)
-
-dependency_profile(regression2_small, config)
-
-dependency_profile(small, config)
-```
-
-Aha! So either
-
-1. The function body of `simulate()` changed, or
-2. One of the objects nested in `simulate()` changed. We need to dive into `simulate()`, but `dependency_profile()` is not useful for imports, so we continue on foot.
-
-```{r inspectsimulate}
-print(simulate) # Looks the same as last time.
-
-deps_targets("simulate", config) # Let's try random_rows.
-
-print(random_rows) # Now that looks different...
-```
-
-At some point, we added some error checking to `random_rows()`. With a fresh perspective, we now realize that this error checking is unnecessary. So we revert to the previous version of `random_rows()`. Now, all our targets are up to date again.
+Now, we see that `random_rows()` has changed since last time, and we have a new dependency `stopifnot()`. `simulate()` shows up in the changes too, but only because `random_rows()` is nested in the body of `simulate()`. If we revert `random_rows()` to its original state, all our targets are up to date again.
 
 ```{r revertrandomrows}
 random_rows <- function(data, n){
@@ -141,7 +135,12 @@ random_rows <- function(data, n){
 }
 
 outdated(config)
+
+drake_cache_log_file(file = "cache_log3.txt")
+
+system2("diff", "cache_log.txt cache_log3.txt", stdout = TRUE)
 ```
+
 
 ## Diagnose failures.
 
