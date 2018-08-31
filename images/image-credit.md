@@ -2,6 +2,19 @@
     - "multiple" by Hea Poh Lin from the [Noun Project](https://thenounproject.com/)
     - "replay" by Sylvain A. from the [Noun Project](https://thenounproject.com/)
     - "checkmark" by Ananth from the [Noun Project](https://thenounproject.com/)
+- Other clipart comes from [openclipart.org](https://openclipart.org/), which allows [unlimited commercial use](https://openclipart.org/share).
+    - https://commons.wikimedia.org/wiki/File:R_logo.svg
+    - https://openclipart.org/detail/49411/binary-file
+    - https://openclipart.org/detail/30769/architetto-istogramma
+    - https://openclipart.org/detail/133777/document-icon
+    - https://openclipart.org/detail/193052/simple-right-arrow
+    - https://openclipart.org/detail/172946/edit-hand-holding-pencil
+    - https://openclipart.org/detail/193050/x-marks-the-spot
+    - https://openclipart.org/detail/212217/rodentiaicons-editredoltr
+    - https://openclipart.org/detail/189377/refresh-icon-simple
+    - https://openclipart.org/detail/275842/sisyphus-overcoming-silhouette
+    - https://openclipart.org/detail/216179/messy-desk
+    - https://openclipart.org/detail/225151/circular-loading-icon-with-dashes-and-some-fading-out
 - The [tweet](https://twitter.com/fossilosophy/status/966408174470299648) from [tweet.png](https://github.com/ropensci/drake/blob/master/docs/images/tweet.png) is by [Brianna McHorse](https://github.com/bmchorse).
 - The [diagram of the typical Tidyverse workflow](https://github.com/ropensci/drake/blob/master/images/tidydag.png) is from [Jenny Bryan](https://github.com/jennybc)'s [December 2017 presentation on workflow maintenance](https://speakerdeck.com/jennybc/zen-and-the-art-of-workflow-maintenance?slide=55).
 - The videos embedded in the [parallel computing vignette](https://ropensci.github.io/drake/articles/parallelism.html) were created using [PowToon](https://www.powtoon.com) and are used only as explicitly permitted in the [Terms and Conditions of Use](https://www.powtoon.com/terms-and-conditions/). The maintainers of and contributors to `drake` make no copyright claim on any of the constituent graphics.
