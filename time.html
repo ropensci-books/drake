@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>The drake R Package User Manual</title>
   <meta name="description" content="The drake R Package User Manual">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -352,109 +352,135 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="time" class="section level1">
 <h1><span class="header-section-number">Chapter 12</span> Time: logging, prediction, and strategy</h1>
 <p>Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a>, <code>drake</code> records how long it takes to build each target. For large projects that take hours or days to run, this feature becomes important for planning and execution.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
-<span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span>
-<span class="kw">make</span>(my_plan, <span class="dt">jobs =</span> <span class="dv">2</span>)
-
-<span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span>
-## # A tibble: 29 x 5
-##    item                   type   elapsed        user           system     
-##  * &lt;chr&gt;                  &lt;chr&gt;  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Durat&gt;
-##  1 &quot;\&quot;report.md\&quot;&quot;        target 0.083s         0.08s          0.004s     
-##  2 &quot;\&quot;report.Rmd\&quot;&quot;       import 0.004s         0.004s         0s         
-##  3 coef_regression1_large target 0.01s          0.012s         0s         
-##  4 coef_regression1_small target 0.01s          0.008s         0s         
-##  5 coef_regression2_large target 0.027s         0.008s         0s         
-##  6 coef_regression2_small target 0.009s         0s             0.008s     
-##  7 data.frame             import 0.05s          0.044s         0.008s     
-##  8 knit                   import 0.05s          0.024s         0.028s     
-##  9 large                  target 0.01s          0.008s         0s         
-## 10 lm                     import 0.042s         0.012s         0.012s     
-## # ... with 19 more rows
-
-## `dplyr`-style `tidyselect` commands
-<span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)
-## # A tibble: 4 x 5
-##   item                   type   elapsed        user           system      
-## * &lt;chr&gt;                  &lt;chr&gt;  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Durati&gt;
-## 1 coef_regression1_large target 0.01s          0.012s         0s          
-## 2 coef_regression1_small target 0.01s          0.008s         0s          
-## 3 coef_regression2_large target 0.027s         0.008s         0s          
-## 4 coef_regression2_small target 0.009s         0s             0.008s
-
-<span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)
-## # A tibble: 16 x 5
-##    item                   type   elapsed        user           system     
-##  * &lt;chr&gt;                  &lt;chr&gt;  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Durat&gt;
-##  1 &quot;\&quot;report.md\&quot;&quot;        target 0.083s         0.08s          0.004s     
-##  2 coef_regression1_large target 0.01s          0.012s         0s         
-##  3 coef_regression1_small target 0.01s          0.008s         0s         
-##  4 coef_regression2_large target 0.027s         0.008s         0s         
-##  5 coef_regression2_small target 0.009s         0s             0.008s     
-##  6 large                  target 0.01s          0.008s         0s         
-##  7 regression1_large      target 0.013s         0.008s         0s         
-##  8 regression1_small      target 0.083s         0.008s         0s         
-##  9 regression2_large      target 0.018s         0.004s         0.008s     
-## 10 regression2_small      target 0.012s         0s             0.008s     
-## 11 report                 target 0.089s         0.084s         0.004s     
-## 12 small                  target 0.015s         0.004s         0.012s     
-## 13 summ_regression1_large target 0.01s          0.008s         0s         
-## 14 summ_regression1_small target 0.008s         0.012s         0s         
-## 15 summ_regression2_large target 0.027s         0.008s         0s         
-## 16 summ_regression2_small target 0.009s         0.012s         0s</code></pre>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb224-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb224-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span></a>
+<a class="sourceLine" id="cb224-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">jobs =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb224-4" data-line-number="4">## Error: package txtq not installed. Please install it with install.packages(&quot;txtq&quot;).</a>
+<a class="sourceLine" id="cb224-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb224-6" data-line-number="6"><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span></a>
+<a class="sourceLine" id="cb224-7" data-line-number="7">## # A tibble: 0 x 5</a>
+<a class="sourceLine" id="cb224-8" data-line-number="8">## # ... with 5 variables: item &lt;chr&gt;, type &lt;chr&gt;, elapsed &lt;S4: Duration&gt;,</a>
+<a class="sourceLine" id="cb224-9" data-line-number="9">## #   user &lt;S4: Duration&gt;, system &lt;S4: Duration&gt;</a>
+<a class="sourceLine" id="cb224-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb224-11" data-line-number="11">## `dplyr`-style `tidyselect` commands</a>
+<a class="sourceLine" id="cb224-12" data-line-number="12"><span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb224-13" data-line-number="13">## # A tibble: 0 x 5</a>
+<a class="sourceLine" id="cb224-14" data-line-number="14">## # ... with 5 variables: item &lt;chr&gt;, type &lt;chr&gt;, elapsed &lt;S4: Duration&gt;,</a>
+<a class="sourceLine" id="cb224-15" data-line-number="15">## #   user &lt;S4: Duration&gt;, system &lt;S4: Duration&gt;</a>
+<a class="sourceLine" id="cb224-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb224-17" data-line-number="17"><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb224-18" data-line-number="18">## # A tibble: 0 x 5</a>
+<a class="sourceLine" id="cb224-19" data-line-number="19">## # ... with 5 variables: item &lt;chr&gt;, type &lt;chr&gt;, elapsed &lt;S4: Duration&gt;,</a>
+<a class="sourceLine" id="cb224-20" data-line-number="20">## #   user &lt;S4: Duration&gt;, system &lt;S4: Duration&gt;</a></code></pre></div>
 <p>For <code>drake</code> version 4.1.0 and earlier, <code>build_times()</code> just measures the elapsed runtime of each command in <code>my_plan$command</code>. For later versions, the build times also account for all the internal operations in <code>drake:::build()</code>, such as <a href="store.html#store">storage and hashing</a>.</p>
 <div id="predict-total-runtime" class="section level2">
 <h2><span class="header-section-number">12.1</span> Predict total runtime</h2>
 <p>Drake uses these times to predict the runtime of the next <code>make()</code>. At this moment, everything is up to date in the current example, so the next <code>make()</code> should be fast. Here, we only factor in the times of the formal targets in the workflow plan, excluding any imports.</p>
-<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
-<span class="kw">predict_runtime</span>(config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)
-## [1] &quot;0s&quot;</code></pre>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb225-2" data-line-number="2"><span class="kw">predict_runtime</span>(config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb225-3" data-line-number="3">## Warning: Some targets were never actually timed, And no hypothetical time was specified in `known_times`. Assuming a runtime of 0 for these targets:</a>
+<a class="sourceLine" id="cb225-4" data-line-number="4">##   coef_regression2_small</a>
+<a class="sourceLine" id="cb225-5" data-line-number="5">##   large</a>
+<a class="sourceLine" id="cb225-6" data-line-number="6">##   small</a>
+<a class="sourceLine" id="cb225-7" data-line-number="7">##   regression1_small</a>
+<a class="sourceLine" id="cb225-8" data-line-number="8">##   regression1_large</a>
+<a class="sourceLine" id="cb225-9" data-line-number="9">##   regression2_small</a>
+<a class="sourceLine" id="cb225-10" data-line-number="10">##   regression2_large</a>
+<a class="sourceLine" id="cb225-11" data-line-number="11">##   report</a>
+<a class="sourceLine" id="cb225-12" data-line-number="12">##   summ_regression1_small</a>
+<a class="sourceLine" id="cb225-13" data-line-number="13">##   summ_regression1_large</a>
+<a class="sourceLine" id="cb225-14" data-line-number="14">##   summ_regression2_small</a>
+<a class="sourceLine" id="cb225-15" data-line-number="15">##   summ_regression2_large</a>
+<a class="sourceLine" id="cb225-16" data-line-number="16">##   coef_regression1_small</a>
+<a class="sourceLine" id="cb225-17" data-line-number="17">##   coef_regression1_large</a>
+<a class="sourceLine" id="cb225-18" data-line-number="18">##   coef_regression2_large</a>
+<a class="sourceLine" id="cb225-19" data-line-number="19">## Error in loadNamespace(name): there is no package called &#39;txtq&#39;</a></code></pre></div>
 <p>Suppose we change a dependency to make some targets out of date. Now, even though, the next <code>make()</code> should take a little longer.</p>
-<pre class="sourceCode r"><code class="sourceCode r">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){
-  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span>
-  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)
-}
-
-<span class="kw">predict_runtime</span>(config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)
-## [1] &quot;0s&quot;</code></pre>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){</a>
+<a class="sourceLine" id="cb226-2" data-line-number="2">  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb226-3" data-line-number="3">  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb226-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb226-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb226-6" data-line-number="6"><span class="kw">predict_runtime</span>(config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb226-7" data-line-number="7">## Warning: Some targets were never actually timed, And no hypothetical time was specified in `known_times`. Assuming a runtime of 0 for these targets:</a>
+<a class="sourceLine" id="cb226-8" data-line-number="8">##   coef_regression2_small</a>
+<a class="sourceLine" id="cb226-9" data-line-number="9">##   large</a>
+<a class="sourceLine" id="cb226-10" data-line-number="10">##   small</a>
+<a class="sourceLine" id="cb226-11" data-line-number="11">##   regression1_small</a>
+<a class="sourceLine" id="cb226-12" data-line-number="12">##   regression1_large</a>
+<a class="sourceLine" id="cb226-13" data-line-number="13">##   regression2_small</a>
+<a class="sourceLine" id="cb226-14" data-line-number="14">##   regression2_large</a>
+<a class="sourceLine" id="cb226-15" data-line-number="15">##   report</a>
+<a class="sourceLine" id="cb226-16" data-line-number="16">##   summ_regression1_small</a>
+<a class="sourceLine" id="cb226-17" data-line-number="17">##   summ_regression1_large</a>
+<a class="sourceLine" id="cb226-18" data-line-number="18">##   summ_regression2_small</a>
+<a class="sourceLine" id="cb226-19" data-line-number="19">##   summ_regression2_large</a>
+<a class="sourceLine" id="cb226-20" data-line-number="20">##   coef_regression1_small</a>
+<a class="sourceLine" id="cb226-21" data-line-number="21">##   coef_regression1_large</a>
+<a class="sourceLine" id="cb226-22" data-line-number="22">##   coef_regression2_large</a>
+<a class="sourceLine" id="cb226-23" data-line-number="23">## Error in loadNamespace(name): there is no package called &#39;txtq&#39;</a></code></pre></div>
 <p>But what if you plan on starting from scratch next time, either after <code>clean()</code> or with <code>make(trigger = trigger(condition = TRUE))</code>?</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict_runtime</span>(config, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)
-## [1] &quot;0.35s&quot;</code></pre>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb227-1" data-line-number="1"><span class="kw">predict_runtime</span>(config, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb227-2" data-line-number="2">## Warning: Some targets were never actually timed, And no hypothetical time was specified in `known_times`. Assuming a runtime of 0 for these targets:</a>
+<a class="sourceLine" id="cb227-3" data-line-number="3">##   coef_regression2_small</a>
+<a class="sourceLine" id="cb227-4" data-line-number="4">##   large</a>
+<a class="sourceLine" id="cb227-5" data-line-number="5">##   small</a>
+<a class="sourceLine" id="cb227-6" data-line-number="6">##   regression1_small</a>
+<a class="sourceLine" id="cb227-7" data-line-number="7">##   regression1_large</a>
+<a class="sourceLine" id="cb227-8" data-line-number="8">##   regression2_small</a>
+<a class="sourceLine" id="cb227-9" data-line-number="9">##   regression2_large</a>
+<a class="sourceLine" id="cb227-10" data-line-number="10">##   report</a>
+<a class="sourceLine" id="cb227-11" data-line-number="11">##   summ_regression1_small</a>
+<a class="sourceLine" id="cb227-12" data-line-number="12">##   summ_regression1_large</a>
+<a class="sourceLine" id="cb227-13" data-line-number="13">##   summ_regression2_small</a>
+<a class="sourceLine" id="cb227-14" data-line-number="14">##   summ_regression2_large</a>
+<a class="sourceLine" id="cb227-15" data-line-number="15">##   coef_regression1_small</a>
+<a class="sourceLine" id="cb227-16" data-line-number="16">##   coef_regression1_large</a>
+<a class="sourceLine" id="cb227-17" data-line-number="17">##   coef_regression2_large</a>
+<a class="sourceLine" id="cb227-18" data-line-number="18">## Error in loadNamespace(name): there is no package called &#39;txtq&#39;</a></code></pre></div>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2">
 <h2><span class="header-section-number">12.2</span> Strategize your high-performance computing</h2>
 <p>Let’s say you are scaling up your workflow. You just put bigger data and heavier computation in your custom code, and the next time you run <code>make()</code>, your targets will take much longer to build. In fact, you estimate that every target except for your R Markdown report will take two hours to complete. Let’s write down these known times in seconds.</p>
-<pre class="sourceCode r"><code class="sourceCode r">known_times &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))
-<span class="kw">names</span>(known_times) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">file_store</span>(<span class="st">&quot;report.md&quot;</span>), my_plan<span class="op">$</span>target[<span class="op">-</span><span class="dv">1</span>])
-known_times
-##            &quot;report.md&quot;                  small                  large 
-##                      5                   7200                   7200 
-##      regression1_small      regression1_large      regression2_small 
-##                   7200                   7200                   7200 
-##      regression2_large summ_regression1_small summ_regression1_large 
-##                   7200                   7200                   7200 
-## summ_regression2_small summ_regression2_large coef_regression1_small 
-##                   7200                   7200                   7200 
-## coef_regression1_large coef_regression2_small coef_regression2_large 
-##                   7200                   7200                   7200</code></pre>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1">known_times &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb228-2" data-line-number="2"><span class="kw">names</span>(known_times) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">file_store</span>(<span class="st">&quot;report.md&quot;</span>), my_plan<span class="op">$</span>target[<span class="op">-</span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb228-3" data-line-number="3">known_times</a>
+<a class="sourceLine" id="cb228-4" data-line-number="4">##            &quot;report.md&quot;                  small                  large </a>
+<a class="sourceLine" id="cb228-5" data-line-number="5">##                      5                   7200                   7200 </a>
+<a class="sourceLine" id="cb228-6" data-line-number="6">##      regression1_small      regression1_large      regression2_small </a>
+<a class="sourceLine" id="cb228-7" data-line-number="7">##                   7200                   7200                   7200 </a>
+<a class="sourceLine" id="cb228-8" data-line-number="8">##      regression2_large summ_regression1_small summ_regression1_large </a>
+<a class="sourceLine" id="cb228-9" data-line-number="9">##                   7200                   7200                   7200 </a>
+<a class="sourceLine" id="cb228-10" data-line-number="10">## summ_regression2_small summ_regression2_large coef_regression1_small </a>
+<a class="sourceLine" id="cb228-11" data-line-number="11">##                   7200                   7200                   7200 </a>
+<a class="sourceLine" id="cb228-12" data-line-number="12">## coef_regression1_large coef_regression2_small coef_regression2_large </a>
+<a class="sourceLine" id="cb228-13" data-line-number="13">##                   7200                   7200                   7200</a></code></pre></div>
 <p>How many parallel jobs should you use in the next <code>make()</code>? The <code>predict_runtime()</code> function can help you decide. <code>predict_runtime(jobs = n)</code> simulates persistent parallel workers and reports the estimated total runtime of <code>make(jobs = n)</code>. (See also <code>predict_load_balancing()</code>.)</p>
-<pre class="sourceCode r"><code class="sourceCode r">time &lt;-<span class="st"> </span><span class="kw">c</span>()
-<span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){
-  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(
-    config,
-    <span class="dt">jobs =</span> jobs,
-    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,
-    <span class="dt">known_times =</span> known_times
-  )
-}
-<span class="kw">library</span>(ggplot2)
-<span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</code></pre>
-<p><img src="drake-manual_files/figure-html/predictjobs-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1">time &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb229-2" data-line-number="2"><span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){</a>
+<a class="sourceLine" id="cb229-3" data-line-number="3">  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(</a>
+<a class="sourceLine" id="cb229-4" data-line-number="4">    config,</a>
+<a class="sourceLine" id="cb229-5" data-line-number="5">    <span class="dt">jobs =</span> jobs,</a>
+<a class="sourceLine" id="cb229-6" data-line-number="6">    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb229-7" data-line-number="7">    <span class="dt">known_times =</span> known_times</a>
+<a class="sourceLine" id="cb229-8" data-line-number="8">  )</a>
+<a class="sourceLine" id="cb229-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb229-10" data-line-number="10">## Warning: Some targets were never actually timed, And no hypothetical time was specified in `known_times`. Assuming a runtime of 0 for these targets:</a>
+<a class="sourceLine" id="cb229-11" data-line-number="11">##   random_rows</a>
+<a class="sourceLine" id="cb229-12" data-line-number="12">##   reg1</a>
+<a class="sourceLine" id="cb229-13" data-line-number="13">##   reg2</a>
+<a class="sourceLine" id="cb229-14" data-line-number="14">##   &quot;report.Rmd&quot;</a>
+<a class="sourceLine" id="cb229-15" data-line-number="15">##   simulate</a>
+<a class="sourceLine" id="cb229-16" data-line-number="16">##   report</a>
+<a class="sourceLine" id="cb229-17" data-line-number="17">## Error in loadNamespace(name): there is no package called &#39;txtq&#39;</a>
+<a class="sourceLine" id="cb229-18" data-line-number="18"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb229-19" data-line-number="19"><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb229-20" data-line-number="20"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb229-21" data-line-number="21"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb229-22" data-line-number="22"><span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb229-23" data-line-number="23"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb229-24" data-line-number="24"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</a>
+<a class="sourceLine" id="cb229-25" data-line-number="25">## Error in data.frame(time = time/3600, jobs = ordered(1:12), group = 1): arguments imply differing number of rows: 0, 12, 1</a></code></pre></div>
 <p>We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of <code>jobs</code> for <code>make()</code> ultimately depends on the runtime you can tolerate and the computing resources at your disposal.</p>
 <p>A final note on predicting runtime: the output of <code>predict_runtime()</code> and <code>predict_load_balancing()</code> also depends the optional <code>workers</code> column of your <code>drake_plan()</code>. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the <a href="hpc.html#hpc">high-performance computing guide</a> for more.</p>
 
