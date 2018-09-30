@@ -551,10 +551,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb253-13" data-line-number="13">  )</a>
 <a class="sourceLine" id="cb253-14" data-line-number="14">)</a>
 <a class="sourceLine" id="cb253-15" data-line-number="15"><span class="kw">digest</span>(circle_class)</a>
-<a class="sourceLine" id="cb253-16" data-line-number="16">## [1] &quot;8736b4c6c152f0cb5faad87537986b90&quot;</a>
+<a class="sourceLine" id="cb253-16" data-line-number="16">## [1] &quot;dfaebb3c19599e2a2c5f1aeeefc249e0&quot;</a>
 <a class="sourceLine" id="cb253-17" data-line-number="17">circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb253-18" data-line-number="18"><span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span></a>
-<a class="sourceLine" id="cb253-19" data-line-number="19">## [1] &quot;8736b4c6c152f0cb5faad87537986b90&quot;</a>
+<a class="sourceLine" id="cb253-19" data-line-number="19">## [1] &quot;d1b5e0959707fea1c0a8b7952eadff36&quot;</a>
 <a class="sourceLine" id="cb253-20" data-line-number="20"><span class="kw">rm</span>(circle)</a></code></pre></div>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1"><span class="kw">clean</span>()</a>
@@ -566,7 +566,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb254-7" data-line-number="7">## target circle</a>
 <a class="sourceLine" id="cb254-8" data-line-number="8">## target area</a>
 <a class="sourceLine" id="cb254-9" data-line-number="9"><span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span></a>
-<a class="sourceLine" id="cb254-10" data-line-number="10">## All targets are already up to date.</a></code></pre></div>
+<a class="sourceLine" id="cb254-10" data-line-number="10">## target circle</a></code></pre></div>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
 <div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1"><span class="kw">clean</span>()</a>
 <a class="sourceLine" id="cb255-2" data-line-number="2">new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){</a>
