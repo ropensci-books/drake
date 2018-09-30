@@ -143,6 +143,8 @@ And remember, `drake` also takes into account imported functions and imported fi
 - `plan_analyses()`
 - `plan_summaries()`
 - `expand_plan()`
+- `gather_by()`
+- `reduce_by()`
 - `gather_plan()`
 - `reduce_plan()`
 
@@ -364,7 +366,7 @@ expand_plan(plan, values = 1:3)
 ```
 
 
-#### `gather_plan()`
+#### `gather_plan()` and `gather_by()`
 
 Other times, you want to combine multiple targets into one. 
 
@@ -382,7 +384,9 @@ In this case, `small` and `large` are data frames, so it may be more convenient 
 gather_plan(plan, target = "combined", gather = "rbind")
 ```
 
-#### `reduce_plan()`
+See also `gather_by()` to gather multiple groups of targets based on other columns in the plan (e.g. from `evaluate_plan(trace = TRUE)`).
+
+#### `reduce_plan()` and `reduce_by()`
 
 `reduce_plan()` is similar to `gather_plan()`, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.
 
@@ -401,6 +405,8 @@ You can control how each pair of targets gets combined.
 ```{r reduceplan2}
 reduce_plan(plan, begin = "c(", op = ", ", end = ")")
 ```
+
+See also `reduce_by()` to do reductions on multiple groups of targets based on other columns in the plan (e.g. from `evaluate_plan(trace = TRUE)`).
 
 ### Custom metaprogramming
 
