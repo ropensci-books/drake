@@ -104,9 +104,16 @@ deps_code(
 file.exists("report.html")
 ```
 
-R objects and functions are detected implicitly, and you can specify multiple file inputs and outputs per command with the `file_in()`, `knitr_in()`, and `file_out()` functions. With `knitr_in()` R Markdown reports like `report.Rmd` ([online here](https://github.com/wlandau/drake-examples/blob/master/main/report.Rmd)), `drake` scans active code chunks for objects mentioned with `loadd()` and `readd()`. So when `fit` or `hist` change, `drake` rebuilds the `report` target to produce the file `report.html`.
+Automatically detected dependencies include:
 
-Output files declared with `file_out()` do not appear in `vis_drake_graph()`, but targets can depend on one another through `file_in()`/`file_out()` connections.
+1. Other targets in the plan.
+2. Objects and functions in your environment.
+3. Objects and functions from packages that you reference with `::` or `:::` (namespaced objects).
+4. Input and output files declared in your commands with `file_in()`, `knitr_in()`, or `file_out()`.
+5. Input files declared in imported functions ((2) or (3)) with `file_in()` or `knitr_in()`.
+6. For `knitr` or R Markdown reports declared with `knitr_in()` ([example here](https://github.com/wlandau/drake-examples/blob/master/main/report.Rmd)), `drake` scans active code chunks for objects mentioned with `loadd()` and `readd()`. So when `fit` or `hist` change, `drake` rebuilds the `report` target to produce the file `report.html`.
+
+Targets can depend on one another through `file_in()`/`file_out()` connections.
 
 ```{r fileinfileout_plans}
 saveRDS(1, "start.rds")
@@ -130,9 +137,7 @@ config <- drake_config(small_plan)
 vis_drake_graph(config)
 ```
 
-So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` knows to rebuild target `y`.
-
-And remember, `drake` also takes into account imported functions and imported files. If there are nontrivial changes to `start.rds`, `letters`, `readRDS()`, or `saveRDS()`, `drake` will rebuild targets `x` and/or `y` as appropriate.
+So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` knows to rebuild target `y`. In addition, if you accidentally modify any of these output files by hand, `drake` will run the command of `x` to restore the files to a reproducible state.
 
 ## Automatically generating workflow plans
 
