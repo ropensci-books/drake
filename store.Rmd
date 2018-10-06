@@ -230,11 +230,7 @@ readd(result, cache = memory_cache)
 In theory, it should be possible to leverage serious databases using `storr_dbi()`. However, if you use such caches, please heed the following.
 
 1. Be sure you have [storr](https://github.com/richfitz/storr) version 1.1.3 or greater installed.
-1. Be careful about parallel computing. For example the `storr::storr_dbi()` cache is not thread-safe. Either
-
-1. Set `parallelism = "clustermq_staged"` in `make()`, or
-2. Set `parallelism = "future"` with `caching = "master"` in `make()`, or
-3. Use no parallel computing at all.
+1. Be careful about parallel computing. For example the `storr::storr_dbi()` cache is not thread-safe. To use these exotic cache types in parallelized `make()`s, select `caching = "master"` and set `parallelism` equal to `"clustermq"`, `"clustermq_staged"`, or `"future"`. In addition, make sure imports are not parallelized (i.e. use something like `make(jobs = c(imports = 1, targets = 4))`.
 
 The following example demonstrates the use of the DBI cahce, and it requires the `DBI` and `RSQLite` packages.
 
@@ -248,6 +244,14 @@ cache <- storr::storr_dbi(
 load_mtcars_example() # Get the code with drake_example("mtcars").
 unlink(".drake", recursive = TRUE)
 make(my_plan, cache = cache)
+# Parallelized alternative:
+options(clustermq.scheduler = "multicore")
+make(
+  my_plan,
+  parallelism = "clustermq",
+  jobs = c(imports = 1, targets = 4),
+  cache = cache
+)
 ```
 
 ## Cleaning up

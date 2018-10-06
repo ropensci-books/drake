@@ -171,6 +171,7 @@ make(my_plan, parallelism = "clustermq", jobs = 4)
 make(my_plan, parallelism = "clustermq_staged", jobs = 4) # Different job scheduling algorithm.
 ```
 
+With the `caching` argument to `make()`, you have the option to either let the workers cache the targets. You can choose either `caching = "worker"` or `caching = "master"`. In the former case, the workers cache the targets directly to the file system in parallel. Target return values are transferred to the central cache over a network file system, not ZeroMQ sockets. In the latter case, target values are sent to the master process via fast ZeroMQ sockets, but then the master has to cache all the data by itself, which could create a bottleneck. `caching = "master"` also allows for alternative cache types such as `storr::storr_environment()` and `storr::storr_dbi()` caches. See the [`storr` package](https://github.com/richfitz/storr) documentation for details.
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
@@ -183,6 +184,8 @@ make(my_plan, parallelism = "future", jobs = 2)
 # Same technology, different scheduling:
 make(my_plan, parallelism = "future_lapply", jobs = 2)
 ```
+
+In the case of `parallelism = "future"`, the `caching` argument can be either `"worker"` or `"master"`, and it works the same as for `"clustermq"` parallelism. 
 
 For `"future_lapply_staged"` parallelism, the `jobs` argument is ignored, and you must instead specify the number of workers in `future::plan()`.
 
