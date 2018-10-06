@@ -178,7 +178,7 @@ error$call
 str(error$calls) # View the traceback.
 ```
 
-To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call `drake_build()`. This function first calls `loadd(deps = TRUE)` to load any missing dependencies (see the `replace` argument here) and then builds your target.
+To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call `drake_build()` or `drake_debug()`. These functions first call `loadd(deps = TRUE)` to load any missing dependencies (see the `replace` argument here) and then build your target. `drake_build()` simply runs the command, and `drake_debug()` runs the command in debug mode using `debugonce()`.
 
 ```{r loaddeps}
 # Pretend we just opened a new R session.
@@ -192,7 +192,7 @@ config <- drake_config(plan = bad_plan)
 
 # Try to build my_target until the error is fixed.
 # Skip all that pesky work checking dependencies.
-drake_build(my_target, config = config)
+drake_build(my_target, config = config) # See also drake_debug().
 
 # The target failed, but the dependency was loaded.
 "b" %in% ls()
@@ -219,7 +219,7 @@ f <- function(x){
 # Now it works!
 # Since you called make() previously, `config` is read from the cache
 # if you do not supply it.
-drake_build(my_target)
+drake_build(my_target) # See also drake_debug().
 
 readd(my_target)
 ```
