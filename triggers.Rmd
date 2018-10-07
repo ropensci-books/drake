@@ -157,6 +157,14 @@ drake_plan(
 )
 ```
 
+## Alternative trigger modes
+
+Sometimes, you may want to suppress a target without having to worry about turning off every single trigger. That is why the `trigger()` function has a `mode` argument, which controls the role of the **condition** trigger in the decision to build or skip a target. The available trigger modes are `"whitelist"` (default), `"blacklist"`, and `"condition"`.
+
+- `trigger(mode = "whitelist")`: we *rebuild* the target whenever `condition` evaluates to `TRUE`. Otherwise, we defer to the other triggers. This is the default behaviro described above in this chapter.
+- `trigger(mode = "blacklist")`: we *skip* the target whenever `condition` evaluates to `FALSE`. Otherwise, we defer to the other triggers.
+- `trigger(mode = "condition")`: here, the `condition` trigger is the only decider, and we ignore all the other triggers. We *rebuild* target whenever `condition` evaluates to `TRUE` and *skip* it whenever `condition` evaluates to `FALSE`.
+
 ## A more practical example
 
 See the ["packages" example](#packages) for a more practical demonstration of triggers and their usefulness.
