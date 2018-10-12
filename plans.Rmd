@@ -144,6 +144,7 @@ So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` 
 `drake` provides many more utilites that increase the flexibility of workflow plan generation beyond `expand.grid()`.
 
 - `drake_plan()`
+- `map_plan()`
 - `evaluate_plan()`
 - `plan_analyses()`
 - `plan_summaries()`
@@ -152,6 +153,66 @@ So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` 
 - `reduce_by()`
 - `gather_plan()`
 - `reduce_plan()`
+
+### `map_plan()`
+
+Similar to the `map()` and `pmap()` family in the [`purrr`](https://github.com/tidyverse/purrr) package, `map_plan()` generates a plan by mapping a function to a grid of arguments. For a practical example, see the [gross state product example in this manual](#gsp). But for now, let's stick to something simple.
+
+Let's say we want find out which variables best explain fuel efficiency (in miles per gallon) in the `mtcars` dataset. We write a function that takes the names of two covariates and fits them to the response variable (`mpg`).
+
+```{r map_plan_fn}
+my_model_fit <- function(x1, x2, data){
+  lm(as.formula(paste("mpg ~", x1, "+", x2)), data = data)
+}
+```
+
+For our covariates, we consider all the variables in `mtcars` except `mpg`.
+
+```{r map_plan_covariates}
+covariates <- setdiff(colnames(mtcars), "mpg")
+```
+
+And we consider all possible pairs.
+
+```{r map_plan_pairs}
+args <- tibble::as_tibble(t(combn(covariates, 2)))
+colnames(args) <- c("x1", "x2")
+head(args)
+```
+
+Each row of `args` represents a function call to `my_model_fit()` using the values in the row. `my_model_fit()` expects`x1` and `x2` to be character strings, so that is how we set them in `args`. But what about the `data` argument? In general, `data` could be the `mtcars` dataset or an unknown upstream target. For the "data" column, we need a list of symbols. The [`syms()`](https://rdrr.io/cran/rlang/man/sym.html) function from the [`rlang`](https://github.com/r-lib/rlang) package can help us.
+
+```{r mtcarssimsplan}
+args$data <- rlang::syms(rep("mtcars", nrow(args)))
+args
+```
+
+For each row of `args`, we want to fit a model using the covariates in the row. Let's make a `drake` plan to do that.
+
+```{r map_plan_1}
+plan <- map_plan(args, "my_model_fit")
+plan
+```
+
+The default target names are ugly, so we can supply our own names. You can either set an "id" column in `args` or set the `id` argument of `map_plan()`.
+
+```{r map_plan_2}
+args$id <- paste0("fit_", args$x1, "_", args$x2)
+plan <- map_plan(args, "my_model_fit")
+plan
+```
+
+Let's actually fit our models...
+
+```{r map_plan_make}
+make(plan, verbose = FALSE)
+```
+
+and inspect our output.
+
+```{r map_plan_readd}
+readd(fit_cyl_disp)
+```
 
 ### Wildcard templating
 
@@ -417,7 +478,7 @@ See also `reduce_by()` to do reductions on multiple groups of targets based on o
 
 The workflow plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don't even need the `drake_plan()` function.
 
-Let's consider a file-based example workflow. Here, our targets execute Linux commands to process input files and create output files.
+The following example could more easily be implemented with `map_plan()`, but we use other techniques to demonstrate the versatility of custom metaprogramming. Let's consider a file-based example workflow. Here, our targets execute Linux commands to process input files and create output files.
 
 <pre><code>cat in1.txt > out1.txt
 cat in2.txt > out2.txt
