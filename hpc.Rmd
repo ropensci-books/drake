@@ -171,7 +171,44 @@ make(my_plan, parallelism = "clustermq", jobs = 4)
 make(my_plan, parallelism = "clustermq_staged", jobs = 4) # Different job scheduling algorithm.
 ```
 
+#### Control how I/O is scheduled
+
 With the `caching` argument to `make()`, you have the option to either let the workers cache the targets. You can choose either `caching = "worker"` or `caching = "master"`. In the former case, the workers cache the targets directly to the file system in parallel. Target return values are transferred to the central cache over a network file system, not ZeroMQ sockets. In the latter case, target values are sent to the master process via fast ZeroMQ sockets, but then the master has to cache all the data by itself, which could create a bottleneck. `caching = "master"` also allows for alternative cache types such as `storr::storr_environment()` and `storr::storr_dbi()` caches. See the [`storr` package](https://github.com/richfitz/storr) documentation for details.
+
+#### The `template()` argument of `make()`
+
+For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq)-based backends, you can parameterize your template file and use the `template` argument of `make()` configure resource requirements. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). We begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
+
+```
+# File: sge_clustermq.tmpl
+# Modified from https://github.com/mschubert/clustermq/wiki/SGE
+#$ -N {{ job_name }}               # job name
+#$ -t 1-{{ n_jobs }}               # submit jobs as array
+#$ -j y                            # combine stdout/error in one file
+#$ -o {{ log_file | /dev/null }}   # output file
+#$ -cwd                            # use pwd as work dir
+#$ -V                              # use environment variable
+#$ -pe smp {{ n_slots | 1 }}       # request n_slots cores per job
+module load R
+ulimit -v $(( 1024 * {{ memory | 4096 }} ))
+R --no-save --no-restore -e 'clustermq:::worker("{{ master }}")'
+```
+
+Then when you run `make()`, use the `template` argument to set `n_slots`.
+
+```{r templateslots, eval = FALSE}
+options(clustermq.scheduler = "sge", clustermq.template = "sge_clustermq.tmpl")
+library(drake)
+load_mtcars_example() # Or set up your own workflow.
+make(
+  my_plan,
+  parallelism = "clustermq",
+  jobs = 16 # Number of jobs / nodes.
+  template = list(n_slots = 4) # Request 4 cores per job.
+)
+```
+
+Custom placeholders like `n_slots` are processed with the [`infuser`](https://github.com/Bart6114/infuser) package.
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
