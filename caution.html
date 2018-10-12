@@ -366,15 +366,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="commands-are-not-perfectly-flexible." class="section level3">
 <h3><span class="header-section-number">B.2.2</span> Commands are NOT perfectly flexible.</h3>
 <p>In your workflow plan data frame (produced by <code>drake_plan()</code> and accepted by <code>make()</code>), your commands can usually be flexible R expressions.</p>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb248-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb248-2" data-line-number="2">  <span class="dt">target1 =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sqrt</span>(<span class="dv">3</span>)),</a>
-<a class="sourceLine" id="cb248-3" data-line-number="3">  <span class="dt">target2 =</span> <span class="kw">my_function</span>(web_scraped_data) <span class="op">%&gt;%</span><span class="st"> </span>my_tidy</a>
-<a class="sourceLine" id="cb248-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb248-5" data-line-number="5">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb248-6" data-line-number="6">##   target  command                                  </a>
-<a class="sourceLine" id="cb248-7" data-line-number="7">## * &lt;chr&gt;   &lt;chr&gt;                                    </a>
-<a class="sourceLine" id="cb248-8" data-line-number="8">## 1 target1 1 + 1 - sqrt(sqrt(3))                    </a>
-<a class="sourceLine" id="cb248-9" data-line-number="9">## 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</a></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb250-2" data-line-number="2">  <span class="dt">target1 =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sqrt</span>(<span class="dv">3</span>)),</a>
+<a class="sourceLine" id="cb250-3" data-line-number="3">  <span class="dt">target2 =</span> <span class="kw">my_function</span>(web_scraped_data) <span class="op">%&gt;%</span><span class="st"> </span>my_tidy</a>
+<a class="sourceLine" id="cb250-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb250-5" data-line-number="5">## # A tibble: 2 x 2</a>
+<a class="sourceLine" id="cb250-6" data-line-number="6">##   target  command                                  </a>
+<a class="sourceLine" id="cb250-7" data-line-number="7">##   &lt;chr&gt;   &lt;chr&gt;                                    </a>
+<a class="sourceLine" id="cb250-8" data-line-number="8">## 1 target1 1 + 1 - sqrt(sqrt(3))                    </a>
+<a class="sourceLine" id="cb250-9" data-line-number="9">## 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</a></code></pre></div>
 <p>However, please try to avoid formulas and function definitions in your commands. You may be able to get away with <code>drake_plan(f = function(x){x + 1})</code> or <code>drake_plan(f = y ~ x)</code> in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let <code>make()</code> import them. (Alternatively, use the <code>envir</code> argument to <code>make()</code> to tightly control which imported functions are available.) Use the <code>check_plan()</code> function to help screen and quality-control your workflow plan data frame, use <code>tracked()</code> to see the items that are reproducibly tracked, and use <code>vis_drake_graph()</code> and <code>build_drake_graph()</code> to see the dependency structure of your project.</p>
 </div>
 </div>
@@ -392,115 +392,115 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="a-note-on-tidy-evaluation-1" class="section level3">
 <h3><span class="header-section-number">B.3.3</span> A note on tidy evaluation</h3>
 <p>Running commands in your R console is not always exactly like running them with <code>make()</code>. That’s because <code>make()</code> uses tidy evaluation as implemented in the <a href="https://github.com/tidyverse/rlang"><code>rlang</code> package</a>.</p>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb249-1" data-line-number="1">## This workflow plan uses rlang&#39;s quasiquotation operator `!!`.</a>
-<a class="sourceLine" id="cb249-2" data-line-number="2">my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">list =</span> <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb249-3" data-line-number="3">  <span class="dt">little_b =</span> <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">b</span><span class="ch">\&quot;</span><span class="st">&quot;</span>,</a>
-<a class="sourceLine" id="cb249-4" data-line-number="4">  <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span></a>
-<a class="sourceLine" id="cb249-5" data-line-number="5">))</a>
-<a class="sourceLine" id="cb249-6" data-line-number="6">my_plan</a>
-<a class="sourceLine" id="cb249-7" data-line-number="7">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb249-8" data-line-number="8">##   target   command   </a>
-<a class="sourceLine" id="cb249-9" data-line-number="9">## * &lt;chr&gt;    &lt;chr&gt;     </a>
-<a class="sourceLine" id="cb249-10" data-line-number="10">## 1 little_b &quot;\&quot;b\&quot;&quot;   </a>
-<a class="sourceLine" id="cb249-11" data-line-number="11">## 2 letter   !!little_b</a>
-<a class="sourceLine" id="cb249-12" data-line-number="12"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb249-13" data-line-number="13">## target little_b</a>
-<a class="sourceLine" id="cb249-14" data-line-number="14">## target letter</a>
-<a class="sourceLine" id="cb249-15" data-line-number="15"><span class="kw">readd</span>(letter)</a>
-<a class="sourceLine" id="cb249-16" data-line-number="16">## [1] &quot;b&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb251-1" data-line-number="1">## This workflow plan uses rlang&#39;s quasiquotation operator `!!`.</a>
+<a class="sourceLine" id="cb251-2" data-line-number="2">my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">list =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb251-3" data-line-number="3">  <span class="dt">little_b =</span> <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">b</span><span class="ch">\&quot;</span><span class="st">&quot;</span>,</a>
+<a class="sourceLine" id="cb251-4" data-line-number="4">  <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span></a>
+<a class="sourceLine" id="cb251-5" data-line-number="5">))</a>
+<a class="sourceLine" id="cb251-6" data-line-number="6">my_plan</a>
+<a class="sourceLine" id="cb251-7" data-line-number="7">## # A tibble: 2 x 2</a>
+<a class="sourceLine" id="cb251-8" data-line-number="8">##   target   command   </a>
+<a class="sourceLine" id="cb251-9" data-line-number="9">##   &lt;chr&gt;    &lt;chr&gt;     </a>
+<a class="sourceLine" id="cb251-10" data-line-number="10">## 1 little_b &quot;\&quot;b\&quot;&quot;   </a>
+<a class="sourceLine" id="cb251-11" data-line-number="11">## 2 letter   !!little_b</a>
+<a class="sourceLine" id="cb251-12" data-line-number="12"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb251-13" data-line-number="13">## target little_b</a>
+<a class="sourceLine" id="cb251-14" data-line-number="14">## target letter</a>
+<a class="sourceLine" id="cb251-15" data-line-number="15"><span class="kw">readd</span>(letter)</a>
+<a class="sourceLine" id="cb251-16" data-line-number="16">## [1] &quot;b&quot;</a></code></pre></div>
 <p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_evaluation = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1">my_variable &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb250-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb250-3" data-line-number="3"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb250-4" data-line-number="4">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
-<a class="sourceLine" id="cb250-5" data-line-number="5">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb250-6" data-line-number="6">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)</a>
-<a class="sourceLine" id="cb250-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb250-8" data-line-number="8">## # A tibble: 3 x 2</a>
-<a class="sourceLine" id="cb250-9" data-line-number="9">##   target command      </a>
-<a class="sourceLine" id="cb250-10" data-line-number="10">## * &lt;chr&gt;  &lt;chr&gt;        </a>
-<a class="sourceLine" id="cb250-11" data-line-number="11">## 1 a      5            </a>
-<a class="sourceLine" id="cb250-12" data-line-number="12">## 2 b      5 + 1        </a>
-<a class="sourceLine" id="cb250-13" data-line-number="13">## 3 d      !!my_variable</a>
-<a class="sourceLine" id="cb250-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb250-15" data-line-number="15"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb250-16" data-line-number="16">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
-<a class="sourceLine" id="cb250-17" data-line-number="17">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb250-18" data-line-number="18">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),</a>
-<a class="sourceLine" id="cb250-19" data-line-number="19">  <span class="dt">tidy_evaluation =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb250-20" data-line-number="20">)</a>
-<a class="sourceLine" id="cb250-21" data-line-number="21">## # A tibble: 3 x 2</a>
-<a class="sourceLine" id="cb250-22" data-line-number="22">##   target command          </a>
-<a class="sourceLine" id="cb250-23" data-line-number="23">## * &lt;chr&gt;  &lt;chr&gt;            </a>
-<a class="sourceLine" id="cb250-24" data-line-number="24">## 1 a      !!my_variable    </a>
-<a class="sourceLine" id="cb250-25" data-line-number="25">## 2 b      !!my_variable + 1</a>
-<a class="sourceLine" id="cb250-26" data-line-number="26">## 3 d      !!my_variable</a></code></pre></div>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb252-1" data-line-number="1">my_variable &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb252-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb252-3" data-line-number="3"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb252-4" data-line-number="4">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
+<a class="sourceLine" id="cb252-5" data-line-number="5">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb252-6" data-line-number="6">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)</a>
+<a class="sourceLine" id="cb252-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb252-8" data-line-number="8">## # A tibble: 3 x 2</a>
+<a class="sourceLine" id="cb252-9" data-line-number="9">##   target command      </a>
+<a class="sourceLine" id="cb252-10" data-line-number="10">##   &lt;chr&gt;  &lt;chr&gt;        </a>
+<a class="sourceLine" id="cb252-11" data-line-number="11">## 1 a      5            </a>
+<a class="sourceLine" id="cb252-12" data-line-number="12">## 2 b      5 + 1        </a>
+<a class="sourceLine" id="cb252-13" data-line-number="13">## 3 d      !!my_variable</a>
+<a class="sourceLine" id="cb252-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb252-15" data-line-number="15"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb252-16" data-line-number="16">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
+<a class="sourceLine" id="cb252-17" data-line-number="17">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb252-18" data-line-number="18">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),</a>
+<a class="sourceLine" id="cb252-19" data-line-number="19">  <span class="dt">tidy_evaluation =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb252-20" data-line-number="20">)</a>
+<a class="sourceLine" id="cb252-21" data-line-number="21">## # A tibble: 3 x 2</a>
+<a class="sourceLine" id="cb252-22" data-line-number="22">##   target command          </a>
+<a class="sourceLine" id="cb252-23" data-line-number="23">##   &lt;chr&gt;  &lt;chr&gt;            </a>
+<a class="sourceLine" id="cb252-24" data-line-number="24">## 1 a      !!my_variable    </a>
+<a class="sourceLine" id="cb252-25" data-line-number="25">## 2 b      !!my_variable + 1</a>
+<a class="sourceLine" id="cb252-26" data-line-number="26">## 3 d      !!my_variable</a></code></pre></div>
 <p>For instances of <code>!!</code> that remain in the workflow plan, <code>make()</code> will run these commands in tidy fashion, evaluating the <code>!!</code> operator using the environment you provided.</p>
 </div>
 <div id="find-and-diagnose-your-errors." class="section level3">
 <h3><span class="header-section-number">B.3.4</span> Find and diagnose your errors.</h3>
 <p>When <code>make()</code> fails, use <code>failed()</code> and <code>diagnose()</code> to debug. Try the following out yourself.</p>
-<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb251-1" data-line-number="1">## Targets with available diagnostic metadata, incluing errors, warnings, etc.</a>
-<a class="sourceLine" id="cb251-2" data-line-number="2"><span class="kw">diagnose</span>()</a>
-<a class="sourceLine" id="cb251-3" data-line-number="3">## [1] &quot;letter&quot;   &quot;little_b&quot;</a>
-<a class="sourceLine" id="cb251-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb251-5" data-line-number="5">f &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb251-6" data-line-number="6">  <span class="kw">stop</span>(<span class="st">&quot;unusual error&quot;</span>)</a>
-<a class="sourceLine" id="cb251-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb251-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb251-9" data-line-number="9">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">target =</span> <span class="kw">f</span>())</a>
-<a class="sourceLine" id="cb251-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb251-11" data-line-number="11">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
-<a class="sourceLine" id="cb251-12" data-line-number="12">  <span class="kw">stdout</span>(),</a>
-<a class="sourceLine" id="cb251-13" data-line-number="13">  <span class="kw">make</span>(bad_plan)</a>
-<a class="sourceLine" id="cb251-14" data-line-number="14">)</a>
-<a class="sourceLine" id="cb251-15" data-line-number="15">## target target</a>
-<a class="sourceLine" id="cb251-16" data-line-number="16">## fail target</a>
-<a class="sourceLine" id="cb251-17" data-line-number="17">## Error: Target `target` failed. Call `diagnose(target)` for details. Error message:</a>
-<a class="sourceLine" id="cb251-18" data-line-number="18">##   unusual error</a>
-<a class="sourceLine" id="cb251-19" data-line-number="19">## Warning: No message sink to remove.</a>
-<a class="sourceLine" id="cb251-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb251-21" data-line-number="21"><span class="kw">failed</span>() <span class="co"># From the last make() only</span></a>
-<a class="sourceLine" id="cb251-22" data-line-number="22">## [1] &quot;target&quot;</a>
-<a class="sourceLine" id="cb251-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb251-24" data-line-number="24">error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<span class="op">$</span>error <span class="co"># See also warnings and messages.</span></a>
-<a class="sourceLine" id="cb251-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb251-26" data-line-number="26">error<span class="op">$</span>message</a>
-<a class="sourceLine" id="cb251-27" data-line-number="27">## [1] &quot;unusual error&quot;</a>
-<a class="sourceLine" id="cb251-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb251-29" data-line-number="29">error<span class="op">$</span>call</a>
-<a class="sourceLine" id="cb251-30" data-line-number="30">## f()</a>
-<a class="sourceLine" id="cb251-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb251-32" data-line-number="32">error<span class="op">$</span>calls <span class="co"># View the traceback.</span></a>
-<a class="sourceLine" id="cb251-33" data-line-number="33">## [[1]]</a>
-<a class="sourceLine" id="cb251-34" data-line-number="34">## local({</a>
-<a class="sourceLine" id="cb251-35" data-line-number="35">##     f()</a>
-<a class="sourceLine" id="cb251-36" data-line-number="36">## })</a>
-<a class="sourceLine" id="cb251-37" data-line-number="37">## </a>
-<a class="sourceLine" id="cb251-38" data-line-number="38">## [[2]]</a>
-<a class="sourceLine" id="cb251-39" data-line-number="39">## eval.parent(substitute(eval(quote(expr), envir)))</a>
-<a class="sourceLine" id="cb251-40" data-line-number="40">## </a>
-<a class="sourceLine" id="cb251-41" data-line-number="41">## [[3]]</a>
-<a class="sourceLine" id="cb251-42" data-line-number="42">## eval(expr, p)</a>
-<a class="sourceLine" id="cb251-43" data-line-number="43">## </a>
-<a class="sourceLine" id="cb251-44" data-line-number="44">## [[4]]</a>
-<a class="sourceLine" id="cb251-45" data-line-number="45">## eval(expr, p)</a>
-<a class="sourceLine" id="cb251-46" data-line-number="46">## </a>
-<a class="sourceLine" id="cb251-47" data-line-number="47">## [[5]]</a>
-<a class="sourceLine" id="cb251-48" data-line-number="48">## eval(quote({</a>
-<a class="sourceLine" id="cb251-49" data-line-number="49">##     f()</a>
-<a class="sourceLine" id="cb251-50" data-line-number="50">## }), new.env())</a>
-<a class="sourceLine" id="cb251-51" data-line-number="51">## </a>
-<a class="sourceLine" id="cb251-52" data-line-number="52">## [[6]]</a>
-<a class="sourceLine" id="cb251-53" data-line-number="53">## eval(quote({</a>
-<a class="sourceLine" id="cb251-54" data-line-number="54">##     f()</a>
-<a class="sourceLine" id="cb251-55" data-line-number="55">## }), new.env())</a>
-<a class="sourceLine" id="cb251-56" data-line-number="56">## </a>
-<a class="sourceLine" id="cb251-57" data-line-number="57">## [[7]]</a>
-<a class="sourceLine" id="cb251-58" data-line-number="58">## f()</a>
-<a class="sourceLine" id="cb251-59" data-line-number="59">## </a>
-<a class="sourceLine" id="cb251-60" data-line-number="60">## [[8]]</a>
-<a class="sourceLine" id="cb251-61" data-line-number="61">## stop(&quot;unusual error&quot;)</a></code></pre></div>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb253-1" data-line-number="1">## Targets with available diagnostic metadata, incluing errors, warnings, etc.</a>
+<a class="sourceLine" id="cb253-2" data-line-number="2"><span class="kw">diagnose</span>()</a>
+<a class="sourceLine" id="cb253-3" data-line-number="3">## [1] &quot;letter&quot;   &quot;little_b&quot;</a>
+<a class="sourceLine" id="cb253-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb253-5" data-line-number="5">f &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb253-6" data-line-number="6">  <span class="kw">stop</span>(<span class="st">&quot;unusual error&quot;</span>)</a>
+<a class="sourceLine" id="cb253-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb253-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb253-9" data-line-number="9">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">target =</span> <span class="kw">f</span>())</a>
+<a class="sourceLine" id="cb253-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb253-11" data-line-number="11">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
+<a class="sourceLine" id="cb253-12" data-line-number="12">  <span class="kw">stdout</span>(),</a>
+<a class="sourceLine" id="cb253-13" data-line-number="13">  <span class="kw">make</span>(bad_plan)</a>
+<a class="sourceLine" id="cb253-14" data-line-number="14">)</a>
+<a class="sourceLine" id="cb253-15" data-line-number="15">## target target</a>
+<a class="sourceLine" id="cb253-16" data-line-number="16">## fail target</a>
+<a class="sourceLine" id="cb253-17" data-line-number="17">## Error: Target `target` failed. Call `diagnose(target)` for details. Error message:</a>
+<a class="sourceLine" id="cb253-18" data-line-number="18">##   unusual error</a>
+<a class="sourceLine" id="cb253-19" data-line-number="19">## Warning: No message sink to remove.</a>
+<a class="sourceLine" id="cb253-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb253-21" data-line-number="21"><span class="kw">failed</span>() <span class="co"># From the last make() only</span></a>
+<a class="sourceLine" id="cb253-22" data-line-number="22">## [1] &quot;target&quot;</a>
+<a class="sourceLine" id="cb253-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb253-24" data-line-number="24">error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<span class="op">$</span>error <span class="co"># See also warnings and messages.</span></a>
+<a class="sourceLine" id="cb253-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb253-26" data-line-number="26">error<span class="op">$</span>message</a>
+<a class="sourceLine" id="cb253-27" data-line-number="27">## [1] &quot;unusual error&quot;</a>
+<a class="sourceLine" id="cb253-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb253-29" data-line-number="29">error<span class="op">$</span>call</a>
+<a class="sourceLine" id="cb253-30" data-line-number="30">## f()</a>
+<a class="sourceLine" id="cb253-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb253-32" data-line-number="32">error<span class="op">$</span>calls <span class="co"># View the traceback.</span></a>
+<a class="sourceLine" id="cb253-33" data-line-number="33">## [[1]]</a>
+<a class="sourceLine" id="cb253-34" data-line-number="34">## local({</a>
+<a class="sourceLine" id="cb253-35" data-line-number="35">##     f()</a>
+<a class="sourceLine" id="cb253-36" data-line-number="36">## })</a>
+<a class="sourceLine" id="cb253-37" data-line-number="37">## </a>
+<a class="sourceLine" id="cb253-38" data-line-number="38">## [[2]]</a>
+<a class="sourceLine" id="cb253-39" data-line-number="39">## eval.parent(substitute(eval(quote(expr), envir)))</a>
+<a class="sourceLine" id="cb253-40" data-line-number="40">## </a>
+<a class="sourceLine" id="cb253-41" data-line-number="41">## [[3]]</a>
+<a class="sourceLine" id="cb253-42" data-line-number="42">## eval(expr, p)</a>
+<a class="sourceLine" id="cb253-43" data-line-number="43">## </a>
+<a class="sourceLine" id="cb253-44" data-line-number="44">## [[4]]</a>
+<a class="sourceLine" id="cb253-45" data-line-number="45">## eval(expr, p)</a>
+<a class="sourceLine" id="cb253-46" data-line-number="46">## </a>
+<a class="sourceLine" id="cb253-47" data-line-number="47">## [[5]]</a>
+<a class="sourceLine" id="cb253-48" data-line-number="48">## eval(quote({</a>
+<a class="sourceLine" id="cb253-49" data-line-number="49">##     f()</a>
+<a class="sourceLine" id="cb253-50" data-line-number="50">## }), new.env())</a>
+<a class="sourceLine" id="cb253-51" data-line-number="51">## </a>
+<a class="sourceLine" id="cb253-52" data-line-number="52">## [[6]]</a>
+<a class="sourceLine" id="cb253-53" data-line-number="53">## eval(quote({</a>
+<a class="sourceLine" id="cb253-54" data-line-number="54">##     f()</a>
+<a class="sourceLine" id="cb253-55" data-line-number="55">## }), new.env())</a>
+<a class="sourceLine" id="cb253-56" data-line-number="56">## </a>
+<a class="sourceLine" id="cb253-57" data-line-number="57">## [[7]]</a>
+<a class="sourceLine" id="cb253-58" data-line-number="58">## f()</a>
+<a class="sourceLine" id="cb253-59" data-line-number="59">## </a>
+<a class="sourceLine" id="cb253-60" data-line-number="60">## [[8]]</a>
+<a class="sourceLine" id="cb253-61" data-line-number="61">## stop(&quot;unusual error&quot;)</a></code></pre></div>
 </div>
 <div id="refresh-the-drake_config-list-early-and-often." class="section level3">
 <h3><span class="header-section-number">B.3.5</span> Refresh the <code>drake_config()</code> list early and often.</h3>
@@ -520,10 +520,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Ordinarily, <code>drake</code> prunes the execution environment at every parallelizable stage. In other words, it loads all the dependencies and unloads anything superfluous for entire batches of targets. This approach may require too much memory for some use cases, so there is an option to delay the loading of dependencies using the <code>lazy_load</code> argument to <code>make()</code> (powered by <code>delayedAssign()</code>). There are two major risks.</p>
 <ol style="list-style-type: decimal">
 <li><p><code>make(..., lazy_load = TRUE, parallelism = &quot;parLapply&quot;, jobs = 2)</code> does not work. If you want to use local multisession parallelism with multiple jobs and lazy loading, try <code>&quot;future_lapply&quot;</code> parallelism instead.</p>
-<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb252-1" data-line-number="1"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb252-2" data-line-number="2">future<span class="op">::</span><span class="kw">plan</span>(multisession)</a>
-<a class="sourceLine" id="cb252-3" data-line-number="3"><span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span></a>
-<a class="sourceLine" id="cb252-4" data-line-number="4"><span class="kw">make</span>(my_plan, <span class="dt">lazy_load =</span> <span class="ot">TRUE</span>, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</a></code></pre></div></li>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1"><span class="kw">library</span>(future)</a>
+<a class="sourceLine" id="cb254-2" data-line-number="2">future<span class="op">::</span><span class="kw">plan</span>(multisession)</a>
+<a class="sourceLine" id="cb254-3" data-line-number="3"><span class="kw">load_mtcars_example</span>() <span class="co"># Get the code with drake_example(&quot;mtcars&quot;).</span></a>
+<a class="sourceLine" id="cb254-4" data-line-number="4"><span class="kw">make</span>(my_plan, <span class="dt">lazy_load =</span> <span class="ot">TRUE</span>, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</a></code></pre></div></li>
 <li><p>Delayed evaluation may cause the same dependencies to be loaded multiple times, and these duplicated loads could be slow.</p></li>
 </ol>
 </div>
@@ -537,106 +537,106 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="objects-that-contain-functions-may-rebuild-too-often" class="section level3">
 <h3><span class="header-section-number">B.4.1</span> Objects that contain functions may rebuild too often</h3>
 <p>For example, an <code>R6</code> class changes whenever a new <code>R6</code> object of that class is created.</p>
-<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb253-1" data-line-number="1"><span class="kw">library</span>(digest)</a>
-<a class="sourceLine" id="cb253-2" data-line-number="2"><span class="kw">library</span>(R6)</a>
-<a class="sourceLine" id="cb253-3" data-line-number="3">circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(</a>
-<a class="sourceLine" id="cb253-4" data-line-number="4">  <span class="st">&quot;circle_class&quot;</span>,</a>
-<a class="sourceLine" id="cb253-5" data-line-number="5">  <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),</a>
-<a class="sourceLine" id="cb253-6" data-line-number="6">  <span class="dt">public =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb253-7" data-line-number="7">    <span class="dt">initialize =</span> <span class="cf">function</span>(radius){</a>
-<a class="sourceLine" id="cb253-8" data-line-number="8">      private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius</a>
-<a class="sourceLine" id="cb253-9" data-line-number="9">    },</a>
-<a class="sourceLine" id="cb253-10" data-line-number="10">    <span class="dt">area =</span> <span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb253-11" data-line-number="11">      pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb253-12" data-line-number="12">    }</a>
-<a class="sourceLine" id="cb253-13" data-line-number="13">  )</a>
-<a class="sourceLine" id="cb253-14" data-line-number="14">)</a>
-<a class="sourceLine" id="cb253-15" data-line-number="15"><span class="kw">digest</span>(circle_class)</a>
-<a class="sourceLine" id="cb253-16" data-line-number="16">## [1] &quot;ec0a2e13800970954e5fc55fcae9d89c&quot;</a>
-<a class="sourceLine" id="cb253-17" data-line-number="17">circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb253-18" data-line-number="18"><span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span></a>
-<a class="sourceLine" id="cb253-19" data-line-number="19">## [1] &quot;2b982829668ab1e37aff7ce083305f2e&quot;</a>
-<a class="sourceLine" id="cb253-20" data-line-number="20"><span class="kw">rm</span>(circle)</a></code></pre></div>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1"><span class="kw">library</span>(digest)</a>
+<a class="sourceLine" id="cb255-2" data-line-number="2"><span class="kw">library</span>(R6)</a>
+<a class="sourceLine" id="cb255-3" data-line-number="3">circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(</a>
+<a class="sourceLine" id="cb255-4" data-line-number="4">  <span class="st">&quot;circle_class&quot;</span>,</a>
+<a class="sourceLine" id="cb255-5" data-line-number="5">  <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),</a>
+<a class="sourceLine" id="cb255-6" data-line-number="6">  <span class="dt">public =</span> <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb255-7" data-line-number="7">    <span class="dt">initialize =</span> <span class="cf">function</span>(radius){</a>
+<a class="sourceLine" id="cb255-8" data-line-number="8">      private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius</a>
+<a class="sourceLine" id="cb255-9" data-line-number="9">    },</a>
+<a class="sourceLine" id="cb255-10" data-line-number="10">    <span class="dt">area =</span> <span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb255-11" data-line-number="11">      pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb255-12" data-line-number="12">    }</a>
+<a class="sourceLine" id="cb255-13" data-line-number="13">  )</a>
+<a class="sourceLine" id="cb255-14" data-line-number="14">)</a>
+<a class="sourceLine" id="cb255-15" data-line-number="15"><span class="kw">digest</span>(circle_class)</a>
+<a class="sourceLine" id="cb255-16" data-line-number="16">## [1] &quot;396afe4114c6733b0d37cfaf0a65ea80&quot;</a>
+<a class="sourceLine" id="cb255-17" data-line-number="17">circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb255-18" data-line-number="18"><span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span></a>
+<a class="sourceLine" id="cb255-19" data-line-number="19">## [1] &quot;0febf8a15d63d997970d6a161a89d98a&quot;</a>
+<a class="sourceLine" id="cb255-20" data-line-number="20"><span class="kw">rm</span>(circle)</a></code></pre></div>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
-<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1"><span class="kw">clean</span>()</a>
-<a class="sourceLine" id="cb254-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb254-3" data-line-number="3">  <span class="dt">circle =</span> circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb254-4" data-line-number="4">  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()</a>
-<a class="sourceLine" id="cb254-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb254-6" data-line-number="6"><span class="kw">make</span>(plan) <span class="co"># `circle_class` changes because it is referenced.</span></a>
-<a class="sourceLine" id="cb254-7" data-line-number="7">## target circle</a>
-<a class="sourceLine" id="cb254-8" data-line-number="8">## target area</a>
-<a class="sourceLine" id="cb254-9" data-line-number="9"><span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span></a>
-<a class="sourceLine" id="cb254-10" data-line-number="10">## target circle</a></code></pre></div>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb256-1" data-line-number="1"><span class="kw">clean</span>()</a>
+<a class="sourceLine" id="cb256-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb256-3" data-line-number="3">  <span class="dt">circle =</span> circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb256-4" data-line-number="4">  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()</a>
+<a class="sourceLine" id="cb256-5" data-line-number="5">)</a>
+<a class="sourceLine" id="cb256-6" data-line-number="6"><span class="kw">make</span>(plan) <span class="co"># `circle_class` changes because it is referenced.</span></a>
+<a class="sourceLine" id="cb256-7" data-line-number="7">## target circle</a>
+<a class="sourceLine" id="cb256-8" data-line-number="8">## target area</a>
+<a class="sourceLine" id="cb256-9" data-line-number="9"><span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span></a>
+<a class="sourceLine" id="cb256-10" data-line-number="10">## target circle</a></code></pre></div>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
-<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1"><span class="kw">clean</span>()</a>
-<a class="sourceLine" id="cb255-2" data-line-number="2">new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){</a>
-<a class="sourceLine" id="cb255-3" data-line-number="3">  circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(</a>
-<a class="sourceLine" id="cb255-4" data-line-number="4">    <span class="st">&quot;circle_class&quot;</span>,</a>
-<a class="sourceLine" id="cb255-5" data-line-number="5">    <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),</a>
-<a class="sourceLine" id="cb255-6" data-line-number="6">    <span class="dt">public =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb255-7" data-line-number="7">      <span class="dt">initialize =</span> <span class="cf">function</span>(radius){</a>
-<a class="sourceLine" id="cb255-8" data-line-number="8">        private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius</a>
-<a class="sourceLine" id="cb255-9" data-line-number="9">      },</a>
-<a class="sourceLine" id="cb255-10" data-line-number="10">      <span class="dt">area =</span> <span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb255-11" data-line-number="11">        pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb255-12" data-line-number="12">      }</a>
-<a class="sourceLine" id="cb255-13" data-line-number="13">    )</a>
-<a class="sourceLine" id="cb255-14" data-line-number="14">  )</a>
-<a class="sourceLine" id="cb255-15" data-line-number="15">  circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> radius)</a>
-<a class="sourceLine" id="cb255-16" data-line-number="16">}</a>
-<a class="sourceLine" id="cb255-17" data-line-number="17">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb255-18" data-line-number="18">  <span class="dt">circle =</span> <span class="kw">new_circle</span>(<span class="dt">radius =</span> <span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb255-19" data-line-number="19">  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()</a>
-<a class="sourceLine" id="cb255-20" data-line-number="20">)</a>
-<a class="sourceLine" id="cb255-21" data-line-number="21"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb255-22" data-line-number="22">## target circle</a>
-<a class="sourceLine" id="cb255-23" data-line-number="23">## target area</a>
-<a class="sourceLine" id="cb255-24" data-line-number="24"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb255-25" data-line-number="25">## All targets are already up to date.</a></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb257-1" data-line-number="1"><span class="kw">clean</span>()</a>
+<a class="sourceLine" id="cb257-2" data-line-number="2">new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){</a>
+<a class="sourceLine" id="cb257-3" data-line-number="3">  circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(</a>
+<a class="sourceLine" id="cb257-4" data-line-number="4">    <span class="st">&quot;circle_class&quot;</span>,</a>
+<a class="sourceLine" id="cb257-5" data-line-number="5">    <span class="dt">private =</span> <span class="kw">list</span>(<span class="dt">radius =</span> <span class="ot">NULL</span>),</a>
+<a class="sourceLine" id="cb257-6" data-line-number="6">    <span class="dt">public =</span> <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb257-7" data-line-number="7">      <span class="dt">initialize =</span> <span class="cf">function</span>(radius){</a>
+<a class="sourceLine" id="cb257-8" data-line-number="8">        private<span class="op">$</span>radius &lt;-<span class="st"> </span>radius</a>
+<a class="sourceLine" id="cb257-9" data-line-number="9">      },</a>
+<a class="sourceLine" id="cb257-10" data-line-number="10">      <span class="dt">area =</span> <span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb257-11" data-line-number="11">        pi <span class="op">*</span><span class="st"> </span>private<span class="op">$</span>radius <span class="op">^</span><span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb257-12" data-line-number="12">      }</a>
+<a class="sourceLine" id="cb257-13" data-line-number="13">    )</a>
+<a class="sourceLine" id="cb257-14" data-line-number="14">  )</a>
+<a class="sourceLine" id="cb257-15" data-line-number="15">  circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> radius)</a>
+<a class="sourceLine" id="cb257-16" data-line-number="16">}</a>
+<a class="sourceLine" id="cb257-17" data-line-number="17">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb257-18" data-line-number="18">  <span class="dt">circle =</span> <span class="kw">new_circle</span>(<span class="dt">radius =</span> <span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb257-19" data-line-number="19">  <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()</a>
+<a class="sourceLine" id="cb257-20" data-line-number="20">)</a>
+<a class="sourceLine" id="cb257-21" data-line-number="21"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb257-22" data-line-number="22">## target circle</a>
+<a class="sourceLine" id="cb257-23" data-line-number="23">## target area</a>
+<a class="sourceLine" id="cb257-24" data-line-number="24"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb257-25" data-line-number="25">## All targets are already up to date.</a></code></pre></div>
 </div>
 <div id="the-magrittr-dot-.-is-always-ignored." class="section level3">
 <h3><span class="header-section-number">B.4.2</span> The <code>magrittr</code> dot (<code>.</code>) is always ignored.</h3>
 <p>It is common practice to use a literal dot (<code>.</code>) to carry an object through a <a href="https://github.com/tidyverse/magrittr"><code>magrittr</code></a> pipeline. Due to some tricky limitations in static code analysis, <code>drake</code> never treats the dot (<code>.</code>) as a dependency, even if you use it as an ordinary variable outside of a <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> context.</p>
-<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb256-1" data-line-number="1"><span class="kw">deps_code</span>(<span class="st">&quot;sqrt(x + y + .)&quot;</span>)</a>
-<a class="sourceLine" id="cb256-2" data-line-number="2">## $globals</a>
-<a class="sourceLine" id="cb256-3" data-line-number="3">## [1] &quot;sqrt&quot; &quot;x&quot;    &quot;y&quot;</a>
-<a class="sourceLine" id="cb256-4" data-line-number="4"><span class="kw">deps_code</span>(<span class="st">&quot;dplyr::filter(complete.cases(.))&quot;</span>)</a>
-<a class="sourceLine" id="cb256-5" data-line-number="5">## $namespaced</a>
-<a class="sourceLine" id="cb256-6" data-line-number="6">## [1] &quot;dplyr::filter&quot;</a>
-<a class="sourceLine" id="cb256-7" data-line-number="7">## </a>
-<a class="sourceLine" id="cb256-8" data-line-number="8">## $globals</a>
-<a class="sourceLine" id="cb256-9" data-line-number="9">## [1] &quot;complete.cases&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb258-1" data-line-number="1"><span class="kw">deps_code</span>(<span class="st">&quot;sqrt(x + y + .)&quot;</span>)</a>
+<a class="sourceLine" id="cb258-2" data-line-number="2">## $globals</a>
+<a class="sourceLine" id="cb258-3" data-line-number="3">## [1] &quot;sqrt&quot; &quot;x&quot;    &quot;y&quot;</a>
+<a class="sourceLine" id="cb258-4" data-line-number="4"><span class="kw">deps_code</span>(<span class="st">&quot;dplyr::filter(complete.cases(.))&quot;</span>)</a>
+<a class="sourceLine" id="cb258-5" data-line-number="5">## $namespaced</a>
+<a class="sourceLine" id="cb258-6" data-line-number="6">## [1] &quot;dplyr::filter&quot;</a>
+<a class="sourceLine" id="cb258-7" data-line-number="7">## </a>
+<a class="sourceLine" id="cb258-8" data-line-number="8">## $globals</a>
+<a class="sourceLine" id="cb258-9" data-line-number="9">## [1] &quot;complete.cases&quot;</a></code></pre></div>
 </div>
 <div id="dependencies-are-not-tracked-in-some-edge-cases." class="section level3">
 <h3><span class="header-section-number">B.4.3</span> Dependencies are not tracked in some edge cases.</h3>
 <p>You should explicitly learn the items in your workflow and the dependencies of your targets.</p>
-<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb257-1" data-line-number="1">?deps</a>
-<a class="sourceLine" id="cb257-2" data-line-number="2">?tracked</a>
-<a class="sourceLine" id="cb257-3" data-line-number="3">?vis_drake_graph</a></code></pre></div>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb259-1" data-line-number="1">?deps</a>
+<a class="sourceLine" id="cb259-2" data-line-number="2">?tracked</a>
+<a class="sourceLine" id="cb259-3" data-line-number="3">?vis_drake_graph</a></code></pre></div>
 <p><code>drake</code> can be fooled into skipping objects that should be treated as dependencies. For example:</p>
-<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb258-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb258-2" data-line-number="2">  b &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">envir =</span> <span class="kw">globalenv</span>()) <span class="co"># x is incorrectly ignored</span></a>
-<a class="sourceLine" id="cb258-3" data-line-number="3">  digest<span class="op">::</span><span class="kw">digest</span>(file_dependency)</a>
-<a class="sourceLine" id="cb258-4" data-line-number="4">}</a>
-<a class="sourceLine" id="cb258-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb258-6" data-line-number="6"><span class="kw">deps_code</span>(f)</a>
-<a class="sourceLine" id="cb258-7" data-line-number="7">## $globals</a>
-<a class="sourceLine" id="cb258-8" data-line-number="8">## [1] &quot;get&quot;             &quot;globalenv&quot;       &quot;file_dependency&quot;</a>
-<a class="sourceLine" id="cb258-9" data-line-number="9">## </a>
-<a class="sourceLine" id="cb258-10" data-line-number="10">## $namespaced</a>
-<a class="sourceLine" id="cb258-11" data-line-number="11">## [1] &quot;digest::digest&quot;</a>
-<a class="sourceLine" id="cb258-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb258-13" data-line-number="13">command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span></a>
-<a class="sourceLine" id="cb258-14" data-line-number="14"><span class="kw">deps_code</span>(command)</a>
-<a class="sourceLine" id="cb258-15" data-line-number="15">## $globals</a>
-<a class="sourceLine" id="cb258-16" data-line-number="16">## [1] &quot;assign&quot;</a>
-<a class="sourceLine" id="cb258-17" data-line-number="17">## </a>
-<a class="sourceLine" id="cb258-18" data-line-number="18">## $namespaced</a>
-<a class="sourceLine" id="cb258-19" data-line-number="19">## [1] &quot;digest::digest&quot;</a>
-<a class="sourceLine" id="cb258-20" data-line-number="20">## </a>
-<a class="sourceLine" id="cb258-21" data-line-number="21">## $file_in</a>
-<a class="sourceLine" id="cb258-22" data-line-number="22">## [1] &quot;\&quot;input_file.rds\&quot;&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb260-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb260-2" data-line-number="2">  b &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">envir =</span> <span class="kw">globalenv</span>()) <span class="co"># x is incorrectly ignored</span></a>
+<a class="sourceLine" id="cb260-3" data-line-number="3">  digest<span class="op">::</span><span class="kw">digest</span>(file_dependency)</a>
+<a class="sourceLine" id="cb260-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb260-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb260-6" data-line-number="6"><span class="kw">deps_code</span>(f)</a>
+<a class="sourceLine" id="cb260-7" data-line-number="7">## $globals</a>
+<a class="sourceLine" id="cb260-8" data-line-number="8">## [1] &quot;get&quot;             &quot;globalenv&quot;       &quot;file_dependency&quot;</a>
+<a class="sourceLine" id="cb260-9" data-line-number="9">## </a>
+<a class="sourceLine" id="cb260-10" data-line-number="10">## $namespaced</a>
+<a class="sourceLine" id="cb260-11" data-line-number="11">## [1] &quot;digest::digest&quot;</a>
+<a class="sourceLine" id="cb260-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb260-13" data-line-number="13">command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span></a>
+<a class="sourceLine" id="cb260-14" data-line-number="14"><span class="kw">deps_code</span>(command)</a>
+<a class="sourceLine" id="cb260-15" data-line-number="15">## $globals</a>
+<a class="sourceLine" id="cb260-16" data-line-number="16">## [1] &quot;assign&quot;</a>
+<a class="sourceLine" id="cb260-17" data-line-number="17">## </a>
+<a class="sourceLine" id="cb260-18" data-line-number="18">## $namespaced</a>
+<a class="sourceLine" id="cb260-19" data-line-number="19">## [1] &quot;digest::digest&quot;</a>
+<a class="sourceLine" id="cb260-20" data-line-number="20">## </a>
+<a class="sourceLine" id="cb260-21" data-line-number="21">## $file_in</a>
+<a class="sourceLine" id="cb260-22" data-line-number="22">## [1] &quot;\&quot;input_file.rds\&quot;&quot;</a></code></pre></div>
 <p><code>drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
 </div>
 <div id="dependencies-of-knitr-reports" class="section level3">
@@ -646,27 +646,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="file-outputs-in-imported-functions." class="section level3">
 <h3><span class="header-section-number">B.4.5</span> File outputs in imported functions.</h3>
 <p>Do not call <code>file_out()</code> inside imported functions that you write. Only targets in your workflow plan data frame should have file outputs.</p>
-<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb259-1" data-line-number="1">## toally_fine() will depend on the imported data.csv file.</a>
-<a class="sourceLine" id="cb259-2" data-line-number="2">## But make sure data.csv is an imported file and not a file target.</a>
-<a class="sourceLine" id="cb259-3" data-line-number="3">totally_okay &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){</a>
-<a class="sourceLine" id="cb259-4" data-line-number="4">  <span class="kw">read.csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>))</a>
-<a class="sourceLine" id="cb259-5" data-line-number="5">}</a>
-<a class="sourceLine" id="cb259-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb259-7" data-line-number="7">## file_out() is for file targets,</a>
-<a class="sourceLine" id="cb259-8" data-line-number="8">## so `drake` will ignore it in imported functions.</a>
-<a class="sourceLine" id="cb259-9" data-line-number="9">avoid_this &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){</a>
-<a class="sourceLine" id="cb259-10" data-line-number="10">  <span class="kw">read.csv</span>(<span class="kw">file_out</span>(<span class="st">&quot;data.csv&quot;</span>))</a>
-<a class="sourceLine" id="cb259-11" data-line-number="11">}</a></code></pre></div>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb261-1" data-line-number="1">## toally_fine() will depend on the imported data.csv file.</a>
+<a class="sourceLine" id="cb261-2" data-line-number="2">## But make sure data.csv is an imported file and not a file target.</a>
+<a class="sourceLine" id="cb261-3" data-line-number="3">totally_okay &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){</a>
+<a class="sourceLine" id="cb261-4" data-line-number="4">  <span class="kw">read.csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb261-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb261-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb261-7" data-line-number="7">## file_out() is for file targets,</a>
+<a class="sourceLine" id="cb261-8" data-line-number="8">## so `drake` will ignore it in imported functions.</a>
+<a class="sourceLine" id="cb261-9" data-line-number="9">avoid_this &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z){</a>
+<a class="sourceLine" id="cb261-10" data-line-number="10">  <span class="kw">read.csv</span>(<span class="kw">file_out</span>(<span class="st">&quot;data.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb261-11" data-line-number="11">}</a></code></pre></div>
 </div>
 <div id="functions-produced-by-vectorize" class="section level3">
 <h3><span class="header-section-number">B.4.6</span> Functions produced by <code>Vectorize()</code></h3>
 <p>With functions produced by <code>Vectorize()</code>, detecting dependencies is especially hard because the body of every such function is</p>
-<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb260-1" data-line-number="1">args &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">as.list</span>(<span class="kw">match.call</span>())[<span class="op">-</span>1L], eval, <span class="kw">parent.frame</span>())</a>
-<a class="sourceLine" id="cb260-2" data-line-number="2">names &lt;-<span class="st"> </span><span class="cf">if</span> (<span class="kw">is.null</span>(<span class="kw">names</span>(args)))</a>
-<a class="sourceLine" id="cb260-3" data-line-number="3">    <span class="kw">character</span>(<span class="kw">length</span>(args)) <span class="cf">else</span> <span class="kw">names</span>(args)</a>
-<a class="sourceLine" id="cb260-4" data-line-number="4">dovec &lt;-<span class="st"> </span>names <span class="op">%in%</span><span class="st"> </span>vectorize.args</a>
-<a class="sourceLine" id="cb260-5" data-line-number="5"><span class="kw">do.call</span>(<span class="st">&quot;mapply&quot;</span>, <span class="kw">c</span>(<span class="dt">FUN =</span> FUN, args[dovec], <span class="dt">MoreArgs =</span> <span class="kw">list</span>(args[<span class="op">!</span>dovec]),</a>
-<a class="sourceLine" id="cb260-6" data-line-number="6">    <span class="dt">SIMPLIFY =</span> SIMPLIFY, <span class="dt">USE.NAMES =</span> USE.NAMES))</a></code></pre></div>
+<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb262-1" data-line-number="1">args &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">as.list</span>(<span class="kw">match.call</span>())[<span class="op">-</span>1L], eval, <span class="kw">parent.frame</span>())</a>
+<a class="sourceLine" id="cb262-2" data-line-number="2">names &lt;-<span class="st"> </span><span class="cf">if</span> (<span class="kw">is.null</span>(<span class="kw">names</span>(args)))</a>
+<a class="sourceLine" id="cb262-3" data-line-number="3">    <span class="kw">character</span>(<span class="kw">length</span>(args)) <span class="cf">else</span> <span class="kw">names</span>(args)</a>
+<a class="sourceLine" id="cb262-4" data-line-number="4">dovec &lt;-<span class="st"> </span>names <span class="op">%in%</span><span class="st"> </span>vectorize.args</a>
+<a class="sourceLine" id="cb262-5" data-line-number="5"><span class="kw">do.call</span>(<span class="st">&quot;mapply&quot;</span>, <span class="kw">c</span>(<span class="dt">FUN =</span> FUN, args[dovec], <span class="dt">MoreArgs =</span> <span class="kw">list</span>(args[<span class="op">!</span>dovec]),</a>
+<a class="sourceLine" id="cb262-6" data-line-number="6">    <span class="dt">SIMPLIFY =</span> SIMPLIFY, <span class="dt">USE.NAMES =</span> USE.NAMES))</a></code></pre></div>
 <p>Thus, if <code>f</code> is constructed with <code>Vectorize(g, ...)</code>, <code>drake</code> searches <code>g()</code> for dependencies, not <code>f()</code>. In fact, if <code>drake</code> sees that <code>environment(f)[[&quot;FUN&quot;]]</code> exists and is a function, then <code>environment(f)[[&quot;FUN&quot;]]</code> will be analyzed instead of <code>f()</code>. Furthermore, if <code>f()</code> is the output of <code>Vectorize()</code>, then <code>drake</code> reproducibly tracks <code>environment(f)[[&quot;FUN&quot;]]</code> rather than <code>f()</code> itself. Thus, if the configuration settings of vectorization change (such as which arguments are vectorized), but the core element-wise functionality remains the same, then <code>make()</code> will not react. Also, if you hover over the <code>f</code> node in <code>vis_drake_graph(hover = TRUE)</code>, then you will see the body of <code>environment(f)[[&quot;FUN&quot;]]</code>, not the body of <code>f()</code>.</p>
 </div>
 <div id="compiled-code-is-not-reproducibly-tracked." class="section level3">
@@ -711,9 +711,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="configuring-futurebatchtools-parallelism-for-clusters" class="section level3">
 <h3><span class="header-section-number">B.5.4</span> Configuring <a href="https://github.com/HenrikBengtsson/future">future</a>/<a href="https://github.com/mllg/batchtools">batchtools</a> parallelism for clusters</h3>
 <p>The <code>&quot;future_lapply&quot;</code> backend unlocks a large array of distributed computing options on serious computing clusters. However, it is your responsibility to configure your workflow for your specific job scheduler. In particular, special <a href="https://github.com/mllg/batchtools">batchtools</a> <code>*.tmpl</code> configuration files are required, and the technique is described in the documentation of <a href="https://github.com/mllg/batchtools">batchtools</a>. You can find some examples of these files in the <code>inst/templates</code> folders of the <a href="https://github.com/mllg/batchtools/tree/master/inst/templates">batchtools</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools/tree/master/inst/templates">future.batchtools</a> GitHub repositories. <code>drake</code> has some <a href="https://github.com/wlandau/drake-examples">prepackaged example workflows</a>. See <code>drake_examples()</code> to view your options, and then <code>drake_example()</code> to write the files for an example.</p>
-<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb261-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;sge&quot;</span>)    <span class="co"># Sun/Univa Grid Engine workflow and supporting files</span></a>
-<a class="sourceLine" id="cb261-2" data-line-number="2"><span class="kw">drake_example</span>(<span class="st">&quot;slurm&quot;</span>)  <span class="co"># SLURM</span></a>
-<a class="sourceLine" id="cb261-3" data-line-number="3"><span class="kw">drake_example</span>(<span class="st">&quot;torque&quot;</span>) <span class="co"># TORQUE</span></a></code></pre></div>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb263-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;sge&quot;</span>)    <span class="co"># Sun/Univa Grid Engine workflow and supporting files</span></a>
+<a class="sourceLine" id="cb263-2" data-line-number="2"><span class="kw">drake_example</span>(<span class="st">&quot;slurm&quot;</span>)  <span class="co"># SLURM</span></a>
+<a class="sourceLine" id="cb263-3" data-line-number="3"><span class="kw">drake_example</span>(<span class="st">&quot;torque&quot;</span>) <span class="co"># TORQUE</span></a></code></pre></div>
 <p>To write just <code>*.tmpl</code> files from these examples, see the <code>drake_batchtools_tmpl_file()</code> function.</p>
 <p>Unfortunately, there is no one-size-fits-all <code>*.tmpl</code> configuration file for any job scheduler, so we cannot guarantee that the above examples will work for you out of the box. To learn how to configure the files to suit your needs, you should make sure you understand your job scheduler and <a href="https://github.com/mllg/batchtools">batchtools</a>.</p>
 </div>
@@ -724,24 +724,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="makefile-level-parallelism-for-imported-objects-and-files" class="section level3">
 <h3><span class="header-section-number">B.5.6</span> Makefile-level parallelism for imported objects and files</h3>
 <p>Makefile-level parallelism is only used for targets in your workflow plan data frame, not imports. To process imported objects and files, drake selects the best local parallel backend for your system and uses the <code>jobs</code> argument to <code>make()</code>. To use at most 2 jobs for imports and at most 4 jobs for targets, run</p>
-<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb262-1" data-line-number="1"><span class="kw">make</span>(..., <span class="dt">parallelism =</span> <span class="st">&quot;Makefile&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>, <span class="dt">args =</span> <span class="st">&quot;--jobs=4&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb264-1" data-line-number="1"><span class="kw">make</span>(..., <span class="dt">parallelism =</span> <span class="st">&quot;Makefile&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>, <span class="dt">args =</span> <span class="st">&quot;--jobs=4&quot;</span>)</a></code></pre></div>
 </div>
 <div id="zombie-processes" class="section level3">
 <h3><span class="header-section-number">B.5.7</span> Zombie processes</h3>
 <p>Some parallel backends, particularly <code>mclapply</code> and <code>future::multicore</code>, may create zombie processes. Zombie children are not usually harmful, but you may wish to kill them yourself. The following function by <a href="https://github.com/CarlBoneri">Carl Boneri</a> should work on Unix-like systems. For a discussion, see <a href="https://github.com/ropensci/drake/issues/116">drake issue 116</a>.</p>
-<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb263-1" data-line-number="1">fork_kill_zombies &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb263-2" data-line-number="2">  <span class="kw">require</span>(inline)</a>
-<a class="sourceLine" id="cb263-3" data-line-number="3">  includes &lt;-<span class="st"> &quot;#include &lt;sys/wait.h&gt;&quot;</span></a>
-<a class="sourceLine" id="cb263-4" data-line-number="4">  code &lt;-<span class="st"> &quot;int wstat; while (waitpid(-1, &amp;wstat, WNOHANG) &gt; 0) {};&quot;</span></a>
-<a class="sourceLine" id="cb263-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb263-6" data-line-number="6">  wait &lt;-<span class="st"> </span>inline<span class="op">::</span><span class="kw">cfunction</span>(</a>
-<a class="sourceLine" id="cb263-7" data-line-number="7">    <span class="dt">body =</span> code,</a>
-<a class="sourceLine" id="cb263-8" data-line-number="8">    <span class="dt">includes =</span> includes,</a>
-<a class="sourceLine" id="cb263-9" data-line-number="9">    <span class="dt">convention =</span> <span class="st">&quot;.C&quot;</span></a>
-<a class="sourceLine" id="cb263-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb263-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb263-12" data-line-number="12">  <span class="kw">invisible</span>(<span class="kw">wait</span>())</a>
-<a class="sourceLine" id="cb263-13" data-line-number="13">}</a></code></pre></div>
+<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb265-1" data-line-number="1">fork_kill_zombies &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb265-2" data-line-number="2">  <span class="kw">require</span>(inline)</a>
+<a class="sourceLine" id="cb265-3" data-line-number="3">  includes &lt;-<span class="st"> &quot;#include &lt;sys/wait.h&gt;&quot;</span></a>
+<a class="sourceLine" id="cb265-4" data-line-number="4">  code &lt;-<span class="st"> &quot;int wstat; while (waitpid(-1, &amp;wstat, WNOHANG) &gt; 0) {};&quot;</span></a>
+<a class="sourceLine" id="cb265-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb265-6" data-line-number="6">  wait &lt;-<span class="st"> </span>inline<span class="op">::</span><span class="kw">cfunction</span>(</a>
+<a class="sourceLine" id="cb265-7" data-line-number="7">    <span class="dt">body =</span> code,</a>
+<a class="sourceLine" id="cb265-8" data-line-number="8">    <span class="dt">includes =</span> includes,</a>
+<a class="sourceLine" id="cb265-9" data-line-number="9">    <span class="dt">convention =</span> <span class="st">&quot;.C&quot;</span></a>
+<a class="sourceLine" id="cb265-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb265-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb265-12" data-line-number="12">  <span class="kw">invisible</span>(<span class="kw">wait</span>())</a>
+<a class="sourceLine" id="cb265-13" data-line-number="13">}</a></code></pre></div>
 </div>
 </div>
 <div id="storage" class="section level2">
@@ -766,8 +766,8 @@ keys/config/am9icw (Sandy Sum's conflicted copy 2018-01-31)
 keys/config/c2VlZA (Sandy Sum's conflicted copy 2018-01-31)
 </code></pre>
 <p>Just remove these files using <code>drake_gc()</code> and proceed with your work.</p>
-<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb264-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>()</a>
-<a class="sourceLine" id="cb264-2" data-line-number="2"><span class="kw">drake_gc</span>(cache)</a></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb266-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>()</a>
+<a class="sourceLine" id="cb266-2" data-line-number="2"><span class="kw">drake_gc</span>(cache)</a></code></pre></div>
 </div>
 <div id="cache-customization-is-limited" class="section level3">
 <h3><span class="header-section-number">B.6.2</span> Cache customization is limited</h3>
