@@ -156,9 +156,16 @@ So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` 
 
 ### `map_plan()`
 
-Similar to the `map()` and `pmap()` family in the [`purrr`](https://github.com/tidyverse/purrr) package, `map_plan()` generates a plan by mapping a function to a grid of arguments. For a practical example, see the [gross state product example in this manual](#gsp). But for now, let's stick to something simple.
+[`purrr`](https://github.com/tidyverse/purrr)-like functional programming is like looping, but cleaner. The idea is to iterate the same computation over multiple different data points. You write a function to do something once, and a [`map()`](https://purrr.tidyverse.org/reference/map.html)-like helper invokes it on each point in your dataset. `drake`'s version of [`map()`](https://purrr.tidyverse.org/reference/map.html) &mdash; or more precisely, [`pmap_df()`](https://purrr.tidyverse.org/reference/map2.html) &mdash; is [`map_plan()`](https://ropensci.github.io/drake/reference/map_plan.html).
 
-Let's say we want find out which variables best explain fuel efficiency (in miles per gallon) in the `mtcars` dataset. We write a function that takes the names of two covariates and fits them to the response variable (`mpg`).
+In the following example, we want to know how well each pair covariates in the [`mtcars` dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html) can predict fuel efficiency (miles per gallon). We will try multiple pairs of covariates using the same statistical analysis, so it is a great time for `drake`-flavored functional programming with `map_plan()`.
+
+As with its cousin, [`pmap_df()`](https://purrr.tidyverse.org/reference/map2.html), [`map_plan()`](https://ropensci.github.io/drake/reference/map_plan.html) needs
+
+1. A function.
+2. A grid of function arguments.
+
+Our function fits a fuel efficiency model given a *single* pair of covariate names `x1` and `x2`.
 
 ```{r map_plan_fn}
 my_model_fit <- function(x1, x2, data){
@@ -166,49 +173,53 @@ my_model_fit <- function(x1, x2, data){
 }
 ```
 
-For our covariates, we consider all the variables in `mtcars` except `mpg`.
+Our grid of function arguments is a data frame of possible values for `x1`, `x2`, and `data`.
 
 ```{r map_plan_covariates}
-covariates <- setdiff(colnames(mtcars), "mpg")
-```
-
-And we consider all possible pairs.
-
-```{r map_plan_pairs}
-args <- tibble::as_tibble(t(combn(covariates, 2)))
-colnames(args) <- c("x1", "x2")
-head(args)
-```
-
-Each row of `args` represents a function call to `my_model_fit()` using the values in the row. `my_model_fit()` expects`x1` and `x2` to be character strings, so that is how we set them in `args`. But what about the `data` argument? In general, `data` could be the `mtcars` dataset or an unknown upstream target. For the "data" column, we need a list of symbols. The [`syms()`](https://rdrr.io/cran/rlang/man/sym.html) function from the [`rlang`](https://github.com/r-lib/rlang) package can help us.
-
-```{r mtcarssimsplan}
-args$data <- rlang::syms(rep("mtcars", nrow(args)))
+covariates <- setdiff(colnames(mtcars), "mpg") # Exclude the response variable.
+args <- combn(covariates, 2) %>% # Take all possible pairs.
+  t() %>% # Take the transpose so each row is a single pair. %>%
+  tibble::as_tibble() # Tibbles are so nice.
+colnames(args) <- c("x1", "x2") # The column names must be the argument names of my_model_fit()
+args$data <- "mtcars"
 args
 ```
 
-For each row of `args`, we want to fit a model using the covariates in the row. Let's make a `drake` plan to do that.
+Each row of `args` corresponds to a call to `my_model_fit()`. To actually write out all those function calls, we use `map_plan()`. 
 
-```{r map_plan_1}
-plan <- map_plan(args, "my_model_fit")
-plan
+```{r argsplan}
+map_plan(args, my_model_fit)
 ```
 
-The default target names are ugly, so we can supply our own names. You can either set an "id" column in `args` or set the `id` argument of `map_plan()`.
+We now have a plan, but it has problems.
 
-```{r map_plan_2}
+1. The `data` argument should be a symbol. In other words, we want `my_model_fit(data = mtcars)`, not `my_model_fit(data = "mtcars")`. So we use the [`syms()`](https://rlang.r-lib.org/reference/sym.html) function from the [`rlang`](https://github.com/r-lib/rlang) package turn `args$data` into a list of symbols.
+2. The default argument names are ugly, so we should add a new `"id"` column to `args` (or select one with the `id` argument of `map_plan()`).
+
+```{r mapplanid}
+# Fixes (1)
+args$data <- rlang::syms(args$data)
+
+# Fixes (2)
 args$id <- paste0("fit_", args$x1, "_", args$x2)
-plan <- map_plan(args, "my_model_fit")
+
+args
+```
+
+Much better. Now, we can create the plan we will actually use.
+
+```{r mapplanmakesymbols}
+plan <- map_plan(args, my_model_fit)
 plan
 ```
 
-Let's actually fit our models...
+We can now fit our models.
 
 ```{r map_plan_make}
 make(plan, verbose = FALSE)
 ```
 
-and inspect our output.
+And inspect the output.
 
 ```{r map_plan_readd}
 readd(fit_cyl_disp)
