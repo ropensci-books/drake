@@ -40,15 +40,37 @@ plan
 
 When you run `make(plan)`, `drake` will produce targets `raw_data`, `data`, `hist`, `fit`, and `report`. 
 
-## Rationale
+## Plans are like R scripts.
+
+Your workflow plan data frame is like your top-level "run everything" script in a project. In fact, you can convert back and forth between plans and scripts using functions [`plan_to_code()`](https://ropensci.github.io/drake/reference/plan_to_code.html) and [`code_to_plan()`](https://ropensci.github.io/drake/reference/code_to_plan.html) (please note the [caveats here](https://ropensci.github.io/drake/reference/code_to_plan.html#details)).
+
+```{r plan_to_code_planschapter}
+plan_to_code(plan, "new_script.R")
+cat(readLines("new_script.R"), sep = "\n")
+
+code_to_plan("new_script.R")
+```
+
+And [`plan_to_notebook()`](https://ropensci.github.io/drake/reference/plan_to_notebook.html) turns plans into [R notebooks](https://bookdown.org/yihui/rmarkdown/notebook.html).
+
+```{r plan_to_notebook_planschapter}
+plan_to_notebook(plan, "new_notebook.Rmd")
+cat(readLines("new_notebook.Rmd"), sep = "\n")
+
+code_to_plan("new_notebook.Rmd")
+```
+
+
+
+## So why do we use plans?
 
 The workflow plan may seem like a burden to set up, and the use of data frames may seem counterintuitive at first, but the rewards are worth the effort.
 
 ### You can skip up-to-date work.
 
-As we saw in our [previous example](#hpc), repeated `make()`s skip work that is already up to date. The reason `drake` can skip things is that you declared all the skippable steps as targets in the workflow plan. Thus, workflow plans are vital to the time savings `drake` brings to large projects.
+As we saw in our [previous example](#hpc), repeated `make()`s skip work that is already up to date. To skip steps, we need to know what those steps actually are. Workflow plan data frames formally enumerate these steps, whereas scripts and notebooks do not.
 
-This approach of declaring targets in advance has stood the test of time. The idea dates at least as far back as [GNU Make](https://www.gnu.org/software/make/), which uses  `Makefile`s to declare targets and dependencies. `drake`'s predecessor [`remake`](https://github.com/richfitz/remake) uses [`YAML`](http://yaml.org/) files in a similar way.
+This general approach of declaring targets in advance has stood the test of time. The idea dates at least as far back as [GNU Make](https://www.gnu.org/software/make/), which uses  `Makefile`s to declare targets and dependencies. `drake`'s predecessor [`remake`](https://github.com/richfitz/remake) uses [`YAML`](http://yaml.org/) files in a similar way.
 
 ### Data frames scale well.
 
@@ -615,28 +637,6 @@ Metaprogramming gets much simpler if you do not need to construct literal calls 
 
 Thanks to [Chris Hammill](https://github.com/cfhammill) for [presenting this scenario and contributing to the solution](https://github.com/ropensci/drake/issues/451).
 
-### Turn scripts and reports into plans
-
-With the `code_to_plan()` function, you can turn your R scripts and `knitr` / R Markdown reports into `drake` workflow plan data frames. In your script or `knitr` / R Markdown code chunks, you can assign expressions to variables, and `code_to_plan()` will turn them into commands and targets, respectively. The `make.R` script demonstrates how this works for the script `script.R` and the report `report.Rmd`.
-
-This feature is easy to break, so there are some rules for your source files:
-
-1. Stick to ssigning a single expression to a single target at a time. For multi-line commands, please enclose the whole command in curly braces. Conversely, compound assignment is not supported (e.g. `target_1 <- target_2 <- target_3 <- get_data()`).
-2. Once you assign an expression to a variable, do not modify the variable any more. The target/command [binding](https://cs.stackexchange.com/questions/39525/what-is-the-difference-between-assignment-valuation-and-name-binding) should be permanent.
-3. Keep it simple. Please use the assignment operators rather than `assign()` and similar functions.
-
-You can [find example code and extra documentation here](https://github.com/wlandau/drake-examples/tree/master/code_to_plan), and you can download the files with `drake_exmaple()`.
-
-```{r code_to_plan}
-library(drake)
-drake_example("code_to_plan")
-plan <- code_to_plan("code_to_plan/script.R")
-plan2 <- code_to_plan("code_to_plan/report.Rmd")
-identical(plan, plan2) # should be TRUE
-print(plan)
-make(plan)
-readd(discrepancy)
-```
 
 ## Optional columns in your plan.
 
@@ -653,7 +653,8 @@ Besides the usual columns `target` and `command`, there are other columns you ca
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
   c("main", "code_to_plan", "start.rds", "report.Rmd", "raw_data.xlsx",
-    "STDIN.o*", "Thumbs.db", "in1.txt", "in2.txt"),
+    "STDIN.o*", "Thumbs.db", "in1.txt", "in2.txt", "new_script.R",
+    "new_notebook.Rmd"),
   recursive = TRUE
 )
 ```
