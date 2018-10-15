@@ -213,14 +213,17 @@ Each row of `args` corresponds to a call to `my_model_fit()`. To actually write 
 map_plan(args, my_model_fit)
 ```
 
-We now have a plan, but it has problems.
+We now have a plan, but it has a couple issues.
 
 1. The `data` argument should be a symbol. In other words, we want `my_model_fit(data = mtcars)`, not `my_model_fit(data = "mtcars")`. So we use the [`syms()`](https://rlang.r-lib.org/reference/sym.html) function from the [`rlang`](https://github.com/r-lib/rlang) package turn `args$data` into a list of symbols.
-2. The default argument names are ugly, so we should add a new `"id"` column to `args` (or select one with the `id` argument of `map_plan()`).
+2. The default argument names are ugly, so we can add a new `"id"` column to `args` (or select one with the `id` argument of `map_plan()`).
 
 ```{r mapplanid}
 # Fixes (1)
 args$data <- rlang::syms(args$data)
+
+# Alternative if `args$data` has code with multiple symbols:
+# args$data <- purrr::map(args$data, rlang::parse_expr)
 
 # Fixes (2)
 args$id <- paste0("fit_", args$x1, "_", args$x2)
