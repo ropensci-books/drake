@@ -231,14 +231,21 @@ args$id <- paste0("fit_", args$x1, "_", args$x2)
 args
 ```
 
-Much better. Now, we can create the plan we will actually use.
+Much better.
 
 ```{r mapplanmakesymbols}
+# `trace = TRUE` fixes (3)
 plan <- map_plan(args, my_model_fit)
 plan
 ```
 
-We can now fit our models.
+We may also want to retain information about the constituent function arguments of each target. With `map_plan(trace = TRUE)`, we can append the columns of `args` alongside the usual `"target"` and `"command"` columns of our plan.
+
+```{r mapplantrace}
+map_plan(args, my_model_fit, trace = TRUE)
+```
+
+In any case, we can now fit our models.
 
 ```{r map_plan_make}
 make(plan, verbose = FALSE)
