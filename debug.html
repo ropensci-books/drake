@@ -512,7 +512,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb185-4" data-line-number="4">##     data[sample.int(n = nrow(data), size = n, replace = TRUE), </a>
 <a class="sourceLine" id="cb185-5" data-line-number="5">##         ]</a>
 <a class="sourceLine" id="cb185-6" data-line-number="6">## }</a>
-<a class="sourceLine" id="cb185-7" data-line-number="7">## &lt;bytecode: 0xfbf5fb0&gt;</a>
+<a class="sourceLine" id="cb185-7" data-line-number="7">## &lt;bytecode: 0x1039f3e0&gt;</a>
 <a class="sourceLine" id="cb185-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb185-9" data-line-number="9">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){</a>
 <a class="sourceLine" id="cb185-10" data-line-number="10">  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
@@ -615,7 +615,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb189-53" data-line-number="53">##  $ : language f(b)</a>
 <a class="sourceLine" id="cb189-54" data-line-number="54">##  $ : language stop(&quot;`x` cannot be negative.&quot;)</a>
 <a class="sourceLine" id="cb189-55" data-line-number="55">##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</a>
-<a class="sourceLine" id="cb189-56" data-line-number="56">##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x126f8c60&gt;</a></code></pre></div>
+<a class="sourceLine" id="cb189-56" data-line-number="56">##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x1104eeb8&gt;</a></code></pre></div>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb190-1" data-line-number="1"><span class="co"># Pretend we just opened a new R session.</span></a>
 <a class="sourceLine" id="cb190-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
@@ -700,10 +700,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb191-17" data-line-number="17">## target x</a>
 <a class="sourceLine" id="cb191-18" data-line-number="18">## target y</a>
 <a class="sourceLine" id="cb191-19" data-line-number="19">## retry y: 1 of 2</a>
-<a class="sourceLine" id="cb191-20" data-line-number="20">## Timing stopped at: 0 0 0.001</a>
-<a class="sourceLine" id="cb191-21" data-line-number="21">## [2018-10-16 17:00:22] TimeoutException: reached CPU time limit [cpu=0.001s,</a>
-<a class="sourceLine" id="cb191-22" data-line-number="22">## elapsed=0.001s]</a>
-<a class="sourceLine" id="cb191-23" data-line-number="23">## Warning: No message sink to remove.</a></code></pre></div>
+<a class="sourceLine" id="cb191-20" data-line-number="20">## retry y: 2 of 2</a>
+<a class="sourceLine" id="cb191-21" data-line-number="21">## fail y</a>
+<a class="sourceLine" id="cb191-22" data-line-number="22">## Error: Target `y` failed. Call `diagnose(y)` for details. Error message:</a>
+<a class="sourceLine" id="cb191-23" data-line-number="23">##   reached elapsed time limit</a>
+<a class="sourceLine" id="cb191-24" data-line-number="24">## Warning: No message sink to remove.</a></code></pre></div>
 <p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your workflow plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb192-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb192-2" data-line-number="2">debug_plan<span class="op">$</span>timeout &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)</a>
