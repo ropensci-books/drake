@@ -350,11 +350,13 @@ make(
 
 ### Persistent scheduling
 
-Backends  "mclapply", "parLapply", and "future_lapply" launch persistent workers.
+Backends  `"mclapply"`, `"parLapply"`, `"clustermq"`, and `"future_lapply"` launch persistent workers.
 
 ```{r persist, eval = FALSE}
 make(my_plan, parallelism = "mclapply", jobs = 2)
 make(my_plan, parallelism = "parLapply", jobs = 2)
+options(clustermq.scheduler = "slurm")
+make(my_plan, parallelism = "clustermq", jobs = 2)
 future::plan(future::multisession)
 make(my_plan, parallelism = "future_lapply", jobs = 2)
 ```
@@ -400,7 +402,7 @@ make(my_plan, parallelism = "Makefile", jobs = 2)
 
 ### Staged scheduling
 
-Backends `"mclapply_staged"` and `"parLapply_staged"` support staged scheduling.
+Backends `"mclapply_staged"`, `"parLapply_staged"`, and `"clustermq_staged"` support staged scheduling.
 
 ```{r staged, eval = FALSE}
 make(my_plan, parallelism = "mclapply_staged", jobs = 2)
