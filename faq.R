@@ -1,6 +1,3 @@
-library(tidyverse)
-library(gh)
-
 is_faq <- function(label){
   identical(label$name, "frequently asked question")
 }
@@ -16,6 +13,8 @@ combine_fields <- function(lst, field){
 }
 
 build_faq <- function(){
+  library(tidyverse)
+  library(gh)
   faq <- gh(
     "GET /repos/ropensci/drake/issues?state=all",
     .limit = Inf
@@ -29,6 +28,6 @@ build_faq <- function(){
   close(con)
 }
 
-if (!identical(Sys.getenv("TRAVIS_PULL_REQUEST"), "true")){
+if (nzchar(Sys.getenv("GITHUB_PAT"))){
   build_faq()
 }
