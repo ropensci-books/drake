@@ -87,7 +87,7 @@ The backends vary widely in terms of how the workers deploy and how they are sch
 
 |                       | Deploy: local | Deploy: remote |
 | --------------------- |:-------------:| -----:|
-| Schedule: persistent | "mclapply", "parLapply" | "clustermq", "future_lapply" |
+| Schedule: persistent | "mclapply", "parLapply" | "blitz", "clustermq", "future_lapply" |
 | Schedule: transient  | | "future", "Makefile" |
 | Schedule: staged     | "mclapply_staged", "parLapply_staged" | "clustermq_staged", "future_lapply_staged" |
 
@@ -142,7 +142,7 @@ make(my_plan, parallelism = "clustermq", jobs = c(imports = 2, targets = 4))
 
 By default, these backends launch the workers on your local machine. It takes extra configuring to actually deploy them to a remote cluster. The next subsections have the details.
 
-### `"clustermq"` and `"clustermq_staged"`
+### `"clustermq"`, `"clustermq_staged"`, and `"blitz"`
 
 The [`clustermq`](https://github.com/mschubert/clustermq) R package is a fast, user-friendly tool for sending R jobs to clusters, and [`clustermq`](https://github.com/mschubert/clustermq)-powered `drake` workers suffer less overhead than other remote workers. To use `drake`'s [`clustermq`](https://github.com/mschubert/clustermq) backends, you must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
 
@@ -209,6 +209,19 @@ make(
 ```
 
 Custom placeholders like `n_slots` are processed with the [`infuser`](https://github.com/Bart6114/infuser) package.
+
+#### Blitz mode
+
+In blitz mode, `drake` schedules jobs without watching dependencies.
+
+Ordinarily, `make()` only builds targets that are out of date or missing. To check if a target is truly out of date, `drake` does a lot of checking, caching, serialization, and hashing behind the scenes. In [some situations](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf), this process is too time-consuming, so users can call `make(parallelism = "blitz")` to skip it. Behavior is exactly like `"clustermq"` parallelism when `jobs > 1` (local computation when `jobs = 1`) except
+
+1. `drake` can no longer tell which targets are out of date, so `make()` always runs everything.
+2. Targets are no longer stored in the cache, so 
+    1. You need to save all your important results manually to your own `file_out()` files.
+    2. For any dynamic R Markdown reports in the pipeline, calls to `loadd()` and `readd()` in active code chunks no longer work.
+    3. Subsequent non-blitz calls to `make()`s start from scratch.
+3. `drake` no longer tries to limit the memory it uses, so you should avoid returning large objects from commands in your plan.
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
