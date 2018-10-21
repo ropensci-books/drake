@@ -65,6 +65,20 @@ library(knitr)
 library(rvest)
 ```
 
+We will want custom functions to summarize the CRAN logs we download.
+
+```{r summplotdatapackages}
+make_my_table <- function(downloads){
+  group_by(downloads, package) %>%
+    summarize(mean_downloads = mean(count))
+}
+
+make_my_plot <- function(downloads){
+  ggplot(downloads) +
+    geom_line(aes(x = date, y = count, group = package, color = package))
+}
+```
+
 We want to explore the daily downloads from these packages.
 
 ```{r packagelist}
@@ -108,8 +122,7 @@ latest_log_date <- function(){
 }
 ```
 
-Continuing with the setup, we want to summarize each set of
-download statistics a couple different ways.
+Once we get our download statistics, we will want to summarize them with tables and plots.
 
 ```{r outputtypespackages}
 output_types <- drake_plan(
@@ -117,33 +130,10 @@ output_types <- drake_plan(
   plot = make_my_plot(dataset__)
 )
 
-output_types
-```
-
-
-We need to define functions to summarize
-and plot the data.
-
-```{r summplotdatapackages}
-make_my_table <- function(downloads){
-  group_by(downloads, package) %>%
-    summarize(mean_downloads = mean(count))
-}
-
-make_my_plot <- function(downloads){
-  ggplot(downloads) +
-    geom_line(aes(x = date, y = count, group = package, color = package))
-}
-```
-
-Below, the targets `recent` and `older`
-each take turns substituting the `dataset__` wildcard.
-Thus, `output_plan` has four rows.
-
-```{r outputplanpackages}
-output_plan <- plan_analyses(
+output_plan <- evaluate_plan(
   plan = output_types,
-  datasets = data_plan
+  wildcard = "dataset__",
+  values = data_plan$target
 )
 
 output_plan
