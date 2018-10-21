@@ -212,7 +212,7 @@ Custom placeholders like `n_slots` are processed with the [`infuser`](https://gi
 
 #### Blitz mode
 
-In blitz mode, `drake` schedules jobs without watching dependencies.
+In blitz mode, `drake`'s only purpose is to orchestrate a workload of jobs, some of which can run in parallel and others which need to wait for dependencies to finish first. It focuses on traversing the directed acyclic graph (DAG) structure of your workflow, and it sacrifices other core functionality for the sake of speed.
 
 Ordinarily, `make()` only builds targets that are out of date or missing. To check if a target is truly out of date, `drake` does a lot of checking, caching, serialization, and hashing behind the scenes. In [some situations](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf), this process is too time-consuming, so users can call `make(parallelism = "blitz")` to skip it. Behavior is exactly like `"clustermq"` parallelism when `jobs > 1` (local computation when `jobs = 1`) except
 
