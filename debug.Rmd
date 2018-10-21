@@ -29,7 +29,6 @@ config <- drake_config(my_plan)
 vis_drake_graph(config, width = "100%", height = "500px")
 ```
 
-
 ### Check specific dependency information.
 
 With the `deps_code()` function, you can see for yourself how `drake` detects first-order dependencies from code.
@@ -256,6 +255,10 @@ withr::with_message_sink(
   make(debug_plan, timeout = Inf, retries = 0)
 )
 ```
+
+## Blitz mode
+
+In blitz mode, `drake` acts as a job scheduler without watching dependencies. In other words, `make(parallelism = "blitz")` always runs all the targets, and computational overhead is dramatically reduced. Because it helps deploy targets much faster, blitz mode may be a nice way to test a workflow before running it in production. Read more [here](https://ropenscilabs.github.io/drake-manual/hpc.html#blitz-mode).
 
 ## More help
 
