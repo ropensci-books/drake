@@ -221,19 +221,6 @@ In blitz mode, `drake` abandons its [claims to reproducibility](https://ropensci
 
 We retain an important advantage in blitz mode: `drake` still knows which targets to run in parallel and which need to wait for dependencies to finish. In other words, blitz mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
 
-```{r blitzdag, echo = FALSE}
-withr::with_dir(tempdir(), {
-  load_main_example()
-  config <- drake_config(plan)
-  vis_drake_graph(
-    config,
-    targets_only = TRUE,
-    show_output_files = FALSE,
-    main = "Example pipeline: drake_example(\"main\")"
-  )
-})
-```
-
 **But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` can no longer provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used
 
 1. For debugging and testing.
