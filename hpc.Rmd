@@ -212,7 +212,7 @@ Custom placeholders like `n_slots` are processed with the [`infuser`](https://gi
 
 #### Blitz mode
 
-```r
+```{r introblitz, eval = FALSE}
 make(plan, parallelism = "blitz", jobs = 8) # Like "clustermq" parallelism
 make(plan, parallelizm = "blitz", jobs = 1) # Ordinary local serial computation
 ```
@@ -236,9 +236,9 @@ withr::with_dir(tempdir(), {
 
 **But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` can no longer provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used
 
-- For debugging and testing.
-- If computational reproducibility is adequately handled some other way.
-- If the data are large and the targets are numerous and/or easy to compute by comparison. In those cases, normal usage of `drake` may not be useful ([example](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf)).
+1. For debugging and testing.
+2. If computational reproducibility is adequately handled some other way.
+3. If the data are large and the targets are numerous and/or easy to compute by comparison. In those cases, normal usage of `drake` and may not be useful ([example](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf)).
 
 In addition, the return values of targets remain available in memory while `make()` is executing, but those values are no longer stored a the cache. Consequently,
 
