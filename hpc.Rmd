@@ -6,11 +6,7 @@ suppressMessages(suppressWarnings(library(drake)))
 suppressMessages(suppressWarnings(library(dplyr)))
 clean(destroy = TRUE, verbose = FALSE)
 unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  error = TRUE,
-  warning = TRUE
-)
+knitr::opts_chunk$set(collapse = TRUE)
 ```
 
 `drake` is not only a reproducibility tool, but also a high-performance computing engine. To activate parallel computing, just set the `jobs` argument of `make()` to a value greater than 1. Below, up to 2 targets can run simultaneously at any given time.
@@ -220,6 +216,19 @@ make(plan, parallelizm = "blitz", jobs = 1) # Ordinary local serial computation
 In blitz mode, `drake` abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence) and focuses exclusively on job scheduling. It forgets about tracking output, and it no longer tries to skip up-to-date targets. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is *electrifyingly* faster.
 
 We retain an important advantage in blitz mode: `drake` still knows which targets to run in parallel and which need to wait for dependencies to finish. In other words, blitz mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
+
+```{r blitzdag, echo = FALSE}
+withr::with_dir(tempdir(), {
+  load_main_example()
+  config <- drake_config(plan)
+  vis_drake_graph(
+    config,
+    targets_only = TRUE,
+    show_output_files = FALSE,
+    main = "Example pipeline: drake_example(\"main\")"
+  )
+})
+```
 
 **But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` can no longer provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used
 
