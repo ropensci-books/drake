@@ -212,16 +212,41 @@ Custom placeholders like `n_slots` are processed with the [`infuser`](https://gi
 
 #### Blitz mode
 
-In blitz mode, `drake`'s only purpose is to orchestrate a workload of jobs, some of which can run in parallel and others which need to wait for dependencies to finish first. It focuses on traversing the directed acyclic graph (DAG) structure of your workflow, and it sacrifices other core functionality for the sake of speed.
+```r
+make(plan, parallelism = "blitz", jobs = 8) # Like "clustermq" parallelism
+make(plan, parallelizm = "blitz", jobs = 1) # Ordinary local serial computation
+```
 
-Ordinarily, `make()` only builds targets that are out of date or missing. To check if a target is truly out of date, `drake` does a lot of checking, caching, serialization, and hashing behind the scenes. In [some situations](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf), this process is too time-consuming, so users can call `make(parallelism = "blitz")` to skip it. Behavior is exactly like `"clustermq"` parallelism when `jobs > 1` (local computation when `jobs = 1`) except
+In blitz mode, `drake` abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence) and focuses exclusively on job scheduling. It forgets about tracking output, and it no longer tries to skip up-to-date targets. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is *electrifyingly* faster.
 
-1. `drake` can no longer tell which targets are out of date, so `make()` always runs everything.
-2. Built targets remain available in memory while `make()` is executing, but those values are no longer stored in the cache. Consequences: 
-    1. You need to save all your important results manually to your own `file_out()` files.
-    2. For any dynamic R Markdown reports in the pipeline, calls to `loadd()` and `readd()` in active code chunks no longer work.
-    3. Subsequent non-blitz calls to `make()`s start from scratch.
-3. `drake` no longer tries to limit the memory it uses, so you should avoid returning large objects from commands in your plan.
+We retain an important advantage in blitz mode: `drake` still knows which targets to run in parallel and which need to wait for dependencies to finish. In other words, blitz mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
+
+```{r blitzdag, echo = FALSE}
+withr::with_dir(tempdir(), {
+  load_main_example()
+  config <- drake_config(plan)
+  vis_drake_graph(
+    config,
+    targets_only = TRUE,
+    show_output_files = FALSE,
+    main = "Example pipeline: drake_example(\"main\")"
+  )
+})
+```
+
+**But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` can no longer provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used
+
+- For debugging and testing.
+- If computational reproducibility is adequately handled some other way.
+- If the data are large and the targets are numerous and/or easy to compute by comparison. In those cases, normal usage of `drake` may not be useful ([example](http://inf.ufrgs.br/gppd/wsppd/2018/papers/proceedings/WSPPD_2018_paper_10.pdf)).
+
+In addition, the return values of targets remain available in memory while `make()` is executing, but those values are no longer stored a the cache. Consequently,
+
+1. You need to save all your important results manually to your own `file_out()` files.
+2. For any dynamic R Markdown reports in the pipeline, calls to `loadd()` and `readd()` in active code chunks no longer work.
+3. Subsequent non-blitz calls to `make()`s start from scratch.
+
+Lastly, `drake` no longer tries to limit the memory it uses, so you should avoid returning large objects from commands in your plan.
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
