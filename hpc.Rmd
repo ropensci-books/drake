@@ -213,11 +213,11 @@ make(plan, parallelism = "blitz", jobs = 8) # Like "clustermq" parallelism
 make(plan, parallelizm = "blitz", jobs = 1) # Ordinary local serial computation
 ```
 
-In blitz mode, `drake` abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence) and focuses exclusively on job scheduling. It forgets about tracking output, and it no longer tries to skip up-to-date targets. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is *electrifyingly* faster.
+In blitz mode, `drake` <span style = "color: red;">abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence)</span> and focuses exclusively on job scheduling. It <span style = "color: red;">forgets about tracking output</span>, and it <span style = "color: red;">no longer tries to skip up-to-date targets</span>. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is much faster for projects with large datasets and lots of targets.
 
 We retain an important advantage in blitz mode: `drake` still knows which targets to run in parallel and which need to wait for dependencies to finish. In other words, blitz mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
 
-```{r blitzdag, echo = FALSE}
+```{r blitzdag, echo = FALSE, message = FALSE}
 withr::with_dir(tempdir(), {
   load_main_example()
   config <- drake_config(plan)
@@ -230,7 +230,7 @@ withr::with_dir(tempdir(), {
 })
 ```
 
-**But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` cannot provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used for debugging and testing or if computional reproducibility is handled some other way.
+<span style = "color: red;">**But we emphasize: in blitz mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` cannot provide evidence that your results are synchronized with the underlying code and data.** Blitz mode should only be used for debugging and testing or if computional reproducibility is handled some other way.</span>
 
 In addition, the return values of targets remain available in memory while `make()` is executing, but those values are no longer stored in a cache. Consequently,
 
