@@ -317,15 +317,15 @@ Wildcards for `evaluate_plan()` do not need to have the double-underscore suffix
 
 ```{r evaluateplan5}
 plan <- drake_plan(
-  t  = rt(1000, df = .df.),
-  normal = runif(1000, mean = MEAN, sd = ..sd)
+  t  = rt(1000, df = .DF.),
+  normal = runif(1000, mean = `{MEAN}`, sd = ..sd)
 )
 evaluate_plan(
   plan,
   rules = list(
-    MEAN = c(0, 1),
+    "`{MEAN}`" = c(0, 1),
     ..sd = c(3, 4),
-    .df. = 5:7
+    .DF. = 5:7
   )
 )
 ```
