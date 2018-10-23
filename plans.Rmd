@@ -60,8 +60,6 @@ cat(readLines("new_notebook.Rmd"), sep = "\n")
 code_to_plan("new_notebook.Rmd")
 ```
 
-
-
 ## So why do we use plans?
 
 The workflow plan may seem like a burden to set up, and the use of data frames may seem counterintuitive at first, but the rewards are worth the effort.
@@ -260,7 +258,7 @@ readd(fit_cyl_disp)
 
 ### Wildcard templating
 
-In `drake`, you can write plans with wildcards. These wilrdards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let's say you are running a simulation study, and you need to generate sets of random numbers from different distributions.
+In `drake`, you can write plans with wildcards. These wildcards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let's say you are running a simulation study, and you need to generate sets of random numbers from different distributions.
 
 
 ```{r evaluteplan1}
@@ -311,6 +309,23 @@ evaluate_plan(
     mean__ = c(0, 1),
     sd__ = c(3, 4),
     df__ = 5:7
+  )
+)
+```
+
+Wildcards do not need to have the double-underscore suffix. Any valid symbol will do.
+
+```{r evaluateplan4}
+plan <- drake_plan(
+  t  = rt(1000, df = .df.),
+  normal = runif(1000, mean = MEAN, sd = ..sd)
+)
+evaluate_plan(
+  plan,
+  rules = list(
+    MEAN = c(0, 1),
+    ..sd = c(3, 4),
+    .df. = 5:7
   )
 )
 ```
