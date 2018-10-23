@@ -98,7 +98,9 @@ drake_plan(
 
 ## Automatic dependency detection
 
-Why can you safely scramble the rows of a `drake` plan? Why is row order irrelevant to execution order? Because `drake` analyzes commands for dependencies, and `make()` processes those dependencies before moving on to downstream targets. To detect dependencies, `drake` walks through the [abstract syntax tree](http://adv-r.had.co.nz/Expressions.html#ast-funs) of every piece of code to find the objects and files relevant to the workflow pipeline.
+Why can you safely scramble the rows of a `drake` plan? Why is row order irrelevant to execution order? Because `drake` _analyzes_ commands and functions for dependencies, and `make()` processes those dependencies before moving on to downstream targets. To detect dependencies, `drake` walks through the [abstract syntax tree](http://adv-r.had.co.nz/Expressions.html#ast-funs) of every piece of code to find the objects and files relevant to the workflow pipeline.
+
+For more information on _static code analysis_, see [this section of _Advanced R_](http://adv-r.had.co.nz/Expressions.html#ast-funs) and the [`CodeDepends`](https://github.com/duncantl/CodeDepends) package.
 
 ```{r depscode_plans}
 create_plot <- function(data) {
