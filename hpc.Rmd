@@ -213,9 +213,7 @@ make(plan, parallelism = "hasty", jobs = 8) # Like "clustermq" parallelism
 make(plan, parallelizm = "hasty", jobs = 1) # Ordinary local serial computation
 ```
 
-In hasty mode, `drake` <span style = "color: red;">abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence)</span> and focuses exclusively on job scheduling. It <span style = "color: red;">forgets about tracking output</span>, and it <span style = "color: red;">no longer tries to skip up-to-date targets</span>. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is much faster for projects with large datasets and lots of targets.
-
-We retain an important advantage in hasty mode: `drake` still knows which targets to run in parallel and which need to wait for dependencies to finish. In other words, hasty mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
+In hasty mode, `drake` <span style = "color: red;">abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence)</span> and focuses exclusively on job scheduling. It <span style = "color: red;">forgets about tracking output</span>, and it <span style = "color: red;">no longer tries to skip up-to-date targets</span>. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is extremely low-overhead, especially for projects with large datasets and lots of targets.
 
 ```{r hastydag, echo = FALSE, message = FALSE}
 withr::with_dir(tempdir(), {
@@ -230,15 +228,42 @@ withr::with_dir(tempdir(), {
 })
 ```
 
-<span style = "color: red;">**But we emphasize: in hasty mode, the [CORE REPRODUCIBILITY CLAIMS of `drake`](https://ropensci.github.io/drake/#evidence) are NO LONGER VALID. Here, `drake` cannot provide evidence that your results are synchronized with the underlying code and data.** Hasty mode should only be used for debugging and testing or if computional reproducibility is handled some other way.</span>
+<span style = "color: red;">**We emphasize: in hasty mode, the [core reproducibility of `drake`](https://ropensci.github.io/drake/#evidence) are no longer valid. Here, `drake` cannot provide evidence that your results are synchronized with the underlying code and data.** Hasty mode should only be used for debugging and testing or if computional reproducibility is handled some other way.</span>
 
-In addition, the return values of targets remain available in memory while `make()` is executing, but those values are no longer stored in a cache. Consequently,
+And ask yourself: are you really willing to run all your targets from the beginning next time you call `make()`? Are you willing to iterate on a project where up-to-date targets are no longer skipped? Are the short-term speed gains really worth it? In the words of an esteemed colleague,
 
-1. You need to save all your important results manually to your own `file_out()` files.
-2. `loadd()` and `readd()` can no longer retrieve data.
+> _The fastest code is the code you do not run_.
+
+#### Specific usage concerns
+
+The return values of targets remain available in memory while `make()` is executing. Unlike `drake`'s usual behavior, those values stay in memory even when they are no longer needed. In addition, the return values are no longer stored in a cache. Consequently,
+
+1. You should save all your important (and large) results manually to your own `file_out()` files.
+2. `loadd()` and `readd()` no longer retrieve data.
 3. Subsequent non-hasty calls to `make()`s start from scratch.
 
-Lastly, `drake` no longer tries to limit the memory it uses, so you should avoid returning giant objects from commands in your plan.
+#### Benefits of hasty mode
+
+1. `drake`'s hasty mode cuts corners to gain speed, but it still knows which targets it can run in parallel and which need to wait for dependencies to finish. In other words, hasty mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
+2. In `drake` version >= 6.1.0.9000, you can micromanage exactly how each target is built. The `hasty_build` argument to `make()` is a function that controls exactly how each target's command is run. The default `hasty_build` function is
+
+```{r default_hasty_build}
+default_hasty_build
+```
+
+You can supply an alternative build function with your own customization. In the following thought experiment, we assume you already defined a function `log_to_website()` that communicated with a web service as your targets are progressing.
+
+```{r my_hasty_build, eval = FALSE}
+my_hasty_build <- function(target, config){
+  log_to_website("start") # Notify a website that the target is starting.
+  large_dataset <- default_hasty_build(target, config) # Run the target's command.
+  log_to_website("end") # Notify a website that the target is finished.
+  write.csv(large_dataset, paste0(target, ".csv") # Write the output to a file.
+  digest::digest(large_dataset) # Just return a small fingerprint.
+}
+
+make(my_plan, parallelism = "hasty", jobs = 2, hasty_build = my_hasty_build)
+```
 
 ### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
 
