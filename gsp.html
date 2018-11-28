@@ -440,22 +440,24 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <a class="sourceLine" id="cb40-27" data-line-number="27">## F-statistic:  4541 on 3 and 812 DF,  p-value: &lt; 2.2e-16</a></code></pre></div>
 <p>Ultimately, we will apply a 3-covariate model to each triplet of predictors in the data.</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)</a>
-<a class="sourceLine" id="cb41-2" data-line-number="2">combos &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(<span class="kw">t</span>(<span class="kw">combn</span>(predictors, <span class="dv">3</span>)))</a>
-<a class="sourceLine" id="cb41-3" data-line-number="3">combos</a>
-<a class="sourceLine" id="cb41-4" data-line-number="4">## # A tibble: 84 x 3</a>
-<a class="sourceLine" id="cb41-5" data-line-number="5">##    V1    V2    V3   </a>
-<a class="sourceLine" id="cb41-6" data-line-number="6">##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</a>
-<a class="sourceLine" id="cb41-7" data-line-number="7">##  1 state year  pcap </a>
-<a class="sourceLine" id="cb41-8" data-line-number="8">##  2 state year  hwy  </a>
-<a class="sourceLine" id="cb41-9" data-line-number="9">##  3 state year  water</a>
-<a class="sourceLine" id="cb41-10" data-line-number="10">##  4 state year  util </a>
-<a class="sourceLine" id="cb41-11" data-line-number="11">##  5 state year  pc   </a>
-<a class="sourceLine" id="cb41-12" data-line-number="12">##  6 state year  emp  </a>
-<a class="sourceLine" id="cb41-13" data-line-number="13">##  7 state year  unemp</a>
-<a class="sourceLine" id="cb41-14" data-line-number="14">##  8 state pcap  hwy  </a>
-<a class="sourceLine" id="cb41-15" data-line-number="15">##  9 state pcap  water</a>
-<a class="sourceLine" id="cb41-16" data-line-number="16">## 10 state pcap  util </a>
-<a class="sourceLine" id="cb41-17" data-line-number="17">## # ... with 74 more rows</a></code></pre></div>
+<a class="sourceLine" id="cb41-2" data-line-number="2">combos &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">combn</span>(predictors, <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb41-3" data-line-number="3"><span class="kw">colnames</span>(combos) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;V1&quot;</span>, <span class="st">&quot;V2&quot;</span>, <span class="st">&quot;V3&quot;</span>)</a>
+<a class="sourceLine" id="cb41-4" data-line-number="4">combos &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(combos)</a>
+<a class="sourceLine" id="cb41-5" data-line-number="5">combos</a>
+<a class="sourceLine" id="cb41-6" data-line-number="6">## # A tibble: 84 x 3</a>
+<a class="sourceLine" id="cb41-7" data-line-number="7">##    V1    V2    V3   </a>
+<a class="sourceLine" id="cb41-8" data-line-number="8">##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</a>
+<a class="sourceLine" id="cb41-9" data-line-number="9">##  1 state year  pcap </a>
+<a class="sourceLine" id="cb41-10" data-line-number="10">##  2 state year  hwy  </a>
+<a class="sourceLine" id="cb41-11" data-line-number="11">##  3 state year  water</a>
+<a class="sourceLine" id="cb41-12" data-line-number="12">##  4 state year  util </a>
+<a class="sourceLine" id="cb41-13" data-line-number="13">##  5 state year  pc   </a>
+<a class="sourceLine" id="cb41-14" data-line-number="14">##  6 state year  emp  </a>
+<a class="sourceLine" id="cb41-15" data-line-number="15">##  7 state year  unemp</a>
+<a class="sourceLine" id="cb41-16" data-line-number="16">##  8 state pcap  hwy  </a>
+<a class="sourceLine" id="cb41-17" data-line-number="17">##  9 state pcap  water</a>
+<a class="sourceLine" id="cb41-18" data-line-number="18">## 10 state pcap  util </a>
+<a class="sourceLine" id="cb41-19" data-line-number="19">## # ... with 74 more rows</a></code></pre></div>
 <p>We want a <code>combos</code> data frame with all the arguments to <code>fit_gsp_model()</code></p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co"># The `data` argument to fit_gsp_model() is a symbol,</span></a>
 <a class="sourceLine" id="cb42-2" data-line-number="2"><span class="co"># which could stand for a generic dataset or an upstream target.</span></a>
