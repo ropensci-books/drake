@@ -200,11 +200,11 @@ Our grid of function arguments is a data frame of possible values for `x1`, `x2`
 
 ```{r map_plan_covariates}
 covariates <- setdiff(colnames(mtcars), "mpg") # Exclude the response variable.
-args <- combn(covariates, 2) %>% # Take all possible pairs.
-  t() %>% # Take the transpose so each row is a single pair. %>%
-  tibble::as_tibble() # Tibbles are so nice.
+args <- t(combn(covariates, 2)) # Take all possible pairs.
 colnames(args) <- c("x1", "x2") # The column names must be the argument names of my_model_fit()
+args <- tibble::as_tibble(args) # Tibbles are so nice.
 args$data <- "mtcars"
+
 args
 ```
 
