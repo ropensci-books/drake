@@ -5,11 +5,11 @@
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>The drake R Package User Manual</title>
-  <meta name="description" content="The drake R Package User Manual">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <title>Chapter 6 Workflow plan data frames | The drake R Package User Manual</title>
+  <meta name="description" content="Chapter 6 Workflow plan data frames | The drake R Package User Manual>
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
 
-  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:title" content="Chapter 6 Workflow plan data frames | The drake R Package User Manual />
   <meta property="og:type" content="book" />
   
   
@@ -17,7 +17,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The drake R Package User Manual" />
+  <meta name="twitter:title" content="Chapter 6 Workflow plan data frames | The drake R Package User Manual />
   
   
   
@@ -36,6 +36,7 @@
 <link rel="next" href="organize.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
@@ -50,7 +51,7 @@
 <script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
-<script src="libs/visNetwork-binding-2.0.4/visNetwork.js"></script>
+<script src="libs/visNetwork-binding-2.0.5/visNetwork.js"></script>
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
@@ -354,88 +355,88 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="what-is-a-workflow-plan-data-frame" class="section level2">
 <h2><span class="header-section-number">6.1</span> What is a workflow plan data frame?</h2>
 <p>Your workflow plan data frame is the object where you declare all the objects and files you are going to produce when you run your project. It enumerates each output R object, or <em>target</em>, and the <em>command</em> that will produce it. Here is the workflow plan from our <a href="hpc.html#hpc">previous example</a>.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb97-2" data-line-number="2">  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),</a>
-<a class="sourceLine" id="cb97-3" data-line-number="3">  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb97-4" data-line-number="4"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb97-5" data-line-number="5"><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb97-6" data-line-number="6">  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</a>
-<a class="sourceLine" id="cb97-7" data-line-number="7">  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),</a>
-<a class="sourceLine" id="cb97-8" data-line-number="8">  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
-<a class="sourceLine" id="cb97-9" data-line-number="9">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb97-10" data-line-number="10">    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
-<a class="sourceLine" id="cb97-11" data-line-number="11">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb97-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb97-13" data-line-number="13">)</a>
-<a class="sourceLine" id="cb97-14" data-line-number="14">plan</a>
-<a class="sourceLine" id="cb97-15" data-line-number="15">## # A tibble: 5 x 2</a>
-<a class="sourceLine" id="cb97-16" data-line-number="16">##   target   command                                                        </a>
-<a class="sourceLine" id="cb97-17" data-line-number="17">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb97-18" data-line-number="18">## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               </a>
-<a class="sourceLine" id="cb97-19" data-line-number="19">## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …</a>
-<a class="sourceLine" id="cb97-20" data-line-number="20">## 3 hist     create_plot(data)                                              </a>
-<a class="sourceLine" id="cb97-21" data-line-number="21">## 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  </a>
-<a class="sourceLine" id="cb97-22" data-line-number="22">## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),
+  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),
+  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),
+  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),
+  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(
+    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+    <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+  )
+)
+plan
+## # A tibble: 5 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               
+## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …
+## 3 hist     create_plot(data)                                              
+## 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  
+## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</code></pre>
 <p>When you run <code>make(plan)</code>, <code>drake</code> will produce targets <code>raw_data</code>, <code>data</code>, <code>hist</code>, <code>fit</code>, and <code>report</code>.</p>
 </div>
 <div id="plans-are-like-r-scripts." class="section level2">
 <h2><span class="header-section-number">6.2</span> Plans are like R scripts.</h2>
 <p>Your workflow plan data frame is like your top-level “run everything” script in a project. In fact, you can convert back and forth between plans and scripts using functions <a href="https://ropensci.github.io/drake/reference/plan_to_code.html"><code>plan_to_code()</code></a> and <a href="https://ropensci.github.io/drake/reference/code_to_plan.html"><code>code_to_plan()</code></a> (please note the <a href="https://ropensci.github.io/drake/reference/code_to_plan.html#details">caveats here</a>).</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1"><span class="kw">plan_to_code</span>(plan, <span class="st">&quot;new_script.R&quot;</span>)</a>
-<a class="sourceLine" id="cb98-2" data-line-number="2">## Loading required namespace: styler</a>
-<a class="sourceLine" id="cb98-3" data-line-number="3">## Warning: `.named` can no longer be a width</a>
-<a class="sourceLine" id="cb98-4" data-line-number="4">## This warning is displayed once per session.</a>
-<a class="sourceLine" id="cb98-5" data-line-number="5"><span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_script.R&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
-<a class="sourceLine" id="cb98-6" data-line-number="6">## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))</a>
-<a class="sourceLine" id="cb98-7" data-line-number="7">## data &lt;- raw_data %&gt;%</a>
-<a class="sourceLine" id="cb98-8" data-line-number="8">##   mutate(Species = forcats::fct_inorder(Species)) %&gt;%</a>
-<a class="sourceLine" id="cb98-9" data-line-number="9">##   select(-X__1)</a>
-<a class="sourceLine" id="cb98-10" data-line-number="10">## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)</a>
-<a class="sourceLine" id="cb98-11" data-line-number="11">## hist &lt;- create_plot(data)</a>
-<a class="sourceLine" id="cb98-12" data-line-number="12">## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),</a>
-<a class="sourceLine" id="cb98-13" data-line-number="13">##   output_file = file_out(&quot;report.html&quot;),</a>
-<a class="sourceLine" id="cb98-14" data-line-number="14">##   quiet = TRUE</a>
-<a class="sourceLine" id="cb98-15" data-line-number="15">## )</a>
-<a class="sourceLine" id="cb98-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb98-17" data-line-number="17"><span class="kw">code_to_plan</span>(<span class="st">&quot;new_script.R&quot;</span>)</a>
-<a class="sourceLine" id="cb98-18" data-line-number="18">## # A tibble: 5 x 2</a>
-<a class="sourceLine" id="cb98-19" data-line-number="19">##   target   command                                                        </a>
-<a class="sourceLine" id="cb98-20" data-line-number="20">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb98-21" data-line-number="21">## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               </a>
-<a class="sourceLine" id="cb98-22" data-line-number="22">## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …</a>
-<a class="sourceLine" id="cb98-23" data-line-number="23">## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  </a>
-<a class="sourceLine" id="cb98-24" data-line-number="24">## 4 hist     create_plot(data)                                              </a>
-<a class="sourceLine" id="cb98-25" data-line-number="25">## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan_to_code</span>(plan, <span class="st">&quot;new_script.R&quot;</span>)
+## Loading required namespace: styler
+## Warning: `.named` can no longer be a width
+## This warning is displayed once per session.
+<span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_script.R&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))
+## data &lt;- raw_data %&gt;%
+##   mutate(Species = forcats::fct_inorder(Species)) %&gt;%
+##   select(-X__1)
+## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)
+## hist &lt;- create_plot(data)
+## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),
+##   output_file = file_out(&quot;report.html&quot;),
+##   quiet = TRUE
+## )
+
+<span class="kw">code_to_plan</span>(<span class="st">&quot;new_script.R&quot;</span>)
+## # A tibble: 5 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               
+## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …
+## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  
+## 4 hist     create_plot(data)                                              
+## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</code></pre>
 <p>And <a href="https://ropensci.github.io/drake/reference/plan_to_notebook.html"><code>plan_to_notebook()</code></a> turns plans into <a href="https://bookdown.org/yihui/rmarkdown/notebook.html">R notebooks</a>.</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1"><span class="kw">plan_to_notebook</span>(plan, <span class="st">&quot;new_notebook.Rmd&quot;</span>)</a>
-<a class="sourceLine" id="cb99-2" data-line-number="2"><span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
-<a class="sourceLine" id="cb99-3" data-line-number="3">## ---</a>
-<a class="sourceLine" id="cb99-4" data-line-number="4">## title: &quot;My Notebook&quot;</a>
-<a class="sourceLine" id="cb99-5" data-line-number="5">## output: html_notebook</a>
-<a class="sourceLine" id="cb99-6" data-line-number="6">## ---</a>
-<a class="sourceLine" id="cb99-7" data-line-number="7">## </a>
-<a class="sourceLine" id="cb99-8" data-line-number="8">## ```{r my_code}</a>
-<a class="sourceLine" id="cb99-9" data-line-number="9">## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))</a>
-<a class="sourceLine" id="cb99-10" data-line-number="10">## data &lt;- raw_data %&gt;%</a>
-<a class="sourceLine" id="cb99-11" data-line-number="11">##   mutate(Species = forcats::fct_inorder(Species)) %&gt;%</a>
-<a class="sourceLine" id="cb99-12" data-line-number="12">##   select(-X__1)</a>
-<a class="sourceLine" id="cb99-13" data-line-number="13">## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)</a>
-<a class="sourceLine" id="cb99-14" data-line-number="14">## hist &lt;- create_plot(data)</a>
-<a class="sourceLine" id="cb99-15" data-line-number="15">## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),</a>
-<a class="sourceLine" id="cb99-16" data-line-number="16">##   output_file = file_out(&quot;report.html&quot;),</a>
-<a class="sourceLine" id="cb99-17" data-line-number="17">##   quiet = TRUE</a>
-<a class="sourceLine" id="cb99-18" data-line-number="18">## )</a>
-<a class="sourceLine" id="cb99-19" data-line-number="19">## ```</a>
-<a class="sourceLine" id="cb99-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb99-21" data-line-number="21"><span class="kw">code_to_plan</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>)</a>
-<a class="sourceLine" id="cb99-22" data-line-number="22">## # A tibble: 5 x 2</a>
-<a class="sourceLine" id="cb99-23" data-line-number="23">##   target   command                                                        </a>
-<a class="sourceLine" id="cb99-24" data-line-number="24">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb99-25" data-line-number="25">## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               </a>
-<a class="sourceLine" id="cb99-26" data-line-number="26">## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …</a>
-<a class="sourceLine" id="cb99-27" data-line-number="27">## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  </a>
-<a class="sourceLine" id="cb99-28" data-line-number="28">## 4 hist     create_plot(data)                                              </a>
-<a class="sourceLine" id="cb99-29" data-line-number="29">## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan_to_notebook</span>(plan, <span class="st">&quot;new_notebook.Rmd&quot;</span>)
+<span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+## ---
+## title: &quot;My Notebook&quot;
+## output: html_notebook
+## ---
+## 
+## ```{r my_code}
+## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))
+## data &lt;- raw_data %&gt;%
+##   mutate(Species = forcats::fct_inorder(Species)) %&gt;%
+##   select(-X__1)
+## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)
+## hist &lt;- create_plot(data)
+## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),
+##   output_file = file_out(&quot;report.html&quot;),
+##   quiet = TRUE
+## )
+## ```
+
+<span class="kw">code_to_plan</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>)
+## # A tibble: 5 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;               
+## 2 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …
+## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  
+## 4 hist     create_plot(data)                                              
+## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</code></pre>
 </div>
 <div id="so-why-do-we-use-plans" class="section level2">
 <h2><span class="header-section-number">6.3</span> So why do we use plans?</h2>
@@ -452,72 +453,72 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="you-do-not-need-to-worry-about-which-targets-run-first." class="section level3">
 <h3><span class="header-section-number">6.3.3</span> You do not need to worry about which targets run first.</h3>
 <p>When you call <code>make()</code> on the plan above, <code>drake</code> takes care of <code>&quot;raw_data.xlsx&quot;</code>, then <code>raw_data</code>, and then <code>data</code> in sequence. Once <code>data</code> completes, <code>fit</code> and <code>hist</code> can start in any order, and then <code>report</code> begins once everything else is done. The execution does not depend on the order of the rows in your plan. In other words, the following plan is equivalent.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb100-2" data-line-number="2">  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),</a>
-<a class="sourceLine" id="cb100-3" data-line-number="3">  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
-<a class="sourceLine" id="cb100-4" data-line-number="4">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb100-5" data-line-number="5">    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
-<a class="sourceLine" id="cb100-6" data-line-number="6">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb100-7" data-line-number="7">  ),</a>
-<a class="sourceLine" id="cb100-8" data-line-number="8">  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</a>
-<a class="sourceLine" id="cb100-9" data-line-number="9">  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb100-10" data-line-number="10"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb100-11" data-line-number="11"><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb100-12" data-line-number="12">  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>))</a>
-<a class="sourceLine" id="cb100-13" data-line-number="13">)</a>
-<a class="sourceLine" id="cb100-14" data-line-number="14">## # A tibble: 5 x 2</a>
-<a class="sourceLine" id="cb100-15" data-line-number="15">##   target   command                                                        </a>
-<a class="sourceLine" id="cb100-16" data-line-number="16">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb100-17" data-line-number="17">## 1 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  </a>
-<a class="sourceLine" id="cb100-18" data-line-number="18">## 2 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…</a>
-<a class="sourceLine" id="cb100-19" data-line-number="19">## 3 hist     create_plot(data)                                              </a>
-<a class="sourceLine" id="cb100-20" data-line-number="20">## 4 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …</a>
-<a class="sourceLine" id="cb100-21" data-line-number="21">## 5 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),
+  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(
+    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+    <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+  ),
+  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),
+  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>X__<span class="dv">1</span>),
+  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>))
+)
+## # A tibble: 5 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  
+## 2 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = fil…
+## 3 hist     create_plot(data)                                              
+## 4 data     &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species)) …
+## 5 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;</code></pre>
 </div>
 </div>
 <div id="automatic-dependency-detection" class="section level2">
 <h2><span class="header-section-number">6.4</span> Automatic dependency detection</h2>
 <p>Why can you safely scramble the rows of a <code>drake</code> plan? Why is row order irrelevant to execution order? Because <code>drake</code> <em>analyzes</em> commands and functions for dependencies, and <code>make()</code> processes those dependencies before moving on to downstream targets. To detect dependencies, <code>drake</code> walks through the <a href="http://adv-r.had.co.nz/Expressions.html#ast-funs">abstract syntax tree</a> of every piece of code to find the objects and files relevant to the workflow pipeline.</p>
 <p>For more information on <em>static code analysis</em>, see <a href="http://adv-r.had.co.nz/Expressions.html#ast-funs">this section of <em>Advanced R</em></a> and the <a href="https://github.com/duncantl/CodeDepends"><code>CodeDepends</code></a> package.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb101-2" data-line-number="2">  <span class="kw">ggplot</span>(data, <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;Petal.Width&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;Species&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb101-3" data-line-number="3"><span class="st">    </span><span class="kw">geom_histogram</span>()</a>
-<a class="sourceLine" id="cb101-4" data-line-number="4">}</a>
-<a class="sourceLine" id="cb101-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb101-6" data-line-number="6"><span class="kw">deps_code</span>(create_plot)</a>
-<a class="sourceLine" id="cb101-7" data-line-number="7">## $globals</a>
-<a class="sourceLine" id="cb101-8" data-line-number="8">## [1] &quot;ggplot&quot;         &quot;aes_string&quot;     &quot;geom_histogram&quot;</a>
-<a class="sourceLine" id="cb101-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb101-10" data-line-number="10"><span class="kw">deps_code</span>(</a>
-<a class="sourceLine" id="cb101-11" data-line-number="11">  <span class="kw">quote</span>({</a>
-<a class="sourceLine" id="cb101-12" data-line-number="12">    <span class="kw">some_function_i_wrote</span>(data)</a>
-<a class="sourceLine" id="cb101-13" data-line-number="13">    rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
-<a class="sourceLine" id="cb101-14" data-line-number="14">      <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb101-15" data-line-number="15">      <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
-<a class="sourceLine" id="cb101-16" data-line-number="16">      <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb101-17" data-line-number="17">    )</a>
-<a class="sourceLine" id="cb101-18" data-line-number="18">  })</a>
-<a class="sourceLine" id="cb101-19" data-line-number="19">)</a>
-<a class="sourceLine" id="cb101-20" data-line-number="20">## $globals</a>
-<a class="sourceLine" id="cb101-21" data-line-number="21">## [1] &quot;some_function_i_wrote&quot; &quot;data&quot;                 </a>
-<a class="sourceLine" id="cb101-22" data-line-number="22">## </a>
-<a class="sourceLine" id="cb101-23" data-line-number="23">## $namespaced</a>
-<a class="sourceLine" id="cb101-24" data-line-number="24">## [1] &quot;rmarkdown::render&quot;</a>
-<a class="sourceLine" id="cb101-25" data-line-number="25">## </a>
-<a class="sourceLine" id="cb101-26" data-line-number="26">## $loadd</a>
-<a class="sourceLine" id="cb101-27" data-line-number="27">## [1] &quot;fit&quot;</a>
-<a class="sourceLine" id="cb101-28" data-line-number="28">## </a>
-<a class="sourceLine" id="cb101-29" data-line-number="29">## $readd</a>
-<a class="sourceLine" id="cb101-30" data-line-number="30">## [1] &quot;hist&quot;</a>
-<a class="sourceLine" id="cb101-31" data-line-number="31">## </a>
-<a class="sourceLine" id="cb101-32" data-line-number="32">## $knitr_in</a>
-<a class="sourceLine" id="cb101-33" data-line-number="33">## [1] &quot;\&quot;report.Rmd\&quot;&quot;</a>
-<a class="sourceLine" id="cb101-34" data-line-number="34">## </a>
-<a class="sourceLine" id="cb101-35" data-line-number="35">## $file_out</a>
-<a class="sourceLine" id="cb101-36" data-line-number="36">## [1] &quot;\&quot;report.html\&quot;&quot;</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {
+  <span class="kw">ggplot</span>(data, <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;Petal.Width&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;Species&quot;</span>)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_histogram</span>()
+}
+
+<span class="kw">deps_code</span>(create_plot)
+## $globals
+## [1] &quot;ggplot&quot;         &quot;aes_string&quot;     &quot;geom_histogram&quot;
+
+<span class="kw">deps_code</span>(
+  <span class="kw">quote</span>({
+    <span class="kw">some_function_i_wrote</span>(data)
+    rmarkdown<span class="op">::</span><span class="kw">render</span>(
+      <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),
+      <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),
+      <span class="dt">quiet =</span> <span class="ot">TRUE</span>
+    )
+  })
+)
+## $globals
+## [1] &quot;some_function_i_wrote&quot; &quot;data&quot;                 
+## 
+## $namespaced
+## [1] &quot;rmarkdown::render&quot;
+## 
+## $loadd
+## [1] &quot;fit&quot;
+## 
+## $readd
+## [1] &quot;hist&quot;
+## 
+## $knitr_in
+## [1] &quot;\&quot;report.Rmd\&quot;&quot;
+## 
+## $file_out
+## [1] &quot;\&quot;report.html\&quot;&quot;</code></pre>
 <p><code>drake</code> detects dependencies without actually running the command.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="kw">file.exists</span>(<span class="st">&quot;report.html&quot;</span>)</a>
-<a class="sourceLine" id="cb102-2" data-line-number="2">## [1] FALSE</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">file.exists</span>(<span class="st">&quot;report.html&quot;</span>)
+## [1] FALSE</code></pre>
 <p>Automatically detected dependencies include:</p>
 <ol style="list-style-type: decimal">
 <li>Other targets in the plan.</li>
@@ -528,27 +529,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>For <code>knitr</code> or R Markdown reports declared with <code>knitr_in()</code> (<a href="https://github.com/wlandau/drake-examples/blob/master/main/report.Rmd">example here</a>), <code>drake</code> scans active code chunks for objects mentioned with <code>loadd()</code> and <code>readd()</code>. So when <code>fit</code> or <code>hist</code> change, <code>drake</code> rebuilds the <code>report</code> target to produce the file <code>report.html</code>.</li>
 </ol>
 <p>Targets can depend on one another through <code>file_in()</code>/<code>file_out()</code> connections.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1"><span class="kw">saveRDS</span>(<span class="dv">1</span>, <span class="st">&quot;start.rds&quot;</span>)</a>
-<a class="sourceLine" id="cb103-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb103-3" data-line-number="3">write_files &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb103-4" data-line-number="4">  x &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="kw">file_in</span>(<span class="st">&quot;start.rds&quot;</span>))</a>
-<a class="sourceLine" id="cb103-5" data-line-number="5">  <span class="cf">for</span> (file <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]){</a>
-<a class="sourceLine" id="cb103-6" data-line-number="6">    <span class="kw">saveRDS</span>(x, file)</a>
-<a class="sourceLine" id="cb103-7" data-line-number="7">  }</a>
-<a class="sourceLine" id="cb103-8" data-line-number="8">}</a>
-<a class="sourceLine" id="cb103-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb103-10" data-line-number="10">small_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb103-11" data-line-number="11">  <span class="dt">x =</span> {</a>
-<a class="sourceLine" id="cb103-12" data-line-number="12">    <span class="kw">write_files</span>()</a>
-<a class="sourceLine" id="cb103-13" data-line-number="13">    <span class="kw">file_out</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</a>
-<a class="sourceLine" id="cb103-14" data-line-number="14">  },</a>
-<a class="sourceLine" id="cb103-15" data-line-number="15">  <span class="dt">y =</span> <span class="kw">readRDS</span>(<span class="kw">file_in</span>(<span class="st">&quot;a&quot;</span>))</a>
-<a class="sourceLine" id="cb103-16" data-line-number="16">)</a>
-<a class="sourceLine" id="cb103-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb103-18" data-line-number="18">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(small_plan)</a>
-<a class="sourceLine" id="cb103-19" data-line-number="19"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveRDS</span>(<span class="dv">1</span>, <span class="st">&quot;start.rds&quot;</span>)
+
+write_files &lt;-<span class="st"> </span><span class="cf">function</span>(){
+  x &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="kw">file_in</span>(<span class="st">&quot;start.rds&quot;</span>))
+  <span class="cf">for</span> (file <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]){
+    <span class="kw">saveRDS</span>(x, file)
+  }
+}
+
+small_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> {
+    <span class="kw">write_files</span>()
+    <span class="kw">file_out</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)
+  },
+  <span class="dt">y =</span> <span class="kw">readRDS</span>(<span class="kw">file_in</span>(<span class="st">&quot;a&quot;</span>))
+)
+
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(small_plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-ffb026e0f95f638569ee" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ffb026e0f95f638569ee">{"x":{"nodes":{"id":["\"a\"","\"b\"","\"c\"","\"start.rds\"","write_files","x","y"],"label":["\"a\"\n0.002s","\"b\"\n0.001s","\"c\"\n0.001s","\"start.rds\"\n0.002s","write_files\n0.003s","x","y"],"command":["{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}",null,null,"{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","readRDS(file_in(\"a\"))"],"status":["outdated","outdated","outdated","imported","imported","outdated","outdated"],"type":["object","object","object","file","function","object","object"],"font.size":[20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#1874CD","#1874CD","#000000","#000000"],"shape":["square","square","square","square","triangle","dot","dot"],"level":[4,4,4,1,2,3,5],"title":["{\n&nbsp;&nbsp;&nbsp;&nbsp;write_files()\n&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")\n}","{\n&nbsp;&nbsp;&nbsp;&nbsp;write_files()\n&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")\n}","{\n&nbsp;&nbsp;&nbsp;&nbsp;write_files()\n&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")\n}","X<br>","function&nbsp;()&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;<-&nbsp;readRDS(file_in(\"start.rds\"))<br>&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(file&nbsp;in&nbsp;letters[1:3])&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;saveRDS(x,&nbsp;file)<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}","{\n&nbsp;&nbsp;&nbsp;&nbsp;write_files()\n&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")\n}","readRDS(file_in(\"a\"))"],"x":[-1,0,1,0,0,0,-1],"y":[0.5,0.5,0.5,-1,-0.5,0,1]},"edges":{"from":["\"start.rds\"","write_files","x","x","x","\"a\""],"to":["write_files","x","\"a\"","\"b\"","\"c\"","y"],"arrows":["to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-ffb026e0f95f638569ee">{"x":{"nodes":{"id":["\"a\"","\"b\"","\"c\"","\"start.rds\"","write_files","x","y"],"label":["\"a\"\n0.001s","\"b\"\n0.011s","\"c\"\n0.003s","\"start.rds\"\n0.002s","write_files\n0.003s","x","y"],"command":["{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}",null,null,"{\n    write_files()\n    file_out(\"a\", \"b\", \"c\")\n}","readRDS(file_in(\"a\"))"],"status":["outdated","outdated","outdated","imported","imported","outdated","outdated"],"type":["object","object","object","file","function","object","object"],"font.size":[20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#1874CD","#1874CD","#000000","#000000"],"shape":["square","square","square","square","triangle","dot","dot"],"level":[4,4,4,1,2,3,5],"title":["{<br>&nbsp;&nbsp;&nbsp;&nbsp;write_files()<br>&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")<br>}","{<br>&nbsp;&nbsp;&nbsp;&nbsp;write_files()<br>&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")<br>}","{<br>&nbsp;&nbsp;&nbsp;&nbsp;write_files()<br>&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")<br>}","X<br>","function&nbsp;()&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;<-&nbsp;readRDS(file_in(\"start.rds\"))<br>&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(file&nbsp;in&nbsp;letters[1:3])&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;saveRDS(x,&nbsp;file)<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}","{<br>&nbsp;&nbsp;&nbsp;&nbsp;write_files()<br>&nbsp;&nbsp;&nbsp;&nbsp;file_out(\"a\",&nbsp;\"b\",&nbsp;\"c\")<br>}","readRDS(file_in(\"a\"))"],"x":[-1,0,1,0,0,0,-1],"y":[0.5,0.5,0.5,-1,-0.5,0,1]},"edges":{"from":["\"start.rds\"","write_files","x","x","x","\"a\""],"to":["write_files","x","\"a\"","\"b\"","\"c\"","y"],"arrows":["to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>So when target <code>x</code> changes the output for files <code>&quot;a&quot;</code>, <code>&quot;b&quot;</code>, or <code>&quot;c&quot;</code>, <code>drake</code> knows to rebuild target <code>y</code>. In addition, if you accidentally modify any of these output files by hand, <code>drake</code> will run the command of <code>x</code> to restore the files to a reproducible state.</p>
 </div>
 <div id="automatically-generating-workflow-plans" class="section level2">
@@ -576,481 +577,481 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>A grid of function arguments.</li>
 </ol>
 <p>Our function fits a fuel efficiency model given a <em>single</em> pair of covariate names <code>x1</code> and <code>x2</code>.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">my_model_fit &lt;-<span class="st"> </span><span class="cf">function</span>(x1, x2, data){</a>
-<a class="sourceLine" id="cb104-2" data-line-number="2">  <span class="kw">lm</span>(<span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;mpg ~&quot;</span>, x1, <span class="st">&quot;+&quot;</span>, x2)), <span class="dt">data =</span> data)</a>
-<a class="sourceLine" id="cb104-3" data-line-number="3">}</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">my_model_fit &lt;-<span class="st"> </span><span class="cf">function</span>(x1, x2, data){
+  <span class="kw">lm</span>(<span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;mpg ~&quot;</span>, x1, <span class="st">&quot;+&quot;</span>, x2)), <span class="dt">data =</span> data)
+}</code></pre>
 <p>Our grid of function arguments is a data frame of possible values for <code>x1</code>, <code>x2</code>, and <code>data</code>.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">covariates &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(mtcars), <span class="st">&quot;mpg&quot;</span>) <span class="co"># Exclude the response variable.</span></a>
-<a class="sourceLine" id="cb105-2" data-line-number="2">args &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">combn</span>(covariates, <span class="dv">2</span>)) <span class="co"># Take all possible pairs.</span></a>
-<a class="sourceLine" id="cb105-3" data-line-number="3"><span class="kw">colnames</span>(args) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>) <span class="co"># The column names must be the argument names of my_model_fit()</span></a>
-<a class="sourceLine" id="cb105-4" data-line-number="4">args &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(args) <span class="co"># Tibbles are so nice.</span></a>
-<a class="sourceLine" id="cb105-5" data-line-number="5">args<span class="op">$</span>data &lt;-<span class="st"> &quot;mtcars&quot;</span></a>
-<a class="sourceLine" id="cb105-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb105-7" data-line-number="7">args</a>
-<a class="sourceLine" id="cb105-8" data-line-number="8">## # A tibble: 45 x 3</a>
-<a class="sourceLine" id="cb105-9" data-line-number="9">##    x1    x2    data  </a>
-<a class="sourceLine" id="cb105-10" data-line-number="10">##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; </a>
-<a class="sourceLine" id="cb105-11" data-line-number="11">##  1 cyl   disp  mtcars</a>
-<a class="sourceLine" id="cb105-12" data-line-number="12">##  2 cyl   hp    mtcars</a>
-<a class="sourceLine" id="cb105-13" data-line-number="13">##  3 cyl   drat  mtcars</a>
-<a class="sourceLine" id="cb105-14" data-line-number="14">##  4 cyl   wt    mtcars</a>
-<a class="sourceLine" id="cb105-15" data-line-number="15">##  5 cyl   qsec  mtcars</a>
-<a class="sourceLine" id="cb105-16" data-line-number="16">##  6 cyl   vs    mtcars</a>
-<a class="sourceLine" id="cb105-17" data-line-number="17">##  7 cyl   am    mtcars</a>
-<a class="sourceLine" id="cb105-18" data-line-number="18">##  8 cyl   gear  mtcars</a>
-<a class="sourceLine" id="cb105-19" data-line-number="19">##  9 cyl   carb  mtcars</a>
-<a class="sourceLine" id="cb105-20" data-line-number="20">## 10 disp  hp    mtcars</a>
-<a class="sourceLine" id="cb105-21" data-line-number="21">## # ... with 35 more rows</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">covariates &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(mtcars), <span class="st">&quot;mpg&quot;</span>) <span class="co"># Exclude the response variable.</span>
+args &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">combn</span>(covariates, <span class="dv">2</span>)) <span class="co"># Take all possible pairs.</span>
+<span class="kw">colnames</span>(args) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>) <span class="co"># The column names must be the argument names of my_model_fit()</span>
+args &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(args) <span class="co"># Tibbles are so nice.</span>
+args<span class="op">$</span>data &lt;-<span class="st"> &quot;mtcars&quot;</span>
+
+args
+## # A tibble: 45 x 3
+##    x1    x2    data  
+##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; 
+##  1 cyl   disp  mtcars
+##  2 cyl   hp    mtcars
+##  3 cyl   drat  mtcars
+##  4 cyl   wt    mtcars
+##  5 cyl   qsec  mtcars
+##  6 cyl   vs    mtcars
+##  7 cyl   am    mtcars
+##  8 cyl   gear  mtcars
+##  9 cyl   carb  mtcars
+## 10 disp  hp    mtcars
+## # ... with 35 more rows</code></pre>
 <p>Each row of <code>args</code> corresponds to a call to <code>my_model_fit()</code>. To actually write out all those function calls, we use <code>map_plan()</code>.</p>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1"><span class="kw">map_plan</span>(args, my_model_fit)</a>
-<a class="sourceLine" id="cb106-2" data-line-number="2">## # A tibble: 45 x 2</a>
-<a class="sourceLine" id="cb106-3" data-line-number="3">##    target              command                                            </a>
-<a class="sourceLine" id="cb106-4" data-line-number="4">##    &lt;chr&gt;               &lt;chr&gt;                                              </a>
-<a class="sourceLine" id="cb106-5" data-line-number="5">##  1 my_model_fit_501e0… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = …</a>
-<a class="sourceLine" id="cb106-6" data-line-number="6">##  2 my_model_fit_d5de1… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;…</a>
-<a class="sourceLine" id="cb106-7" data-line-number="7">##  3 my_model_fit_eac6c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = …</a>
-<a class="sourceLine" id="cb106-8" data-line-number="8">##  4 my_model_fit_3900e… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = \&quot;…</a>
-<a class="sourceLine" id="cb106-9" data-line-number="9">##  5 my_model_fit_a2d79… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = …</a>
-<a class="sourceLine" id="cb106-10" data-line-number="10">##  6 my_model_fit_f5c0a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = \&quot;…</a>
-<a class="sourceLine" id="cb106-11" data-line-number="11">##  7 my_model_fit_507d2… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = \&quot;…</a>
-<a class="sourceLine" id="cb106-12" data-line-number="12">##  8 my_model_fit_b5f9a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = …</a>
-<a class="sourceLine" id="cb106-13" data-line-number="13">##  9 my_model_fit_8c4c5… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = …</a>
-<a class="sourceLine" id="cb106-14" data-line-number="14">## 10 my_model_fit_f9bb9… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = \…</a>
-<a class="sourceLine" id="cb106-15" data-line-number="15">## # ... with 35 more rows</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit)
+## # A tibble: 45 x 2
+##    target              command                                            
+##    &lt;chr&gt;               &lt;chr&gt;                                              
+##  1 my_model_fit_501e0… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = …
+##  2 my_model_fit_d5de1… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;…
+##  3 my_model_fit_eac6c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = …
+##  4 my_model_fit_3900e… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = \&quot;…
+##  5 my_model_fit_a2d79… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = …
+##  6 my_model_fit_f5c0a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = \&quot;…
+##  7 my_model_fit_507d2… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = \&quot;…
+##  8 my_model_fit_b5f9a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = …
+##  9 my_model_fit_8c4c5… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = …
+## 10 my_model_fit_f9bb9… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = \…
+## # ... with 35 more rows</code></pre>
 <p>We now have a plan, but it has a couple issues.</p>
 <ol style="list-style-type: decimal">
 <li>The <code>data</code> argument should be a symbol. In other words, we want <code>my_model_fit(data = mtcars)</code>, not <code>my_model_fit(data = &quot;mtcars&quot;)</code>. So we use the <a href="https://rlang.r-lib.org/reference/sym.html"><code>syms()</code></a> function from the <a href="https://github.com/r-lib/rlang"><code>rlang</code></a> package turn <code>args$data</code> into a list of symbols.</li>
 <li>The default argument names are ugly, so we can add a new <code>&quot;id&quot;</code> column to <code>args</code> (or select one with the <code>id</code> argument of <code>map_plan()</code>).</li>
 </ol>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1"><span class="co"># Fixes (1)</span></a>
-<a class="sourceLine" id="cb107-2" data-line-number="2">args<span class="op">$</span>data &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(args<span class="op">$</span>data)</a>
-<a class="sourceLine" id="cb107-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb107-4" data-line-number="4"><span class="co"># Alternative if each element of `args$data` is code with multiple symbols:</span></a>
-<a class="sourceLine" id="cb107-5" data-line-number="5"><span class="co"># args$data &lt;- purrr::map(args$data, rlang::parse_expr)</span></a>
-<a class="sourceLine" id="cb107-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb107-7" data-line-number="7"><span class="co"># Fixes (2)</span></a>
-<a class="sourceLine" id="cb107-8" data-line-number="8">args<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;fit_&quot;</span>, args<span class="op">$</span>x1, <span class="st">&quot;_&quot;</span>, args<span class="op">$</span>x2)</a>
-<a class="sourceLine" id="cb107-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb107-10" data-line-number="10">args</a>
-<a class="sourceLine" id="cb107-11" data-line-number="11">## # A tibble: 45 x 4</a>
-<a class="sourceLine" id="cb107-12" data-line-number="12">##    x1    x2    data     id          </a>
-<a class="sourceLine" id="cb107-13" data-line-number="13">##    &lt;chr&gt; &lt;chr&gt; &lt;list&gt;   &lt;chr&gt;       </a>
-<a class="sourceLine" id="cb107-14" data-line-number="14">##  1 cyl   disp  &lt;symbol&gt; fit_cyl_disp</a>
-<a class="sourceLine" id="cb107-15" data-line-number="15">##  2 cyl   hp    &lt;symbol&gt; fit_cyl_hp  </a>
-<a class="sourceLine" id="cb107-16" data-line-number="16">##  3 cyl   drat  &lt;symbol&gt; fit_cyl_drat</a>
-<a class="sourceLine" id="cb107-17" data-line-number="17">##  4 cyl   wt    &lt;symbol&gt; fit_cyl_wt  </a>
-<a class="sourceLine" id="cb107-18" data-line-number="18">##  5 cyl   qsec  &lt;symbol&gt; fit_cyl_qsec</a>
-<a class="sourceLine" id="cb107-19" data-line-number="19">##  6 cyl   vs    &lt;symbol&gt; fit_cyl_vs  </a>
-<a class="sourceLine" id="cb107-20" data-line-number="20">##  7 cyl   am    &lt;symbol&gt; fit_cyl_am  </a>
-<a class="sourceLine" id="cb107-21" data-line-number="21">##  8 cyl   gear  &lt;symbol&gt; fit_cyl_gear</a>
-<a class="sourceLine" id="cb107-22" data-line-number="22">##  9 cyl   carb  &lt;symbol&gt; fit_cyl_carb</a>
-<a class="sourceLine" id="cb107-23" data-line-number="23">## 10 disp  hp    &lt;symbol&gt; fit_disp_hp </a>
-<a class="sourceLine" id="cb107-24" data-line-number="24">## # ... with 35 more rows</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fixes (1)</span>
+args<span class="op">$</span>data &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(args<span class="op">$</span>data)
+
+<span class="co"># Alternative if each element of `args$data` is code with multiple symbols:</span>
+<span class="co"># args$data &lt;- purrr::map(args$data, rlang::parse_expr)</span>
+
+<span class="co"># Fixes (2)</span>
+args<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;fit_&quot;</span>, args<span class="op">$</span>x1, <span class="st">&quot;_&quot;</span>, args<span class="op">$</span>x2)
+
+args
+## # A tibble: 45 x 4
+##    x1    x2    data     id          
+##    &lt;chr&gt; &lt;chr&gt; &lt;list&gt;   &lt;chr&gt;       
+##  1 cyl   disp  &lt;symbol&gt; fit_cyl_disp
+##  2 cyl   hp    &lt;symbol&gt; fit_cyl_hp  
+##  3 cyl   drat  &lt;symbol&gt; fit_cyl_drat
+##  4 cyl   wt    &lt;symbol&gt; fit_cyl_wt  
+##  5 cyl   qsec  &lt;symbol&gt; fit_cyl_qsec
+##  6 cyl   vs    &lt;symbol&gt; fit_cyl_vs  
+##  7 cyl   am    &lt;symbol&gt; fit_cyl_am  
+##  8 cyl   gear  &lt;symbol&gt; fit_cyl_gear
+##  9 cyl   carb  &lt;symbol&gt; fit_cyl_carb
+## 10 disp  hp    &lt;symbol&gt; fit_disp_hp 
+## # ... with 35 more rows</code></pre>
 <p>Much better.</p>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">map_plan</span>(args, my_model_fit)</a>
-<a class="sourceLine" id="cb108-2" data-line-number="2">plan</a>
-<a class="sourceLine" id="cb108-3" data-line-number="3">## # A tibble: 45 x 2</a>
-<a class="sourceLine" id="cb108-4" data-line-number="4">##    target       command                                                   </a>
-<a class="sourceLine" id="cb108-5" data-line-number="5">##    &lt;chr&gt;        &lt;chr&gt;                                                     </a>
-<a class="sourceLine" id="cb108-6" data-line-number="6">##  1 fit_cyl_disp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = mtcars)&quot;</a>
-<a class="sourceLine" id="cb108-7" data-line-number="7">##  2 fit_cyl_hp   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot;  </a>
-<a class="sourceLine" id="cb108-8" data-line-number="8">##  3 fit_cyl_drat &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = mtcars)&quot;</a>
-<a class="sourceLine" id="cb108-9" data-line-number="9">##  4 fit_cyl_wt   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = mtcars)&quot;  </a>
-<a class="sourceLine" id="cb108-10" data-line-number="10">##  5 fit_cyl_qsec &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = mtcars)&quot;</a>
-<a class="sourceLine" id="cb108-11" data-line-number="11">##  6 fit_cyl_vs   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = mtcars)&quot;  </a>
-<a class="sourceLine" id="cb108-12" data-line-number="12">##  7 fit_cyl_am   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = mtcars)&quot;  </a>
-<a class="sourceLine" id="cb108-13" data-line-number="13">##  8 fit_cyl_gear &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = mtcars)&quot;</a>
-<a class="sourceLine" id="cb108-14" data-line-number="14">##  9 fit_cyl_carb &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = mtcars)&quot;</a>
-<a class="sourceLine" id="cb108-15" data-line-number="15">## 10 fit_disp_hp  &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot; </a>
-<a class="sourceLine" id="cb108-16" data-line-number="16">## # ... with 35 more rows</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">map_plan</span>(args, my_model_fit)
+plan
+## # A tibble: 45 x 2
+##    target       command                                                   
+##    &lt;chr&gt;        &lt;chr&gt;                                                     
+##  1 fit_cyl_disp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = mtcars)&quot;
+##  2 fit_cyl_hp   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot;  
+##  3 fit_cyl_drat &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = mtcars)&quot;
+##  4 fit_cyl_wt   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = mtcars)&quot;  
+##  5 fit_cyl_qsec &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = mtcars)&quot;
+##  6 fit_cyl_vs   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = mtcars)&quot;  
+##  7 fit_cyl_am   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = mtcars)&quot;  
+##  8 fit_cyl_gear &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = mtcars)&quot;
+##  9 fit_cyl_carb &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = mtcars)&quot;
+## 10 fit_disp_hp  &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot; 
+## # ... with 35 more rows</code></pre>
 <p>We may also want to retain information about the constituent function arguments of each target. With <code>map_plan(trace = TRUE)</code>, we can append the columns of <code>args</code> alongside the usual <code>&quot;target&quot;</code> and <code>&quot;command&quot;</code> columns of our plan.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1"><span class="kw">map_plan</span>(args, my_model_fit, <span class="dt">trace =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb109-2" data-line-number="2">## # A tibble: 45 x 6</a>
-<a class="sourceLine" id="cb109-3" data-line-number="3">##    target    command                           x1    x2    data   id      </a>
-<a class="sourceLine" id="cb109-4" data-line-number="4">##    &lt;chr&gt;     &lt;chr&gt;                             &lt;chr&gt; &lt;chr&gt; &lt;list&gt; &lt;chr&gt;   </a>
-<a class="sourceLine" id="cb109-5" data-line-number="5">##  1 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   disp  &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-6" data-line-number="6">##  2 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   hp    &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-7" data-line-number="7">##  3 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   drat  &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-8" data-line-number="8">##  4 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   wt    &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-9" data-line-number="9">##  5 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   qsec  &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-10" data-line-number="10">##  6 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   vs    &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-11" data-line-number="11">##  7 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   am    &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-12" data-line-number="12">##  8 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   gear  &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-13" data-line-number="13">##  9 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   carb  &lt;symb… fit_cyl…</a>
-<a class="sourceLine" id="cb109-14" data-line-number="14">## 10 fit_disp… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 … disp  hp    &lt;symb… fit_dis…</a>
-<a class="sourceLine" id="cb109-15" data-line-number="15">## # ... with 35 more rows</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit, <span class="dt">trace =</span> <span class="ot">TRUE</span>)
+## # A tibble: 45 x 6
+##    target    command                           x1    x2    data   id      
+##    &lt;chr&gt;     &lt;chr&gt;                             &lt;chr&gt; &lt;chr&gt; &lt;list&gt; &lt;chr&gt;   
+##  1 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   disp  &lt;symb… fit_cyl…
+##  2 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   hp    &lt;symb… fit_cyl…
+##  3 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   drat  &lt;symb… fit_cyl…
+##  4 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   wt    &lt;symb… fit_cyl…
+##  5 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   qsec  &lt;symb… fit_cyl…
+##  6 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   vs    &lt;symb… fit_cyl…
+##  7 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   am    &lt;symb… fit_cyl…
+##  8 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   gear  &lt;symb… fit_cyl…
+##  9 fit_cyl_… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 =… cyl   carb  &lt;symb… fit_cyl…
+## 10 fit_disp… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 … disp  hp    &lt;symb… fit_dis…
+## # ... with 35 more rows</code></pre>
 <p>In any case, we can now fit our models.</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1"><span class="kw">make</span>(plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre>
 <p>And inspect the output.</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="kw">readd</span>(fit_cyl_disp)</a>
-<a class="sourceLine" id="cb111-2" data-line-number="2">## </a>
-<a class="sourceLine" id="cb111-3" data-line-number="3">## Call:</a>
-<a class="sourceLine" id="cb111-4" data-line-number="4">## lm(formula = as.formula(paste(&quot;mpg ~&quot;, x1, &quot;+&quot;, x2)), data = data)</a>
-<a class="sourceLine" id="cb111-5" data-line-number="5">## </a>
-<a class="sourceLine" id="cb111-6" data-line-number="6">## Coefficients:</a>
-<a class="sourceLine" id="cb111-7" data-line-number="7">## (Intercept)          cyl         disp  </a>
-<a class="sourceLine" id="cb111-8" data-line-number="8">##    34.66099     -1.58728     -0.02058</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(fit_cyl_disp)
+## 
+## Call:
+## lm(formula = as.formula(paste(&quot;mpg ~&quot;, x1, &quot;+&quot;, x2)), data = data)
+## 
+## Coefficients:
+## (Intercept)          cyl         disp  
+##    34.66099     -1.58728     -0.02058</code></pre>
 </div>
 <div id="wildcard-templating" class="section level3">
 <h3><span class="header-section-number">6.5.2</span> Wildcard templating</h3>
 <p>In <code>drake</code>, you can write plans with wildcards. These wildcards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let’s say you are running a simulation study, and you need to generate sets of random numbers from different distributions.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb112-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb112-3" data-line-number="3">  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb112-4" data-line-number="4">)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
+)</code></pre>
 <p>If you need to generate many datasets with different means, you may wish to write out each target individually.</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb113-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb113-3" data-line-number="3">  <span class="dt">normal_0 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-4" data-line-number="4">  <span class="dt">normal_1 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-5" data-line-number="5">  <span class="dt">normal_2 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-6" data-line-number="6">  <span class="dt">normal_3 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-7" data-line-number="7">  <span class="dt">normal_4 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">4</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-8" data-line-number="8">  <span class="dt">normal_5 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">5</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-9" data-line-number="9">  <span class="dt">normal_6 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">6</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-10" data-line-number="10">  <span class="dt">normal_7 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">7</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-11" data-line-number="11">  <span class="dt">normal_8 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">8</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb113-12" data-line-number="12">  <span class="dt">normal_9 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">9</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb113-13" data-line-number="13">)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal_0 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_1 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_2 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_3 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_4 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">4</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_5 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">5</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_6 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">6</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_7 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">7</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_8 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">8</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">normal_9 =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">9</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
+)</code></pre>
 <p>But writing all that code manually is a pain and prone to human error. Instead, use <code>evaluate_plan()</code></p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb114-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb114-3" data-line-number="3">  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb114-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb114-5" data-line-number="5"><span class="kw">evaluate_plan</span>(plan, <span class="dt">wildcard =</span> <span class="st">&quot;mean__&quot;</span>, <span class="dt">values =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)</a>
-<a class="sourceLine" id="cb114-6" data-line-number="6">## # A tibble: 11 x 2</a>
-<a class="sourceLine" id="cb114-7" data-line-number="7">##    target   command                      </a>
-<a class="sourceLine" id="cb114-8" data-line-number="8">##    &lt;chr&gt;    &lt;chr&gt;                        </a>
-<a class="sourceLine" id="cb114-9" data-line-number="9">##  1 t        rt(1000, df = 5)             </a>
-<a class="sourceLine" id="cb114-10" data-line-number="10">##  2 normal_0 runif(1000, mean = 0, sd = 1)</a>
-<a class="sourceLine" id="cb114-11" data-line-number="11">##  3 normal_1 runif(1000, mean = 1, sd = 1)</a>
-<a class="sourceLine" id="cb114-12" data-line-number="12">##  4 normal_2 runif(1000, mean = 2, sd = 1)</a>
-<a class="sourceLine" id="cb114-13" data-line-number="13">##  5 normal_3 runif(1000, mean = 3, sd = 1)</a>
-<a class="sourceLine" id="cb114-14" data-line-number="14">##  6 normal_4 runif(1000, mean = 4, sd = 1)</a>
-<a class="sourceLine" id="cb114-15" data-line-number="15">##  7 normal_5 runif(1000, mean = 5, sd = 1)</a>
-<a class="sourceLine" id="cb114-16" data-line-number="16">##  8 normal_6 runif(1000, mean = 6, sd = 1)</a>
-<a class="sourceLine" id="cb114-17" data-line-number="17">##  9 normal_7 runif(1000, mean = 7, sd = 1)</a>
-<a class="sourceLine" id="cb114-18" data-line-number="18">## 10 normal_8 runif(1000, mean = 8, sd = 1)</a>
-<a class="sourceLine" id="cb114-19" data-line-number="19">## 11 normal_9 runif(1000, mean = 9, sd = 1)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> <span class="dv">5</span>),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> <span class="dv">1</span>)
+)
+<span class="kw">evaluate_plan</span>(plan, <span class="dt">wildcard =</span> <span class="st">&quot;mean__&quot;</span>, <span class="dt">values =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)
+## # A tibble: 11 x 2
+##    target   command                      
+##    &lt;chr&gt;    &lt;chr&gt;                        
+##  1 t        rt(1000, df = 5)             
+##  2 normal_0 runif(1000, mean = 0, sd = 1)
+##  3 normal_1 runif(1000, mean = 1, sd = 1)
+##  4 normal_2 runif(1000, mean = 2, sd = 1)
+##  5 normal_3 runif(1000, mean = 3, sd = 1)
+##  6 normal_4 runif(1000, mean = 4, sd = 1)
+##  7 normal_5 runif(1000, mean = 5, sd = 1)
+##  8 normal_6 runif(1000, mean = 6, sd = 1)
+##  9 normal_7 runif(1000, mean = 7, sd = 1)
+## 10 normal_8 runif(1000, mean = 8, sd = 1)
+## 11 normal_9 runif(1000, mean = 9, sd = 1)</code></pre>
 <p>You can specify multiple wildcards at once. If multiple wildcards appear in the same command, you will get a new target for each unique combination of values.</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb115-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> df__),</a>
-<a class="sourceLine" id="cb115-3" data-line-number="3">  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> sd__)</a>
-<a class="sourceLine" id="cb115-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb115-5" data-line-number="5"><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb115-6" data-line-number="6">  plan,</a>
-<a class="sourceLine" id="cb115-7" data-line-number="7">  <span class="dt">rules =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb115-8" data-line-number="8">    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb115-9" data-line-number="9">    <span class="dt">sd__ =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>),</a>
-<a class="sourceLine" id="cb115-10" data-line-number="10">    <span class="dt">df__ =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span></a>
-<a class="sourceLine" id="cb115-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb115-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb115-13" data-line-number="13">## # A tibble: 7 x 2</a>
-<a class="sourceLine" id="cb115-14" data-line-number="14">##   target     command                      </a>
-<a class="sourceLine" id="cb115-15" data-line-number="15">##   &lt;chr&gt;      &lt;chr&gt;                        </a>
-<a class="sourceLine" id="cb115-16" data-line-number="16">## 1 t_5        rt(1000, df = 5)             </a>
-<a class="sourceLine" id="cb115-17" data-line-number="17">## 2 t_6        rt(1000, df = 6)             </a>
-<a class="sourceLine" id="cb115-18" data-line-number="18">## 3 t_7        rt(1000, df = 7)             </a>
-<a class="sourceLine" id="cb115-19" data-line-number="19">## 4 normal_0_3 runif(1000, mean = 0, sd = 3)</a>
-<a class="sourceLine" id="cb115-20" data-line-number="20">## 5 normal_0_4 runif(1000, mean = 0, sd = 4)</a>
-<a class="sourceLine" id="cb115-21" data-line-number="21">## 6 normal_1_3 runif(1000, mean = 1, sd = 3)</a>
-<a class="sourceLine" id="cb115-22" data-line-number="22">## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> df__),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> sd__)
+)
+<span class="kw">evaluate_plan</span>(
+  plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
+    <span class="dt">sd__ =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>),
+    <span class="dt">df__ =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span>
+  )
+)
+## # A tibble: 7 x 2
+##   target     command                      
+##   &lt;chr&gt;      &lt;chr&gt;                        
+## 1 t_5        rt(1000, df = 5)             
+## 2 t_6        rt(1000, df = 6)             
+## 3 t_7        rt(1000, df = 7)             
+## 4 normal_0_3 runif(1000, mean = 0, sd = 3)
+## 5 normal_0_4 runif(1000, mean = 0, sd = 4)
+## 6 normal_1_3 runif(1000, mean = 1, sd = 3)
+## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</code></pre>
 <p>Wildcards for <code>evaluate_plan()</code> do not need to have the double-underscore suffix. Any valid symbol will do.</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb116-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> .DF.),</a>
-<a class="sourceLine" id="cb116-3" data-line-number="3">  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="st">`</span><span class="dt">{MEAN}</span><span class="st">`</span>, <span class="dt">sd =</span> ..sd)</a>
-<a class="sourceLine" id="cb116-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb116-5" data-line-number="5"><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb116-6" data-line-number="6">  plan,</a>
-<a class="sourceLine" id="cb116-7" data-line-number="7">  <span class="dt">rules =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb116-8" data-line-number="8">    <span class="st">&quot;`{MEAN}`&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb116-9" data-line-number="9">    <span class="dt">..sd =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>),</a>
-<a class="sourceLine" id="cb116-10" data-line-number="10">    <span class="dt">.DF. =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span></a>
-<a class="sourceLine" id="cb116-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb116-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb116-13" data-line-number="13">## # A tibble: 7 x 2</a>
-<a class="sourceLine" id="cb116-14" data-line-number="14">##   target     command                      </a>
-<a class="sourceLine" id="cb116-15" data-line-number="15">##   &lt;chr&gt;      &lt;chr&gt;                        </a>
-<a class="sourceLine" id="cb116-16" data-line-number="16">## 1 t_5        rt(1000, df = 5)             </a>
-<a class="sourceLine" id="cb116-17" data-line-number="17">## 2 t_6        rt(1000, df = 6)             </a>
-<a class="sourceLine" id="cb116-18" data-line-number="18">## 3 t_7        rt(1000, df = 7)             </a>
-<a class="sourceLine" id="cb116-19" data-line-number="19">## 4 normal_0_3 runif(1000, mean = 0, sd = 3)</a>
-<a class="sourceLine" id="cb116-20" data-line-number="20">## 5 normal_0_4 runif(1000, mean = 0, sd = 4)</a>
-<a class="sourceLine" id="cb116-21" data-line-number="21">## 6 normal_1_3 runif(1000, mean = 1, sd = 3)</a>
-<a class="sourceLine" id="cb116-22" data-line-number="22">## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> .DF.),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> <span class="st">`</span><span class="dt">{MEAN}</span><span class="st">`</span>, <span class="dt">sd =</span> ..sd)
+)
+<span class="kw">evaluate_plan</span>(
+  plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="st">&quot;`{MEAN}`&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
+    <span class="dt">..sd =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>),
+    <span class="dt">.DF. =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span>
+  )
+)
+## # A tibble: 7 x 2
+##   target     command                      
+##   &lt;chr&gt;      &lt;chr&gt;                        
+## 1 t_5        rt(1000, df = 5)             
+## 2 t_6        rt(1000, df = 6)             
+## 3 t_7        rt(1000, df = 7)             
+## 4 normal_0_3 runif(1000, mean = 0, sd = 3)
+## 5 normal_0_4 runif(1000, mean = 0, sd = 4)
+## 6 normal_1_3 runif(1000, mean = 1, sd = 3)
+## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</code></pre>
 <p>Set <code>expand</code> to <code>FALSE</code> to disable expansion.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb117-2" data-line-number="2">  <span class="dt">t  =</span> <span class="kw">rpois</span>(samples__, <span class="dt">lambda =</span> mean__),</a>
-<a class="sourceLine" id="cb117-3" data-line-number="3">  <span class="dt">normal =</span> <span class="kw">runif</span>(samples__, <span class="dt">mean =</span> mean__)</a>
-<a class="sourceLine" id="cb117-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb117-5" data-line-number="5"><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb117-6" data-line-number="6">  plan,</a>
-<a class="sourceLine" id="cb117-7" data-line-number="7">  <span class="dt">rules =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb117-8" data-line-number="8">    <span class="dt">samples__ =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb117-9" data-line-number="9">    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb117-10" data-line-number="10">  ),</a>
-<a class="sourceLine" id="cb117-11" data-line-number="11">  <span class="dt">expand =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb117-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb117-13" data-line-number="13">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb117-14" data-line-number="14">##   target command              </a>
-<a class="sourceLine" id="cb117-15" data-line-number="15">##   &lt;chr&gt;  &lt;chr&gt;                </a>
-<a class="sourceLine" id="cb117-16" data-line-number="16">## 1 t      rpois(50, lambda = 1)</a>
-<a class="sourceLine" id="cb117-17" data-line-number="17">## 2 normal runif(100, mean = 5)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">t  =</span> <span class="kw">rpois</span>(samples__, <span class="dt">lambda =</span> mean__),
+  <span class="dt">normal =</span> <span class="kw">runif</span>(samples__, <span class="dt">mean =</span> mean__)
+)
+<span class="kw">evaluate_plan</span>(
+  plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">samples__ =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">100</span>),
+    <span class="dt">mean__ =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)
+  ),
+  <span class="dt">expand =</span> <span class="ot">FALSE</span>
+)
+## # A tibble: 2 x 2
+##   target command              
+##   &lt;chr&gt;  &lt;chr&gt;                
+## 1 t      rpois(50, lambda = 1)
+## 2 normal runif(100, mean = 5)</code></pre>
 <p>Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">hard_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb118-2" data-line-number="2">  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(school__),</a>
-<a class="sourceLine" id="cb118-3" data-line-number="3">  <span class="dt">students =</span> <span class="kw">check_students</span>(school__),</a>
-<a class="sourceLine" id="cb118-4" data-line-number="4">  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(school__),</a>
-<a class="sourceLine" id="cb118-5" data-line-number="5">  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(school__)</a>
-<a class="sourceLine" id="cb118-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb118-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb118-8" data-line-number="8"><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb118-9" data-line-number="9">  hard_plan,</a>
-<a class="sourceLine" id="cb118-10" data-line-number="10">  <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>, <span class="st">&quot;schoolC&quot;</span>))</a>
-<a class="sourceLine" id="cb118-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb118-12" data-line-number="12">## # A tibble: 12 x 2</a>
-<a class="sourceLine" id="cb118-13" data-line-number="13">##    target               command                      </a>
-<a class="sourceLine" id="cb118-14" data-line-number="14">##    &lt;chr&gt;                &lt;chr&gt;                        </a>
-<a class="sourceLine" id="cb118-15" data-line-number="15">##  1 credits_schoolA      check_credit_hours(schoolA)  </a>
-<a class="sourceLine" id="cb118-16" data-line-number="16">##  2 credits_schoolB      check_credit_hours(schoolB)  </a>
-<a class="sourceLine" id="cb118-17" data-line-number="17">##  3 credits_schoolC      check_credit_hours(schoolC)  </a>
-<a class="sourceLine" id="cb118-18" data-line-number="18">##  4 students_schoolA     check_students(schoolA)      </a>
-<a class="sourceLine" id="cb118-19" data-line-number="19">##  5 students_schoolB     check_students(schoolB)      </a>
-<a class="sourceLine" id="cb118-20" data-line-number="20">##  6 students_schoolC     check_students(schoolC)      </a>
-<a class="sourceLine" id="cb118-21" data-line-number="21">##  7 grads_schoolA        check_graduations(schoolA)   </a>
-<a class="sourceLine" id="cb118-22" data-line-number="22">##  8 grads_schoolB        check_graduations(schoolB)   </a>
-<a class="sourceLine" id="cb118-23" data-line-number="23">##  9 grads_schoolC        check_graduations(schoolC)   </a>
-<a class="sourceLine" id="cb118-24" data-line-number="24">## 10 public_funds_schoolA check_public_funding(schoolA)</a>
-<a class="sourceLine" id="cb118-25" data-line-number="25">## 11 public_funds_schoolB check_public_funding(schoolB)</a>
-<a class="sourceLine" id="cb118-26" data-line-number="26">## 12 public_funds_schoolC check_public_funding(schoolC)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">hard_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(school__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(school__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(school__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(school__)
+)
+
+<span class="kw">evaluate_plan</span>(
+  hard_plan,
+  <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>, <span class="st">&quot;schoolC&quot;</span>))
+)
+## # A tibble: 12 x 2
+##    target               command                      
+##    &lt;chr&gt;                &lt;chr&gt;                        
+##  1 credits_schoolA      check_credit_hours(schoolA)  
+##  2 credits_schoolB      check_credit_hours(schoolB)  
+##  3 credits_schoolC      check_credit_hours(schoolC)  
+##  4 students_schoolA     check_students(schoolA)      
+##  5 students_schoolB     check_students(schoolB)      
+##  6 students_schoolC     check_students(schoolC)      
+##  7 grads_schoolA        check_graduations(schoolA)   
+##  8 grads_schoolB        check_graduations(schoolB)   
+##  9 grads_schoolC        check_graduations(schoolC)   
+## 10 public_funds_schoolA check_public_funding(schoolA)
+## 11 public_funds_schoolB check_public_funding(schoolB)
+## 12 public_funds_schoolC check_public_funding(schoolC)</code></pre>
 <p>But what if some metrics do not make sense? For example, what if <code>schoolC</code> is a completely privately-funded school? With no public funds, <code>check_public_funds(schoolC)</code> may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb119-2" data-line-number="2">  <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),</a>
-<a class="sourceLine" id="cb119-3" data-line-number="3">  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),</a>
-<a class="sourceLine" id="cb119-4" data-line-number="4">  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),</a>
-<a class="sourceLine" id="cb119-5" data-line-number="5">  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),</a>
-<a class="sourceLine" id="cb119-6" data-line-number="6">  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)</a>
-<a class="sourceLine" id="cb119-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb119-8" data-line-number="8"><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb119-9" data-line-number="9">  <span class="dt">plan =</span> plan_template,</a>
-<a class="sourceLine" id="cb119-10" data-line-number="10">  <span class="dt">rules =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb119-11" data-line-number="11">    <span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),</a>
-<a class="sourceLine" id="cb119-12" data-line-number="12">    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),</a>
-<a class="sourceLine" id="cb119-13" data-line-number="13">    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)</a>
-<a class="sourceLine" id="cb119-14" data-line-number="14">  )</a>
-<a class="sourceLine" id="cb119-15" data-line-number="15">)</a>
-<a class="sourceLine" id="cb119-16" data-line-number="16">## # A tibble: 14 x 2</a>
-<a class="sourceLine" id="cb119-17" data-line-number="17">##    target                command                       </a>
-<a class="sourceLine" id="cb119-18" data-line-number="18">##    &lt;chr&gt;                 &lt;chr&gt;                         </a>
-<a class="sourceLine" id="cb119-19" data-line-number="19">##  1 school_A              &quot;get_school_data(\&quot;A\&quot;)&quot;      </a>
-<a class="sourceLine" id="cb119-20" data-line-number="20">##  2 school_B              &quot;get_school_data(\&quot;B\&quot;)&quot;      </a>
-<a class="sourceLine" id="cb119-21" data-line-number="21">##  3 school_C              &quot;get_school_data(\&quot;C\&quot;)&quot;      </a>
-<a class="sourceLine" id="cb119-22" data-line-number="22">##  4 credits_school_A      check_credit_hours(school_A)  </a>
-<a class="sourceLine" id="cb119-23" data-line-number="23">##  5 credits_school_B      check_credit_hours(school_B)  </a>
-<a class="sourceLine" id="cb119-24" data-line-number="24">##  6 credits_school_C      check_credit_hours(school_C)  </a>
-<a class="sourceLine" id="cb119-25" data-line-number="25">##  7 students_school_A     check_students(school_A)      </a>
-<a class="sourceLine" id="cb119-26" data-line-number="26">##  8 students_school_B     check_students(school_B)      </a>
-<a class="sourceLine" id="cb119-27" data-line-number="27">##  9 students_school_C     check_students(school_C)      </a>
-<a class="sourceLine" id="cb119-28" data-line-number="28">## 10 grads_school_A        check_graduations(school_A)   </a>
-<a class="sourceLine" id="cb119-29" data-line-number="29">## 11 grads_school_B        check_graduations(school_B)   </a>
-<a class="sourceLine" id="cb119-30" data-line-number="30">## 12 grads_school_C        check_graduations(school_C)   </a>
-<a class="sourceLine" id="cb119-31" data-line-number="31">## 13 public_funds_school_A check_public_funding(school_A)</a>
-<a class="sourceLine" id="cb119-32" data-line-number="32">## 14 public_funds_school_B check_public_funding(school_B)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)
+)
+<span class="kw">evaluate_plan</span>(
+  <span class="dt">plan =</span> plan_template,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),
+    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),
+    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)
+  )
+)
+## # A tibble: 14 x 2
+##    target                command                       
+##    &lt;chr&gt;                 &lt;chr&gt;                         
+##  1 school_A              &quot;get_school_data(\&quot;A\&quot;)&quot;      
+##  2 school_B              &quot;get_school_data(\&quot;B\&quot;)&quot;      
+##  3 school_C              &quot;get_school_data(\&quot;C\&quot;)&quot;      
+##  4 credits_school_A      check_credit_hours(school_A)  
+##  5 credits_school_B      check_credit_hours(school_B)  
+##  6 credits_school_C      check_credit_hours(school_C)  
+##  7 students_school_A     check_students(school_A)      
+##  8 students_school_B     check_students(school_B)      
+##  9 students_school_C     check_students(school_C)      
+## 10 grads_school_A        check_graduations(school_A)   
+## 11 grads_school_B        check_graduations(school_B)   
+## 12 grads_school_C        check_graduations(school_C)   
+## 13 public_funds_school_A check_public_funding(school_A)
+## 14 public_funds_school_B check_public_funding(school_B)</code></pre>
 <p>Thanks to <a href="https://github.com/AlexAxthelm">Alex Axthelm</a> for this use case in <a href="https://github.com/ropensci/drake/issues/235">issue 235</a>.</p>
 </div>
 <div id="wildcard-clusters" class="section level3">
 <h3><span class="header-section-number">6.5.3</span> Wildcard clusters</h3>
 <p>With <code>evaluate_plan(trace = TRUE)</code>, you can generate columns that show how the targets were generated from the wildcards.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb120-2" data-line-number="2">  <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),</a>
-<a class="sourceLine" id="cb120-3" data-line-number="3">  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),</a>
-<a class="sourceLine" id="cb120-4" data-line-number="4">  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),</a>
-<a class="sourceLine" id="cb120-5" data-line-number="5">  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),</a>
-<a class="sourceLine" id="cb120-6" data-line-number="6">  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)</a>
-<a class="sourceLine" id="cb120-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb120-8" data-line-number="8">plan &lt;-<span class="st"> </span><span class="kw">evaluate_plan</span>(</a>
-<a class="sourceLine" id="cb120-9" data-line-number="9">  <span class="dt">plan =</span> plan_template,</a>
-<a class="sourceLine" id="cb120-10" data-line-number="10">  <span class="dt">rules =</span> <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb120-11" data-line-number="11">    <span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),</a>
-<a class="sourceLine" id="cb120-12" data-line-number="12">    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),</a>
-<a class="sourceLine" id="cb120-13" data-line-number="13">    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)</a>
-<a class="sourceLine" id="cb120-14" data-line-number="14">  ),</a>
-<a class="sourceLine" id="cb120-15" data-line-number="15">  <span class="dt">trace =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb120-16" data-line-number="16">)</a>
-<a class="sourceLine" id="cb120-17" data-line-number="17">plan</a>
-<a class="sourceLine" id="cb120-18" data-line-number="18">## # A tibble: 14 x 8</a>
-<a class="sourceLine" id="cb120-19" data-line-number="19">##    target command school__ school___from all_schools__ all_schools___f…</a>
-<a class="sourceLine" id="cb120-20" data-line-number="20">##    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;           </a>
-<a class="sourceLine" id="cb120-21" data-line-number="21">##  1 schoo… &quot;get_s… A        school        &lt;NA&gt;          &lt;NA&gt;            </a>
-<a class="sourceLine" id="cb120-22" data-line-number="22">##  2 schoo… &quot;get_s… B        school        &lt;NA&gt;          &lt;NA&gt;            </a>
-<a class="sourceLine" id="cb120-23" data-line-number="23">##  3 schoo… &quot;get_s… C        school        &lt;NA&gt;          &lt;NA&gt;            </a>
-<a class="sourceLine" id="cb120-24" data-line-number="24">##  4 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      credits         </a>
-<a class="sourceLine" id="cb120-25" data-line-number="25">##  5 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      credits         </a>
-<a class="sourceLine" id="cb120-26" data-line-number="26">##  6 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      credits         </a>
-<a class="sourceLine" id="cb120-27" data-line-number="27">##  7 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      students        </a>
-<a class="sourceLine" id="cb120-28" data-line-number="28">##  8 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      students        </a>
-<a class="sourceLine" id="cb120-29" data-line-number="29">##  9 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      students        </a>
-<a class="sourceLine" id="cb120-30" data-line-number="30">## 10 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      grads           </a>
-<a class="sourceLine" id="cb120-31" data-line-number="31">## 11 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      grads           </a>
-<a class="sourceLine" id="cb120-32" data-line-number="32">## 12 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      grads           </a>
-<a class="sourceLine" id="cb120-33" data-line-number="33">## 13 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            </a>
-<a class="sourceLine" id="cb120-34" data-line-number="34">## 14 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            </a>
-<a class="sourceLine" id="cb120-35" data-line-number="35">## # ... with 2 more variables: public_schools__ &lt;chr&gt;,</a>
-<a class="sourceLine" id="cb120-36" data-line-number="36">## #   public_schools___from &lt;chr&gt;</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),
+  <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),
+  <span class="dt">students =</span> <span class="kw">check_students</span>(all_schools__),
+  <span class="dt">grads =</span> <span class="kw">check_graduations</span>(all_schools__),
+  <span class="dt">public_funds =</span> <span class="kw">check_public_funding</span>(public_schools__)
+)
+plan &lt;-<span class="st"> </span><span class="kw">evaluate_plan</span>(
+  <span class="dt">plan =</span> plan_template,
+  <span class="dt">rules =</span> <span class="kw">list</span>(
+    <span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),
+    <span class="dt">all_schools__ =</span>  <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>),
+    <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)
+  ),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+plan
+## # A tibble: 14 x 8
+##    target command school__ school___from all_schools__ all_schools___f…
+##    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;           
+##  1 schoo… &quot;get_s… A        school        &lt;NA&gt;          &lt;NA&gt;            
+##  2 schoo… &quot;get_s… B        school        &lt;NA&gt;          &lt;NA&gt;            
+##  3 schoo… &quot;get_s… C        school        &lt;NA&gt;          &lt;NA&gt;            
+##  4 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      credits         
+##  5 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      credits         
+##  6 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      credits         
+##  7 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      students        
+##  8 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      students        
+##  9 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      students        
+## 10 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      grads           
+## 11 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      grads           
+## 12 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      grads           
+## 13 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
+## 14 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
+## # ... with 2 more variables: public_schools__ &lt;chr&gt;,
+## #   public_schools___from &lt;chr&gt;</code></pre>
 <p>And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
-<a class="sourceLine" id="cb121-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(</a>
-<a class="sourceLine" id="cb121-3" data-line-number="3">  config,</a>
-<a class="sourceLine" id="cb121-4" data-line-number="4">  <span class="dt">group =</span> <span class="st">&quot;all_schools__&quot;</span>,</a>
-<a class="sourceLine" id="cb121-5" data-line-number="5">  <span class="dt">clusters =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>)</a>
-<a class="sourceLine" id="cb121-6" data-line-number="6">)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">vis_drake_graph</span>(
+  config,
+  <span class="dt">group =</span> <span class="st">&quot;all_schools__&quot;</span>,
+  <span class="dt">clusters =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>, <span class="st">&quot;school_C&quot;</span>)
+)</code></pre>
 <div id="htmlwidget-25db82eb3b31272a5d15" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-25db82eb3b31272a5d15">{"x":{"nodes":{"id":["check_credit_hours","check_graduations","check_public_funding","check_students","get_school_data","public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"label":["check_credit_hours\n0.001s","check_graduations\n0.001s","check_public_funding\n0.001s","check_students\n0.001s","get_school_data\n0.002s","public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"command":[null,null,null,null,null,"check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(\"A\")","get_school_data(\"B\")","get_school_data(\"C\")","check_credit_hours(school_A)","check_credit_hours(school_B)","check_credit_hours(school_C)"],"school__":[null,null,null,null,null,null,null,"A","B","C",null,null,null],"school___from":[null,null,null,null,null,null,null,"school","school","school",null,null,null],"all_schools__":[null,null,null,null,null,null,null,null,null,null,"school_A","school_B","school_C"],"all_schools___from":[null,null,null,null,null,null,null,null,null,null,"credits","credits","credits"],"public_schools__":[null,null,null,null,null,"school_A","school_B",null,null,null,null,null,null],"public_schools___from":[null,null,null,null,null,"public_funds","public_funds",null,null,null,null,null,null],"status":["imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","function","object","object","object","object","object","cluster","cluster","cluster"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","triangle","dot","dot","dot","dot","dot","diamond","diamond","diamond"],"level":[1,1,1,1,1,3,3,2,2,2,3,3,3],"title":["function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(\"A\")","get_school_data(\"B\")","get_school_data(\"C\")","credits_school_A, grads_school_A, students_sch...","credits_school_B, grads_school_B, students_sch...","credits_school_C, grads_school_C, students_sch..."],"x":[-0.523809523809524,-1,1,-0.80952380952381,0.238095238095238,0.80952380952381,1,-0.238095238095238,0.714285714285714,0.333333333333333,-1,-0.428571428571429,0.333333333333333],"y":[-1,-1,-1,-1,-1,1,1,0,0,0,1,1,1]},"edges":{"from":["get_school_data","get_school_data","get_school_data","check_students","check_students","check_students","check_graduations","check_graduations","check_graduations","check_credit_hours","check_credit_hours","check_credit_hours","check_public_funding","check_public_funding","school_A","school_A","school_B","school_B","school_C"],"to":["school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","public_funds_school_A","public_funds_school_B","all_schools__: school_A","public_funds_school_A","all_schools__: school_B","public_funds_school_B","all_schools__: school_C"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","Cluster"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","diamond"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,10]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-25db82eb3b31272a5d15">{"x":{"nodes":{"id":["check_credit_hours","check_graduations","check_public_funding","check_students","get_school_data","public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"label":["check_credit_hours\n0.001s","check_graduations\n0.002s","check_public_funding\n0.002s","check_students\n0.002s","get_school_data\n0.002s","public_funds_school_A","public_funds_school_B","school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C"],"command":[null,null,null,null,null,"check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(\"A\")","get_school_data(\"B\")","get_school_data(\"C\")","check_credit_hours(school_A)","check_credit_hours(school_B)","check_credit_hours(school_C)"],"school__":[null,null,null,null,null,null,null,"A","B","C",null,null,null],"school___from":[null,null,null,null,null,null,null,"school","school","school",null,null,null],"all_schools__":[null,null,null,null,null,null,null,null,null,null,"school_A","school_B","school_C"],"all_schools___from":[null,null,null,null,null,null,null,null,null,null,"credits","credits","credits"],"public_schools__":[null,null,null,null,null,"school_A","school_B",null,null,null,null,null,null],"public_schools___from":[null,null,null,null,null,"public_funds","public_funds",null,null,null,null,null,null],"status":["imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","function","object","object","object","object","object","cluster","cluster","cluster"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","triangle","dot","dot","dot","dot","dot","diamond","diamond","diamond"],"level":[1,1,1,1,1,3,3,2,2,2,3,3,3],"title":["function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","function&nbsp;()&nbsp;<br>{<br>}","check_public_funding(school_A)","check_public_funding(school_B)","get_school_data(\"A\")","get_school_data(\"B\")","get_school_data(\"C\")","credits_school_A, grads_school_A, students_sch...","credits_school_B, grads_school_B, students_sch...","credits_school_C, grads_school_C, students_sch..."],"x":[-0.523809523809524,-1,1,-0.80952380952381,0.238095238095238,0.80952380952381,1,-0.238095238095238,0.714285714285714,0.333333333333333,-1,-0.428571428571429,0.333333333333333],"y":[-1,-1,-1,-1,-1,1,1,0,0,0,1,1,1]},"edges":{"from":["get_school_data","get_school_data","get_school_data","check_students","check_students","check_students","check_graduations","check_graduations","check_graduations","check_credit_hours","check_credit_hours","check_credit_hours","check_public_funding","check_public_funding","school_A","school_A","school_B","school_B","school_C"],"to":["school_A","school_B","school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","all_schools__: school_A","all_schools__: school_B","all_schools__: school_C","public_funds_school_A","public_funds_school_B","all_schools__: school_A","public_funds_school_A","all_schools__: school_B","public_funds_school_B","all_schools__: school_C"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","Cluster"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","diamond"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,10]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>See the <a href="vis.html#vis">visualization guide</a> for more details.</p>
 </div>
 <div id="specialized-wildcard-functionality" class="section level3">
 <h3><span class="header-section-number">6.5.4</span> Specialized wildcard functionality</h3>
 <p>In the <a href="mtcars.html#mtcars"><code>mtcars</code> example</a>, we will analyze bootstrapped versions of the <code>mtcars</code> dataset to look for an association between the weight and the fuel efficiency of cars. This example uses <code>plan_analyses()</code> and <code>plan_summaries()</code>, two specialized applications of <code>evaluate_plan()</code>. First, we generate the plan for the bootstrapped datasets.</p>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1">my_datasets &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb122-2" data-line-number="2">  <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),</a>
-<a class="sourceLine" id="cb122-3" data-line-number="3">  <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>))</a>
-<a class="sourceLine" id="cb122-4" data-line-number="4">my_datasets</a>
-<a class="sourceLine" id="cb122-5" data-line-number="5">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb122-6" data-line-number="6">##   target command     </a>
-<a class="sourceLine" id="cb122-7" data-line-number="7">##   &lt;chr&gt;  &lt;chr&gt;       </a>
-<a class="sourceLine" id="cb122-8" data-line-number="8">## 1 small  simulate(48)</a>
-<a class="sourceLine" id="cb122-9" data-line-number="9">## 2 large  simulate(64)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">my_datasets &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
+  <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>))
+my_datasets
+## # A tibble: 2 x 2
+##   target command     
+##   &lt;chr&gt;  &lt;chr&gt;       
+## 1 small  simulate(48)
+## 2 large  simulate(64)</code></pre>
 <p>We want to analyze each dataset with one of two regression models.</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1">methods &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb123-2" data-line-number="2">  <span class="dt">regression1 =</span> <span class="kw">reg1</span>(dataset__),</a>
-<a class="sourceLine" id="cb123-3" data-line-number="3">  <span class="dt">regression2 =</span> <span class="kw">reg2</span>(dataset__))</a>
-<a class="sourceLine" id="cb123-4" data-line-number="4">methods</a>
-<a class="sourceLine" id="cb123-5" data-line-number="5">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb123-6" data-line-number="6">##   target      command        </a>
-<a class="sourceLine" id="cb123-7" data-line-number="7">##   &lt;chr&gt;       &lt;chr&gt;          </a>
-<a class="sourceLine" id="cb123-8" data-line-number="8">## 1 regression1 reg1(dataset__)</a>
-<a class="sourceLine" id="cb123-9" data-line-number="9">## 2 regression2 reg2(dataset__)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">methods &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">regression1 =</span> <span class="kw">reg1</span>(dataset__),
+  <span class="dt">regression2 =</span> <span class="kw">reg2</span>(dataset__))
+methods
+## # A tibble: 2 x 2
+##   target      command        
+##   &lt;chr&gt;       &lt;chr&gt;          
+## 1 regression1 reg1(dataset__)
+## 2 regression2 reg2(dataset__)</code></pre>
 <p>We evaluate the <code>dataset__</code> wildcard to generate all the regression commands we will need.</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" data-line-number="1">my_analyses &lt;-<span class="st"> </span><span class="kw">plan_analyses</span>(methods, <span class="dt">datasets =</span> my_datasets)</a>
-<a class="sourceLine" id="cb124-2" data-line-number="2">my_analyses</a>
-<a class="sourceLine" id="cb124-3" data-line-number="3">## # A tibble: 4 x 2</a>
-<a class="sourceLine" id="cb124-4" data-line-number="4">##   target            command    </a>
-<a class="sourceLine" id="cb124-5" data-line-number="5">##   &lt;chr&gt;             &lt;chr&gt;      </a>
-<a class="sourceLine" id="cb124-6" data-line-number="6">## 1 regression1_small reg1(small)</a>
-<a class="sourceLine" id="cb124-7" data-line-number="7">## 2 regression1_large reg1(large)</a>
-<a class="sourceLine" id="cb124-8" data-line-number="8">## 3 regression2_small reg2(small)</a>
-<a class="sourceLine" id="cb124-9" data-line-number="9">## 4 regression2_large reg2(large)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">my_analyses &lt;-<span class="st"> </span><span class="kw">plan_analyses</span>(methods, <span class="dt">datasets =</span> my_datasets)
+my_analyses
+## # A tibble: 4 x 2
+##   target            command    
+##   &lt;chr&gt;             &lt;chr&gt;      
+## 1 regression1_small reg1(small)
+## 2 regression1_large reg1(large)
+## 3 regression2_small reg2(small)
+## 4 regression2_large reg2(large)</code></pre>
 <p>Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1">summary_types &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb125-2" data-line-number="2">  <span class="dt">summ =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__<span class="op">$</span>residuals)),</a>
-<a class="sourceLine" id="cb125-3" data-line-number="3">  <span class="dt">coef =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__))<span class="op">$</span>coefficients</a>
-<a class="sourceLine" id="cb125-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb125-5" data-line-number="5">summary_types</a>
-<a class="sourceLine" id="cb125-6" data-line-number="6">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb125-7" data-line-number="7">##   target command                                           </a>
-<a class="sourceLine" id="cb125-8" data-line-number="8">##   &lt;chr&gt;  &lt;chr&gt;                                             </a>
-<a class="sourceLine" id="cb125-9" data-line-number="9">## 1 summ   suppressWarnings(summary(analysis__$residuals))   </a>
-<a class="sourceLine" id="cb125-10" data-line-number="10">## 2 coef   suppressWarnings(summary(analysis__))$coefficients</a>
-<a class="sourceLine" id="cb125-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb125-12" data-line-number="12">results &lt;-<span class="st"> </span><span class="kw">plan_summaries</span>(summary_types, <span class="dt">analyses =</span> my_analyses,</a>
-<a class="sourceLine" id="cb125-13" data-line-number="13">  <span class="dt">datasets =</span> my_datasets, <span class="dt">gather =</span> <span class="ot">NULL</span>) <span class="co"># Gathering is suppressed here.</span></a>
-<a class="sourceLine" id="cb125-14" data-line-number="14">results</a>
-<a class="sourceLine" id="cb125-15" data-line-number="15">## # A tibble: 8 x 2</a>
-<a class="sourceLine" id="cb125-16" data-line-number="16">##   target                command                                           </a>
-<a class="sourceLine" id="cb125-17" data-line-number="17">##   &lt;chr&gt;                 &lt;chr&gt;                                             </a>
-<a class="sourceLine" id="cb125-18" data-line-number="18">## 1 summ_regression1_sma… suppressWarnings(summary(regression1_small$residu…</a>
-<a class="sourceLine" id="cb125-19" data-line-number="19">## 2 summ_regression1_lar… suppressWarnings(summary(regression1_large$residu…</a>
-<a class="sourceLine" id="cb125-20" data-line-number="20">## 3 summ_regression2_sma… suppressWarnings(summary(regression2_small$residu…</a>
-<a class="sourceLine" id="cb125-21" data-line-number="21">## 4 summ_regression2_lar… suppressWarnings(summary(regression2_large$residu…</a>
-<a class="sourceLine" id="cb125-22" data-line-number="22">## 5 coef_regression1_sma… suppressWarnings(summary(regression1_small))$coef…</a>
-<a class="sourceLine" id="cb125-23" data-line-number="23">## 6 coef_regression1_lar… suppressWarnings(summary(regression1_large))$coef…</a>
-<a class="sourceLine" id="cb125-24" data-line-number="24">## 7 coef_regression2_sma… suppressWarnings(summary(regression2_small))$coef…</a>
-<a class="sourceLine" id="cb125-25" data-line-number="25">## 8 coef_regression2_lar… suppressWarnings(summary(regression2_large))$coef…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">summary_types &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">summ =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__<span class="op">$</span>residuals)),
+  <span class="dt">coef =</span> <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(analysis__))<span class="op">$</span>coefficients
+)
+summary_types
+## # A tibble: 2 x 2
+##   target command                                           
+##   &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 summ   suppressWarnings(summary(analysis__$residuals))   
+## 2 coef   suppressWarnings(summary(analysis__))$coefficients
+
+results &lt;-<span class="st"> </span><span class="kw">plan_summaries</span>(summary_types, <span class="dt">analyses =</span> my_analyses,
+  <span class="dt">datasets =</span> my_datasets, <span class="dt">gather =</span> <span class="ot">NULL</span>) <span class="co"># Gathering is suppressed here.</span>
+results
+## # A tibble: 8 x 2
+##   target                command                                           
+##   &lt;chr&gt;                 &lt;chr&gt;                                             
+## 1 summ_regression1_sma… suppressWarnings(summary(regression1_small$residu…
+## 2 summ_regression1_lar… suppressWarnings(summary(regression1_large$residu…
+## 3 summ_regression2_sma… suppressWarnings(summary(regression2_small$residu…
+## 4 summ_regression2_lar… suppressWarnings(summary(regression2_large$residu…
+## 5 coef_regression1_sma… suppressWarnings(summary(regression1_small))$coef…
+## 6 coef_regression1_lar… suppressWarnings(summary(regression1_large))$coef…
+## 7 coef_regression2_sma… suppressWarnings(summary(regression2_small))$coef…
+## 8 coef_regression2_lar… suppressWarnings(summary(regression2_large))$coef…</code></pre>
 <p>Next, we bind all the rows together for a single plan that we can later supply to <code>make()</code>.</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb126-1" data-line-number="1">my_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(my_datasets, my_analyses, results)</a>
-<a class="sourceLine" id="cb126-2" data-line-number="2">my_plan</a>
-<a class="sourceLine" id="cb126-3" data-line-number="3">## # A tibble: 14 x 2</a>
-<a class="sourceLine" id="cb126-4" data-line-number="4">##    target               command                                           </a>
-<a class="sourceLine" id="cb126-5" data-line-number="5">##    &lt;chr&gt;                &lt;chr&gt;                                             </a>
-<a class="sourceLine" id="cb126-6" data-line-number="6">##  1 small                simulate(48)                                      </a>
-<a class="sourceLine" id="cb126-7" data-line-number="7">##  2 large                simulate(64)                                      </a>
-<a class="sourceLine" id="cb126-8" data-line-number="8">##  3 regression1_small    reg1(small)                                       </a>
-<a class="sourceLine" id="cb126-9" data-line-number="9">##  4 regression1_large    reg1(large)                                       </a>
-<a class="sourceLine" id="cb126-10" data-line-number="10">##  5 regression2_small    reg2(small)                                       </a>
-<a class="sourceLine" id="cb126-11" data-line-number="11">##  6 regression2_large    reg2(large)                                       </a>
-<a class="sourceLine" id="cb126-12" data-line-number="12">##  7 summ_regression1_sm… suppressWarnings(summary(regression1_small$residu…</a>
-<a class="sourceLine" id="cb126-13" data-line-number="13">##  8 summ_regression1_la… suppressWarnings(summary(regression1_large$residu…</a>
-<a class="sourceLine" id="cb126-14" data-line-number="14">##  9 summ_regression2_sm… suppressWarnings(summary(regression2_small$residu…</a>
-<a class="sourceLine" id="cb126-15" data-line-number="15">## 10 summ_regression2_la… suppressWarnings(summary(regression2_large$residu…</a>
-<a class="sourceLine" id="cb126-16" data-line-number="16">## 11 coef_regression1_sm… suppressWarnings(summary(regression1_small))$coef…</a>
-<a class="sourceLine" id="cb126-17" data-line-number="17">## 12 coef_regression1_la… suppressWarnings(summary(regression1_large))$coef…</a>
-<a class="sourceLine" id="cb126-18" data-line-number="18">## 13 coef_regression2_sm… suppressWarnings(summary(regression2_small))$coef…</a>
-<a class="sourceLine" id="cb126-19" data-line-number="19">## 14 coef_regression2_la… suppressWarnings(summary(regression2_large))$coef…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">my_plan &lt;-<span class="st"> </span><span class="kw">rbind</span>(my_datasets, my_analyses, results)
+my_plan
+## # A tibble: 14 x 2
+##    target               command                                           
+##    &lt;chr&gt;                &lt;chr&gt;                                             
+##  1 small                simulate(48)                                      
+##  2 large                simulate(64)                                      
+##  3 regression1_small    reg1(small)                                       
+##  4 regression1_large    reg1(large)                                       
+##  5 regression2_small    reg2(small)                                       
+##  6 regression2_large    reg2(large)                                       
+##  7 summ_regression1_sm… suppressWarnings(summary(regression1_small$residu…
+##  8 summ_regression1_la… suppressWarnings(summary(regression1_large$residu…
+##  9 summ_regression2_sm… suppressWarnings(summary(regression2_small$residu…
+## 10 summ_regression2_la… suppressWarnings(summary(regression2_large$residu…
+## 11 coef_regression1_sm… suppressWarnings(summary(regression1_small))$coef…
+## 12 coef_regression1_la… suppressWarnings(summary(regression1_large))$coef…
+## 13 coef_regression2_sm… suppressWarnings(summary(regression2_small))$coef…
+## 14 coef_regression2_la… suppressWarnings(summary(regression2_large))$coef…</code></pre>
 </div>
 <div id="non-wildcard-functions" class="section level3">
 <h3><span class="header-section-number">6.5.5</span> Non-wildcard functions</h3>
 <div id="expand_plan" class="section level4">
 <h4><span class="header-section-number">6.5.5.1</span> <code>expand_plan()</code></h4>
 <p>Sometimes, you just want multiple replicates of the same targets.</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb127-2" data-line-number="2">  <span class="dt">fake_data =</span> <span class="kw">simulate_from_model</span>(),</a>
-<a class="sourceLine" id="cb127-3" data-line-number="3">  <span class="dt">bootstrapped_data =</span> <span class="kw">bootstrap_from_real_data</span>(real_data)</a>
-<a class="sourceLine" id="cb127-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb127-5" data-line-number="5"><span class="kw">expand_plan</span>(plan, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb127-6" data-line-number="6">## # A tibble: 6 x 2</a>
-<a class="sourceLine" id="cb127-7" data-line-number="7">##   target              command                            </a>
-<a class="sourceLine" id="cb127-8" data-line-number="8">##   &lt;chr&gt;               &lt;chr&gt;                              </a>
-<a class="sourceLine" id="cb127-9" data-line-number="9">## 1 fake_data_1         simulate_from_model()              </a>
-<a class="sourceLine" id="cb127-10" data-line-number="10">## 2 fake_data_2         simulate_from_model()              </a>
-<a class="sourceLine" id="cb127-11" data-line-number="11">## 3 fake_data_3         simulate_from_model()              </a>
-<a class="sourceLine" id="cb127-12" data-line-number="12">## 4 bootstrapped_data_1 bootstrap_from_real_data(real_data)</a>
-<a class="sourceLine" id="cb127-13" data-line-number="13">## 5 bootstrapped_data_2 bootstrap_from_real_data(real_data)</a>
-<a class="sourceLine" id="cb127-14" data-line-number="14">## 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">fake_data =</span> <span class="kw">simulate_from_model</span>(),
+  <span class="dt">bootstrapped_data =</span> <span class="kw">bootstrap_from_real_data</span>(real_data)
+)
+<span class="kw">expand_plan</span>(plan, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+## # A tibble: 6 x 2
+##   target              command                            
+##   &lt;chr&gt;               &lt;chr&gt;                              
+## 1 fake_data_1         simulate_from_model()              
+## 2 fake_data_2         simulate_from_model()              
+## 3 fake_data_3         simulate_from_model()              
+## 4 bootstrapped_data_1 bootstrap_from_real_data(real_data)
+## 5 bootstrapped_data_2 bootstrap_from_real_data(real_data)
+## 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</code></pre>
 </div>
 <div id="gather_plan-and-gather_by" class="section level4">
 <h4><span class="header-section-number">6.5.5.2</span> <code>gather_plan()</code> and <code>gather_by()</code></h4>
 <p>Other times, you want to combine multiple targets into one.</p>
-<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb128-2" data-line-number="2">  <span class="dt">small =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>)),</a>
-<a class="sourceLine" id="cb128-3" data-line-number="3">  <span class="dt">large =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;large&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>))</a>
-<a class="sourceLine" id="cb128-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb128-5" data-line-number="5"><span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>)</a>
-<a class="sourceLine" id="cb128-6" data-line-number="6">## # A tibble: 1 x 2</a>
-<a class="sourceLine" id="cb128-7" data-line-number="7">##   target   command                           </a>
-<a class="sourceLine" id="cb128-8" data-line-number="8">##   &lt;chr&gt;    &lt;chr&gt;                             </a>
-<a class="sourceLine" id="cb128-9" data-line-number="9">## 1 combined list(small = small, large = large)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">25</span>)),
+  <span class="dt">large =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;large&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>))
+)
+<span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>)
+## # A tibble: 1 x 2
+##   target   command                           
+##   &lt;chr&gt;    &lt;chr&gt;                             
+## 1 combined list(small = small, large = large)</code></pre>
 <p>In this case, <code>small</code> and <code>large</code> are data frames, so it may be more convenient to combine the rows together.</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1"><span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>, <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>)</a>
-<a class="sourceLine" id="cb129-2" data-line-number="2">## # A tibble: 1 x 2</a>
-<a class="sourceLine" id="cb129-3" data-line-number="3">##   target   command                            </a>
-<a class="sourceLine" id="cb129-4" data-line-number="4">##   &lt;chr&gt;    &lt;chr&gt;                              </a>
-<a class="sourceLine" id="cb129-5" data-line-number="5">## 1 combined rbind(small = small, large = large)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>, <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>)
+## # A tibble: 1 x 2
+##   target   command                            
+##   &lt;chr&gt;    &lt;chr&gt;                              
+## 1 combined rbind(small = small, large = large)</code></pre>
 <p>See also <code>gather_by()</code> to gather multiple groups of targets based on other columns in the plan (e.g. from <code>evaluate_plan(trace = TRUE)</code>).</p>
 </div>
 <div id="reduce_plan-and-reduce_by" class="section level4">
 <h4><span class="header-section-number">6.5.5.3</span> <code>reduce_plan()</code> and <code>reduce_by()</code></h4>
 <p><code>reduce_plan()</code> is similar to <code>gather_plan()</code>, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb130-2" data-line-number="2">  <span class="dt">a =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb130-3" data-line-number="3">  <span class="dt">b =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb130-4" data-line-number="4">  <span class="dt">c =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb130-5" data-line-number="5">  <span class="dt">d =</span> <span class="dv">4</span></a>
-<a class="sourceLine" id="cb130-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb130-7" data-line-number="7"><span class="kw">reduce_plan</span>(plan)</a>
-<a class="sourceLine" id="cb130-8" data-line-number="8">## # A tibble: 3 x 2</a>
-<a class="sourceLine" id="cb130-9" data-line-number="9">##   target   command            </a>
-<a class="sourceLine" id="cb130-10" data-line-number="10">##   &lt;chr&gt;    &lt;chr&gt;              </a>
-<a class="sourceLine" id="cb130-11" data-line-number="11">## 1 target_1 a + b              </a>
-<a class="sourceLine" id="cb130-12" data-line-number="12">## 2 target_2 c + d              </a>
-<a class="sourceLine" id="cb130-13" data-line-number="13">## 3 target   target_1 + target_2</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="dv">1</span>,
+  <span class="dt">b =</span> <span class="dv">2</span>,
+  <span class="dt">c =</span> <span class="dv">3</span>,
+  <span class="dt">d =</span> <span class="dv">4</span>
+)
+<span class="kw">reduce_plan</span>(plan)
+## # A tibble: 3 x 2
+##   target   command            
+##   &lt;chr&gt;    &lt;chr&gt;              
+## 1 target_1 a + b              
+## 2 target_2 c + d              
+## 3 target   target_1 + target_2</code></pre>
 <p>You can control how each pair of targets gets combined.</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" data-line-number="1"><span class="kw">reduce_plan</span>(plan, <span class="dt">begin =</span> <span class="st">&quot;c(&quot;</span>, <span class="dt">op =</span> <span class="st">&quot;, &quot;</span>, <span class="dt">end =</span> <span class="st">&quot;)&quot;</span>)</a>
-<a class="sourceLine" id="cb131-2" data-line-number="2">## # A tibble: 3 x 2</a>
-<a class="sourceLine" id="cb131-3" data-line-number="3">##   target   command              </a>
-<a class="sourceLine" id="cb131-4" data-line-number="4">##   &lt;chr&gt;    &lt;chr&gt;                </a>
-<a class="sourceLine" id="cb131-5" data-line-number="5">## 1 target_1 c(a, b)              </a>
-<a class="sourceLine" id="cb131-6" data-line-number="6">## 2 target_2 c(c, d)              </a>
-<a class="sourceLine" id="cb131-7" data-line-number="7">## 3 target   c(target_1, target_2)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reduce_plan</span>(plan, <span class="dt">begin =</span> <span class="st">&quot;c(&quot;</span>, <span class="dt">op =</span> <span class="st">&quot;, &quot;</span>, <span class="dt">end =</span> <span class="st">&quot;)&quot;</span>)
+## # A tibble: 3 x 2
+##   target   command              
+##   &lt;chr&gt;    &lt;chr&gt;                
+## 1 target_1 c(a, b)              
+## 2 target_2 c(c, d)              
+## 3 target   c(target_1, target_2)</code></pre>
 <p>See also <code>reduce_by()</code> to do reductions on multiple groups of targets based on other columns in the plan (e.g. from <code>evaluate_plan(trace = TRUE)</code>).</p>
 </div>
 </div>
@@ -1062,125 +1063,125 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 cat in2.txt > out2.txt
 </code></pre>
 <p>The <a href="https://github.com/tidyverse/glue"><code>glue</code></a> package can automatically generate these Linux commands.</p>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="kw">library</span>(glue)</a>
-<a class="sourceLine" id="cb132-2" data-line-number="2"><span class="kw">glue_data</span>(</a>
-<a class="sourceLine" id="cb132-3" data-line-number="3">  <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb132-4" data-line-number="4">    <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>), </a>
-<a class="sourceLine" id="cb132-5" data-line-number="5">    <span class="dt">outputs =</span> <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb132-6" data-line-number="6">  ),</a>
-<a class="sourceLine" id="cb132-7" data-line-number="7">  <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span></a>
-<a class="sourceLine" id="cb132-8" data-line-number="8">)</a>
-<a class="sourceLine" id="cb132-9" data-line-number="9">## cat in1.txt &gt; out1.txt</a>
-<a class="sourceLine" id="cb132-10" data-line-number="10">## cat in2.txt &gt; out2.txt</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(glue)
+<span class="kw">glue_data</span>(
+  <span class="kw">list</span>(
+    <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>), 
+    <span class="dt">outputs =</span> <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>)
+  ),
+  <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>
+)
+## cat in1.txt &gt; out1.txt
+## cat in2.txt &gt; out2.txt</code></pre>
 <p>Our <code>drake</code> commands will use <code>system()</code> to execute the Linux commands that <a href="https://github.com/tidyverse/glue"><code>glue</code></a> generates. Technically, we could use <code>drake_plan()</code> if we wanted.</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
-<a class="sourceLine" id="cb133-2" data-line-number="2"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb133-3" data-line-number="3">  <span class="kw">glue_data</span>(</a>
-<a class="sourceLine" id="cb133-4" data-line-number="4">    <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb133-5" data-line-number="5">      <span class="dt">inputs =</span> <span class="kw">file_in</span>(<span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>)), </a>
-<a class="sourceLine" id="cb133-6" data-line-number="6">      <span class="dt">outputs =</span> <span class="kw">file_out</span>(<span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>))</a>
-<a class="sourceLine" id="cb133-7" data-line-number="7">    ),</a>
-<a class="sourceLine" id="cb133-8" data-line-number="8">    <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span></a>
-<a class="sourceLine" id="cb133-9" data-line-number="9">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb133-10" data-line-number="10"><span class="st">    </span><span class="kw">lapply</span>(<span class="dt">FUN =</span> system)</a>
-<a class="sourceLine" id="cb133-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb133-12" data-line-number="12">## # A tibble: 1 x 2</a>
-<a class="sourceLine" id="cb133-13" data-line-number="13">##   target        command                                                   </a>
-<a class="sourceLine" id="cb133-14" data-line-number="14">##   &lt;chr&gt;         &lt;chr&gt;                                                     </a>
-<a class="sourceLine" id="cb133-15" data-line-number="15">## 1 drake_target… &quot;glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.txt…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+<span class="kw">drake_plan</span>(
+  <span class="kw">glue_data</span>(
+    <span class="kw">list</span>(
+      <span class="dt">inputs =</span> <span class="kw">file_in</span>(<span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>)), 
+      <span class="dt">outputs =</span> <span class="kw">file_out</span>(<span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>))
+    ),
+    <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>
+  ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">lapply</span>(<span class="dt">FUN =</span> system)
+)
+## # A tibble: 1 x 2
+##   target        command                                                   
+##   &lt;chr&gt;         &lt;chr&gt;                                                     
+## 1 drake_target… &quot;glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.txt…</code></pre>
 <p>But what if we want to <em>generate</em> these <a href="https://github.com/tidyverse/glue"><code>glue</code></a> commands instead of writing them literally in our plan? This is a job for custom metaprogramming with <a href="https://www.youtube.com/watch?v=nERXS3ssntw">tidy evaluation</a>. First, we create a function to generate the <code>drake</code> command of an arbitrary target.</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="kw">library</span>(rlang) <span class="co"># for tidy evaluation</span></a>
-<a class="sourceLine" id="cb134-2" data-line-number="2">write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd, <span class="dt">inputs =</span> <span class="ot">NULL</span> , <span class="dt">outputs =</span> <span class="ot">NULL</span>){</a>
-<a class="sourceLine" id="cb134-3" data-line-number="3">  inputs &lt;-<span class="st"> </span><span class="kw">enexpr</span>(inputs)</a>
-<a class="sourceLine" id="cb134-4" data-line-number="4">  outputs &lt;-<span class="st"> </span><span class="kw">enexpr</span>(outputs)</a>
-<a class="sourceLine" id="cb134-5" data-line-number="5">  <span class="kw">expr</span>({</a>
-<a class="sourceLine" id="cb134-6" data-line-number="6">    <span class="kw">glue_data</span>(</a>
-<a class="sourceLine" id="cb134-7" data-line-number="7">      <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb134-8" data-line-number="8">        <span class="dt">inputs =</span> <span class="kw">file_in</span>(<span class="op">!!</span>inputs),</a>
-<a class="sourceLine" id="cb134-9" data-line-number="9">        <span class="dt">outputs =</span> <span class="kw">file_out</span>(<span class="op">!!</span>outputs)</a>
-<a class="sourceLine" id="cb134-10" data-line-number="10">      ),</a>
-<a class="sourceLine" id="cb134-11" data-line-number="11">      <span class="op">!!</span>cmd</a>
-<a class="sourceLine" id="cb134-12" data-line-number="12">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb134-13" data-line-number="13"><span class="st">      </span><span class="kw">lapply</span>(<span class="dt">FUN =</span> system)</a>
-<a class="sourceLine" id="cb134-14" data-line-number="14">  }) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb134-15" data-line-number="15"><span class="st">    </span>expr_text</a>
-<a class="sourceLine" id="cb134-16" data-line-number="16">}</a>
-<a class="sourceLine" id="cb134-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb134-18" data-line-number="18"><span class="kw">write_command</span>(</a>
-<a class="sourceLine" id="cb134-19" data-line-number="19">  <span class="dt">cmd =</span> <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>,</a>
-<a class="sourceLine" id="cb134-20" data-line-number="20">  <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>),</a>
-<a class="sourceLine" id="cb134-21" data-line-number="21">  <span class="dt">outputs =</span> <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb134-22" data-line-number="22">) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb134-23" data-line-number="23"><span class="st">  </span>cat</a>
-<a class="sourceLine" id="cb134-24" data-line-number="24">## {</a>
-<a class="sourceLine" id="cb134-25" data-line-number="25">##     glue_data(list(inputs = file_in(c(&quot;in1.txt&quot;, &quot;in2.txt&quot;)), </a>
-<a class="sourceLine" id="cb134-26" data-line-number="26">##         outputs = file_out(c(&quot;out1.txt&quot;, &quot;out2.txt&quot;))), &quot;cat {inputs} &gt; {outputs}&quot;) %&gt;% </a>
-<a class="sourceLine" id="cb134-27" data-line-number="27">##         lapply(FUN = system)</a>
-<a class="sourceLine" id="cb134-28" data-line-number="28">## }</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rlang) <span class="co"># for tidy evaluation</span>
+write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd, <span class="dt">inputs =</span> <span class="ot">NULL</span> , <span class="dt">outputs =</span> <span class="ot">NULL</span>){
+  inputs &lt;-<span class="st"> </span><span class="kw">enexpr</span>(inputs)
+  outputs &lt;-<span class="st"> </span><span class="kw">enexpr</span>(outputs)
+  <span class="kw">expr</span>({
+    <span class="kw">glue_data</span>(
+      <span class="kw">list</span>(
+        <span class="dt">inputs =</span> <span class="kw">file_in</span>(<span class="op">!!</span>inputs),
+        <span class="dt">outputs =</span> <span class="kw">file_out</span>(<span class="op">!!</span>outputs)
+      ),
+      <span class="op">!!</span>cmd
+    ) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">lapply</span>(<span class="dt">FUN =</span> system)
+  }) <span class="op">%&gt;%</span>
+<span class="st">    </span>expr_text
+}
+
+<span class="kw">write_command</span>(
+  <span class="dt">cmd =</span> <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>,
+  <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>),
+  <span class="dt">outputs =</span> <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>)
+) <span class="op">%&gt;%</span>
+<span class="st">  </span>cat
+## {
+##     glue_data(list(inputs = file_in(c(&quot;in1.txt&quot;, &quot;in2.txt&quot;)), 
+##         outputs = file_out(c(&quot;out1.txt&quot;, &quot;out2.txt&quot;))), &quot;cat {inputs} &gt; {outputs}&quot;) %&gt;% 
+##         lapply(FUN = system)
+## }</code></pre>
 <p>Then, we lay out all the arguments we will pass to <code>write_command()</code>. Here, each row corresponds to a separate target.</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" data-line-number="1">meta_plan &lt;-<span class="st"> </span><span class="kw">tribble</span>(</a>
-<a class="sourceLine" id="cb135-2" data-line-number="2">  <span class="op">~</span>cmd, <span class="op">~</span>inputs, <span class="op">~</span>outputs,</a>
-<a class="sourceLine" id="cb135-3" data-line-number="3">  <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>),</a>
-<a class="sourceLine" id="cb135-4" data-line-number="4">  <span class="st">&quot;cat {inputs} {inputs} &gt; {outputs}&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;out3.txt&quot;</span>, <span class="st">&quot;out4.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb135-5" data-line-number="5">) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb135-6" data-line-number="6"><span class="st">  </span>print</a>
-<a class="sourceLine" id="cb135-7" data-line-number="7">## # A tibble: 2 x 3</a>
-<a class="sourceLine" id="cb135-8" data-line-number="8">##   cmd                               inputs    outputs  </a>
-<a class="sourceLine" id="cb135-9" data-line-number="9">##   &lt;chr&gt;                             &lt;list&gt;    &lt;list&gt;   </a>
-<a class="sourceLine" id="cb135-10" data-line-number="10">## 1 cat {inputs} &gt; {outputs}          &lt;chr [2]&gt; &lt;chr [2]&gt;</a>
-<a class="sourceLine" id="cb135-11" data-line-number="11">## 2 cat {inputs} {inputs} &gt; {outputs} &lt;chr [2]&gt; &lt;chr [2]&gt;</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">meta_plan &lt;-<span class="st"> </span><span class="kw">tribble</span>(
+  <span class="op">~</span>cmd, <span class="op">~</span>inputs, <span class="op">~</span>outputs,
+  <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;in1.txt&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>),
+  <span class="st">&quot;cat {inputs} {inputs} &gt; {outputs}&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;out3.txt&quot;</span>, <span class="st">&quot;out4.txt&quot;</span>)
+) <span class="op">%&gt;%</span>
+<span class="st">  </span>print
+## # A tibble: 2 x 3
+##   cmd                               inputs    outputs  
+##   &lt;chr&gt;                             &lt;list&gt;    &lt;list&gt;   
+## 1 cat {inputs} &gt; {outputs}          &lt;chr [2]&gt; &lt;chr [2]&gt;
+## 2 cat {inputs} {inputs} &gt; {outputs} &lt;chr [2]&gt; &lt;chr [2]&gt;</code></pre>
 <p>Finally, we create our workflow plan without any built-in <code>drake</code> functions.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb136-2" data-line-number="2">  <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),</a>
-<a class="sourceLine" id="cb136-3" data-line-number="3">  <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)</a>
-<a class="sourceLine" id="cb136-4" data-line-number="4">) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb136-5" data-line-number="5"><span class="st">  </span>print</a>
-<a class="sourceLine" id="cb136-6" data-line-number="6">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb136-7" data-line-number="7">##   target   command                                                        </a>
-<a class="sourceLine" id="cb136-8" data-line-number="8">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb136-9" data-line-number="9">## 1 target_1 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.t…</a>
-<a class="sourceLine" id="cb136-10" data-line-number="10">## 2 target_2 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;out1.txt\&quot;, \&quot;out2…</a>
-<a class="sourceLine" id="cb136-11" data-line-number="11"><span class="kw">writeLines</span>(<span class="st">&quot;in1&quot;</span>, <span class="st">&quot;in1.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb136-12" data-line-number="12"><span class="kw">writeLines</span>(<span class="st">&quot;in2&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb136-13" data-line-number="13"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),
+  <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)
+) <span class="op">%&gt;%</span>
+<span class="st">  </span>print
+## # A tibble: 2 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 target_1 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.t…
+## 2 target_2 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;out1.txt\&quot;, \&quot;out2…
+<span class="kw">writeLines</span>(<span class="st">&quot;in1&quot;</span>, <span class="st">&quot;in1.txt&quot;</span>)
+<span class="kw">writeLines</span>(<span class="st">&quot;in2&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>)
+<span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</code></pre>
 <div id="htmlwidget-dda5858bd620d236e22c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["\"in1.txt\"","\"in2.txt\"","\"out1.txt\"","\"out2.txt\"","\"out3.txt\"","\"out4.txt\"","target_1","target_2"],"label":["\"in1.txt\"\n0.002s","\"in2.txt\"\n0.002s","\"out1.txt\"\n0.001s","\"out2.txt\"\n0.001s","\"out3.txt\"\n0.001s","\"out4.txt\"\n0.001s","target_1","target_2"],"command":[null,null,"{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}"],"status":["imported","imported","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["file","file","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["square","square","square","square","square","square","dot","dot"],"level":[1,1,3,3,5,5,2,4],"title":["in1","in2","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1....","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1....","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{\n&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1...."],"x":[-1,1,-1,1,-1,1,0,0],"y":[-1,-1,0,0,1,1,-0.5,0.5]},"edges":{"from":["\"in1.txt\"","\"in2.txt\"","target_1","target_1","\"out1.txt\"","\"out2.txt\"","target_2","target_2"],"to":["target_1","target_1","\"out1.txt\"","\"out2.txt\"","target_2","target_2","\"out3.txt\"","\"out4.txt\""],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","File"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","square"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["\"in1.txt\"","\"in2.txt\"","\"out1.txt\"","\"out2.txt\"","\"out3.txt\"","\"out4.txt\"","target_1","target_2"],"label":["\"in1.txt\"\n0.003s","\"in2.txt\"\n0.002s","\"out1.txt\"\n0.002s","\"out2.txt\"\n0.002s","\"out3.txt\"\n0.001s","\"out4.txt\"\n0.002s","target_1","target_2"],"command":[null,null,"{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"in1.txt\", \"in2.txt\")), \n        outputs = file_out(c(\"out1.txt\", \"out2.txt\"))), \"cat {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}","{\n    glue_data(list(inputs = file_in(c(\"out1.txt\", \"out2.txt\")), \n        outputs = file_out(c(\"out3.txt\", \"out4.txt\"))), \"cat {inputs} {inputs} > {outputs}\") %>% \n        lapply(FUN = system)\n}"],"status":["imported","imported","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["file","file","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["square","square","square","square","square","square","dot","dot"],"level":[1,1,3,3,5,5,2,4],"title":["in1","in2","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1....","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1....","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"in1.t...","{<br>&nbsp;&nbsp;&nbsp;&nbsp;glue_data(list(inputs&nbsp;=&nbsp;file_in(c(\"out1...."],"x":[-1,1,-1,1,-1,1,0,0],"y":[-1,-1,0,0,1,1,-0.5,0.5]},"edges":{"from":["\"in1.txt\"","\"in2.txt\"","target_1","target_1","\"out1.txt\"","\"out2.txt\"","target_2","target_2"],"to":["target_1","target_1","\"out1.txt\"","\"out2.txt\"","target_2","target_2","\"out3.txt\"","\"out4.txt\""],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","File"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","square"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Alternatively, you could use <code>as.call()</code> instead of tidy evaluation to generate your plan. Use <code>as.call()</code> to construct calls to <code>file_in()</code>, <code>file_out()</code>, and custom functions in your commands.</p>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="kw">library</span>(purrr) <span class="co"># pmap_chr() is particularly useful here.</span></a>
-<a class="sourceLine" id="cb137-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb137-3" data-line-number="3"><span class="co"># A function that will be called in your commands.</span></a>
-<a class="sourceLine" id="cb137-4" data-line-number="4">command_function &lt;-<span class="st"> </span><span class="cf">function</span>(cmd, inputs, outputs){</a>
-<a class="sourceLine" id="cb137-5" data-line-number="5">  <span class="kw">glue_data</span>(</a>
-<a class="sourceLine" id="cb137-6" data-line-number="6">    <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb137-7" data-line-number="7">      <span class="dt">inputs =</span> inputs,</a>
-<a class="sourceLine" id="cb137-8" data-line-number="8">      <span class="dt">outputs =</span> outputs</a>
-<a class="sourceLine" id="cb137-9" data-line-number="9">    ),</a>
-<a class="sourceLine" id="cb137-10" data-line-number="10">    cmd</a>
-<a class="sourceLine" id="cb137-11" data-line-number="11">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-12" data-line-number="12"><span class="st">    </span>purrr<span class="op">::</span><span class="kw">walk</span>(system)</a>
-<a class="sourceLine" id="cb137-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb137-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb137-15" data-line-number="15"><span class="co"># A function to generate quoted calls to command_function(),</span></a>
-<a class="sourceLine" id="cb137-16" data-line-number="16"><span class="co"># which in turn contain quoted calls to file_in() and file_out().</span></a>
-<a class="sourceLine" id="cb137-17" data-line-number="17">write_command &lt;-<span class="st"> </span><span class="cf">function</span>(...){</a>
-<a class="sourceLine" id="cb137-18" data-line-number="18">  args &lt;-<span class="st"> </span><span class="kw">list</span>(...)</a>
-<a class="sourceLine" id="cb137-19" data-line-number="19">  args<span class="op">$</span>inputs &lt;-<span class="st"> </span><span class="kw">as.call</span>(<span class="kw">list</span>(<span class="kw">quote</span>(file_in), args<span class="op">$</span>inputs))</a>
-<a class="sourceLine" id="cb137-20" data-line-number="20">  args<span class="op">$</span>outputs &lt;-<span class="st"> </span><span class="kw">as.call</span>(<span class="kw">list</span>(<span class="kw">quote</span>(file_out), args<span class="op">$</span>outputs))</a>
-<a class="sourceLine" id="cb137-21" data-line-number="21">  <span class="kw">c</span>(<span class="kw">quote</span>(command_function), args) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-22" data-line-number="22"><span class="st">    </span><span class="kw">as.call</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-23" data-line-number="23"><span class="st">    </span>rlang<span class="op">::</span><span class="kw">expr_text</span>()</a>
-<a class="sourceLine" id="cb137-24" data-line-number="24">}</a>
-<a class="sourceLine" id="cb137-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb137-26" data-line-number="26">plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb137-27" data-line-number="27">  <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),</a>
-<a class="sourceLine" id="cb137-28" data-line-number="28">  <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)</a>
-<a class="sourceLine" id="cb137-29" data-line-number="29">) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-30" data-line-number="30"><span class="st">  </span>print</a>
-<a class="sourceLine" id="cb137-31" data-line-number="31">## # A tibble: 2 x 2</a>
-<a class="sourceLine" id="cb137-32" data-line-number="32">##   target   command                                                        </a>
-<a class="sourceLine" id="cb137-33" data-line-number="33">##   &lt;chr&gt;    &lt;chr&gt;                                                          </a>
-<a class="sourceLine" id="cb137-34" data-line-number="34">## 1 target_1 &quot;command_function(cmd = \&quot;cat {inputs} &gt; {outputs}\&quot;, inputs =…</a>
-<a class="sourceLine" id="cb137-35" data-line-number="35">## 2 target_2 &quot;command_function(cmd = \&quot;cat {inputs} {inputs} &gt; {outputs}\&quot;,…</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(purrr) <span class="co"># pmap_chr() is particularly useful here.</span>
+
+<span class="co"># A function that will be called in your commands.</span>
+command_function &lt;-<span class="st"> </span><span class="cf">function</span>(cmd, inputs, outputs){
+  <span class="kw">glue_data</span>(
+    <span class="kw">list</span>(
+      <span class="dt">inputs =</span> inputs,
+      <span class="dt">outputs =</span> outputs
+    ),
+    cmd
+  ) <span class="op">%&gt;%</span>
+<span class="st">    </span>purrr<span class="op">::</span><span class="kw">walk</span>(system)
+}
+
+<span class="co"># A function to generate quoted calls to command_function(),</span>
+<span class="co"># which in turn contain quoted calls to file_in() and file_out().</span>
+write_command &lt;-<span class="st"> </span><span class="cf">function</span>(...){
+  args &lt;-<span class="st"> </span><span class="kw">list</span>(...)
+  args<span class="op">$</span>inputs &lt;-<span class="st"> </span><span class="kw">as.call</span>(<span class="kw">list</span>(<span class="kw">quote</span>(file_in), args<span class="op">$</span>inputs))
+  args<span class="op">$</span>outputs &lt;-<span class="st"> </span><span class="kw">as.call</span>(<span class="kw">list</span>(<span class="kw">quote</span>(file_out), args<span class="op">$</span>outputs))
+  <span class="kw">c</span>(<span class="kw">quote</span>(command_function), args) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.call</span>() <span class="op">%&gt;%</span>
+<span class="st">    </span>rlang<span class="op">::</span><span class="kw">expr_text</span>()
+}
+
+plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),
+  <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)
+) <span class="op">%&gt;%</span>
+<span class="st">  </span>print
+## # A tibble: 2 x 2
+##   target   command                                                        
+##   &lt;chr&gt;    &lt;chr&gt;                                                          
+## 1 target_1 &quot;command_function(cmd = \&quot;cat {inputs} &gt; {outputs}\&quot;, inputs =…
+## 2 target_2 &quot;command_function(cmd = \&quot;cat {inputs} {inputs} &gt; {outputs}\&quot;,…</code></pre>
 <p>Metaprogramming gets much simpler if you do not need to construct literal calls to <code>file_in()</code>, <code>file_out()</code>, etc. in your commands. The construction of <code>model_plan</code> in the <a href="gsp.html#gsp">gross state product exmaple</a> is an example.</p>
 <p>Thanks to <a href="https://github.com/cfhammill">Chris Hammill</a> for <a href="https://github.com/ropensci/drake/issues/451">presenting this scenario and contributing to the solution</a>.</p>
 </div>
@@ -1230,6 +1231,10 @@ gitbook.start({
 "link": null,
 "text": null
 },
+"history": {
+"link": null,
+"text": null
+},
 "download": null,
 "toc": {
 "collapse": "subsection"
@@ -1244,7 +1249,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(src))
       src = src.replace(/^https?:/, '');
     script.src = src;
