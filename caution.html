@@ -282,12 +282,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.2" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>12.2</b> Strategize your high-performance computing</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="store.html"><a href="store.html"><i class="fa fa-check"></i><b>13</b> Storage</a><ul>
-<li class="chapter" data-level="13.1" data-path="store.html"><a href="store.html#caches"><i class="fa fa-check"></i><b>13.1</b> Caches</a></li>
+<li class="chapter" data-level="13.1" data-path="store.html"><a href="store.html#cache-formats"><i class="fa fa-check"></i><b>13.1</b> Cache formats</a><ul>
+<li class="chapter" data-level="13.1.1" data-path="store.html"><a href="store.html#rds-caches"><i class="fa fa-check"></i><b>13.1.1</b> RDS caches</a></li>
+<li class="chapter" data-level="13.1.2" data-path="store.html"><a href="store.html#database-caches"><i class="fa fa-check"></i><b>13.1.2</b> Database caches</a></li>
+<li class="chapter" data-level="13.1.3" data-path="store.html"><a href="store.html#environment-caches"><i class="fa fa-check"></i><b>13.1.3</b> Environment caches</a></li>
+</ul></li>
 <li class="chapter" data-level="13.2" data-path="store.html"><a href="store.html#hash-algorithms"><i class="fa fa-check"></i><b>13.2</b> Hash algorithms</a></li>
-<li class="chapter" data-level="13.3" data-path="store.html"><a href="store.html#which-hash-algorithm-should-you-choose"><i class="fa fa-check"></i><b>13.3</b> Which hash algorithm should you choose?</a></li>
-<li class="chapter" data-level="13.4" data-path="store.html"><a href="store.html#select-the-hash-algorithms-of-the-cache"><i class="fa fa-check"></i><b>13.4</b> Select the hash algorithms of the cache</a></li>
-<li class="chapter" data-level="13.5" data-path="store.html"><a href="store.html#using-storr-directly"><i class="fa fa-check"></i><b>13.5</b> Using <code>storr</code> directly</a></li>
-<li class="chapter" data-level="13.6" data-path="store.html"><a href="store.html#cleaning-up"><i class="fa fa-check"></i><b>13.6</b> Cleaning up</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
@@ -552,10 +552,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;26f838d2d21848a64c52d00430374fe5&quot;
+## [1] &quot;305699ecea387481f0909766afc2c22f&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;325643e567812ab878181c160f55c61a&quot;
+## [1] &quot;57e18229089d3a300c2d70e8bd041fd7&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -600,13 +600,13 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <p>It is common practice to use a literal dot (<code>.</code>) to carry an object through a <a href="https://github.com/tidyverse/magrittr"><code>magrittr</code></a> pipeline. Due to some tricky limitations in static code analysis, <code>drake</code> never treats the dot (<code>.</code>) as a dependency, even if you use it as an ordinary variable outside of a <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> context.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_code</span>(<span class="st">&quot;sqrt(x + y + .)&quot;</span>)
 ## $globals
-## [1] &quot;sqrt&quot; &quot;x&quot;    &quot;y&quot;
+## [1] &quot;sqrt&quot; &quot;x&quot;    &quot;y&quot;    &quot;.&quot;
 <span class="kw">deps_code</span>(<span class="st">&quot;dplyr::filter(complete.cases(.))&quot;</span>)
 ## $namespaced
 ## [1] &quot;dplyr::filter&quot;
 ## 
 ## $globals
-## [1] &quot;complete.cases&quot;</code></pre>
+## [1] &quot;complete.cases&quot; &quot;.&quot;</code></pre>
 </div>
 <div id="dependencies-are-not-tracked-in-some-edge-cases." class="section level3">
 <h3><span class="header-section-number">B.4.3</span> Dependencies are not tracked in some edge cases.</h3>
@@ -621,19 +621,19 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 }
 
 <span class="kw">deps_code</span>(f)
-## $globals
-## [1] &quot;get&quot;             &quot;globalenv&quot;       &quot;file_dependency&quot;
-## 
 ## $namespaced
 ## [1] &quot;digest::digest&quot;
+## 
+## $globals
+## [1] &quot;get&quot;             &quot;globalenv&quot;       &quot;file_dependency&quot;
 
 command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span>
 <span class="kw">deps_code</span>(command)
-## $globals
-## [1] &quot;assign&quot;
-## 
 ## $namespaced
 ## [1] &quot;digest::digest&quot;
+## 
+## $globals
+## [1] &quot;assign&quot;
 ## 
 ## $file_in
 ## [1] &quot;\&quot;input_file.rds\&quot;&quot;</code></pre>
