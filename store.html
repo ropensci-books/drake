@@ -444,8 +444,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-## [1] &quot;065f93613f1cb914.rds&quot; &quot;09a8001518b1d7ee.rds&quot; &quot;0ba98f927bbfc778.rds&quot;
-## [4] &quot;13e7f976c6a7b317.rds&quot; &quot;1501a08061745dd3.rds&quot; &quot;189112c08a57c447.rds&quot;
+## [1] &quot;0241d7e6d0478124.rds&quot; &quot;0574b9a98ac6048b.rds&quot; &quot;065f93613f1cb914.rds&quot;
+## [4] &quot;09e746ee10301a3e.rds&quot; &quot;0ba98f927bbfc778.rds&quot; &quot;1445ef14a1633156.rds&quot;
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 ## [1] &quot;bGFyZ2U&quot;                        &quot;c21hbGw&quot;                       
 ## [3] &quot;c2ltdWxhdGU&quot;                    &quot;c3VtbV9yZWdyZXNzaW9uMl9sYXJnZQ&quot;
@@ -466,16 +466,17 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <h3><span class="header-section-number">13.1.2</span> Database caches</h3>
 <p>It is possible use a single SQLite database file as the cache.</p>
 <pre class="sourceCode r"><code class="sourceCode r">mydb &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), <span class="st">&quot;database-file.sqlite&quot;</span>)
-## Error in loadNamespace(name): there is no package called &#39;RSQLite&#39;
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_dbi</span>(<span class="st">&quot;datatable&quot;</span>, <span class="st">&quot;keystable&quot;</span>, mydb)
-## Error in inherits(con, driver_classes()): object &#39;mydb&#39; not found
 <span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
-## Error in cache$exists(&quot;long_hash_algo&quot;, namespace = &quot;config&quot;): attempt to apply non-function
 <span class="kw">loadd</span>(small, <span class="dt">cache =</span> cache)
-## Error in sort(self$driver$list_keys(namespace)): attempt to apply non-function
 <span class="kw">head</span>(small)
-## Error in head(small): object &#39;small&#39; not found</code></pre>
-<pre><code>## Error in cache$destroy(): attempt to apply non-function</code></pre>
+##       x    y
+## 1 5.424 10.4
+## 2 3.440 17.8
+## 3 3.440 19.2
+## 4 3.170 15.8
+## 5 3.730 17.3
+## 6 3.845 19.2</code></pre>
 <p>But be careful: for safe parallel computing (<code>jobs</code> &gt; 1) there are additional requirements for <code>make()</code>:</p>
 <ol style="list-style-type: decimal">
 <li>Select either <code>parallelism = &quot;clustermq&quot;</code> or <code>parallelism = &quot;future&quot;</code>.</li>
