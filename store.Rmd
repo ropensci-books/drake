@@ -107,28 +107,7 @@ head(list.files(".drake/data"))
 head(list.files(".drake/keys/objects"))
 ```
 
-This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to convert all this data into a single SQLite database file.
-
-```{r converttosqlite}
-# Get the old RDS cache.
-cache <- get_cache()
-
-# Create and connect to a single database file.
-mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
-
-# Initialize a storr cache in that database file.
-portable <- storr::storr_dbi("datatable", "keystable", mydb)
-
-# Transfer the data from the RDS cache to the database file.
-portable$import(cache) # Alternative: cache$export(portable)
-head(portable$list())
-```
-
-Now, you can more easily share the single `database-file.sqlite` with your collaborators, who can then convert it to their own RDS caches if needed.
-
-```{r portabledisconnect, echo = FALSE}
-portable$destroy()
-```
+This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to work with database cashes as the next section describes.
 
 Alternatively, you can track changes in a cache log file with fingerprints of all your targets.
 
@@ -141,7 +120,7 @@ Use the `cache_log_file` argument of `make()` to refresh the cache log file ever
 
 ### Database caches
 
-It is possible to work entirely with database caches, with no need to convert to and from the RDS format.
+It is possible use a single SQLite database file as the cache.
 
 ```{r databaseinit}
 mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
