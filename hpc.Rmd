@@ -9,7 +9,7 @@ unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-`drake` is not only a reproducibility tool, but also a high-performance computing engine. This chapter has guidance for time-consuming workflows and high-level parallel computation.
+This chapter provides guidance on time-consuming `drake` workflows and high-level parallel computation.
 
 ```{r a, eval = FALSE}
 library(drake)
@@ -19,12 +19,12 @@ make(my_plan, jobs = 2)
 
 ## Batch mode for long workflows
 
-If you expect your project to run for several minutes or hours, put the call to `make()` in a script (say, `drake_work.R`, or whatever name you choose). Then, run it in an unobtrusive background process that persists after you log out. On Mac and Linux, you can use a terminal or shell to do this.
+If you expect `make()` to take a long time, create a master script for your project (say, `drake-work.R`) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.
 
 <pre><code>nohup nice -19 R CMD BATCH drake_work.R &
 </code></pre>
 
-Explanation:
+where:
 
 - `nohup`: Keep the job running even if you log out of the machine.
 - `nice -19`: This is a low-priority job that should not consume many resources. Other processes should take priority.
@@ -33,7 +33,7 @@ Explanation:
 
 ## Let `make()` schedule your targets.
 
-`drake` uses your project's implicit dependency graph to figure out how to do your work. It knows which targets can build in parallel and which ones need to wait for dependencies. Do not micromanage the timing of individual targets, and do not run parallel instances of `make()` on the same project. Instead, choose appropriate `parallelism` and `jobs` arguments as the next sections describe.
+`drake` uses your project's implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.
 
 ```{r hpcgraph}
 load_mtcars_example()
@@ -41,26 +41,28 @@ config <- drake_config(my_plan)
 vis_drake_graph(config)
 ```
 
+You do not need to not micromanage the timing among targets, and you do not need to run parallel instances of `make()`. As the next sections describe, `drake` has built-in parallel and distributed computing support.
+
 ## Parallel backends
 
-Choose the parallel backend with the `parallelism` argument, and set the `jobs` argument to scale the magnitude of parallelism appropriately.
+Choose the parallel backend with the `parallelism` argument and set the `jobs` argument to scale the work appropriately.
 
 ```{r b, eval = FALSE}
 make(my_plan, parallelism = "future", jobs = 2)
 ```
-The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the usual recommendation is [`clustermq`](https://github.com/mschubert/clustermq) because it is usually faster than [`future`](https://github.com/HenrikBengtsson/future). However, [`future`](https://github.com/HenrikBengtsson/future) covers important use cases: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) (`drake_example("Docker-psock")`).
+The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the best choice is usually [`clustermq`](https://github.com/mschubert/clustermq). (It is faster than [`future`](https://github.com/HenrikBengtsson/future).) However, [`future`](https://github.com/HenrikBengtsson/future) is more accessible: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) (`drake_example("Docker-psock")`).
 
 ## The [`clustermq`](https://github.com/mschubert/clustermq) backend
 
-### The idea: persistent workers
+### Persistent workers
 
-The `make(parallelism = "clustermq", jobs = 2)` launches 2 parallel *persistent workers*. The master process assigns targets to workers, and the workers run the commands simultaneously.
+The `make(parallelism = "clustermq", jobs = 2)` launches 2 parallel *persistent workers*. The master process assigns targets to workers, and the workers simultaneously traverse the dependency graph.
 
 <script src="https://fast.wistia.com/embed/medias/ycczhxwkjw.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_ycczhxwkjw videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/ycczhxwkjw/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 
 ### Installation
 
-You must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
+You must first install [ZeroMQ](http://zeromq.org/) ([instructions here](http://zeromq.org/intro:get-the-software)) and then install the [`clustermq`](https://github.com/mschubert/clustermq) package.
 
 ```{r installclustermq, eval = FALSE}
 install.packages("clustermq") # CRAN release
@@ -68,9 +70,9 @@ install.packages("clustermq") # CRAN release
 devtools::install_github("mschubert/clustermq", ref = "develop")
 ```
 
-### Local parallelism
+### On your local machine
 
-To run your targets in parallel over the cores on your local machine, set the global option below and run `make()`.
+To run your targets in parallel over the cores of your local machine, set the global option below and run `make()`.
 
 ```{r clustermqmulticore, eval = FALSE}
 options(clustermq.scheduler = "multicore")
@@ -79,19 +81,19 @@ make(plan, parallelism = "clustermq", jobs = 2)
 
 ### On a cluster
 
-[`clustermq`](https://github.com/mschubert/clustermq) detects most clusters automatically. However, you may still want to configure resources, wall time limits, etc. If so, you will need a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files). Use `drake_hpc_template_file()` to write one of the available example template files for [`clustermq`](https://github.com/mschubert/clustermq). (list with `drake_hpc_template_files()`). You will probably need to edit your template file manually to match your resources and needs.
-
-```{r clustermqtemplatefile, eval = FALSE}
-drake_hpc_tempalte_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
-```
-
-Next, tell [`clustermq`](https://github.com/mschubert/clustermq) to use your scheduler and template file. [`clustermq`](https://github.com/mschubert/clustermq) has a [really nice wiki](https://github.com/mschubert/clustermq/wiki#setting-up-the-scheduler) with more detailed directions.
+Set the [`clustermq`](https://github.com/mschubert/clustermq) global options to register your computing resources. For [SLURM](https://slurm.schedmd.com/slurmd.html):
 
 ```{r clustermqopts, eval = FALSE}
 options(clustermq.scheduler = "slurm", clustermq.template = "slurm_clustermq.tmpl")
 ```
 
-Next, call `make()` to deploy your targets to remote nodes on the cluster.
+Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
+
+```{r clustermqtemplatefile, eval = FALSE}
+drake_hpc_tempalte_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
+```
+
+After modifying `slurm_clustermq.tmpl` by hand to meet your needs, call `make()` as usual.
 
 ```{r clustermqrun, eval = FALSE}
 make(plan, parallelism = "clustermq", jobs = 4)
@@ -99,15 +101,15 @@ make(plan, parallelism = "clustermq", jobs = 4)
 
 ## The [`future`](https://github.com/HenrikBengtsson/future) backend
 
-### The idea: transient workers
+### Transient workers
 
-`make(parallelism = "future", jobs = 2)` launches *transient workers* to build your targets. When a target is ready to build, the master process creates a new worker to build it, and the worker terminates when the target is done. `jobs = 2` means that at most 2 transient workers can run at a given time.
+`make(parallelism = "future", jobs = 2)` launches *transient workers* to build your targets. When a target is ready to build, the master process creates a fresh worker to build it, and the worker terminates when the target is done. `jobs = 2` means that at most 2 transient workers are allowed to run at a given time.
 
 <script src="https://fast.wistia.com/embed/medias/340yvlp515.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_340yvlp515 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/340yvlp515/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div><br>
 
 ### Installation
 
-Install [`future`](https://github.com/HenrikBengtsson/future) like an ordinary R package.
+Install the [`future`](https://github.com/HenrikBengtsson/future) package.
 
 ```{r installfuture, eval = FALSE}
 install.packages("future") # CRAN release
@@ -115,11 +117,11 @@ install.packages("future") # CRAN release
 devtools::install_github("HenrikBengtsson/future", ref = "develop")
 ```
 
-If you are interested in computing on a cluster, more functionality is available through the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package. The [`future`](https://github.com/HenrikBengtsson/future) ecosystem contains even more packages that extend [`future`](https://github.com/HenrikBengtsson/future)'s parallel computing functionality, such as [`future.callr`](https://github.com/HenrikBengtsson/future.callr).
+If you intend to use a cluster, be sure to install the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package too. The [`future`](https://github.com/HenrikBengtsson/future) ecosystem contains even more packages that extend [`future`](https://github.com/HenrikBengtsson/future)'s parallel computing functionality, such as [`future.callr`](https://github.com/HenrikBengtsson/future.callr).
 
-### Local parallelism
+### On your local machine
 
-First, select a [`future`](https://github.com/HenrikBengtsson/future) plan to tell [`future`](https://github.com/HenrikBengtsson/future) how to create the workers. See [this table](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) for a description of the options that come natively with [`future`](https://github.com/HenrikBengtsson/future).
+First, select a [`future`](https://github.com/HenrikBengtsson/future) plan to tell [`future`](https://github.com/HenrikBengtsson/future) how to create the workers. See [this table](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) for descriptions of the core options.
 
 ```{r futureworkers, eval = FALSE}
 future::plan(future::multiprocess) 
@@ -133,20 +135,20 @@ make(plan, parallelism = "future", jobs = 2)
 
 ### On a cluster
 
-For computing on a cluster, you need the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package. Use [this list](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend) to select a [`future`](https://github.com/HenrikBengtsson/future) plan that suits your computing resources. You will need a compatible [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) with configuration details. `drake` can generate starters for some clusters. 
+Install the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package and use [this list](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend) to select a [`future`](https://github.com/HenrikBengtsson/future) plan that matches your resources. You will also need a compatible [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) with configuration details. As with [`clustermq`](https://github.com/mschubert/clustermq), `drake` can generate some examples:
 
 ```{r exlksjdf, eval = FALSE}
 drake_hpc_tempalte_file("slurm_batchtools.tmpl") # Edit by hand.
 ```
 
-Next, register the template file with the plan.
+Next, register the template file with a plan.
 
 ```{r futureslurmplan, eval = FALSE}
 library(future.batchtools)
 future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
 ```
 
-Finally, run `make()`
+Finally, run `make()`.
 
 ```{r futureslurmmake, eval = FALSE}
 make(plan, parallelism = "future", jobs = 2)
@@ -156,7 +158,7 @@ make(plan, parallelism = "future", jobs = 2)
 
 ### Memory
 
-By default, `make()` keeps targets in memory during runtime. Some are dependencies of downstream targets, and others may be superfluous. The `memory_strategy` argument to `make()` allows you to choose the tradeoff that best suits your project. Options:
+By default, `make()` keeps targets in memory during runtime. Some targets are dependencies of other targets downstream, while others may be no longer actually need to be in memory. The `memory_strategy` argument to `make()` allows you to choose the tradeoff that best suits your project. Options:
 
 - `"speed"`: Once a target is loaded in memory, just keep it there. This choice maximizes speed and hogs memory.
 - `"memory"`: Just before building each new target, unload everything from memory except the target's direct dependencies. This option conserves memory, but it sacrifices speed because each new target needs to reload any previously unloaded targets from storage.
@@ -164,18 +166,18 @@ By default, `make()` keeps targets in memory during runtime. Some are dependenci
 
 ### Storage
 
-In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. This option is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
+In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. `caching = "master"` is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
 
-In `make(caching = "worker")`, the parallel workers write targets to the cache simultaneously. Some output-heavy projects can benefit from a speed increase this way. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:
+In `make(caching = "worker")`, the parallel workers are responsible for writing the targets to the cache. Some output-heavy projects can benefit from this form of parallelism. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:
 
-- The workers must all have the same file system and the same working directory as the master process.
-- Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel writes.
+- All the workers must have the same file system and the same working directory as the master process.
+- Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel cache operations.
 
 See the [storage chapter](#store) for details.
 
 ### The `template` argument of `make()`
 
-For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq)-based backends, you can parameterize your template file and use the `template` argument of `make()` configure resource requirements. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). We begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
+For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq)-based backends, you can parameterize your template file and use the `template` argument of `make()`. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). Begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
 
 ```
 # File: sge_clustermq.tmpl
@@ -197,11 +199,11 @@ Then when you run `make()`, use the `template` argument to set `n_slots`.
 ```{r templateslots, eval = FALSE}
 options(clustermq.scheduler = "sge", clustermq.template = "sge_clustermq.tmpl")
 library(drake)
-load_mtcars_example() # Or set up your own workflow.
+load_mtcars_example()
 make(
   my_plan,
   parallelism = "clustermq",
-  jobs = 16 # Number of jobs / nodes.
+  jobs = 16,
   template = list(n_slots = 4) # Request 4 cores per job.
 )
 ```
@@ -210,13 +212,10 @@ Custom placeholders like `n_slots` are processed with the [`infuser`](https://gi
 
 ### Hasty mode
 
-**CAUTION: READ THIS WHOLE SECTION BEFORE ATTEMPTING HASTY MODE.**
-
 Hasty mode is [`clustermq`](https://github.com/mschubert/clustermq) parallelism with all of `drake`'s storage and reproducibility guarantees stripped away. 
 
 ```{r introhasty, eval = FALSE}
-make(plan, parallelism = "hasty", jobs = 8) # Like "clustermq" parallelism
-make(plan, parallelizm = "hasty", jobs = 1) # Ordinary local serial computation
+make(plan, parallelism = "hasty", jobs = 8)
 ```
 
 Drawbacks:
