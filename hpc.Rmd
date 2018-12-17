@@ -154,16 +154,24 @@ make(plan, parallelism = "future", jobs = 2)
 
 ## Advanced options
 
-### Who stores the targets?
+### Memory
 
-The `caching` argument lets you decide.
+By default, `make()` keeps targets in memory during runtime. Some are dependencies of downstream targets, and others may be superfluous. The `memory_strategy` argument to `make()` allows you to choose the tradeoff that best suits your project. Options:
+
+- `"speed"`: Once a target is loaded in memory, just keep it there. This choice maximizes speed and hogs memory.
+- `"memory"`: Just before building each new target, unload everything from memory except the target's direct dependencies. This option conserves memory, but it sacrifices speed because each new target needs to reload any previously unloaded targets from storage.
+- `"lookahead"`: Just before building each new target, search the dependency graph to find targets that will not be needed for the rest of the current `make()` session. In this mode, targets are only in memory if they need to be loaded, and we avoid superfluous reads from the cache. However, searching the graph takes time, and it could even double the computational overhead for large projects.
+
+### Storage
 
 In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. This option is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
 
 In `make(caching = "worker")`, the parallel workers write targets to the cache simultaneously. Some output-heavy projects can benefit from a speed increase this way. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:
 
 - The workers must all have the same file system and the same working directory as the master process.
-- Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel writes. 
+- Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel writes.
+
+See the [storage chapter](#store) for details.
 
 ### The `template` argument of `make()`
 
