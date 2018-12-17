@@ -1,6 +1,6 @@
-# High-performance computing with drake {#hpc}
+# High-performance computing {#hpc}
 
-```{r suppression08, echo = F}
+```{r suppression08, echo = FALSE}
 suppressMessages(suppressWarnings(library(future)))
 suppressMessages(suppressWarnings(library(drake)))
 suppressMessages(suppressWarnings(library(dplyr)))
@@ -9,7 +9,7 @@ unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-`drake` is not only a reproducibility tool, but also a high-performance computing engine. To activate parallel computing, just set the `jobs` argument of `make()` to a value greater than 1. Below, up to 2 targets can run simultaneously at any given time.
+`drake` is not only a reproducibility tool, but also a high-performance computing engine. This chapter has guidance for time-consuming workflows and high-level parallel computation.
 
 ```{r a, eval = FALSE}
 library(drake)
@@ -19,35 +19,21 @@ make(my_plan, jobs = 2)
 
 ## Batch mode for long workflows
 
-To deploy serious long workflows, we recommend putting the call to `make()` in a script (say, `drake_work.R`) and running it in an unobtrusive background process that persists after you log out. In the Linux command line, this is straightforward.
+If you expect your project to run for several minutes or hours, put the call to `make()` in a script (say, `drake_work.R`, or whatever name you choose). Then, run it in an unobtrusive background process that persists after you log out. On Mac and Linux, you can use a terminal or shell to do this.
 
 <pre><code>nohup nice -19 R CMD BATCH drake_work.R &
 </code></pre>
 
-Or, you could call `drake` inside an overarching [`Makefile`](https://www.gnu.org/software/make/) that chains multiple stages together in a larger reproducible pipeline. (See [Karl Broman's post](http://kbroman.org/minimal_make/) on [`Makefile`](https://www.gnu.org/software/make/)s for reproducible research.)
+Explanation:
 
-<pre><code>all: final_output.pdf
+- `nohup`: Keep the job running even if you log out of the machine.
+- `nice -19`: This is a low-priority job that should not consume many resources. Other processes should take priority.
+- `R CMD BATCH drake_work.R`: Run the `drake_work.R` script in a new R session.
+- `&`: Run this job in the background so you can do other stuff in the terminal window.
 
-final_output.pdf: python_magic.py results_summary.csv
-    python python_magic.py
+## Let `make()` schedule your targets.
 
-results_summary.csv: drake_work.R
-    Rscript drake_work.R
-
-clean:
-    rm -rf .drake
-</code></pre>
-
-Then, run your whole pipleine in a persistent background process.
-
-<pre><code>nohup nice -19 R CMD BATCH make &
-</code></pre>
-
-If you do write a custom [`Makefile`](https://www.gnu.org/software/make/) at the root of your project and you plan to use `make(parallelism = "Makefile")`, please read about `make(parallelism = "Makefile")` later in this document to avoid potential conflicts between your [`Makefile`](https://www.gnu.org/software/make/) and the one `drake` writes.
-
-## Let drake schedule your targets.
-
-When you deploy your project, `drake` uses the dependency network to figure out how to run your work in parallel. You as the user do not have to micromanage when individual targets are built.
+`drake` uses your project's implicit dependency graph to figure out how to do your work. It knows which targets can build in parallel and which ones need to wait for dependencies. Do not micromanage the timing of individual targets, and do not run parallel instances of `make()` on the same project. Instead, choose appropriate `parallelism` and `jobs` arguments as the next sections describe.
 
 ```{r hpcgraph}
 load_mtcars_example()
@@ -57,121 +43,129 @@ vis_drake_graph(config)
 
 ## Parallel backends
 
-There are multiple ways to walk this graph and multiple ways to launch workers, and every project has its own needs. Thus, `drake` supports multiple parallel backends. Choose the backend with the `parallelism` argument.
+Choose the parallel backend with the `parallelism` argument, and set the `jobs` argument to scale the magnitude of parallelism appropriately.
 
 ```{r b, eval = FALSE}
-make(my_plan, parallelism = "parLapply", jobs = 2)
-```
-
-You can use a different backend for the imports than you select for the targets. If you do so, you force all the imports to be processed before any of the targets are built, but you might want to do so anyway. For example, staged scheduling could be great for imports even when it is not be the right choice for the targets (more on that later).
-
-```{r run2differentbackends, eval = FALSE}
-make(
-  my_plan,
-  parallelism = c(imports = "mclapply_staged", targets = "mclapply"),
-  jobs = 2
-)
-```
-
-List your options with `parallelism_choices()`.
-
-```{r choices}
-parallelism_choices()
-```
-
-The backends vary widely in terms of how the workers deploy and how they are scheduled.
-
-|                       | Deploy: local | Deploy: remote |
-| --------------------- |:-------------:| -----:|
-| Schedule: persistent | "mclapply", "parLapply" | "hasty", "clustermq", "future_lapply" |
-| Schedule: transient  | | "future", "Makefile" |
-| Schedule: staged     | "mclapply_staged", "parLapply_staged" | "clustermq_staged", "future_lapply_staged" |
-
-The next sections describe how and when to use each scheduling algorithm and deployment strategy.
-
-## Local workers
-
-Local workers deploy as separate forks or processes to you computer. The `"mclapply"` and `"mclapply_staged"` backends uses the `mclapply()` function from the `parallel` package to launch workers. 
-
-```{r local1, eval = FALSE}
-make(my_plan, parallelism = "mclapply", jobs = 2)
-make(my_plan, parallelism = "mclapply_staged", jobs = 2)
-```
-
-Workers are quicker to launch than in any other `drake` backend, so these two choices are the lowest-overhead options. However, they have limitations: the `mclapply()` function is inefficient with respect to computer memory (see explanations [here](https://github.com/tdhock/mclapply-memory) and [here](http://lcolladotor.github.io/2013/11/14/Reducing-memory-overhead-when-using-mclapply/#.Wu8Fc9Yh1hE)) and it cannot launch multiple workers on Windows. For this reason, `drake` supports platform agnostic backends `"parLapply"` and `"parLapply_staged"`, both of which are based on the `parLapply()` function from the `parallel` package. These options work on Windows, but each `make()` requires extra overhead to create a [parallel socket (PSOCK) cluster](http://gforge.se/2015/02/how-to-go-parallel-in-r-basics-tips/).
-
-```{r local2, eval = FALSE}
-make(my_plan, parallelism = "parLapply", jobs = 2)
-make(my_plan, parallelism = "parLapply_staged", jobs = 2)
-```
-
-The default parallelism is `"parLapply"` on Windows and `"mclapply"` everywhere else.
-
-```{r defaultparallelism}
-default_parallelism()
-```
-
-## Remote workers
-
-The `"future_lapply"`, `"future"`, and `"Makefile"` backends have the option to launch workers to remote resources such as nodes on a computing cluster.
-
-```{r distributedoptions}
-parallelism_choices(distributed_only = TRUE)
-```
-
-Testing them out is straightforward.
-
-```{r remote1, eval = FALSE}
-make(my_plan, parallelism = "clustermq", jobs = 2)
-make(my_plan, parallelism = "clustermq_staged", jobs = 2)
 make(my_plan, parallelism = "future", jobs = 2)
-make(my_plan, parallelism = "future_lapply", jobs = 2)
-make(my_plan, parallelism = "future_lapply_staged", jobs = 2)
-make(my_plan, parallelism = "Makefile", jobs = 2)
 ```
+The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the usual recommendation is [`clustermq`](https://github.com/mschubert/clustermq) because it is usually faster than [`future`](https://github.com/HenrikBengtsson/future). However, [`future`](https://github.com/HenrikBengtsson/future) covers important use cases: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) (`drake_example("Docker-psock")`).
 
-For remote workers, the all the imports are processed with one of the local worker backends before any of the targets start. You can use different numbers of workers for the imports and the targets.
+## The [`clustermq`](https://github.com/mschubert/clustermq) backend
 
-```{r remote2, eval = FALSE}
-make(my_plan, parallelism = "clustermq", jobs = c(imports = 2, targets = 4))
-```
+### The idea: persistent workers
 
-By default, these backends launch the workers on your local machine. It takes extra configuring to actually deploy them to a remote cluster. The next subsections have the details.
+The `make(parallelism = "clustermq", jobs = 2)` launches 2 parallel *persistent workers*. The master process assigns targets to workers, and the workers run the commands simultaneously.
 
-### `"clustermq"`, `"clustermq_staged"`, and `"hasty"`
+<script src="https://fast.wistia.com/embed/medias/ycczhxwkjw.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_ycczhxwkjw videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/ycczhxwkjw/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 
-The [`clustermq`](https://github.com/mschubert/clustermq) R package is a fast, user-friendly tool for sending R jobs to clusters, and [`clustermq`](https://github.com/mschubert/clustermq)-powered `drake` workers suffer less overhead than other remote workers. To use `drake`'s [`clustermq`](https://github.com/mschubert/clustermq) backends, you must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
+### Installation
+
+You must first install [ZeroMQ](http://zeromq.org/) ([installation instructions here](http://zeromq.org/intro:get-the-software)). Then, install [`clustermq`](https://github.com/mschubert/clustermq) explicitly (it does not come with `drake`).
 
 ```{r installclustermq, eval = FALSE}
 install.packages("clustermq") # CRAN release
 # Alternatively, install the GitHub development version.
-devtools::install_github("mschubert/clustermq", ref = "develop") # "develop" is the name of a git branch.
+devtools::install_github("mschubert/clustermq", ref = "develop")
 ```
 
-[`clustermq`](https://github.com/mschubert/clustermq) detects most clusters automatically. However, you may still want to configure resources, wall time limits, etc. If so, you will need a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files). Use `drake_hpc_template_file()` to write one of the available example template files for [`clustermq`](https://github.com/mschubert/clustermq). (list with `drake_hpc_template_files()`). You will probably need to edit your tempalte file manually to match your resources and needs.
+### Local parallelism
+
+To run your targets in parallel over the cores on your local machine, set the global option below and run `make()`.
+
+```{r clustermqmulticore, eval = FALSE}
+options(clustermq.scheduler = "multicore")
+make(plan, parallelism = "clustermq", jobs = 2)
+```
+
+### On a cluster
+
+[`clustermq`](https://github.com/mschubert/clustermq) detects most clusters automatically. However, you may still want to configure resources, wall time limits, etc. If so, you will need a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files). Use `drake_hpc_template_file()` to write one of the available example template files for [`clustermq`](https://github.com/mschubert/clustermq). (list with `drake_hpc_template_files()`). You will probably need to edit your template file manually to match your resources and needs.
 
 ```{r clustermqtemplatefile, eval = FALSE}
 drake_hpc_tempalte_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
 ```
 
-Next, configure [`clustermq`](https://github.com/mschubert/clustermq) to use your scheduler and template file. [`clustermq`](https://github.com/mschubert/clustermq) has a [really nice wiki](https://github.com/mschubert/clustermq/wiki#setting-up-the-scheduler) with more detailed directions.
+Next, tell [`clustermq`](https://github.com/mschubert/clustermq) to use your scheduler and template file. [`clustermq`](https://github.com/mschubert/clustermq) has a [really nice wiki](https://github.com/mschubert/clustermq/wiki#setting-up-the-scheduler) with more detailed directions.
 
 ```{r clustermqopts, eval = FALSE}
 options(clustermq.scheduler = "slurm", clustermq.template = "slurm_clustermq.tmpl")
 ```
 
-Tip: for a dry run on your local machine, use `options(clustermq.scheduler = "multicore")` instead. Either way, once it is time to run your project, simply call `make()` with one of the [`clustermq`](https://github.com/mschubert/clustermq) parallelism backends.
+Next, call `make()` to deploy your targets to remote nodes on the cluster.
 
 ```{r clustermqrun, eval = FALSE}
-make(my_plan, parallelism = "clustermq", jobs = 4)
-make(my_plan, parallelism = "clustermq_staged", jobs = 4) # Different job scheduling algorithm.
+make(plan, parallelism = "clustermq", jobs = 4)
 ```
 
-#### Control how I/O is scheduled
+## The [`future`](https://github.com/HenrikBengtsson/future) backend
 
-With the `caching` argument to `make()`, you have the option to either let the workers cache the targets. You can choose either `caching = "worker"` or `caching = "master"`. In the former case, the workers cache the targets directly to the file system in parallel. Target return values are transferred to the central cache over a network file system, not ZeroMQ sockets. In the latter case, target values are sent to the master process via fast ZeroMQ sockets, but then the master has to cache all the data by itself, which could create a bottleneck. `caching = "master"` also allows for alternative cache types such as `storr::storr_environment()` and `storr::storr_dbi()` caches. See the [`storr` package](https://github.com/richfitz/storr) documentation for details.
+### The idea: transient workers
 
-#### The `template` argument of `make()`
+`make(parallelism = "future", jobs = 2)` launches *transient workers* to build your targets. When a target is ready to build, the master process creates a new worker to build it, and the worker terminates when the target is done. `jobs = 2` means that at most 2 transient workers can run at a given time.
+
+<script src="https://fast.wistia.com/embed/medias/340yvlp515.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_340yvlp515 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/340yvlp515/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div><br>
+
+### Installation
+
+Install [`future`](https://github.com/HenrikBengtsson/future) like an ordinary R package.
+
+```{r installfuture, eval = FALSE}
+install.packages("future") # CRAN release
+# Alternatively, install the GitHub development version.
+devtools::install_github("HenrikBengtsson/future", ref = "develop") # "develop" is the name of a git branch.
+```
+
+If you are interested in computing on a cluster, more functionality is available through the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package. The [`future`](https://github.com/HenrikBengtsson/future) ecosystem contains even more packages that extend [`future`](https://github.com/HenrikBengtsson/future)'s parallel computing functionality, such as [`future.callr`](https://github.com/HenrikBengtsson/future.callr).
+
+### Local parallelism
+
+First, select a [`future`](https://github.com/HenrikBengtsson/future) plan to tell [`future`](https://github.com/HenrikBengtsson/future) how to create the workers. See [this table](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) for a description of the options that come natively with [`future`](https://github.com/HenrikBengtsson/future).
+
+```{r futureworkers, eval = FALSE}
+future::plan(future::multiprocess) 
+```
+
+Next, run `make()`.
+
+```{r futureworkersmake, eval = FALSE}
+make(plan, parallelism = "future", jobs = 2)
+```
+
+### On a cluster
+
+For computing on a cluster, you need the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package. Use [this list](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend) to select a [`future`](https://github.com/HenrikBengtsson/future) plan that suits your computing resources. You will need a compatible [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) with configuration details. `drake` can generate starters for some clusters. 
+
+```{r exlksjdf, eval = FALSE}
+drake_hpc_tempalte_file("slurm_batchtools.tmpl") # Edit by hand.
+```
+
+Next, register the template file with the plan.
+
+```{r futureslurmplan, eval = FALSE}
+library(future.batchtools)
+future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
+```
+
+Finally, run `make()`
+
+```{r futureslurmmake, eval = FALSE}
+make(plan, parallelism = "future", jobs = 2)
+```
+
+## Advanced options
+
+### Who stores the targets?
+
+The `caching` argument lets you decide.
+
+In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. This option is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
+
+In `make(caching = "worker")`, the parallel workers write targets to the cache simultaneously. Some output-heavy projects can benefit from a speed increase this way. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:
+
+- The workers must all have the same file system and the same working directory as the master process.
+- Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel writes. 
+
+### The `template` argument of `make()`
 
 For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq)-based backends, you can parameterize your template file and use the `template` argument of `make()` configure resource requirements. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). We begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
 
@@ -206,326 +200,29 @@ make(
 
 Custom placeholders like `n_slots` are processed with the [`infuser`](https://github.com/Bart6114/infuser) package.
 
-#### Hasty mode
+### Hasty mode
+
+**CAUTION: READ THIS WHOLE SECTION BEFORE ATTEMPTING HASTY MODE.**
+
+Hasty mode is [`clustermq`](https://github.com/mschubert/clustermq) parallelism with all of `drake`'s storage and reproducibility guarantees stripped away. 
 
 ```{r introhasty, eval = FALSE}
 make(plan, parallelism = "hasty", jobs = 8) # Like "clustermq" parallelism
 make(plan, parallelizm = "hasty", jobs = 1) # Ordinary local serial computation
 ```
 
-In hasty mode, `drake` <span style = "color: red;">abandons its [claims to reproducibility](https://ropensci.github.io/drake/#evidence)</span> and focuses exclusively on job scheduling. It <span style = "color: red;">forgets about tracking output</span>, and it <span style = "color: red;">no longer tries to skip up-to-date targets</span>. In fact, it runs every target every time you call `make()`. But in exchange, job scheduling is extremely low-overhead, especially for projects with large datasets and lots of targets.
+Drawbacks:
 
-```{r hastydag, echo = FALSE, message = FALSE}
-withr::with_dir(tempdir(), {
-  load_main_example()
-  config <- drake_config(plan)
-  vis_drake_graph(
-    config,
-    targets_only = TRUE,
-    show_output_files = FALSE,
-    main = "Example pipeline: drake_example(\"main\")"
-  )
-})
-```
+- **DRAKE NO LONGER PROVIDES EVIDENCE THAT YOUR WORKFLOW IS TRUSTWORTHY OR REPRODUCIBLE.**
+- **[THESE REPRODUCIBILITY CLAIMS](https://github.com/ropensci/drake#reproducibility-with-confidence) ARE NO LONGER VALID.**
+- There is no cache. You need to write code to store your own targets. The `hasty_build` argument to `make()` and the `default_hasty_build()` function may help you get started.
 
-<span style = "color: red;">**We emphasize: in hasty mode, the [core reproducibility of `drake`](https://ropensci.github.io/drake/#evidence) are no longer valid. Here, `drake` cannot provide evidence that your results are synchronized with the underlying code and data.** Hasty mode should only be used for debugging and testing or if computional reproducibility is handled some other way.</span>
+Advantages:
 
-And ask yourself: are you really willing to run all your targets from the beginning next time you call `make()`? Are you willing to iterate on a project where up-to-date targets are no longer skipped? Are the short-term speed gains really worth it? In the words of an esteemed colleague,
+- There is no overhead from storing and checking targets, so hasty mode runs much faster than `drake`'s standard modes.
+- `drake` still builds the correct targets in the correct order, waiting for dependencies to finish before advancing downstream.
 
-> _The fastest code is the code you do not run_.
-
-#### Specific usage concerns
-
-The return values of targets remain available in memory while `make()` is executing. Unlike `drake`'s usual behavior, those values stay in memory even when they are no longer needed. In addition, the return values are no longer stored in a cache. Consequently,
-
-1. You should save all your important (and large) results manually to your own `file_out()` files.
-2. `loadd()` and `readd()` no longer retrieve data.
-3. Subsequent non-hasty calls to `make()`s start from scratch.
-
-#### Benefits of hasty mode
-
-1. `drake`'s hasty mode cuts corners to gain speed, but it still knows which targets it can run in parallel and which need to wait for dependencies to finish. In other words, hasty mode is still smart enough to traverse end-to-end pipelines of jobs that need to wait for each other.
-2. In `drake` version >= 6.1.0.9000, you can micromanage exactly how each target is built. The `hasty_build` argument to `make()` is a function that controls exactly how each target's command is run. The default `hasty_build` function is
-
-```{r default_hasty_build}
-default_hasty_build
-```
-
-You can supply an alternative build function with your own customization. In the following thought experiment, we assume you already defined a function `log_to_website()` that communicated with a web service as your targets are progressing.
-
-```{r my_hasty_build, eval = FALSE}
-my_hasty_build <- function(target, config){
-  log_to_website("start") # Notify a website that the target is starting.
-  large_dataset <- default_hasty_build(target, config) # Run the target's command.
-  log_to_website("end") # Notify a website that the target is finished.
-  write.csv(large_dataset, paste0(target, ".csv") # Write the output to a file.
-  digest::digest(large_dataset) # Just return a small fingerprint.
-}
-
-make(my_plan, parallelism = "hasty", jobs = 2, hasty_build = my_hasty_build)
-```
-
-User-side applications aside, the main purpose of the `hasty_build` argument is actually to experiment with new internals for `drake` itself. Benchmarking in hasty mode is much easier this way.
-
-### `"future"`, `"future_lapply"`, and `"future_lapply_staged"`
-
-The `plan()` function from the [`future`](https://github.com/HenrikBengtsson/future) package configures how and where the workers will deploy on the next `make()`. For example, the following code uses [`future`](https://github.com/HenrikBengtsson/future)'s `multisession` backend, which is analogous to `drake`'s `"parLapply"` parallelism.
-
-```{r future1, eval = FALSE}
-library(future)
-future::plan(multisession)
-make(my_plan, parallelism = "future", jobs = 2)
-# Same technology, different scheduling:
-make(my_plan, parallelism = "future_lapply", jobs = 2)
-```
-
-In the case of `parallelism = "future"`, the `caching` argument can be either `"worker"` or `"master"`, and it works the same as for `"clustermq"` parallelism. 
-
-For `"future_lapply_staged"` parallelism, the `jobs` argument is ignored, and you must instead specify the number of workers in `future::plan()`.
-
-```{r future1b, eval = FALSE}
-future::plan(multisession, workers = 2)
-make(my_plan, parallelism = "future_lapply_staged")
-```
-
-To deploy to a cluster (say, a [SLURM](https://slurm.schedmd.com/) cluster), you need the [`batchtools`](https://github.com/mllg/batchtools) and [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) packages.
-
-```{r futurebatchtools, eval = FALSE}
-library(future.batchtools)
-```
-
-You also need [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files) to configure [`batchtools`](https://github.com/mllg/batchtools) with the cluster: memory specifications, wall time limits etc. Use `drake_hpc_template_file()` to write one of the available example template files for [`batchtools`](https://github.com/mllg/batchtools) (list with `drake_hpc_template_files()`). You will probably need to edit your tempalte file manually to match your resources and needs.
-
-```{r exlksjdf, eval = FALSE}
-drake_hpc_tempalte_file("slurm_batchtools.tmpl") # Write the file slurm_batchtools.tmpl.
-```
-
-Load the template file your `future::plan()` and call `make()` to run the project.
-
-```{r futurebatchtools2, eval = FALSE}
-future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
-make(my_plan, parallelism = "future", jobs = 2)
-# Same technology, different scheduling options:
-make(my_plan, parallelism = "future_lapply", jobs = 2)
-```
-
-And as before, `"future_lapply_staged"` uses the `workers` argument from `future::plan()` rather than `jobs` in `make()`.
-
-```{r futurebatchtools2a, eval = FALSE}
-future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl", workers = 2)
-make(my_plan, parallelism = "future_lapply_staged")
-```
-
-See packages [`future`](https://github.com/HenrikBengtsson/future), [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools), and [`batchtools`](https://github.com/mllg/batchtools) for more options. For example, the alternatives for `future::plan()` are listed [here](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) and [here](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend).
-
-### `"Makefile"`
-
-Here, `drake` actually writes, configures, and runs a proper [`Makefile`](https://www.gnu.org/software/make/) to run the targets.
-
-```{r futurebatchtools3, eval = FALSE}
-make(my_plan, parallelism = "Makefile", jobs = 2)
-```
-
-You can configure both the Unix command that runs the [`Makefile`](https://www.gnu.org/software/make/) and the command line arguments passed to it.
-
-```{r touchsilent, eval = FALSE}
-make(
-  my_plan,
-  parallelism = "Makefile",
-  command = "lsmake",
-  args = c("--touch", "--silent")
-)
-```
-
-If `drake`'s `Makefile` conflicts with a `Makefile` you already wrote yourself, `drake` does not overwrite your `Makefile`. Instead, `make()` tells you about the conflict and then stops running. To force `drake` to use a different `Makefile` that does not conflict with yours, pass the file path to the `makefile_path` argument and set the `--file` argument in `args`.
-
-```{r custommakefilepath, eval = FALSE}
-make(
-  my_plan,
-  parallelism = "Makefile",
-  makefile_path = "my_folder/my_makefile",
-  args = "--file=my_folder/my_makefile"
-)
-```
-
-There are more customization options in `make()`, such as the `recipe_command` argument.
-
-```{r recipe2, eval = FALSE}
-make(my_plan, parallelism = "Makefile", jobs = 4,
-  recipe_command = "R -e 'R_RECIPE' -q")
-```
-
-See the help files of individual functions for details.
-
-```{r defaultmakecommandfunction}
-default_Makefile_command()
-
-default_recipe_command()
-
-r_recipe_wildcard()
-
-Makefile_recipe(
-  recipe_command = "R -e 'R_RECIPE' -q",
-  target = "this_target",
-  cache_path = "custom_cache"
-)
-```
-
-To deploy workers to a cluster, you need to supply the [`Makefile`](https://www.gnu.org/software/make/) with a custom shell script that launches cluster jobs. Use the `shell_file()` function to write an example compatible with the [Univa Grid Engine](http://www.univa.com/products/). You will probably need to configure it manually. Suppose our file is `shell.sh`.
-
-<pre><code>#!/bin/bash
-shift
-echo "module load R; $*" | qsub -sync y -cwd -j y
-</code></pre>
-
-You will need to set permissions to allow execution. In the Linux command line, this is straightforward.
-
-<pre><code>$ chmod +x shell.sh 
-</code></pre>
-
-When you actually call `make()`, use the `prepend` argument to write a line at the top of the [`Makefile`](https://www.gnu.org/software/make/) to reference your shell file.
-
-```{r hpcprepend, eval = FALSE}
-make(my_plan, parallelism = "Makefile", jobs = 2, prepend = "SHELL=./shell.sh")
-```
-
-[SLURM](https://slurm.schedmd.com/) users may be able to [invoke `srun` and dispense with `shell.sh` altogether](http://plindenbaum.blogspot.com/2014/09/parallelizing-gnu-make-4-in-slurm.html), though success may vary depending on the SLURM system. You will probably also need to set resource allocation parameters governing memory, runtime, etc. See `man srun` for the possible `.SHELLFLAGS`.
-
-```{r cluster, eval = FALSE}
-make(
-  my_plan,
-  parallelism = "Makefile",
-  jobs = 2,
-  prepend = c(
-    "SHELL=srun",
-    ".SHELLFLAGS=-N1 -n1 bash -c"
-  )
-)
-```
-
-## Scheduling algorithms
-
-### Persistent scheduling
-
-Backends  `"mclapply"`, `"parLapply"`, `"clustermq"`, and `"future_lapply"` launch persistent workers.
-
-```{r persist, eval = FALSE}
-make(my_plan, parallelism = "mclapply", jobs = 2)
-make(my_plan, parallelism = "parLapply", jobs = 2)
-options(clustermq.scheduler = "slurm")
-make(my_plan, parallelism = "clustermq", jobs = 2)
-future::plan(future::multisession)
-make(my_plan, parallelism = "future_lapply", jobs = 2)
-```
-
-In each of these calls to `make()`, three processes launch: two workers and one master. Whenever a worker is idle, the master assigns it the next available target (whose dependencies have been built). The workers keep running until there are no more targets to build. The following video demonstrates the concept.
-
-<script src="https://fast.wistia.com/embed/medias/ycczhxwkjw.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_ycczhxwkjw videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/ycczhxwkjw/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
-
-For staged scheduling, you can micromanage which workers can run which targets. This column can be an integer vector or a list of integer vectors. Simply set an optional `workers` column in your `drake_plan()`. Why would you wish to do this? Consider the `mtcars` example.
-
-```{r workerscol}
-load_mtcars_example()
-my_plan$workers <- 1
-my_plan$workers[grepl("large", my_plan$target)] <- 2
-my_plan
-```
-
-Here, one of the workers is in charge of all the targets that have to do with the `large` dataset. That way, we do not need other workers to read `large` from disk. If reads from disk take a long time, this could speed up your workflow. On the other hand, delegating all the `large` targets to worker 2 could prevent worker 1 from sharing the computational load, which could slow things down. Ultimately, you as the user need to make these tradeoffs. Also, the `workers` column only applies to the persistent scheduling backends.
-
-Similarly, you can set an optional `priority` column for your `drake_plan()`.
-
-```{r prioritycol}
-plan <- drake_plan(A = build(), B = stuff())
-plan$priority <- c(1, 2)
-plan
-```
-
-Because of the `priority` column, if targets `A` and `B` are both ready to build, then `A` will be assigned to a worker first. Custom priorities apply to the staged scheduling backends, plus the `"future"` backend.
-
-The `predict_runtime()` and `predict_load_balancing()` functions emulate persistent workers, and the predictions also apply to transient workers. See the [timing guide](#time) for a demonstration. These functions also respond to the `workers` column.
-
-### Transient scheduling
-
-Persistent workers are great because they minimize overhead: all the workers are created at the beginning, and then you never have to create any more for the rest of the runthrough. Unfortunately, computing clusters usually limit the amount of time each worker can stay running. That is why `drake` also supports transient workers in backends `"future"` and `"Makefile"`. Here, the master process creates a new worker for each target individually, and the worker dies after it finishes its single target. For the `"future"` backend, the master is just the existing process calling `make()`. The following video demonstrates the concept.
-
-<script src="https://fast.wistia.com/embed/medias/340yvlp515.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_340yvlp515 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/340yvlp515/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div><br>
-
-```{r transient, eval = FALSE}
-future::plan(future::multisession)
-make(my_plan, parallelism = "future", jobs = 2)
-make(my_plan, parallelism = "Makefile", jobs = 2)
-```
-
-### Staged scheduling
-
-Backends `"mclapply_staged"`, `"parLapply_staged"`, and `"clustermq_staged"` support staged scheduling.
-
-```{r staged, eval = FALSE}
-make(my_plan, parallelism = "mclapply_staged", jobs = 2)
-make(my_plan, parallelism = "parLapply_staged", jobs = 2)
-```
-
-Here, the dependency network is divided into separate stages of conditionally independent targets. Within each stage, `drake` uses `mclapply()` or `parLapply()` to process the targets in parallel. Stages run one after the other, so the slowest target in the current stage needs to complete before the next stage begins. So we lose a lot of parallel efficiency. The following video demonstrates the major drawback.<sup><a href="#note1" id="note1ref">[1]</a></sup>
-
-<script src="https://fast.wistia.com/embed/medias/uxzk0qgy9e.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_uxzk0qgy9e videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/uxzk0qgy9e/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
-
-However, because there is no formal master process in each stage, overhead is extremely low. This lack of overhead can make staged parallelism a great choice for projects with a small number of large stages: tall dependency graphs with most of the work in the tallest stages.
-
-```{r staged2}
-library(dplyr)
-library(drake)
-
-N <- 500
-
-gen_data <- function() {
-  tibble(a = seq_len(N), b = 1, c = 2, d = 3)
-}
-
-plan_data <- drake_plan(
-  data = gen_data()
-)
-
-plan_sub <-
-  gen_data() %>%
-  transmute(
-    target = paste0("data", a),
-    command = paste0("data[", a, ", ]")
-  )
-
-plan <- bind_rows(plan_data, plan_sub)
-plan
-
-config <- drake_config(plan)
-vis_drake_graph(config)
-```
-
-## Final thoughts
-
-### Debugging
-
-For large workflows, downsizing and debugging tools become super important. See the [guide to debugging and testing `drake` projects](#debug) for help on diagnosing problems with a workflow.
-
-### drake as an ordinary job scheduler
-
-If you do not care about reproducibility and you want `drake` to be an ordinary job scheduler, consider using alternative triggers (see `?trigger`).
-
-```{r triggerparallel, eval = FALSE}
-load_mtcars_example()
-make(my_plan, trigger = trigger(condition = TRUE))
-```
-
-Above, `drake` only builds the missing targets. This skips much of the time-consuming hashing that ordinarily detects which targets are out of date.
-
-### More resources
-
-See the [timing guide](#time) for explanations of functions `predict_runtime()` and `predict_load_balancing()`, which can help you plan and strategize deployment.
-
-## Footnotes
-
-<a id="note1" href="#note1ref">[1]</a> The video of staged parallelism is an oversimplification. It holds mostly true for `make(parallelism = "parLapply_staged")`, but `make(parallelism = "mclapply_staged")` is a bit different. In the former case, each stage is a call to `parLapply()`, which recycles existing workers on a pre-built parallel socket (PSOCK) cluster. But in the latter, every stage is a new call to `mclapply()`, which launches a brand new batch of workers. In that sense, workers in `make(parallelism = "parLapply_staged")` are sort of persistent, and workers in `make(parallelism = "mclapply_staged")` are sort of transient for some projects.
-
-```{r endofline_quickstart08, echo = F}
+```{r endoflinehpc, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
 unlink(
   c(
