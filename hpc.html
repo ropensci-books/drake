@@ -422,7 +422,7 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 <p>Set the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> global options to register your computing resources. For <a href="https://slurm.schedmd.com/slurmd.html">SLURM</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span>)</code></pre>
 <p>Here, <code>slurm_clustermq.tmpl</code> is a <a href="https://github.com/ropensci/drake/tree/master/inst/hpc_template_files">template file</a> with configuration details. Use <code>drake_hpc_template_file()</code> to write one of the available examples.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_tempalte_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Write the file slurm_clustermq.tmpl.</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Write the file slurm_clustermq.tmpl.</span></code></pre>
 <p>After modifying <code>slurm_clustermq.tmpl</code> by hand to meet your needs, call <code>make()</code> as usual.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">4</span>)</code></pre>
 </div>
@@ -463,7 +463,7 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 <div id="on-a-cluster-1" class="section level3">
 <h3><span class="header-section-number">10.5.4</span> On a cluster</h3>
 <p>Install the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> package and use <a href="https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend">this list</a> to select a <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> plan that matches your resources. You will also need a compatible <a href="https://github.com/mllg/batchtools/tree/master/inst/templates">template file</a> with configuration details. As with <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a>, <code>drake</code> can generate some examples:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_tempalte_file</span>(<span class="st">&quot;slurm_batchtools.tmpl&quot;</span>) <span class="co"># Edit by hand.</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_batchtools.tmpl&quot;</span>) <span class="co"># Edit by hand.</span></code></pre>
 <p>Next, register the template file with a plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future.batchtools)
 future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;slurm_batchtools.tmpl&quot;</span>)</code></pre>
