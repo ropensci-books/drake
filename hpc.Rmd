@@ -175,9 +175,9 @@ In `make(caching = "worker")`, the parallel workers are responsible for writing 
 
 See the [storage chapter](#store) for details.
 
-### The `template` argument of `make()`
+### The `template` argument for persistent workers
 
-For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq)-based backends, you can parameterize your template file and use the `template` argument of `make()`. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). Begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
+For more control and flexibility in the [`clustermq`](https://github.com/mschubert/clustermq) backend, you can parameterize your template file and use the `template` argument of `make()`. For example, suppose you want to programatically set the number of "slots" (basically cores) per job on an [SGE system](http://gridscheduler.sourceforge.net/htmlman/manuals.html) (`clustermq` guide to SGE setup [here](https://github.com/mschubert/clustermq/wiki/SGE)). Begin with a parameterized template file `sge_clustermq.tmpl` with a custom `n_slots` placeholder.
 
 ```
 # File: sge_clustermq.tmpl
@@ -204,11 +204,55 @@ make(
   my_plan,
   parallelism = "clustermq",
   jobs = 16,
-  template = list(n_slots = 4) # Request 4 cores per job.
+  template = list(n_slots = 4) # Request 4 cores per persistent worker.
 )
 ```
 
 Custom placeholders like `n_slots` are processed with the [`infuser`](https://github.com/Bart6114/infuser) package.
+
+### The `resources` column for transient workers
+
+Different targets may need different resources. For example,
+
+```{r diffresources1}
+plan <- drake_plan(
+  data = download_data(),
+  model = big_machine_learning_model(data)
+)
+```
+
+The `model` needs a GPU and multiple CPU cores, and the `data` only needs the bare minimum resources. Declare these requirements in a new list column of the `plan`. Here, each element is a named list for the `resources` argument of `future::future()`.
+
+```{r planresources}
+plan$resources <- list(
+  list(cores = 1, gpus = 0),
+  list(cores = 4, gpus = 1)
+)
+```
+
+Next, plug your resources into the [`brew`](https://CRAN.R-project.org/package=brew) patterns of your [`batchtools`](https://github.com/mllg/batchtools) template file. The following `sge_batchtools.tmpl` file shows how to do it, but the file itself probably requires modification before it will work with your own machine.
+
+```
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o <%= log.file %>
+#$ -V
+#$ -N <%= job.name %>
+#$ -pe smp <%= resources[["cores"]] %> # CPU cores
+#$ -l gpu=<%= resources[["gpus"]] %>   # GPUs.
+Rscript -e 'batchtools::doJobCollection("<%= uri %>")'
+exit 0
+```
+
+Finally, register the template file and run your project.
+
+```{r futuresgeplanresources, eval = FALSE}
+library(drake)
+library(future.batchtools)
+future::plan(batchtools_sge, template = "sge_batchtools.tmpl")
+make(plan, parallelism = "future", jobs = 2)
+```
 
 ### Hasty mode
 
