@@ -25,28 +25,24 @@ Thanks to [Jasper Clarkberg](https://github.com/dapperjapper), `drake` records h
 ```{r timing_intro}
 library(drake)
 load_mtcars_example() # Get the code with drake_example("mtcars").
-make(my_plan, jobs = 2)
+make(my_plan)
 
 build_times(digits = 8) # From the cache.
 
 ## `dplyr`-style `tidyselect` commands
 build_times(starts_with("coef"), digits = 8)
-
-build_times(digits = 8, targets_only = TRUE)
 ```
-
-For `drake` version 4.1.0 and earlier, `build_times()` just measures the elapsed runtime of each command in `my_plan$command`. For later versions, the build times also account for all the internal operations in `drake:::build()`, such as [storage and hashing](#store).
 
 ## Predict total runtime
 
-drake uses these times to predict the runtime of the next `make()`. At this moment, everything is up to date in the current example, so the next `make()` should be fast. Here, we only factor in the times of the formal targets in the workflow plan, excluding any imports.
+`drake` uses these times to predict the runtime of the next `make()`. At this moment, everything is up to date in the current example, so the next `make()` should ideally take no time at all (except for preprocessing overhead).
 
 ```{r predict_runtime}
 config <- drake_config(my_plan, verbose = FALSE)
-predict_runtime(config, targets_only = TRUE)
+predict_runtime(config)
 ```
 
-Suppose we change a dependency to make some targets out of date. Now, the next `make()` should take a little longer since some targets are out of date.
+Suppose we change a dependency to make some targets out of date. Now, the next `make()` should take longer since some targets are out of date.
 
 ```{r changedep_timing}
 reg2 <- function(d){
@@ -54,13 +50,13 @@ reg2 <- function(d){
   lm(y ~ x3, data = d)
 }
 
-predict_runtime(config, targets_only = TRUE)
+predict_runtime(config)
 ```
 
-But what if you plan on starting from scratch next time, either after `clean()` or with `make(trigger = trigger(condition = TRUE))`?
+And what if you plan to delete the cache and build all the targets from scratch?
 
 ```{r predict_runtime_scratch}
-predict_runtime(config, from_scratch = TRUE, targets_only = TRUE)
+predict_runtime(config, from_scratch = TRUE)
 ```
 
 ## Strategize your high-performance computing
@@ -68,8 +64,9 @@ predict_runtime(config, from_scratch = TRUE, targets_only = TRUE)
 Let's say you are scaling up your workflow. You just put bigger data and heavier computation in your custom code, and the next time you run `make()`, your targets will take much longer to build. In fact, you estimate that every target except for your R Markdown report will take two hours to complete. Let's write down these known times in seconds.
 
 ```{r knowntimes}
-known_times <- c(5, rep(7200, nrow(my_plan) - 1))
-names(known_times) <- c(file_store("report.md"), my_plan$target[-1])
+known_times <- rep(7200, nrow(my_plan))
+names(known_times) <- my_plan$target
+known_times["report"] <- 5
 known_times
 ```
 
