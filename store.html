@@ -6,10 +6,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Chapter 13 Storage | The drake R Package User Manual</title>
-  <meta name="description" content="Chapter 13 Storage | The drake R Package User Manual>
+  <meta name="description" content="Chapter 13 Storage | The drake R Package User Manual">
   <meta name="generator" content="bookdown  and GitBook 2.6.7">
 
-  <meta property="og:title" content="Chapter 13 Storage | The drake R Package User Manual />
+  <meta property="og:title" content="Chapter 13 Storage | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
   
   
@@ -17,7 +17,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Storage | The drake R Package User Manual />
+  <meta name="twitter:title" content="Chapter 13 Storage | The drake R Package User Manual" />
   
   
   
@@ -269,7 +269,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#storage"><i class="fa fa-check"></i><b>10.6.2</b> Storage</a></li>
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
-<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.5</b> Hasty mode</a></li>
+<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -369,9 +369,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;.drake&quot;</span>)
 
 <span class="kw">head</span>(cache<span class="op">$</span><span class="kw">list</span>())
-## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-## [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-## [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      
+## [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      
+## [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;
 
 <span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))
 ##       x    y
@@ -383,9 +383,9 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 ## 6 3.845 19.2</code></pre>
 <p><code>drake</code> has its own interface on top of <a href="https://github.com/richfitz/storr">storr</a> to make it easier to work with the default <code>.drake/</code> cache. The <code>loadd()</code>, <code>readd()</code>, and <code>cached()</code> functions explore saved targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">cached</span>())
-## [1] &quot;\&quot;report.md\&quot;&quot;          &quot;\&quot;report.Rmd\&quot;&quot;        
-## [3] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-## [5] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
+## [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
+## [5] &quot;large&quot;                  &quot;datasets::mtcars&quot;
 
 <span class="kw">head</span>(<span class="kw">readd</span>(small))
 ##       x    y
@@ -434,8 +434,8 @@ cache2<span class="op">$</span><span class="kw">list</span>()
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> plan2, <span class="dt">cache =</span> cache2)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
-<div id="htmlwidget-13b0e8e333249dfcc101" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-13b0e8e333249dfcc101">{"x":{"nodes":{"id":["x","y"],"label":["x\n0.005s","y\n0.004s"],"command":["1","sqrt(x)"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"title":["1","sqrt(x)"],"x":[null,null],"y":[-1,1]},"edges":{"from":["x"],"to":["y"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3a2661fca5f246b54697" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3a2661fca5f246b54697">{"x":{"nodes":{"id":["x","y"],"label":["x\n0.009s","y\n0.008s"],"command":["1","sqrt(x)"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"title":["1","sqrt(x)"],"x":[null,null],"y":[-1,1]},"edges":{"from":["x"],"to":["y"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Destroy caches to remove them from your file system.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache<span class="op">$</span><span class="kw">destroy</span>()
 cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
@@ -446,22 +446,22 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-## [1] &quot;00b326a46147a4ff.rds&quot; &quot;00ef2eab4abb348a.rds&quot; &quot;029106cdb136bef0.rds&quot;
-## [4] &quot;065f93613f1cb914.rds&quot; &quot;0b6ab287f74cb1c4.rds&quot; &quot;10ba9aa21090044f.rds&quot;
+## [1] &quot;065f93613f1cb914.rds&quot; &quot;186569d3f3b93989.rds&quot; &quot;189112c08a57c447.rds&quot;
+## [4] &quot;1e1a6653ae11cf09.rds&quot; &quot;1f496c91d601ca96.rds&quot; &quot;2362318068e2692d.rds&quot;
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
-## [1] &quot;bGFyZ2U&quot;                        &quot;c21hbGw&quot;                       
-## [3] &quot;c2ltdWxhdGU&quot;                    &quot;c3VtbV9yZWdyZXNzaW9uMl9sYXJnZQ&quot;
-## [5] &quot;c3VtbV9yZWdyZXNzaW9uMl9zbWFsbA&quot; &quot;c3VtbV9yZWdyZXNzaW9uMV9sYXJnZQ&quot;</code></pre>
+## [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      
+## [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      
+## [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;</code></pre>
 <p>This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to work with database cashes as the next section describes.</p>
 <p>Alternatively, you can track changes in a cache log file with fingerprints of all your targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_cache_log_file</span>(<span class="st">&quot;log.txt&quot;</span>)
 <span class="kw">cat</span>(<span class="kw">head</span>(<span class="kw">readLines</span>(<span class="st">&quot;log.txt&quot;</span>)), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
 ## hash type name
-## c1f59b4a56a4c1a8 target &quot;report.md&quot;
-## 7a456ee58df699be import &quot;report.Rmd&quot;
 ## 4e6e4d4c0bcda263 target coef_regression1_large
 ## 5ad25785a84e0cac target coef_regression1_small
-## b2662785d55b28c1 target coef_regression2_large</code></pre>
+## b2662785d55b28c1 target coef_regression2_large
+## 23c66b36be56905b target coef_regression2_small
+## 7b6504d4c0dcceab target large</code></pre>
 <p>Use the <code>cache_log_file</code> argument of <code>make()</code> to refresh the cache log file every time you run <code>make()</code>. Then, if you put this file under version control (e.g. with git/GitHub) then the commit history will tell you how your data objects change over time.</p>
 </div>
 <div id="database-caches" class="section level3">
