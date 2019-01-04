@@ -254,23 +254,14 @@ future::plan(batchtools_sge, template = "sge_batchtools.tmpl")
 make(plan, parallelism = "future", jobs = 2)
 ```
 
-### Hasty mode
+### Custom job schedulers
 
-Hasty mode is [`clustermq`](https://github.com/mschubert/clustermq) parallelism with all of `drake`'s storage and reproducibility guarantees stripped away. 
+It is possible to supply a custom job scheduler function to the `parallelism` argument of `make()`. Functions `backend_hasty()` and `backend_future_lapply_staged()` from packages [`drake.hasty`](https://github.com/wlandau/drake.hasty) and [`drake.future.lapply.staged`](https://github.com/wlandau/drake.future.lapply.staged), respectively, are examples. You might consider writing your own such function if you wish to
 
-```{r introhasty, eval = FALSE}
-make(plan, parallelism = "hasty", jobs = 8)
-```
+1. Experiment with a more efficient job scheduler before proposing a patch to core `drake`, or
+2. Aggressively optimize `drake` for your specialized computing resources.
 
-Drawbacks:
-
-- **DRAKE NO LONGER PROVIDES EVIDENCE THAT YOUR WORKFLOW IS TRUSTWORTHY OR REPRODUCIBLE. [THE CORE SCIENTIFIC CLAIMS](https://github.com/ropensci/drake#reproducibility-with-confidence) ARE NO LONGER VALID.**
-- There is no cache. You need to write code to store your own targets. The `hasty_build` argument to `make()` and the `default_hasty_build()` function may help you get started.
-
-Advantages:
-
-- There is no overhead from storing and checking targets, so hasty mode runs much faster than `drake`'s standard modes.
-- `drake` still builds the correct targets in the correct order, waiting for dependencies to finish before advancing downstream.
+This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.
 
 ```{r endoflinehpc, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
