@@ -256,12 +256,16 @@ make(plan, parallelism = "future", jobs = 2)
 
 ### Custom job schedulers
 
-It is possible to supply a custom job scheduler function to the `parallelism` argument of `make()`. Functions `backend_hasty()` and `backend_future_lapply_staged()` from packages [`drake.hasty`](https://github.com/wlandau/drake.hasty) and [`drake.future.lapply.staged`](https://github.com/wlandau/drake.future.lapply.staged), respectively, are examples. You might consider writing your own such function if you wish to
+It is possible to supply a custom job scheduler function to the `parallelism` argument of `make()`. The  `backend_future_lapply_staged()` function from the [`drake.future.lapply.staged`](https://github.com/wlandau/drake.future.lapply.staged) package is an example. You might consider writing your own such function if you wish to
 
 1. Experiment with a more efficient job scheduler before proposing a patch to core `drake`, or
 2. Aggressively optimize `drake` for your specialized computing resources.
 
 This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.
+
+### Hasty mode
+
+The [`drake.hasty`](https://github.com/wlandau/drake.hasty) package is a bare-bones spin-off of `drake`. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.
 
 ```{r endoflinehpc, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
