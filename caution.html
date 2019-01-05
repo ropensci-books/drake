@@ -270,6 +270,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
 <li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.6</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -544,10 +545,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;32c48f3abdba9b8acfc3e2dafe415b80&quot;
+## [1] &quot;d509a9c457df8301a7716591ab623779&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;3302dae2cd57b2b4930e60d0b0a587e7&quot;
+## [1] &quot;1b7a4b7eaee9247630a6289365324a91&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -634,7 +635,7 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <span class="kw">readd</span>(<span class="st">&quot;base::print&quot;</span>, <span class="dt">character_only =</span> <span class="ot">TRUE</span>, <span class="dt">cache =</span> cache)
 ## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x1f70808&gt;
+## &lt;bytecode: 0x377ab50&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <p>But <code>print()</code> itself is not actually very helpful. Because of S3, <code>print.data.frame()</code> is actually doing the work. If you were to write your own S3 system and change a specific method like <code>print.data.frame()</code>, changes would not be reproducibly tracked because <code>drake</code> only finds the generic function.</p>
 <p>This is unavoidable because <code>drake</code> uses static code analysis to detect dependencies. It finds generics like <code>print()</code>, but it has no way of knowing in advance what method will actually be called.</p>

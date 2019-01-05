@@ -270,6 +270,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
 <li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.6</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -372,31 +373,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # A tibble: 15 x 4
 ##    target                 elapsed        user           system        
 ##    &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;
-##  1 coef_regression1_large 0.007s         0.008s         0s            
-##  2 coef_regression1_small 0.019s         0.016s         0.004s        
-##  3 coef_regression2_large 0.007s         0.008s         0s            
-##  4 coef_regression2_small 0.008s         0.008s         0s            
-##  5 large                  0.008s         0.008s         0s            
-##  6 regression1_large      0.009s         0.008s         0s            
-##  7 regression1_small      0.01s          0.008s         0s            
-##  8 regression2_large      0.01s          0.012s         0s            
-##  9 regression2_small      0.01s          0.004s         0.004s        
-## 10 report                 0.058s         0.056s         0s            
-## 11 small                  0.008s         0.008s         0s            
-## 12 summ_regression1_large 0.008s         0.004s         0s            
-## 13 summ_regression1_small 0.008s         0.008s         0s            
-## 14 summ_regression2_large 0.008s         0.008s         0s            
-## 15 summ_regression2_small 0.008s         0.008s         0s
+##  1 coef_regression1_large 0.007s         0.004s         0s            
+##  2 coef_regression1_small 0.005s         0.008s         0s            
+##  3 coef_regression2_large 0.005s         0.004s         0s            
+##  4 coef_regression2_small 0.006s         0.008s         0s            
+##  5 large                  0.007s         0.004s         0.004s        
+##  6 regression1_large      0.007s         0.008s         0s            
+##  7 regression1_small      0.007s         0.004s         0s            
+##  8 regression2_large      0.007s         0.008s         0s            
+##  9 regression2_small      0.007s         0.004s         0s            
+## 10 report                 0.058s         0.052s         0.004s        
+## 11 small                  0.006s         0.008s         0s            
+## 12 summ_regression1_large 0.006s         0.004s         0s            
+## 13 summ_regression1_small 0.006s         0.008s         0s            
+## 14 summ_regression2_large 0.005s         0.004s         0s            
+## 15 summ_regression2_small 0.006s         0.004s         0s
 
 ## `dplyr`-style `tidyselect` commands
 <span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)
 ## # A tibble: 4 x 4
 ##   target                 elapsed        user           system        
 ##   &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;
-## 1 coef_regression1_large 0.007s         0.008s         0s            
-## 2 coef_regression1_small 0.019s         0.016s         0.004s        
-## 3 coef_regression2_large 0.007s         0.008s         0s            
-## 4 coef_regression2_small 0.008s         0.008s         0s</code></pre>
+## 1 coef_regression1_large 0.007s         0.004s         0s            
+## 2 coef_regression1_small 0.005s         0.008s         0s            
+## 3 coef_regression2_large 0.005s         0.004s         0s            
+## 4 coef_regression2_small 0.006s         0.008s         0s</code></pre>
 <div id="predict-total-runtime" class="section level2">
 <h2><span class="header-section-number">12.1</span> Predict total runtime</h2>
 <p><code>drake</code> uses these times to predict the runtime of the next <code>make()</code>. At this moment, everything is up to date in the current example, so the next <code>make()</code> should ideally take no time at all (except for preprocessing overhead).</p>
@@ -410,10 +411,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }
 
 <span class="kw">predict_runtime</span>(config)
-## [1] &quot;0.109s&quot;</code></pre>
+## [1] &quot;0.094s&quot;</code></pre>
 <p>And what if you plan to delete the cache and build all the targets from scratch?</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict_runtime</span>(config, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)
-## [1] &quot;0.186s&quot;</code></pre>
+## [1] &quot;0.145s&quot;</code></pre>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2">
 <h2><span class="header-section-number">12.2</span> Strategize your high-performance computing</h2>
