@@ -89,7 +89,8 @@ str(drake_graph_info(config))
 `drake`'s visuals tell you which targets are up to date and which are outdated.
 
 ```{r graphmake}
-config <- make(my_plan, jobs = 2, verbose = FALSE)
+make(my_plan, jobs = 2, verbose = FALSE)
+config <- drake_config(my_plan, jobs = 2, verbose = FALSE)
 outdated(config)
 sankey_drake_graph(config)
 ```
@@ -234,34 +235,16 @@ plan <- drake_plan(
 )
 writeLines("in1", "in1.txt")
 writeLines("in2", "in2.txt")
-config <- make(plan)
+make(plan)
+config <- drake_config(plan)
 writeLines("abcdefg", "out3.txt")
 vis_drake_graph(config, targets_only = TRUE)
 ```
 
-If your graph is too busy, you can hide the output files with `show_output_files = FALSE`. `drake` preserves dependency relationships induced by files, so there is now an edge from `target1` to `target2`.
+If your graph is too busy, you can hide the output files with `show_output_files = FALSE`.
 
 ```{r visfileplan2}
 vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
-```
-
-If `target2` depends on the *value* of `target1` in addition to its output files, the graph adds another edge.
-
-```{r visfileplan3}
-plan <- drake_plan(
-  target1 = {
-    file.copy(file_in("in1.txt"), file_out("out1.txt"))
-    file.copy(file_in("in2.txt"), file_out("out2.txt"))
-    rnorm(5)
-  },
-  target2 = {
-    file.copy(file_in("out1.txt"), file_out("out3.txt"))
-    file.copy(file_in("out2.txt"), file_out("out4.txt"))
-    target1 + 5
-  }
-)
-config <- drake_config(plan)
-vis_drake_graph(config, targets_only = TRUE)
 ```
 
 ```{r endofline_vis, echo = F}
