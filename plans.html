@@ -380,8 +380,6 @@ plan
 <p>Your workflow plan data frame is like your top-level “run everything” script in a project. In fact, you can convert back and forth between plans and scripts using functions <a href="https://ropensci.github.io/drake/reference/plan_to_code.html"><code>plan_to_code()</code></a> and <a href="https://ropensci.github.io/drake/reference/code_to_plan.html"><code>code_to_plan()</code></a> (please note the <a href="https://ropensci.github.io/drake/reference/code_to_plan.html#details">caveats here</a>).</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan_to_code</span>(plan, <span class="st">&quot;new_script.R&quot;</span>)
 ## Loading required namespace: styler
-## Warning: `.named` can no longer be a width
-## This warning is displayed once per session.
 <span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_script.R&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
 ## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))
 ## data &lt;- raw_data %&gt;%
@@ -597,7 +595,7 @@ args
 ##  8 cyl   gear  mtcars
 ##  9 cyl   carb  mtcars
 ## 10 disp  hp    mtcars
-## # ... with 35 more rows</code></pre>
+## # … with 35 more rows</code></pre>
 <p>Each row of <code>args</code> corresponds to a call to <code>my_model_fit()</code>. To actually write out all those function calls, we use <code>map_plan()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit)
 ## # A tibble: 45 x 2
@@ -613,7 +611,7 @@ args
 ##  8 my_model_fit_b5f9a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = \…
 ##  9 my_model_fit_8c4c5… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = \…
 ## 10 my_model_fit_f9bb9… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;…
-## # ... with 35 more rows</code></pre>
+## # … with 35 more rows</code></pre>
 <p>We now have a plan, but it has a couple issues.</p>
 <ol style="list-style-type: decimal">
 <li>The <code>data</code> argument should be a symbol. In other words, we want <code>my_model_fit(data = mtcars)</code>, not <code>my_model_fit(data = &quot;mtcars&quot;)</code>. So we use the <a href="https://rlang.r-lib.org/reference/sym.html"><code>syms()</code></a> function from the <a href="https://github.com/r-lib/rlang"><code>rlang</code></a> package turn <code>args$data</code> into a list of symbols.</li>
@@ -642,7 +640,7 @@ args
 ##  8 cyl   gear  &lt;sym&gt;  fit_cyl_gear
 ##  9 cyl   carb  &lt;sym&gt;  fit_cyl_carb
 ## 10 disp  hp    &lt;sym&gt;  fit_disp_hp 
-## # ... with 35 more rows</code></pre>
+## # … with 35 more rows</code></pre>
 <p>Much better.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">map_plan</span>(args, my_model_fit)
 plan
@@ -659,7 +657,7 @@ plan
 ##  8 fit_cyl_gear &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = mtcars)&quot;
 ##  9 fit_cyl_carb &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = mtcars)&quot;
 ## 10 fit_disp_hp  &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot; 
-## # ... with 35 more rows</code></pre>
+## # … with 35 more rows</code></pre>
 <p>We may also want to retain information about the constituent function arguments of each target. With <code>map_plan(trace = TRUE)</code>, we can append the columns of <code>args</code> alongside the usual <code>&quot;target&quot;</code> and <code>&quot;command&quot;</code> columns of our plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit, <span class="dt">trace =</span> <span class="ot">TRUE</span>)
 ## # A tibble: 45 x 6
@@ -675,7 +673,7 @@ plan
 ##  8 fit_cyl_g… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   gear  &lt;sym&gt; fit_cyl…
 ##  9 fit_cyl_c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   carb  &lt;sym&gt; fit_cyl…
 ## 10 fit_disp_… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 =… disp  hp    &lt;sym&gt; fit_dis…
-## # ... with 35 more rows</code></pre>
+## # … with 35 more rows</code></pre>
 <p>In any case, we can now fit our models.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre>
 <p>And inspect the output.</p>
@@ -892,7 +890,7 @@ plan
 ## 12 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      grads           
 ## 13 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
 ## 14 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
-## # ... with 2 more variables: public_schools__ &lt;chr&gt;,
+## # … with 2 more variables: public_schools__ &lt;chr&gt;,
 ## #   public_schools___from &lt;chr&gt;</code></pre>
 <p>And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
