@@ -545,10 +545,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;d509a9c457df8301a7716591ab623779&quot;
+## [1] &quot;2648c859e470cf1f7334b9f6cd2fe9b4&quot;
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;1b7a4b7eaee9247630a6289365324a91&quot;
+## [1] &quot;8b744758ce01a63ee5fd726f07ea9b61&quot;
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -635,7 +635,7 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <span class="kw">readd</span>(<span class="st">&quot;base::print&quot;</span>, <span class="dt">character_only =</span> <span class="ot">TRUE</span>, <span class="dt">cache =</span> cache)
 ## function (x, ...) 
 ## UseMethod(&quot;print&quot;)
-## &lt;bytecode: 0x377ab50&gt;
+## &lt;bytecode: 0x1fd6520&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <p>But <code>print()</code> itself is not actually very helpful. Because of S3, <code>print.data.frame()</code> is actually doing the work. If you were to write your own S3 system and change a specific method like <code>print.data.frame()</code>, changes would not be reproducibly tracked because <code>drake</code> only finds the generic function.</p>
 <p>This is unavoidable because <code>drake</code> uses static code analysis to detect dependencies. It finds generics like <code>print()</code>, but it has no way of knowing in advance what method will actually be called.</p>
