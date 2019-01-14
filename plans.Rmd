@@ -169,8 +169,6 @@ So when target `x` changes the output for files `"a"`, `"b"`, or `"c"`, `drake` 
 - `drake_plan()`
 - `map_plan()`
 - `evaluate_plan()`
-- `plan_analyses()`
-- `plan_summaries()`
 - `expand_plan()`
 - `gather_by()`
 - `reduce_by()`
@@ -428,54 +426,6 @@ vis_drake_graph(
 ```
 
 See the [visualization guide](#vis) for more details.
-
-### Specialized wildcard functionality
-
-In the [`mtcars` example](#mtcars), we will analyze bootstrapped versions of the `mtcars` dataset to look for an association between the weight and the fuel efficiency of cars. This example uses `plan_analyses()` and `plan_summaries()`, two specialized applications of `evaluate_plan()`. First, we generate the plan for the bootstrapped datasets.
-
-```{r datasets2}
-my_datasets <- drake_plan(
-  small = simulate(48),
-  large = simulate(64))
-my_datasets
-```
-
-We want to analyze each dataset with one of two regression models.
-
-```{r methods2}
-methods <- drake_plan(
-  regression1 = reg1(dataset__),
-  regression2 = reg2(dataset__))
-methods
-```
-
-We evaluate the `dataset__` wildcard to generate all the regression commands we will need.
-
-```{r analyses2}
-my_analyses <- plan_analyses(methods, datasets = my_datasets)
-my_analyses
-```
-
-Next, we summarize each analysis of each dataset. We calculate descriptive statistics on the residuals, and we collect the regression coefficients and their p-values.
-
-```{r summaries2}
-summary_types <- drake_plan(
-  summ = suppressWarnings(summary(analysis__$residuals)),
-  coef = suppressWarnings(summary(analysis__))$coefficients
-)
-summary_types
-
-results <- plan_summaries(summary_types, analyses = my_analyses,
-  datasets = my_datasets, gather = NULL) # Gathering is suppressed here.
-results
-```
-
-Next, we bind all the rows together for a single plan that we can later supply to `make()`.
-
-```{r wholeplan2}
-my_plan <- rbind(my_datasets, my_analyses, results)
-my_plan
-```
 
 ### Non-wildcard functions
 
