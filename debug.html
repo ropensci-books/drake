@@ -209,9 +209,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5.1" data-path="plans.html"><a href="plans.html#map_plan"><i class="fa fa-check"></i><b>6.5.1</b> <code>map_plan()</code></a></li>
 <li class="chapter" data-level="6.5.2" data-path="plans.html"><a href="plans.html#wildcard-templating"><i class="fa fa-check"></i><b>6.5.2</b> Wildcard templating</a></li>
 <li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#wildcard-clusters"><i class="fa fa-check"></i><b>6.5.3</b> Wildcard clusters</a></li>
-<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#specialized-wildcard-functionality"><i class="fa fa-check"></i><b>6.5.4</b> Specialized wildcard functionality</a></li>
-<li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>6.5.5</b> Non-wildcard functions</a></li>
-<li class="chapter" data-level="6.5.6" data-path="plans.html"><a href="plans.html#custom-metaprogramming"><i class="fa fa-check"></i><b>6.5.6</b> Custom metaprogramming</a></li>
+<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>6.5.4</b> Non-wildcard functions</a></li>
+<li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#custom-metaprogramming"><i class="fa fa-check"></i><b>6.5.5</b> Custom metaprogramming</a></li>
 </ul></li>
 <li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional columns in your plan.</a></li>
 </ul></li>
@@ -515,7 +514,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 ##     data[sample.int(n = nrow(data), size = n, replace = TRUE), 
 ##         ]
 ## }
-## &lt;bytecode: 0x121b23a8&gt;
+## &lt;bytecode: 0xa059ce8&gt;
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -593,7 +592,6 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 ## fail my_target
 ## Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:
 ##   `x` cannot be negative.
-## Warning: No message sink to remove.
 
 <span class="kw">failed</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># from the last make() only</span>
 ## [1] &quot;my_target&quot;
@@ -618,7 +616,7 @@ error<span class="op">$</span>call
 ##  $ : language f(b)
 ##  $ : language stop(&quot;`x` cannot be negative.&quot;)
 ##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3
-##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x1182ca80&gt;</code></pre>
+##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x108691e8&gt;</code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -704,8 +702,7 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 ## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
 ## instead.
 ## target x
-## target y
-## Warning: No message sink to remove.</code></pre>
+## target y</code></pre>
 <p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your workflow plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 debug_plan<span class="op">$</span>timeout &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
@@ -728,8 +725,7 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 ## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
 ## instead.
 ## target x
-## target y
-## Warning: No message sink to remove.</code></pre>
+## target y</code></pre>
 </div>
 <div id="consider-hasty-mode" class="section level2">
 <h2><span class="header-section-number">9.4</span> Consider hasty mode</h2>
