@@ -321,7 +321,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="B.3.9" data-path="caution.html"><a href="caution.html#packages-are-not-tracked-as-dependencies."><i class="fa fa-check"></i><b>B.3.9</b> Packages are not tracked as dependencies.</a></li>
 </ul></li>
 <li class="chapter" data-level="B.4" data-path="caution.html"><a href="caution.html#high-performance-computing"><i class="fa fa-check"></i><b>B.4</b> High-performance computing</a><ul>
-<li class="chapter" data-level="B.4.1" data-path="caution.html"><a href="caution.html#the-practical-utility-of-parallel-computing"><i class="fa fa-check"></i><b>B.4.1</b> The practical utility of parallel computing</a></li>
+<li class="chapter" data-level="B.4.1" data-path="caution.html"><a href="caution.html#calling-mclapply-within-targets"><i class="fa fa-check"></i><b>B.4.1</b> Calling <code>mclapply()</code> <em>within</em> targets</a></li>
 <li class="chapter" data-level="B.4.2" data-path="caution.html"><a href="caution.html#zombie-processes"><i class="fa fa-check"></i><b>B.4.2</b> Zombie processes</a></li>
 </ul></li>
 <li class="chapter" data-level="B.5" data-path="caution.html"><a href="caution.html#storage-1"><i class="fa fa-check"></i><b>B.5</b> Storage</a><ul>
@@ -373,20 +373,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # A tibble: 15 x 4
 ##    target                 elapsed        user           system        
 ##    &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;
-##  1 coef_regression1_large 0.003s         0.004s         0s            
-##  2 coef_regression1_small 0.004s         0.004s         0s            
-##  3 coef_regression2_large 0.004s         0.004s         0s            
+##  1 coef_regression1_large 0.004s         0s             0s            
+##  2 coef_regression1_small 0.003s         0.004s         0s            
+##  3 coef_regression2_large 0.003s         0.004s         0s            
 ##  4 coef_regression2_small 0.004s         0s             0s            
-##  5 large                  0.004s         0.004s         0s            
-##  6 regression1_large      0.005s         0.004s         0s            
+##  5 large                  0.004s         0s             0.004s        
+##  6 regression1_large      0.004s         0.004s         0s            
 ##  7 regression1_small      0.005s         0.004s         0s            
 ##  8 regression2_large      0.005s         0.004s         0s            
-##  9 regression2_small      0.016s         0.016s         0s            
-## 10 report                 0.056s         0.048s         0.008s        
-## 11 small                  0.004s         0.004s         0s            
-## 12 summ_regression1_large 0.004s         0s             0.004s        
-## 13 summ_regression1_small 0.004s         0.004s         0s            
-## 14 summ_regression2_large 0.004s         0s             0.004s        
+##  9 regression2_small      0.004s         0.004s         0s            
+## 10 report                 0.052s         0.044s         0.008s        
+## 11 small                  0.003s         0.004s         0s            
+## 12 summ_regression1_large 0.004s         0.004s         0s            
+## 13 summ_regression1_small 0.003s         0.004s         0s            
+## 14 summ_regression2_large 0.004s         0.004s         0s            
 ## 15 summ_regression2_small 0.003s         0.004s         0s
 
 ## `dplyr`-style `tidyselect` commands
@@ -394,9 +394,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # A tibble: 4 x 4
 ##   target                 elapsed        user           system        
 ##   &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;
-## 1 coef_regression1_large 0.003s         0.004s         0s            
-## 2 coef_regression1_small 0.004s         0.004s         0s            
-## 3 coef_regression2_large 0.004s         0.004s         0s            
+## 1 coef_regression1_large 0.004s         0s             0s            
+## 2 coef_regression1_small 0.003s         0.004s         0s            
+## 3 coef_regression2_large 0.003s         0.004s         0s            
 ## 4 coef_regression2_small 0.004s         0s             0s</code></pre>
 <div id="predict-total-runtime" class="section level2">
 <h2><span class="header-section-number">12.1</span> Predict total runtime</h2>
@@ -411,10 +411,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }
 
 <span class="kw">predict_runtime</span>(config)
-## [1] &quot;0.092s&quot;</code></pre>
+## [1] &quot;0.075s&quot;</code></pre>
 <p>And what if you plan to delete the cache and build all the targets from scratch?</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict_runtime</span>(config, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)
-## [1] &quot;0.125s&quot;</code></pre>
+## [1] &quot;0.105s&quot;</code></pre>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2">
 <h2><span class="header-section-number">12.2</span> Strategize your high-performance computing</h2>

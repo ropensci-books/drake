@@ -321,7 +321,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="B.3.9" data-path="caution.html"><a href="caution.html#packages-are-not-tracked-as-dependencies."><i class="fa fa-check"></i><b>B.3.9</b> Packages are not tracked as dependencies.</a></li>
 </ul></li>
 <li class="chapter" data-level="B.4" data-path="caution.html"><a href="caution.html#high-performance-computing"><i class="fa fa-check"></i><b>B.4</b> High-performance computing</a><ul>
-<li class="chapter" data-level="B.4.1" data-path="caution.html"><a href="caution.html#the-practical-utility-of-parallel-computing"><i class="fa fa-check"></i><b>B.4.1</b> The practical utility of parallel computing</a></li>
+<li class="chapter" data-level="B.4.1" data-path="caution.html"><a href="caution.html#calling-mclapply-within-targets"><i class="fa fa-check"></i><b>B.4.1</b> Calling <code>mclapply()</code> <em>within</em> targets</a></li>
 <li class="chapter" data-level="B.4.2" data-path="caution.html"><a href="caution.html#zombie-processes"><i class="fa fa-check"></i><b>B.4.2</b> Zombie processes</a></li>
 </ul></li>
 <li class="chapter" data-level="B.5" data-path="caution.html"><a href="caution.html#storage-1"><i class="fa fa-check"></i><b>B.5</b> Storage</a><ul>
@@ -577,6 +577,14 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 ## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     4
 ## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
+<p>The above <code>make()</code> may fail because <a href="https://github.com/ropensci/drake/issues/664#issuecomment-453163562"><code>make()</code> locks your environment</a> and <a href="https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones"><code>mclapply()</code> tries to add new variables to it</a>. If that happens, try <code>make(plan, lock_envir = FALSE)</code> or other parallel computing functions like <code>parLapply()</code> or <code>furrr::future_map()</code>. See <a href="https://github.com/ropensci/drake/issues/675#issuecomment-454403818">this comment</a> and the ensuing discussion.</p>
+<p>But usually, parallelism <em>among</em> targets happens through a cluster.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Edit by hand.</span>
+<span class="kw">options</span>(
+  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>,
+  <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span>,
+)
+<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 <p>If you change the <code>cores</code> column and then run <code>make()</code> a second time, the targets will stay up to date. This is appropriate because changes to <code>mc.cores</code> do not actually affect the output values of the targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan<span class="op">$</span>cores &lt;-<span class="st"> </span><span class="dv">2</span>
 
@@ -586,7 +594,7 @@ plan
 ##   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;
 ## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     2
 ## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 </div>
 <div id="hasty-mode" class="section level3">
 <h3><span class="header-section-number">10.6.7</span> Hasty mode</h3>
