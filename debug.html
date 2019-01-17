@@ -212,7 +212,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>6.5.4</b> Non-wildcard functions</a></li>
 <li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#custom-metaprogramming"><i class="fa fa-check"></i><b>6.5.5</b> Custom metaprogramming</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional columns in your plan.</a></li>
+<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-custom-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional custom columns in your plan.</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="organize.html"><a href="organize.html"><i class="fa fa-check"></i><b>7</b> How to organize the files of drake projects</a><ul>
 <li class="chapter" data-level="7.1" data-path="organize.html"><a href="organize.html#examples-1"><i class="fa fa-check"></i><b>7.1</b> Examples</a></li>
@@ -269,7 +269,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
 <li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
-<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.6</b> Hasty mode</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.6</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.7</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -514,7 +515,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 ##     data[sample.int(n = nrow(data), size = n, replace = TRUE), 
 ##         ]
 ## }
-## &lt;bytecode: 0xa059ce8&gt;
+## &lt;bytecode: 0x8e44528&gt;
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -616,7 +617,7 @@ error<span class="op">$</span>call
 ##  $ : language f(b)
 ##  $ : language stop(&quot;`x` cannot be negative.&quot;)
 ##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3
-##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x108691e8&gt;</code></pre>
+##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xe4f6f68&gt;</code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)

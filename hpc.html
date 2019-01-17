@@ -212,7 +212,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>6.5.4</b> Non-wildcard functions</a></li>
 <li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#custom-metaprogramming"><i class="fa fa-check"></i><b>6.5.5</b> Custom metaprogramming</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional columns in your plan.</a></li>
+<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-custom-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional custom columns in your plan.</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="organize.html"><a href="organize.html"><i class="fa fa-check"></i><b>7</b> How to organize the files of drake projects</a><ul>
 <li class="chapter" data-level="7.1" data-path="organize.html"><a href="organize.html#examples-1"><i class="fa fa-check"></i><b>7.1</b> Examples</a></li>
@@ -269,7 +269,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
 <li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
-<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.6</b> Hasty mode</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.6</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.7</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -551,8 +552,44 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 </ol>
 <p>This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.</p>
 </div>
+<div id="parallel-computing-within-targets" class="section level3">
+<h3><span class="header-section-number">10.6.6</span> Parallel computing <em>within</em> targets</h3>
+<p>In addition to parallism <em>among</em> targets on a cluster, you may wish to invoke parallelism <em>within</em> each target locally on its compute node. One successful approach is to</p>
+<ol style="list-style-type: decimal">
+<li>Define a custom plan column with the number of local workers for each target, and</li>
+<li>Use the <code>from_plan()</code> function to get number of workers inside each command.</li>
+</ol>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="kw">target</span>(
+    parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, sqrt, <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)),
+    <span class="dt">cores =</span> <span class="dv">4</span>
+  ),
+  <span class="dt">b =</span> <span class="kw">target</span>(
+    parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, sqrt, <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)),
+    <span class="dt">cores =</span> <span class="dv">2</span>
+  )
+)
+
+ plan
+## # A tibble: 2 x 3
+##   target command                                                      cores
+##   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;
+## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     4
+## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
+<p>If you change the <code>cores</code> column and then run <code>make()</code> a second time, the targets will stay up to date. This is appropriate because changes to <code>mc.cores</code> do not actually affect the output values of the targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan<span class="op">$</span>cores &lt;-<span class="st"> </span><span class="dv">2</span>
+
+plan
+## # A tibble: 2 x 3
+##   target command                                                      cores
+##   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;
+## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     2
+## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
+</div>
 <div id="hasty-mode" class="section level3">
-<h3><span class="header-section-number">10.6.6</span> Hasty mode</h3>
+<h3><span class="header-section-number">10.6.7</span> Hasty mode</h3>
 <p>The <a href="https://github.com/wlandau/drake.hasty"><code>drake.hasty</code></a> package is a bare-bones spin-off of <code>drake</code>. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.</p>
 
 </div>

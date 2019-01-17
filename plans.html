@@ -212,7 +212,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#non-wildcard-functions"><i class="fa fa-check"></i><b>6.5.4</b> Non-wildcard functions</a></li>
 <li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#custom-metaprogramming"><i class="fa fa-check"></i><b>6.5.5</b> Custom metaprogramming</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional columns in your plan.</a></li>
+<li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#optional-custom-columns-in-your-plan."><i class="fa fa-check"></i><b>6.6</b> Optional custom columns in your plan.</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="organize.html"><a href="organize.html"><i class="fa fa-check"></i><b>7</b> How to organize the files of drake projects</a><ul>
 <li class="chapter" data-level="7.1" data-path="organize.html"><a href="organize.html#examples-1"><i class="fa fa-check"></i><b>7.1</b> Examples</a></li>
@@ -269,7 +269,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
 <li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
-<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.6</b> Hasty mode</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.6</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.7</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -1099,15 +1100,15 @@ plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <p>Thanks to <a href="https://github.com/cfhammill">Chris Hammill</a> for <a href="https://github.com/ropensci/drake/issues/451">presenting this scenario and contributing to the solution</a>.</p>
 </div>
 </div>
-<div id="optional-columns-in-your-plan." class="section level2">
-<h2><span class="header-section-number">6.6</span> Optional columns in your plan.</h2>
-<p>Besides the usual columns <code>target</code> and <code>command</code>, there are other columns you can add.</p>
+<div id="optional-custom-columns-in-your-plan." class="section level2">
+<h2><span class="header-section-number">6.6</span> Optional custom columns in your plan.</h2>
+<p>Besides the usual columns <code>target</code> and <code>command</code>, you can add all kinds of custom columns to your plan, and you can The following columns have special meanings for <code>make()</code>.</p>
 <ul>
 <li><code>elapsed</code> and <code>cpu</code>: number of seconds to wait for the target to build before timing out (<code>elapsed</code> for elapsed time and <code>cpu</code> for CPU time).</li>
 <li><code>priority</code>: for <a href="hpc.html#hpc">parallel computing</a>, optionally rank the targets according to priority. That way, when two targets become ready to build at the same time, <code>drake</code> will pick the one with the dominant priority first.</li>
+<li><code>resources</code>: target-specific lists of resources on a cluster. See the advanced options in the <a href="hpc.html#hpc">parallel computing</a> chapter for details.</li>
 <li><code>retries</code>: number of times to retry building a target in the event of an error.</li>
 <li><code>trigger</code>: choose the criterion that <code>drake</code> uses to decide whether to build the target. See <code>?trigger</code> or read the <a href="triggers.html#triggers">trigger chapter</a> to learn more.</li>
-<li><code>worker</code>: for <a href="hpc.html#hpc">paralllel computing</a>, optionally name the preferred worker to assign to each target.</li>
 </ul>
 
 </div>
