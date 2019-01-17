@@ -270,7 +270,7 @@ In addition to parallism *among* targets on a cluster, you may wish to invoke pa
 1. Define a custom plan column with the number of local workers for each target, and
 2. Use the `from_plan()` function to get number of workers inside each command.
 
-```{r fromplanworkers}
+```{r fromplanworkershpc}
 plan <- drake_plan(
   a = target(
     parallel::mclapply(1:8, sqrt, mc.cores = from_plan("cores")),
@@ -305,7 +305,7 @@ make(plan, parallelism = "clustermq", jobs = 2)
 
 If you change the `cores` column and then run `make()` a second time, the targets will stay up to date. This is appropriate because changes to `mc.cores` do not actually affect the output values of the targets.
 
-```{r fromplanworkers3}
+```{r fromplanworkershpc3}
 plan$cores <- 2
 
 plan
