@@ -263,6 +263,46 @@ It is possible to supply a custom job scheduler function to the `parallelism` ar
 
 This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.
 
+### Parallel computing *within* targets
+
+In addition to parallism *among* targets on a cluster, you may wish to invoke parallelism *within* each target locally on its compute node. One successful approach is to
+
+1. Define a custom plan column with the number of local workers for each target, and
+2. Use the `from_plan()` function to get number of workers inside each command.
+
+```{r fromplanworkers}
+plan <- drake_plan(
+  a = target(
+    parallel::mclapply(1:8, sqrt, mc.cores = from_plan("cores")),
+    cores = 4
+  ),
+  b = target(
+    parallel::mclapply(1:4, sqrt, mc.cores = from_plan("cores")),
+    cores = 2
+  )
+)
+
+ plan
+```
+
+
+```{r fromplannorun2, eval = FALSE}
+make(plan)
+```
+
+If you change the `cores` column and then run `make()` a second time, the targets will stay up to date. This is appropriate because changes to `mc.cores` do not actually affect the output values of the targets.
+
+```{r fromplanworkers3}
+plan$cores <- 2
+
+plan
+```
+
+
+```{r fromplannorun3, eval = FALSE}
+make(plan)
+```
+
 ### Hasty mode
 
 The [`drake.hasty`](https://github.com/wlandau/drake.hasty) package is a bare-bones spin-off of `drake`. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.
