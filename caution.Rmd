@@ -302,19 +302,17 @@ In your workflow plan, you can use `file_in()`, `file_out()`, and `knitr_in()` t
 
 ## High-performance computing
 
-### The practical utility of parallel computing
+### Calling `mclapply()` *within* targets
 
-`drake` claims that it can
+The following workflow fails because [`make()` locks your environment](https://github.com/ropensci/drake/issues/664#issuecomment-453163562) and [`mclapply()` tries to add new variables to it](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones).
 
-1. Build and cache your targets in parallel (in stages).
-2. Build and cache your targets in the correct order, finishing dependencies before starting targets that depend on them.
-3. Deploy your targets to the parallel backend of your choice.
+```{r fromplanworkers, eval = FALSE}
+plan <- drake_plan(parallel::mclapply(1:8, sqrt, mc.cores = 2))
+make(plan)
+```
 
-However, the practical efficiency of the parallel computing functionality remains to be verified rigorously. Serious performance studies will be part of future work that has not yet been conducted at the time of writing. In addition, each project has its own best parallel computing set up, and the user needs to optimize it on a case-by-case basis. Some general considerations include the following.
+But there are plenty of workarounds, including `make(plan, lock_envir = FALSE)` and other parallel computing functions like `parLapply()` or `furrr::future_map()`. See [this  comment](https://github.com/ropensci/drake/issues/675#issuecomment-454403818) and the ensuing discussion.
 
-- The high overhead and high scalability of distributed computing versus the low overhead and low scalability of local multicore computing.
-- The high memory usage of local multicore computing, especially `make(parallelism = "future")` with `future::multicore`, as opposed to distributed computing, which can spread the memory demands over the available nodes on a cluster.
-- The marginal gains of increasing the number of jobs indefinitely, especially in the case of local multicore computing if the number of cores is low.
 
 ### Zombie processes
 
