@@ -8,11 +8,7 @@ unlink(
   c("mtcars", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
   recursive = TRUE
 )
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  error = TRUE,
-  warning = TRUE
-)
+knitr::opts_chunk$set(collapse = TRUE)
 ```
 
 This chapter is a walkthrough of `drake`'s main functionality based on the mtcars example. It sets up the project and runs it repeatedly to demonstrate `drake`'s most important functionality.
@@ -173,12 +169,6 @@ List all the reproducibly-tracked objects and files.
 tracked(config)
 ```
 
-Check for circular reasoning, missing input files, and other pitfalls.
-
-```{r check}
-check_plan(my_plan)
-```
-
 ## Generate the workflow plan
 
 The workflow plan data frame `my_plan` would be a pain to write by hand, so `drake` has functions to help you. Here are the commands to generate the bootstrapped datasets.
@@ -312,12 +302,6 @@ cached(small, large)
 
 cached()
 
-built()
-
-imported()
-
-head(read_drake_plan())
-
 head(progress()) # See also in_progress()
 
 progress(large)
@@ -328,7 +312,7 @@ progress(large)
 The next time you run `make(my_plan)`, nothing will build because `drake` knows everything is already up to date.
 
 ```{r uptodateinvig}
-config <- make(my_plan) # Will use config later. See also drake_config().
+make(my_plan)
 ```
 
 But if you change one of your functions, commands, or other dependencies, drake will update the affected targets. Suppose we change the quadratic term to a cubic term in `reg2()`. We might want to do this if we suspect a cubic relationship between tons and miles per gallon.
@@ -343,6 +327,7 @@ reg2 <- function(d) {
 The targets that depend on `reg2()` need to be rebuilt.
 
 ```{r plotwithreg2}
+config <- drake_config(my_plan)
 outdated(config)
 ```
 
