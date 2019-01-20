@@ -356,7 +356,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 6</span> Workflow plan data frames</h1>
 <div id="what-is-a-drake-plan" class="section level2">
 <h2><span class="header-section-number">6.1</span> What is a <code>drake</code> plan?</h2>
-<p>A <code>drake</code> plan is a data frame with columns named <code>target</code> and <code>command</code>. Each target an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the <code>drake_plan()</code> function is particularly convenient. Recall the plan from our <a href="main.html#main">previous example</a>:</p>
+<p>A <code>drake</code> plan is a data frame with columns named <code>target</code> and <code>command</code>. Each target is an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the <code>drake_plan()</code> function is particularly convenient. Recall the plan from our <a href="main.html#main">previous example</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),
   <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
@@ -378,7 +378,7 @@ plan
 ## 3 hist     create_plot(data)                                               
 ## 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   
 ## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</code></pre>
-<p><code>drake_plan()</code> does not run the workflow, it only creates the plan. To build the actual targets, we need to run <code>make()</code>. Creating the plan is like writing an R script, and running <code>make(your_plan)</code> is like calling <a href="https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source"><code>source(&quot;your_script.R&quot;)</code></a> an R script.</p>
+<p><code>drake_plan()</code> does not run the workflow, it only creates the plan. To build the actual targets, we need to run <code>make()</code>. Creating the plan is like writing an R script, and running <code>make(your_plan)</code> is like calling <a href="https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source"><code>source(&quot;your_script.R&quot;)</code></a>.</p>
 </div>
 <div id="plans-are-similar-to-r-scripts." class="section level2">
 <h2><span class="header-section-number">6.2</span> Plans are similar to R scripts.</h2>
@@ -435,17 +435,17 @@ plan
 </div>
 <div id="so-why-do-we-use-plans" class="section level2">
 <h2><span class="header-section-number">6.3</span> So why do we use plans?</h2>
-<p>If you have ever waited more than 10 minutes for an R script to finish executing, then you know the frustration of having to rerun it whenever your code changes. Plans help make life easier.</p>
+<p>If you have ever waited more than 10 minutes for an R script to finish, then you know the frustration of having to rerun the whole thing every time you make a change. Plans make life easier.</p>
 <div id="plans-chop-up-the-work-into-pieces." class="section level3">
 <h3><span class="header-section-number">6.3.1</span> Plans chop up the work into pieces.</h3>
-<p>Some targets may need an update, while others may not. In our <a href="main.html#main">first example</a>, <code>make()</code> was smart enough to skip the data cleaning step and just rebuild the plot and report. Because plans chop up your work, it takes less thinking and less runtime to bring your results up to date.</p>
+<p>Some targets may need an update while others may not. In our <a href="main.html#main">first example</a>, <code>make()</code> was smart enough to skip the data cleaning step and just rebuild the plot and report. <code>drake</code> and its plans compartmentalize the work, and this can save you from wasted effort in the long run.</p>
 </div>
 <div id="drake-uses-plans-to-schedule-you-work." class="section level3">
 <h3><span class="header-section-number">6.3.2</span> <code>drake</code> uses plans to schedule you work.</h3>
-<p><code>make()</code> automatically learns the build order of your targets and <a href="hpc.html#hpc">how to run them in parallel</a>. The magic is <a href="http://adv-r.had.co.nz/Expressions.html#ast-funs"><em>static code analysis</em></a>, which allows <code>drake</code> to detect the dependencies of each target, command, and function.</p>
+<p><code>make()</code> automatically learns the build order of your targets and <a href="hpc.html#hpc">how to run them in parallel</a>. The underlying magic is <a href="http://adv-r.had.co.nz/Expressions.html#ast-funs"><em>static code analysis</em></a>, which automatically detects the dependencies of each target without having to run its command.</p>
 <pre class="sourceCode r"><code class="sourceCode r">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {
   <span class="kw">ggplot</span>(data, <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;Petal.Width&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;Species&quot;</span>)) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_histogram</span>()
+<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">20</span>)
 }
 
 <span class="kw">deps_code</span>(create_plot)
@@ -458,34 +458,31 @@ plan
 ## 
 ## $namespaced
 ## [1] &quot;datasets::iris&quot;</code></pre>
-<p>Because of dependency relationships, row order does not matter once the plan is fully created. The following plan declares <code>file</code> before <code>plot</code>.</p>
+<p>Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares <code>file</code> before <code>plot</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">small_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">file =</span> <span class="kw">ggsave</span>(<span class="kw">file_out</span>(<span class="st">&quot;plot.png&quot;</span>), plot),
+  <span class="dt">file =</span> <span class="kw">ggsave</span>(<span class="kw">file_out</span>(<span class="st">&quot;plot.png&quot;</span>), plot, <span class="dt">width =</span> <span class="dv">7</span>, <span class="dt">height =</span> <span class="dv">5</span>),
   <span class="dt">plot =</span> <span class="kw">create_plot</span>(datasets<span class="op">::</span>iris)
 )</code></pre>
 <p>But <code>file</code> actually depends on <code>plot</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">small_config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(small_plan)
 <span class="kw">vis_drake_graph</span>(small_config)</code></pre>
 <div id="htmlwidget-ffb026e0f95f638569ee" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ffb026e0f95f638569ee">{"x":{"nodes":{"id":["create_plot","file","n-MRQXIYLTMV2HGOR2NFZGS4Y","p-OBWG65BOOBXGO","plot"],"imported":[true,false,true,false,false],"label":["create_plot","file","datasets::iris","file plot.png","plot"],"command":[null,"ggsave(file_out(\"plot.png\"), plot)",null,"ggsave(file_out(\"plot.png\"), plot)","create_plot(datasets::iris)"],"status":["imported","outdated","imported","outdated","outdated"],"type":["function","object","object","object","object"],"font.size":[20,20,20,20,20],"color":["#1874CD","#000000","#1874CD","#000000","#000000"],"shape":["triangle","dot","dot","square","dot"],"level":[1,3,1,4,2],"title":["function&nbsp;(data)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;ggplot(data,&nbsp;aes_string(x&nbsp;=&nbsp;\"Petal.Width\",...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geom_histogram()<br>}","ggsave(file_out(\"plot.png\"),&nbsp;plot)","n-MRQXIYLTMV2HGOR2NFZGS4Y","ggsave(file_out(\"plot.png\"),&nbsp;plot)","create_plot(datasets::iris)"],"x":[-1,0,1,0,0],"y":[-1,0.333333333333333,-1,1,-0.333333333333333]},"edges":{"from":["create_plot","plot","file","n-MRQXIYLTMV2HGOR2NFZGS4Y"],"to":["plot","file","p-OBWG65BOOBXGO","plot"],"arrows":["to","to","to","to"],"smooth":[true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-ffb026e0f95f638569ee">{"x":{"nodes":{"id":["create_plot","file","n-MRQXIYLTMV2HGOR2NFZGS4Y","p-OBWG65BOOBXGO","plot"],"imported":[true,false,true,false,false],"label":["create_plot","file","datasets::iris","file plot.png","plot"],"command":[null,"ggsave(file_out(\"plot.png\"), plot, width = 7, height = 5)",null,"ggsave(file_out(\"plot.png\"), plot, width = 7, height = 5)","create_plot(datasets::iris)"],"status":["imported","outdated","imported","outdated","outdated"],"type":["function","object","object","object","object"],"font.size":[20,20,20,20,20],"color":["#1874CD","#000000","#1874CD","#000000","#000000"],"shape":["triangle","dot","dot","square","dot"],"level":[1,3,1,4,2],"title":["function&nbsp;(data)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;ggplot(data,&nbsp;aes_string(x&nbsp;=&nbsp;\"Petal.Width\",...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geom_histogram(bins&nbsp;=&nbsp;20)<br>}","ggsave(file_out(\"plot.png\"),&nbsp;plot,&nbsp;width&nbsp;=&nbsp;7,&nbsp;...","n-MRQXIYLTMV2HGOR2NFZGS4Y","ggsave(file_out(\"plot.png\"),&nbsp;plot,&nbsp;width&nbsp;=&nbsp;7,&nbsp;...","create_plot(datasets::iris)"],"x":[-1,0,1,0,0],"y":[-1,0.333333333333333,-1,1,-0.333333333333333]},"edges":{"from":["create_plot","plot","file","n-MRQXIYLTMV2HGOR2NFZGS4Y"],"to":["plot","file","p-OBWG65BOOBXGO","plot"],"arrows":["to","to","to","to"],"smooth":[true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>So <code>make()</code> builds <code>plot</code> first.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
 <span class="kw">make</span>(small_plan)
 ## target plot
-## target file
-## Target file messages:
-##   Saving 6 x 6 in image
-##   `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+## target file</code></pre>
 </div>
 </div>
 <div id="special-custom-columns-in-your-plan." class="section level2">
 <h2><span class="header-section-number">6.4</span> Special custom columns in your plan.</h2>
-<p>The plan must include columns <code>target</code> and <code>command</code>, and you add other columns too.</p>
+<p>You can add other columns besides the required <code>target</code> and <code>command</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cbind</span>(small_plan, <span class="dt">cpu =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
-##   target                            command cpu
-## 1   file ggsave(file_out(&quot;plot.png&quot;), plot)   1
-## 2   plot        create_plot(datasets::iris)   2</code></pre>
-<p>The <code>target()</code> function is a more convenient way to do this. Within <code>drake_plan()</code>, <code>target()</code> lets you create any custom column except <code>transform</code> and <code>group</code>, which are reserved keywords (see the next section).</p>
+##   target                                                   command cpu
+## 1   file ggsave(file_out(&quot;plot.png&quot;), plot, width = 7, height = 5)   1
+## 2   plot                               create_plot(datasets::iris)   2</code></pre>
+<p>Within <code>drake_plan()</code>, <code>target()</code> lets you create any custom column except <code>transform</code> and <code>group</code>, which have special meanings in <code>drake</code>’s <a href="http://adv-r.had.co.nz/dsl.html">domain-specific language</a>, (See the next section.)</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">file =</span> <span class="kw">target</span>(
     <span class="kw">ggsave</span>(<span class="kw">file_out</span>(<span class="st">&quot;plot.png&quot;</span>), plot),
@@ -509,13 +506,12 @@ plan
 </div>
 <div id="create-large-plans-the-easy-way" class="section level2">
 <h2><span class="header-section-number">6.5</span> Create large plans the <em>easy</em> way</h2>
-<p><code>drake</code> version 7.0.0 will support new special syntax to create complicated plans from boilerplate code. The functionality will be officially considered experimental for the next few releases. To try it out before version 7.0.0 reaches <a href="http://cran.r-project.org">CRAN</a>, install the <a href="https://github.com/ropensci/drake">current development version</a> from GitHub.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)
-<span class="kw">library</span>(remotes)
-<span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre>
+<p><code>drake</code> version 7.0.0 will introduce new experimental syntax to make it easer to create plans. To try it out before the next <a href="http://cran.r-project.org">CRAN</a> release, install the <a href="https://github.com/ropensci/drake">current development version</a> from GitHub.</p>
+<p><code>r install.packages(&quot;remotes&quot;) library(remotes) install_github(&quot;ropensci/drake&quot;)</code>version 7.0.0 reaches</p>
 <div id="transformations-a-high-level" class="section level3">
 <h3><span class="header-section-number">6.5.1</span> Transformations: a high level</h3>
 <p>Transformations let you generate targets from templates. The general syntax is</p>
+<p>```</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">template_target =</span> <span class="kw">target</span>(
     your_command,
@@ -525,42 +521,56 @@ plan
 )</code></pre>
 <p>The behavior mimics the Tidyverse. Transformations are just like Tidyverse verbs, and grouping variables are like arguments to <code>dplyr::group_by()</code>. Supported transformations:</p>
 <ul>
-<li><strong>map()</strong>: like <code>purrr::pmap()</code>. Iterates through the levels of grouping variables to create new targets. Grouping variables must be all the same length.</li>
+<li><strong>map()</strong>: like <code>purrr::pmap()</code>. Creates a new target for each index along your grouping variables. Grouping variables must be all the same length.</li>
 <li><strong>cross()</strong>: like <code>tidyr::crossing()</code>. Creates a new target for each unique combination of levels of the grouping variables.</li>
 <li><strong>reduce()</strong>: like <code>dplyr::summarize()</code>. Targets are aggregated at each combination of levels of the grouping variables.</li>
 </ul>
 </div>
 <div id="transformations-minimize-typing" class="section level3">
 <h3><span class="header-section-number">6.5.2</span> Transformations minimize typing</h3>
-<p>Writing out every single command by hand can get tiring.</p>
+<p>It can get tiring to write out every single target by hand.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
-  <span class="dt">analysis_0_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
   <span class="dt">analysis_1_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
   <span class="dt">analysis_2_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_3_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_4_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">4</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
   <span class="dt">analysis_5_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">5</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_6_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">6</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_7_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">7</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_8_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">8</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
-  <span class="dt">analysis_9_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">9</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
-)
-## # A tibble: 11 x 2
-##    target       command                            
-##    &lt;chr&gt;        &lt;chr&gt;                              
-##  1 data         get_data()                         
-##  2 analysis_0_1 fit_model_x(data, mean = 0, sd = 1)
-##  3 analysis_1_1 fit_model_x(data, mean = 1, sd = 1)
-##  4 analysis_2_1 fit_model_x(data, mean = 2, sd = 1)
-##  5 analysis_3_1 fit_model_x(data, mean = 3, sd = 1)
-##  6 analysis_4_1 fit_model_x(data, mean = 4, sd = 1)
-##  7 analysis_5_1 fit_model_x(data, mean = 5, sd = 1)
-##  8 analysis_6_1 fit_model_x(data, mean = 6, sd = 1)
-##  9 analysis_7_1 fit_model_x(data, mean = 7, sd = 1)
-## 10 analysis_8_1 fit_model_x(data, mean = 8, sd = 1)
-## 11 analysis_9_1 fit_model_x(data, mean = 9, sd = 1)</code></pre>
+  <span class="dt">analysis_10_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">10</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">analysis_100_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">analysis_1000_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1000</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
+  <span class="dt">analysis_1_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="dt">analysis_2_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="dt">analysis_5_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">5</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="dt">analysis_10_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">10</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="dt">analysis_100_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="dt">analysis_1000_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1000</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
+  <span class="co"># uuuuugh my wrists are cramping :( ...</span>
+)</code></pre>
 <p>Save yourself trouble and apply a transformation.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">data =</span> <span class="kw">get_data</span>(),
+  <span class="dt">analysis =</span> <span class="kw">target</span>(
+    <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(
+      <span class="dt">mean =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>),
+      <span class="dt">sd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>)
+    )
+  )
+)
+## # A tibble: 25 x 2
+##    target          command                                        
+##    &lt;chr&gt;           &lt;chr&gt;                                          
+##  1 data            get_data()                                     
+##  2 analysis_1_1    fit_model_x(data, mean = mean_val, sd = sd_val)
+##  3 analysis_2_1    fit_model_x(data, mean = mean_val, sd = sd_val)
+##  4 analysis_5_1    fit_model_x(data, mean = mean_val, sd = sd_val)
+##  5 analysis_10_1   fit_model_x(data, mean = mean_val, sd = sd_val)
+##  6 analysis_100_1  fit_model_x(data, mean = mean_val, sd = sd_val)
+##  7 analysis_1000_1 fit_model_x(data, mean = mean_val, sd = sd_val)
+##  8 analysis_1_2    fit_model_x(data, mean = mean_val, sd = sd_val)
+##  9 analysis_2_2    fit_model_x(data, mean = mean_val, sd = sd_val)
+## 10 analysis_5_2    fit_model_x(data, mean = mean_val, sd = sd_val)
+## # … with 15 more rows</code></pre>
+<p>Use <code>map()</code> to move along the indices of your grouping variables.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
   <span class="dt">analysis =</span> <span class="kw">target</span>(
@@ -578,7 +588,7 @@ plan
 ## 1 data                     get_data()                         
 ## 2 analysis_fit_model_x_0_2 fit_model_x(data, mean = 0, sd = 2)
 ## 3 analysis_fit_model_y_1_3 fit_model_y(data, mean = 1, sd = 3)</code></pre>
-<p>To get a model for each combination of <code>fit_model</code>, <code>mean_val</code> and <code>sd_val</code>, use <code>cross()</code>.</p>
+<p>Use <code>cross()</code> to get a model for each combination of <code>fit_model</code>, <code>mean_val</code> and <code>sd_val</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
   <span class="dt">analysis =</span> <span class="kw">target</span>(
@@ -602,7 +612,7 @@ plan
 ## 7 analysis_fit_model_y_0_3 fit_model_y(data, mean = 0, sd = 3)
 ## 8 analysis_fit_model_x_1_3 fit_model_x(data, mean = 1, sd = 3)
 ## 9 analysis_fit_model_y_1_3 fit_model_y(data, mean = 1, sd = 3)</code></pre>
-<p>If you have multiple datasets, you can apply another transformation and then use <code>data</code> as a grouping variable for the analyses.</p>
+<p>You can use multiple transformations. The code below plans multiple datasets and declares multiple analyses for each one.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">get_data</span>(name),
@@ -639,11 +649,11 @@ plan
 ## 16 analysis_fit_model_y_0_3_data_.B. fit_model_y(data_.B., mean = 0, sd = …
 ## 17 analysis_fit_model_x_1_3_data_.B. fit_model_x(data_.B., mean = 1, sd = …
 ## 18 analysis_fit_model_y_1_3_data_.B. fit_model_y(data_.B., mean = 1, sd = …</code></pre>
-<p>For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator <code>!!</code> to plug them in.</p>
+<p>For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator <code>!!</code> to plug in the values.</p>
 <pre class="sourceCode r"><code class="sourceCode r">data_names &lt;-<span class="st"> </span>LETTERS
 model_functions &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(<span class="kw">c</span>(<span class="st">&quot;fit_model_x&quot;</span>, <span class="st">&quot;fit_model_y&quot;</span>))
-mean_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span>
-sd_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span>
+mean_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>
+sd_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>
 
 <span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
@@ -674,7 +684,7 @@ sd_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">
 ##  9 data_.I. &quot;get_data(\&quot;I\&quot;)&quot;
 ## 10 data_.J. &quot;get_data(\&quot;J\&quot;)&quot;
 ## # … with 224 more rows</code></pre>
-<p>A reduction gathers targets into named lists. The following plan post-processes such a list into a data frame.</p>
+<p>A reduction gathers targets into named lists, which you are free to post-process with <code>do.call()</code> or similar.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
@@ -698,7 +708,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-25db82eb3b31272a5d15" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-25db82eb3b31272a5d15">{"x":{"nodes":{"id":["data_1_3","data_2_4","drake_target_1"],"imported":[false,false,false],"label":["data_1_3","data_2_4","drake_target_1"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3 = data_1_3, data_2_4 = data_2_4))"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3&nbsp;=&nbsp;data_1_3,&nbsp;data_..."],"x":[-1,1,0],"y":[-1,-1,1]},"edges":{"from":["data_1_3","data_2_4"],"to":["drake_target_1","drake_target_1"],"arrows":["to","to"],"smooth":[true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>Supply grouping variables to <code>reduce()</code> to get a summary for each combination of levels.</p>
+<p>You can configure <code>reduce()</code> to give you a summary for each combination of grouping levels.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
@@ -714,7 +724,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-dda5858bd620d236e22c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["data_1_3","data_1_4","data_2_3","data_2_4","drake_target_1_1","drake_target_1_2"],"imported":[false,false,false,false,false,false],"label":["data_1_3","data_1_4","data_2_3","data_2_4","drake_target_1_1","drake_target_1_2"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 1, sd = 4)","sim_data(mean = 2, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3 = data_1_3, data_1_4 = data_1_4))","do.call(rbind, list(data_2_3 = data_2_3, data_2_4 = data_2_4))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,2,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3&nbsp;=&nbsp;data_1_3,&nbsp;data_...","do.call(rbind,&nbsp;list(data_2_3&nbsp;=&nbsp;data_2_3,&nbsp;data_..."],"x":[-1,-0.333333333333333,0.333333333333333,1,-0.666666666666667,0.666666666666667],"y":[-1,-1,-1,-1,1,1]},"edges":{"from":["data_1_3","data_2_3","data_1_4","data_2_4"],"to":["drake_target_1_1","drake_target_1_2","drake_target_1_1","drake_target_1_2"],"arrows":["to","to","to","to"],"smooth":[true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>Groupings for <code>reduce()</code> propagate downstream. Click and drag the nodes in the graph to unpack what is happening.</p>
+<p>Groupings for <code>reduce()</code> propagate downstream. Click and drag the nodes in the graph to mentally unpack the transformations.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
   <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>),
