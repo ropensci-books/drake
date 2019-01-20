@@ -11,7 +11,7 @@ suppressPackageStartupMessages(library(glue))
 suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(rlang))
 suppressPackageStartupMessages(library(tidyverse))
-pkgconfig::set_config("drake::strings_in_dots" = "literals")
+clean(destroy = TRUE)
 invisible(drake_example("main", overwrite = TRUE))
 invisible(file.copy("main/raw_data.xlsx", ".", overwrite = TRUE))
 invisible(file.copy("main/report.Rmd", ".", overwrite = TRUE))
@@ -20,7 +20,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 
 ## What is a `drake` plan?
 
-A `drake` plan is a data frame with columns named `target` and `command`. Each target an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the `drake_plan()` function is particularly convenient. Recall the plan from our [previous example](#main):
+A `drake` plan is a data frame with columns named `target` and `command`. Each target is an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the `drake_plan()` function is particularly convenient. Recall the plan from our [previous example](#main):
 
 ```{r firstexampleplan}
 plan <- drake_plan(
@@ -38,7 +38,7 @@ plan <- drake_plan(
 plan
 ```
 
-`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source) an R script.
+`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
 
 ## Plans are similar to R scripts.
 
@@ -62,20 +62,20 @@ code_to_plan("new_notebook.Rmd")
 
 ## So why do we use plans?
 
-If you have ever waited more than 10 minutes for an R script to finish executing, then you know the frustration of having to rerun it whenever your code changes. Plans help make life easier.
+If you have ever waited more than 10 minutes for an R script to finish, then you know the frustration of having to rerun the whole thing every time you make a change. Plans make life easier.
 
 ### Plans chop up the work into pieces.
 
-Some targets may need an update, while others may not. In our [first example](#main), `make()` was smart enough to skip the data cleaning step and just rebuild the plot and report. Because plans chop up your work, it takes less thinking and less runtime to bring your results up to date.
+Some targets may need an update while others may not. In our [first example](#main), `make()` was smart enough to skip the data cleaning step and just rebuild the plot and report. `drake` and its plans compartmentalize the work, and this can save you from wasted effort in the long run.
 
 ### `drake` uses plans to schedule you work.
 
-`make()` automatically learns the build order of your targets and [how to run them in parallel](#hpc). The magic is [_static code analysis_](http://adv-r.had.co.nz/Expressions.html#ast-funs), which allows `drake` to detect the dependencies of each target, command, and function.
+`make()` automatically learns the build order of your targets and [how to run them in parallel](#hpc). The underlying magic is [_static code analysis_](http://adv-r.had.co.nz/Expressions.html#ast-funs), which automatically detects the dependencies of each target without having to run its command.
 
 ```{r depscode_plans}
 create_plot <- function(data) {
   ggplot(data, aes_string(x = "Petal.Width", fill = "Species")) +
-    geom_histogram()
+    geom_histogram(bins = 20)
 }
 
 deps_code(create_plot)
@@ -83,11 +83,11 @@ deps_code(create_plot)
 deps_code("create_plot(datasets::iris)")
 ```
 
-Because of dependency relationships, row order does not matter once the plan is fully created. The following plan declares `file` before `plot`.
+Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares `file` before `plot`.
 
 ```{r smallplan__}
 small_plan <- drake_plan(
-  file = ggsave(file_out("plot.png"), plot),
+  file = ggsave(file_out("plot.png"), plot, width = 7, height = 5),
   plot = create_plot(datasets::iris)
 )
 ```
@@ -108,13 +108,13 @@ make(small_plan)
 
 ## Special custom columns in your plan.
 
-The plan must include columns `target` and `command`, and you add other columns too.
+You can add other columns besides the required `target` and `command`.
 
 ```{r addcolplan}
 cbind(small_plan, cpu = c(1, 2))
 ```
 
-The `target()` function is a more convenient way to do this. Within `drake_plan()`, `target()` lets you create any custom column except `transform` and `group`, which are reserved keywords (see the next section).
+Within `drake_plan()`, `target()` lets you create any custom column except `transform` and `group`, which have special meanings in `drake`'s [domain-specific language](http://adv-r.had.co.nz/dsl.html), (See the next section.)
 
 ```{r targetfn}
 drake_plan(
@@ -136,13 +136,13 @@ The following columns have special meanings for `make()`.
 
 ## Create large plans the *easy* way
 
-`drake` version 7.0.0 will support new special syntax to create complicated plans from boilerplate code. The functionality will be officially considered experimental for the next few releases. To try it out before version 7.0.0 reaches [CRAN](http://cran.r-project.org), install the [current development version](https://github.com/ropensci/drake) from GitHub.
+`drake` version 7.0.0 will introduce new experimental syntax to make it easer to create plans. To try it out before the next [CRAN](http://cran.r-project.org) release, install the [current development version](https://github.com/ropensci/drake) from GitHub.
 
 ```{r installdevdrakedsl, eval = FALSE}
 install.packages("remotes")
 library(remotes)
 install_github("ropensci/drake")
-```
+```version 7.0.0 reaches
 
 ### Transformations: a high level
 
@@ -160,33 +160,51 @@ drake_plan(
 
 The behavior mimics the Tidyverse. Transformations are just like Tidyverse verbs, and grouping variables are like arguments to `dplyr::group_by()`. Supported transformations:
 
-- **map()**: like `purrr::pmap()`. Iterates through the levels of grouping variables to create new targets. Grouping variables must be all the same length.
+- **map()**: like `purrr::pmap()`. Creates a new target for each index along your grouping variables. Grouping variables must be all the same length.
 - **cross()**: like `tidyr::crossing()`. Creates a new target for each unique combination of levels of the grouping variables.
 - **reduce()**: like `dplyr::summarize()`. Targets are aggregated at each combination of levels of the grouping variables.
 
 ### Transformations minimize typing
 
-Writing out every single command by hand can get tiring.
+It can get tiring to write out every single target by hand.
 
-```{r fulldrakeplanlongstats}
+```{r fulldrakeplanlongstats, eval = FALSE}
 drake_plan(
   data = get_data(),
-  analysis_0_1 = fit_model_x(data, mean = 0, sd = 1),
   analysis_1_1 = fit_model_x(data, mean = 1, sd = 1),
   analysis_2_1 = fit_model_x(data, mean = 2, sd = 1),
-  analysis_3_1 = fit_model_x(data, mean = 3, sd = 1),
-  analysis_4_1 = fit_model_x(data, mean = 4, sd = 1),
   analysis_5_1 = fit_model_x(data, mean = 5, sd = 1),
-  analysis_6_1 = fit_model_x(data, mean = 6, sd = 1),
-  analysis_7_1 = fit_model_x(data, mean = 7, sd = 1),
-  analysis_8_1 = fit_model_x(data, mean = 8, sd = 1),
-  analysis_9_1 = fit_model_x(data, mean = 9, sd = 1)
+  analysis_10_1 = fit_model_x(data, mean = 10, sd = 1),
+  analysis_100_1 = fit_model_x(data, mean = 100, sd = 1),
+  analysis_1000_1 = fit_model_x(data, mean = 1000, sd = 1),
+  analysis_1_2 = fit_model_x(data, mean = 1, sd = 2),
+  analysis_2_2 = fit_model_x(data, mean = 2, sd = 2),
+  analysis_5_2 = fit_model_x(data, mean = 5, sd = 2),
+  analysis_10_2 = fit_model_x(data, mean = 10, sd = 2),
+  analysis_100_2 = fit_model_x(data, mean = 100, sd = 2),
+  analysis_1000_2 = fit_model_x(data, mean = 1000, sd = 2),
+  # uuuuugh my wrists are cramping :( ...
 )
 ```
 
 Save yourself trouble and apply a transformation.
 
 ```{r transform1}
+drake_plan(
+  data = get_data(),
+  analysis = target(
+    fit_model_x(data, mean = mean_val, sd = sd_val),
+    transform = cross(
+      mean = c(1, 2, 5, 10, 100, 1000),
+      sd = c(1, 2, 5, 10)
+    )
+  )
+)
+```
+
+Use `map()` to move along the indices of your grouping variables.
+
+```{r transform1b}
 drake_plan(
   data = get_data(),
   analysis = target(
@@ -200,7 +218,7 @@ drake_plan(
 )
 ```
 
-To get a model for each combination of `fit_model`, `mean_val` and `sd_val`, use `cross()`.
+Use `cross()` to get a model for each combination of `fit_model`, `mean_val` and `sd_val`.
 
 ```{r transform2}
 drake_plan(
@@ -216,7 +234,7 @@ drake_plan(
 )
 ```
 
-If you have multiple datasets, you can apply another transformation and then use `data` as a grouping variable for the analyses.
+You can use multiple transformations. The code below plans multiple datasets and declares multiple analyses for each one.
 
 ```{r transform3}
 drake_plan(
@@ -236,13 +254,13 @@ drake_plan(
 )
 ```
 
-For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator `!!` to plug them in.
+For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator `!!` to plug in the values.
 
 ```{r transform4}
 data_names <- LETTERS
 model_functions <- rlang::syms(c("fit_model_x", "fit_model_y"))
-mean_vals <- 1:100
-sd_vals <- 1:100
+mean_vals <- 1:1000
+sd_vals <- 1:1000
 
 drake_plan(
   data = target(
@@ -260,7 +278,7 @@ drake_plan(
   )
 )
 ```
-A reduction gathers targets into named lists. The following plan post-processes such a list into a data frame.
+A reduction gathers targets into named lists, which you are free to post-process with `do.call()` or similar.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -280,7 +298,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Supply grouping variables to `reduce()` to get a summary for each combination of levels.
+You can configure `reduce()` to give you a summary for each combination of grouping levels.
 
 ```{r transform6}
 plan <- drake_plan(
@@ -298,7 +316,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to unpack what is happening.
+Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to mentally unpack the transformations.
 
 ```{r groupings9}
 plan <- drake_plan(
