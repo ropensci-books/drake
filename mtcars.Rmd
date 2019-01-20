@@ -169,9 +169,52 @@ List all the reproducibly-tracked objects and files.
 tracked(config)
 ```
 
-## Generate the workflow plan
+## Generate the plan
 
-The workflow plan data frame `my_plan` would be a pain to write by hand, so `drake` has functions to help you. Here are the commands to generate the bootstrapped datasets.
+### The easy way
+
+`drake` version 7.0.0 will support new special syntax to create complicated `drake` plans from boilerplate code. See the [chapter on plans](#plans) for more details. To get the funcionality early, install development drake.
+
+```{r installdevdrakedsl, eval = FALSE}
+install.packages("remotes")
+library(remotes)
+install_github("ropensci/drake")
+```
+
+Then, use transformations to generate the plan.
+
+```{r, dslmtcars}
+drake_plan(
+  report = knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE),
+  small = simulate(48),
+  large = simulate(64),
+  regression1 = target(
+    reg1(data),
+    transform = map(data = c(small, large)),
+    group = reg
+  ),
+  regression2 = target(
+    reg2(data),
+    transform = map(data),
+    group = reg
+  ),
+  summ = target(
+    suppressWarnings(summary(reg$residuals)),
+    transform = map(reg)
+  ),
+  coef = target(
+    suppressWarnings(summary(reg))$coefficients,
+    transform = map(reg)
+  )
+)
+```
+
+
+### The old way
+
+`drake` has old wildcard templating functions to help generate plans. It is more difficult to adapt them to practical use cases, but they have been around since the early days of `drake`.
+
+Here are the commands to generate the bootstrapped datasets.
 
 ```{r datasets}
 my_datasets <- drake_plan(
