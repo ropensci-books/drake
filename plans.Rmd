@@ -387,6 +387,7 @@ plan1$data_size <- c("large", "small", "small")
 plan1
 
 plan2 <- drake_plan(
+  
   summaries = target(
     summarize_analyses(analysis),
     transform = reduce(data_size)
@@ -396,12 +397,13 @@ plan2 <- drake_plan(
 
 plan2
 
-plan <- bind_plans(plan1, plan2)
+plan3 <- bind_plans(plan1, plan2)
+plan3
+
+plan <- transform_plan(plan3)
 plan
 
-transform_plan(plan)
-
-transform_plan(plan, trace = TRUE)
+drake_plan_source(plan)
 ```
 
 <br>
