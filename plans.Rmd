@@ -20,7 +20,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 
 ## What is a `drake` plan?
 
-A `drake` plan is a data frame with columns `"target"` and `"command"`. Each target is the name of an R object produced in your workflow, and each command is the R code that produces it. In this sense, the `drake` plan is a tidy representation of the steps of your data analysis project. You can create plans any way you like, but the `drake_plan()` function is usually the most convenient way. Recall the plan from our [previous example](#main):
+A `drake` plan is a data frame with columns named `target` and `command`. Each target an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the `drake_plan()` function is particularly convenient. Recall the plan from our [previous example](#main):
 
 ```{r firstexampleplan}
 plan <- drake_plan(
@@ -38,7 +38,7 @@ plan <- drake_plan(
 plan
 ```
 
-Creating the plan does not actually run the workflow. To build the targets, we need to run `make()` on the plan just as we would [`source()`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source) an R script.
+`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source) an R script.
 
 ## Plans are similar to R scripts.
 
@@ -62,17 +62,15 @@ code_to_plan("new_notebook.Rmd")
 
 ## So why do we use plans?
 
-If you have ever waited more than 10 minutes for an R script to finish running, then you know the frustration of having to rerun it whenever you go back and change your code. Plans help make life easier.
+If you have ever waited more than 10 minutes for an R script to finish executing, then you know the frustration of having to rerun it whenever your code changes. Plans help make life easier.
 
-### Plans break up the work into skippable steps.
+### Plans chop up the work into pieces.
 
-As we saw in our [first example](#main), `make()` skips steps of your workflow that are already up to date. In order to skip those steps, we need to define them up front, which is exactly what `drake` plans do.
+Some targets may need an update, while others may not. In our [first example](#main), `make()` was smart enough to skip the data cleaning step and just rebuild the plot and report. Because plans chop up your work, it takes less thinking and less runtime to bring your results up to date.
 
 ### `drake` uses plans to schedule you work.
 
-You need to know how to build each target, but because of plans, you do not need to think too hard about how the targets fit together. `drake` analyzes the plan's commands to figure out which targets to run at which times during `make()`. You can check what `drake` is thinking with the [`vis_drake_graph()` function](#visuals).
-
-The magic is in _static code analysis_, where `drake` looks at the dependencies of your commands without actually running them (ref: [_Advanced R_](http://adv-r.had.co.nz/Expressions.html#ast-funs), [`CodeDepends`](https://github.com/duncantl/CodeDepends)).
+`make()` automatically learns the build order of your targets and [how to run them in parallel](#hpc). The magic is [_static code analysis_](http://adv-r.had.co.nz/Expressions.html#ast-funs), which allows `drake` to detect the dependencies of each target, command, and function.
 
 ```{r depscode_plans}
 create_plot <- function(data) {
@@ -85,7 +83,7 @@ deps_code(create_plot)
 deps_code("create_plot(datasets::iris)")
 ```
 
-The following plan declares `file` before `plot`.
+Because of dependency relationships, row order does not matter once the plan is fully created. The following plan declares `file` before `plot`.
 
 ```{r smallplan__}
 small_plan <- drake_plan(
@@ -136,14 +134,11 @@ The following columns have special meanings for `make()`
 - `retries`: number of times to retry building a target in the event of an error.
 - `trigger`: rule to decide whether a target needs to run. See the [trigger chapter](#triggers) to learn more.
 
-
-
-
-## Generating large plans the new way
+## Create large plans the *easy* way
 
 Coming soon...
 
-## Generating large plans the old way
+## Create large plans the *old* way
 
 `drake` provides many more utilites that increase the flexibility of workflow plan generation beyond `expand.grid()`.
 
