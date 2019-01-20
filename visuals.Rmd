@@ -152,22 +152,26 @@ vis_drake_graph(config, ncol_legend = 0)
 
 ## Clusters
 
-With the `group` and `clusters` arguments to the graphing functions, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [workflow plan guide](#plans). Our plan was generated with `evaluate_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
+With the `group` and `clusters` arguments to the graphing functions, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [workflow plan guide](#plans). Our plan was generated with `drake_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
 
 ```{r tracevisgraph1}
-plan_template <- drake_plan(
-  school = get_school_data("school__"),
-  credits = check_credit_hours(all_schools__),
-  students = check_students(all_schools__),
-  grads = check_graduations(all_schools__),
-  public_funds = check_public_funding(public_schools__)
-)
-plan <- evaluate_plan(
-  plan = plan_template,
-  rules = list(
-    school__ = c("A", "B", "C"),
-    all_schools__ =  c("school_A", "school_B", "school_C"),
-    public_schools__ = c("school_A", "school_B")
+# Visit https://ropenscilabs.github.io/drake-manual/plans.html#create-large-plans-the-easy-way
+# to learn about the syntax with target(transform = ...).
+plan <- drake_plan(
+  school = target(
+    get_school_data(id),
+    transform = map(id = c(1, 2, 3))
+  ),
+  credits = target(
+    fun(school),
+    transform = cross(
+      school,
+      fun = c(check_credit_hours, check_students, check_graduations)
+    )
+  ),
+  public_funds_school = target(
+    command = check_public_funding(school),
+    transform = map(school = c(school_1, school_2))
   ),
   trace = TRUE
 )
@@ -190,10 +194,9 @@ For large projects with hundreds of nodes, this can get quite cumbersome. But he
 
 ```{r tracevisgraph2}
 config <- drake_config(plan)
-vis_drake_graph(
-  config,
-  group = "all_schools__",
-  clusters = c("school_A", "school_B", "school_C")
+vis_drake_graph(config,
+  group = "school",
+  clusters = c("school_1", "school_2", "school_3")
 )
 ```
 
