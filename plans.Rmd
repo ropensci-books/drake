@@ -372,40 +372,6 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-For more customization, you can construct sections of the plan in stages, combine the sections together, and then transform at the very end. This sort of preprocessing tends to rely on `drake_plan(trace = TRUE)`, which retains provenance information generated during the transformation process.
-
-```{r indcolsplans}
-plan1 <- drake_plan(
-  analysis = target(
-    analyze_data(source),
-    transform = map(source = c(source1, source2, source3))
-  ),
-  trace = TRUE
-)
-plan1$data_size <- c("large", "small", "small")
-
-plan1
-
-plan2 <- drake_plan(
-  
-  summaries = target(
-    summarize_analyses(analysis),
-    transform = reduce(data_size)
-  ),
-  transform = FALSE
-)
-
-plan2
-
-plan3 <- bind_plans(plan1, plan2)
-plan3
-
-plan <- transform_plan(plan3)
-plan
-
-drake_plan_source(plan)
-```
-
 <br>
 
 ## Create large plans the *old* way
