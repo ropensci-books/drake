@@ -114,7 +114,7 @@ The plan must include columns `target` and `command`, and you add other columns 
 cbind(small_plan, cpu = c(1, 2))
 ```
 
-The `target()` function is a more convenient way to do this.
+The `target()` function is a more convenient way to do this. Within `drake_plan()`, `target()` lets you create any custom column except `transform` and `group`, which are reserved keywords (see the next section).
 
 ```{r targetfn}
 drake_plan(
@@ -126,7 +126,7 @@ drake_plan(
 )
 ```
 
-The following columns have special meanings for `make()`
+The following columns have special meanings for `make()`.
 
 - `elapsed` and `cpu`: number of seconds to wait for the target to build before timing out (`elapsed` for elapsed time and `cpu` for CPU time).
 - `priority`: for [parallel computing](#hpc), optionally rank the targets according to priority in the scheduler.
@@ -136,11 +136,228 @@ The following columns have special meanings for `make()`
 
 ## Create large plans the *easy* way
 
-Coming soon...
+`drake` version 7.0.0 will support new special syntax to create complicated plans from boilerplate code. The functionality will be officially considered experimental for the next few releases. To try it out before version 7.0.0 reaches [CRAN](http://cran.r-project.org), install the [current development version](https://github.com/ropensci/drake) from GitHub.
+
+```{r installdevdrakedsl, eval = FALSE}
+install.packages("remotes")
+library(remotes)
+install_github("ropensci/drake")
+```
+
+### Transformations: a high level
+
+Transformations let you generate targets from templates. The general syntax is
+
+```{r transformat, eval = FALSE}
+drake_plan(
+  template_target = target(
+    your_command,
+    transform = supported_transformation(grouping_variables),
+    group = c(custom_group_1, custom_group_2) # optional
+  )
+)
+```
+
+The behavior mimics the Tidyverse. Transformations are just like Tidyverse verbs, and grouping variables are like arguments to `dplyr::group_by()`. Supported transformations:
+
+- **map()**: like `purrr::pmap()`. Iterates through the levels of grouping variables to create new targets. Grouping variables must be all the same length.
+- **cross()**: like `tidyr::crossing()`. Creates a new target for each unique combination of levels of the grouping variables.
+- **reduce()**: like `dplyr::summarize()`. Targets are aggregated at each combination of levels of the grouping variables.
+
+### Transformations minimize typing
+
+Writing out every single command by hand can get tiring.
+
+```{r fulldrakeplanlongstats}
+drake_plan(
+  data = get_data(),
+  analysis_0_1 = fit_model_x(data, mean = 0, sd = 1),
+  analysis_1_1 = fit_model_x(data, mean = 1, sd = 1),
+  analysis_2_1 = fit_model_x(data, mean = 2, sd = 1),
+  analysis_3_1 = fit_model_x(data, mean = 3, sd = 1),
+  analysis_4_1 = fit_model_x(data, mean = 4, sd = 1),
+  analysis_5_1 = fit_model_x(data, mean = 5, sd = 1),
+  analysis_6_1 = fit_model_x(data, mean = 6, sd = 1),
+  analysis_7_1 = fit_model_x(data, mean = 7, sd = 1),
+  analysis_8_1 = fit_model_x(data, mean = 8, sd = 1),
+  analysis_9_1 = fit_model_x(data, mean = 9, sd = 1)
+)
+```
+
+Save yourself trouble and apply a transformation.
+
+```{r transform1}
+drake_plan(
+  data = get_data(),
+  analysis = target(
+    fit_model(data, mean = mean_val, sd = sd_val),
+    transform = map(
+      fit_model = c(fit_model_x, fit_model_y),
+      mean_val = c(0, 1),
+      sd_val = c(2, 3)
+    )
+  )
+)
+```
+
+To get a model for each combination of `fit_model`, `mean_val` and `sd_val`, use `cross()`.
+
+```{r transform2}
+drake_plan(
+  data = get_data(),
+  analysis = target(
+    fit_model(data, mean = mean_val, sd = sd_val),
+    transform = cross(
+      fit_model = c(fit_model_x, fit_model_y),
+      mean_val = c(0, 1),
+      sd_val = c(2, 3)
+    )
+  )
+)
+```
+
+If you have multiple datasets, you can apply another transformation and then use `data` as a grouping variable for the analyses.
+
+```{r transform3}
+drake_plan(
+  data = target(
+    get_data(name),
+    transform = map(name = c("A", "B"))
+  ),
+  analysis = target(
+    fit_model(data, mean = mean_val, sd = sd_val),
+    transform = cross(
+      data,
+      fit_model = c(fit_model_x, fit_model_y),
+      mean_val = c(0, 1),
+      sd_val = c(2, 3)
+    )
+  )
+)
+```
+
+For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator `!!` to plug them in.
+
+```{r transform4}
+data_names <- LETTERS
+model_functions <- rlang::syms(c("fit_model_x", "fit_model_y"))
+mean_vals <- 1:100
+sd_vals <- 1:100
+
+drake_plan(
+  data = target(
+    get_data(name),
+    transform = map(name = !!data_names)
+  ),
+  analysis = target(
+    fit_model(data, mean = mean_val, sd = sd_val),
+    transform = cross(
+      data,
+      fit_model = !!model_functions,
+      mean_val = !!mean_vals,
+      sd_val = !!sd_vals
+    )
+  )
+)
+```
+A reduction gathers targets into named lists. The following plan post-processes such a list into a data frame.
+
+```{r transform5}
+plan <- drake_plan(
+  data = target(
+    sim_data(mean = x, sd = y),
+    transform = map(x = c(1, 2), y = c(3, 4))
+  ),
+  target(
+    do.call(rbind, data),
+    transform = reduce()
+  )
+)
+
+plan
+
+config <- drake_config(plan)
+vis_drake_graph(plan)
+```
+
+Supply grouping variables to `reduce()` to get a summary for each combination of levels.
+
+```{r transform6}
+plan <- drake_plan(
+  data = target(
+    sim_data(mean = x, sd = y),
+    transform = cross(x = c(1, 2), y = c(3, 4))
+  ),
+  target(
+    do.call(rbind, data),
+    transform = reduce(x)
+  )
+)
+
+config <- drake_config(plan)
+vis_drake_graph(plan)
+```
+
+Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to unpack what is happening.
+
+```{r groupings9}
+plan <- drake_plan(
+  small = simulate(48),
+  large = simulate(64),
+  reg = target(
+    reg_fun(data),
+    transform = cross(reg_fun = c(reg1, reg2), data = c(small, large))
+  ),
+  summ = target(
+    sum_fun(data, reg),
+    transform = cross(sum_fun = c(coef, residuals), reg)
+  ),
+  winners = target(
+    min(summ),
+    transform = reduce(data, sum_fun)
+  ),
+  others = target(
+    analyze(list(c(summ), c(data))),
+    transform = reduce(data, sum_fun)
+  ),
+  final_winner = target(
+    min(winners),
+    transform = reduce()
+  )
+)
+
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+ You can even define custom post-hoc groupings for further control. Just supply new symbols to `group`.
+
+```{r groupings8}
+plan <- drake_plan(
+  data_sim = target(
+    sim_data(mean = x, sd = y),
+    transform = cross(x = c(1, 2), y = c(3, 4)),
+    group = c(data, sim)
+  ),
+  data_download = target(
+    download_data(url = x),
+    transform = map(x = c("http://url_1", "http://url_2")),
+    group = data
+  ),
+  summaries = target(
+    compare_datasets(data),
+    transform = reduce()
+  )
+)
+
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
 
 ## Create large plans the *old* way
 
-`drake` provides many more utilites that increase the flexibility of workflow plan generation beyond `expand.grid()`.
+`drake` provides several older utility that increase the flexibility of workflow plan generation beyond `expand.grid()`.
 
 - `drake_plan()`
 - `map_plan()`
