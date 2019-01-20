@@ -316,7 +316,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to mentally unpack the transformations.
+Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to see the results of the transformations.
 
 ```{r groupings9}
 plan <- drake_plan(
@@ -370,6 +370,38 @@ plan <- drake_plan(
 
 config <- drake_config(plan)
 vis_drake_graph(config)
+```
+
+For more customization, you can construct sections of the plan in stages, combine the sections together, and then transform at the very end. This sort of preprocessing tends to rely on `drake_plan(trace = TRUE)`, which retains provenance information generated during the transformation process.
+
+```{r indcolsplans}
+plan1 <- drake_plan(
+  analysis = target(
+    analyze_data(source),
+    transform = map(source = c(source1, source2, source3))
+  ),
+  trace = TRUE
+)
+plan1$data_size <- c("large", "small", "small")
+
+plan1
+
+plan2 <- drake_plan(
+  summaries = target(
+    summarize_analyses(analysis),
+    transform = reduce(data_size)
+  ),
+  transform = FALSE
+)
+
+plan2
+
+plan <- bind_plans(plan1, plan2)
+plan
+
+transform_plan(plan)
+
+transform_plan(plan, trace = TRUE)
 ```
 
 <br>
