@@ -186,12 +186,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6" data-path="gsp.html"><a href="gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>4.6</b> Comparison with GNU Make</a></li>
 <li class="chapter" data-level="4.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>4.7</b> References</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and <code>drake</code> plan generation</a><ul>
 <li class="chapter" data-level="5.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
 <li class="chapter" data-level="5.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>5.2</b> Quick examples</a></li>
 <li class="chapter" data-level="5.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>5.3</b> The motivation of the mtcars example</a></li>
 <li class="chapter" data-level="5.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>5.4</b> Set up the mtcars example</a></li>
-<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>5.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-drake-plan"><i class="fa fa-check"></i><b>5.5</b> The <code>drake</code> plan</a></li>
 <li class="chapter" data-level="5.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-plan"><i class="fa fa-check"></i><b>5.6</b> Generate the plan</a><ul>
 <li class="chapter" data-level="5.6.1" data-path="mtcars.html"><a href="mtcars.html#the-easy-way"><i class="fa fa-check"></i><b>5.6.1</b> The easy way</a></li>
 <li class="chapter" data-level="5.6.2" data-path="mtcars.html"><a href="mtcars.html#the-old-way"><i class="fa fa-check"></i><b>5.6.2</b> The old way</a></li>
@@ -376,7 +376,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>It is best to write your code as a bunch of functions. You can save those functions in R scripts and then <code>source()</code> them before doing anything else.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load functions get_data(), analyze_data, and summarize_results()</span>
 <span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>)</code></pre>
-<p>Then, set up your workflow plan data frame.</p>
+<p>Then, set up your <code>drake</code> plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span>
   <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),
@@ -409,7 +409,7 @@ good_plan
 <li><code>analyze_data.R</code></li>
 <li><code>summarize_results.R</code></li>
 </ul>
-<p>If you migrate to <code>drake</code>, you may be tempted to set up a workflow plan like this.</p>
+<p>If you migrate to <code>drake</code>, you may be tempted to set up a <code>drake</code> plan like this.</p>
 <pre class="sourceCode r"><code class="sourceCode r">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),
   <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),
@@ -447,7 +447,7 @@ bad_plan
 <p>Dangers:</p>
 <ol style="list-style-type: decimal">
 <li>In the first <code>make(bad_plan, jobs = 2)</code>, <code>drake</code> will try to build <code>my_data</code> and <code>my_analysis</code> at the same time even though <code>my_data</code> must finish before <code>my_analysis</code> begins.</li>
-<li><code>drake</code> is oblivious to <code>data.csv</code> since it is not explicitly mentioned in a workflow plan command. So when <code>data.csv</code> changes, <code>make(bad_plan)</code> will not rebuild <code>my_data</code>.</li>
+<li><code>drake</code> is oblivious to <code>data.csv</code> since it is not explicitly mentioned in a <code>drake</code> plan command. So when <code>data.csv</code> changes, <code>make(bad_plan)</code> will not rebuild <code>my_data</code>.</li>
 <li><code>my_analysis</code> will not update when <code>my_data</code> changes.</li>
 <li>The return value of <code>source()</code> is formatted counter-intuitively. If <code>source(file_in(&quot;get_data.R&quot;))</code> is the command for <code>my_data</code>, then <code>my_data</code> will always be a list with elements <code>&quot;value&quot;</code> and <code>&quot;visible&quot;</code>. In other words, <code>source(file_in(&quot;get_data.R&quot;))$value</code> is really what you would want.</li>
 </ol>

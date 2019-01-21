@@ -186,12 +186,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6" data-path="gsp.html"><a href="gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>4.6</b> Comparison with GNU Make</a></li>
 <li class="chapter" data-level="4.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>4.7</b> References</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and <code>drake</code> plan generation</a><ul>
 <li class="chapter" data-level="5.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
 <li class="chapter" data-level="5.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>5.2</b> Quick examples</a></li>
 <li class="chapter" data-level="5.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>5.3</b> The motivation of the mtcars example</a></li>
 <li class="chapter" data-level="5.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>5.4</b> Set up the mtcars example</a></li>
-<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>5.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-drake-plan"><i class="fa fa-check"></i><b>5.5</b> The <code>drake</code> plan</a></li>
 <li class="chapter" data-level="5.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-plan"><i class="fa fa-check"></i><b>5.6</b> Generate the plan</a><ul>
 <li class="chapter" data-level="5.6.1" data-path="mtcars.html"><a href="mtcars.html#the-easy-way"><i class="fa fa-check"></i><b>5.6.1</b> The easy way</a></li>
 <li class="chapter" data-level="5.6.2" data-path="mtcars.html"><a href="mtcars.html#the-old-way"><i class="fa fa-check"></i><b>5.6.2</b> The old way</a></li>
@@ -1209,7 +1209,7 @@ plan
 ##   &lt;chr&gt;  &lt;chr&gt;                
 ## 1 t      rpois(50, lambda = 1)
 ## 2 normal runif(100, mean = 5)</code></pre>
-<p>Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.</p>
+<p>Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a <code>drake</code> plan with your metrics and let the wildcard templating expand over the available schools.</p>
 <pre class="sourceCode r"><code class="sourceCode r">hard_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(school__),
   <span class="dt">students =</span> <span class="kw">check_students</span>(school__),
@@ -1236,7 +1236,7 @@ plan
 ## 10 public_funds_schoolA check_public_funding(schoolA)
 ## 11 public_funds_schoolB check_public_funding(schoolB)
 ## 12 public_funds_schoolC check_public_funding(schoolC)</code></pre>
-<p>But what if some metrics do not make sense? For example, what if <code>schoolC</code> is a completely privately-funded school? With no public funds, <code>check_public_funds(schoolC)</code> may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.</p>
+<p>But what if some metrics do not make sense? For example, what if <code>schoolC</code> is a completely privately-funded school? With no public funds, <code>check_public_funds(schoolC)</code> may quit in error if we are not careful. This is where setting up <code>drake</code> plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),
   <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(all_schools__),
@@ -1390,7 +1390,7 @@ plan
 </div>
 <div id="custom-metaprogramming" class="section level3">
 <h3><span class="header-section-number">6.6.5</span> Custom metaprogramming</h3>
-<p>The workflow plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don’t even need the <code>drake_plan()</code> function.</p>
+<p>The <code>drake</code> plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don’t even need the <code>drake_plan()</code> function.</p>
 <p>The following example could more easily be implemented with <code>map_plan()</code>, but we use other techniques to demonstrate the versatility of custom metaprogramming. Let’s consider a file-based example workflow. Here, our targets execute Linux commands to process input files and create output files.</p>
 <pre><code>cat in1.txt > out1.txt
 cat in2.txt > out2.txt
@@ -1463,7 +1463,7 @@ write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd
 ##   &lt;chr&gt;                             &lt;list&gt;    &lt;list&gt;   
 ## 1 cat {inputs} &gt; {outputs}          &lt;chr [2]&gt; &lt;chr [2]&gt;
 ## 2 cat {inputs} {inputs} &gt; {outputs} &lt;chr [2]&gt; &lt;chr [2]&gt;</code></pre>
-<p>Finally, we create our workflow plan without any built-in <code>drake</code> functions.</p>
+<p>Finally, we create our <code>drake</code> plan without any built-in <code>drake</code> functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
   <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),
   <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)

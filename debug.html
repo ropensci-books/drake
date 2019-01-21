@@ -186,12 +186,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6" data-path="gsp.html"><a href="gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>4.6</b> Comparison with GNU Make</a></li>
 <li class="chapter" data-level="4.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>4.7</b> References</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and workflow plan generation</a><ul>
+<li class="chapter" data-level="5" data-path="mtcars.html"><a href="mtcars.html"><i class="fa fa-check"></i><b>5</b> The mtcars example and <code>drake</code> plan generation</a><ul>
 <li class="chapter" data-level="5.1" data-path="mtcars.html"><a href="mtcars.html#get-the-code.-2"><i class="fa fa-check"></i><b>5.1</b> Get the code.</a></li>
 <li class="chapter" data-level="5.2" data-path="mtcars.html"><a href="mtcars.html#quick-examples"><i class="fa fa-check"></i><b>5.2</b> Quick examples</a></li>
 <li class="chapter" data-level="5.3" data-path="mtcars.html"><a href="mtcars.html#the-motivation-of-the-mtcars-example"><i class="fa fa-check"></i><b>5.3</b> The motivation of the mtcars example</a></li>
 <li class="chapter" data-level="5.4" data-path="mtcars.html"><a href="mtcars.html#set-up-the-mtcars-example"><i class="fa fa-check"></i><b>5.4</b> Set up the mtcars example</a></li>
-<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-workflow-plan-data-frame"><i class="fa fa-check"></i><b>5.5</b> The workflow plan data frame</a></li>
+<li class="chapter" data-level="5.5" data-path="mtcars.html"><a href="mtcars.html#the-drake-plan"><i class="fa fa-check"></i><b>5.5</b> The <code>drake</code> plan</a></li>
 <li class="chapter" data-level="5.6" data-path="mtcars.html"><a href="mtcars.html#generate-the-plan"><i class="fa fa-check"></i><b>5.6</b> Generate the plan</a><ul>
 <li class="chapter" data-level="5.6.1" data-path="mtcars.html"><a href="mtcars.html#the-easy-way"><i class="fa fa-check"></i><b>5.6.1</b> The easy way</a></li>
 <li class="chapter" data-level="5.6.2" data-path="mtcars.html"><a href="mtcars.html#the-old-way"><i class="fa fa-check"></i><b>5.6.2</b> The old way</a></li>
@@ -523,7 +523,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 ##     data[sample.int(n = nrow(data), size = n, replace = TRUE), 
 ##         ]
 ## }
-## &lt;bytecode: 0x8f9fa60&gt;
+## &lt;bytecode: 0x9a859e0&gt;
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -625,7 +625,7 @@ error<span class="op">$</span>call
 ##  $ : language f(b)
 ##  $ : language stop(&quot;`x` cannot be negative.&quot;)
 ##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3
-##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x92f6dc8&gt;</code></pre>
+##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x15c26448&gt;</code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -712,7 +712,7 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 ## instead.
 ## target x
 ## target y</code></pre>
-<p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your workflow plan. These columns override the analogous arguments to <code>make()</code>.</p>
+<p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 debug_plan<span class="op">$</span>timeout &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
 debug_plan<span class="op">$</span>retries &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>
