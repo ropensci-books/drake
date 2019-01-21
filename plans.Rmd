@@ -144,7 +144,145 @@ library(remotes)
 install_github("ropensci/drake")
 ```version 7.0.0 reaches
 
-### Transformations: a high level
+### Transformations: a high level overview
+
+Ordinarily, `drake_plan()` requires you to write out all the targets one-by-one. This is a literal pain.
+
+```{r fulldrakeplanlongstats, eval = FALSE}
+drake_plan(
+  data = get_data(),
+  analysis_1_1 = fit_model_x(data, mean = 1, sd = 1),
+  analysis_2_1 = fit_model_x(data, mean = 2, sd = 1),
+  analysis_5_1 = fit_model_x(data, mean = 5, sd = 1),
+  analysis_10_1 = fit_model_x(data, mean = 10, sd = 1),
+  analysis_100_1 = fit_model_x(data, mean = 100, sd = 1),
+  analysis_1000_1 = fit_model_x(data, mean = 1000, sd = 1),
+  analysis_1_2 = fit_model_x(data, mean = 1, sd = 2),
+  analysis_2_2 = fit_model_x(data, mean = 2, sd = 2),
+  analysis_5_2 = fit_model_x(data, mean = 5, sd = 2),
+  analysis_10_2 = fit_model_x(data, mean = 10, sd = 2),
+  analysis_100_2 = fit_model_x(data, mean = 100, sd = 2),
+  analysis_1000_2 = fit_model_x(data, mean = 1000, sd = 2),
+  # UUUGGGHH my wrists are cramping! :( ...
+)
+```
+
+Instead, use a transformation.
+
+```{r draketrans1}
+lots_of_sds <- as.numeric(1:1e3)
+
+drake_plan(
+  data = get_data(),
+  analysis = target(
+    fun(data, mean = mean_val, sd = sd_val),
+    transform = cross(mean_val = c(2, 5, 10, 100, 1000), sd_val = !!lots_of_sds)
+  )
+)
+```
+
+Behind the scenes, `drake_plan()` creates new columns as the transformation is happening. You can see those columns with `trace = TRUE`.
+
+```{r draketrans2}
+drake_plan(
+  data = get_data(),
+  analysis = target(
+    analyze(data, mean, sd),
+    transform = map(mean = c(3, 4), sd = c(1, 2))
+  ),
+  trace = TRUE
+)
+```
+
+Those columns let you to chain transformations together to create complex pipelines.
+
+```{r draketrans2}
+plan <- drake_plan(
+  small = get_small_data(),
+  large = get_large_data(),
+  analysis = target( # Analyze each dataset once with a different mean.
+    analyze(data, mean),
+    transform = map(data = c(small, large), mean = c(1, 2))
+  ),
+  # Calculate 2 different performance metrics on every model fit.
+  metric = target(
+    metric_fun(analysis),
+    # mse = mean squared error, mae = mean absolute error.
+    # Assume these are functions you write.
+    transform = cross(metric_fun = c(mse, mae), analysis)
+  ),
+  # Summarize the performance metrics for each dataset.
+  summ_data = target(summary(metric), transform = reduce(data)),
+  # Same, but for each metric type.
+  summ_metric = target(summary(metric), transform = reduce(metric_fun))
+)
+
+plan
+
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+### Types of transformations
+
+`drake` supports three types of transformations: `map()`, `cross()`, and `reduce()`. They are not actual functions in `drake`, but you can treat them as functions when you pass them to `transform`. Each transformation is modeled after a function from the [Tidyverse](https://www.tidyverse.org/).
+
+| `drake`    | Tidyverse                  |
+|------------|----------------------------|
+| `map()`    | `pmap()` from `purrr`      |
+| `cross()`  | `crossing()` from `tidyr`  |
+| `reduce()` | `summarize()` from `dplyr` |
+
+#### `map()`
+
+`map()` creates a new target for each row in a grid. The grid comes from column-binding the arguments, so the lengths need to be conformal just like with `data.frame()`.
+
+```{r drakemap1}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2, 3), ncol = c(4, 5, 6))
+  )
+)
+```
+
+```{r drakemap2}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2, 3), ncol = 4)
+  )
+)
+```
+
+```{r drakemaperr, error = TRUE}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2, 3), ncol = c(4, 5))
+  )
+)
+```
+
+#### `cross()`
+
+`cross()` creates a new target for each combination of argument values.
+
+```{r drakemap2}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = cross(nrow = c(1, 2, 3), ncol = c(4, 5))
+  )
+)
+```
+
+
+
+
+
+
+
 
 Transformations let you generate targets from templates. The general syntax is
 
