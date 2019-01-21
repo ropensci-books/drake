@@ -208,8 +208,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="6.4" data-path="plans.html"><a href="plans.html#special-custom-columns-in-your-plan."><i class="fa fa-check"></i><b>6.4</b> Special custom columns in your plan.</a></li>
 <li class="chapter" data-level="6.5" data-path="plans.html"><a href="plans.html#create-large-plans-the-easy-way"><i class="fa fa-check"></i><b>6.5</b> Create large plans the <em>easy</em> way</a><ul>
-<li class="chapter" data-level="6.5.1" data-path="plans.html"><a href="plans.html#transformations-a-high-level"><i class="fa fa-check"></i><b>6.5.1</b> Transformations: a high level</a></li>
-<li class="chapter" data-level="6.5.2" data-path="plans.html"><a href="plans.html#transformations-minimize-typing"><i class="fa fa-check"></i><b>6.5.2</b> Transformations minimize typing</a></li>
+<li class="chapter" data-level="6.5.1" data-path="plans.html"><a href="plans.html#transformations-a-high-level-overview"><i class="fa fa-check"></i><b>6.5.1</b> Transformations: a high level overview</a></li>
+<li class="chapter" data-level="6.5.2" data-path="plans.html"><a href="plans.html#the-types-of-transformations"><i class="fa fa-check"></i><b>6.5.2</b> The types of transformations</a></li>
+<li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#grouping-variables"><i class="fa fa-check"></i><b>6.5.3</b> Grouping variables</a></li>
+<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#tags"><i class="fa fa-check"></i><b>6.5.4</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#create-large-plans-the-old-way"><i class="fa fa-check"></i><b>6.6</b> Create large plans the <em>old</em> way</a><ul>
 <li class="chapter" data-level="6.6.1" data-path="plans.html"><a href="plans.html#map_plan"><i class="fa fa-check"></i><b>6.6.1</b> <code>map_plan()</code></a></li>
@@ -508,27 +510,10 @@ plan
 <h2><span class="header-section-number">6.5</span> Create large plans the <em>easy</em> way</h2>
 <p><code>drake</code> version 7.0.0 will introduce new experimental syntax to make it easer to create plans. To try it out before the next <a href="http://cran.r-project.org">CRAN</a> release, install the <a href="https://github.com/ropensci/drake">current development version</a> from GitHub.</p>
 <p><code>r install.packages(&quot;remotes&quot;) library(remotes) install_github(&quot;ropensci/drake&quot;)</code>version 7.0.0 reaches</p>
-<div id="transformations-a-high-level" class="section level3">
-<h3><span class="header-section-number">6.5.1</span> Transformations: a high level</h3>
-<p>Transformations let you generate targets from templates. The general syntax is</p>
+<div id="transformations-a-high-level-overview" class="section level3">
+<h3><span class="header-section-number">6.5.1</span> Transformations: a high level overview</h3>
+<p>Ordinarily, <code>drake_plan()</code> requires you to write out all the targets one-by-one. This is a literal pain.</p>
 <p>```</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
-  <span class="dt">template_target =</span> <span class="kw">target</span>(
-    your_command,
-    <span class="dt">transform =</span> <span class="kw">supported_transformation</span>(grouping_variables),
-    <span class="dt">group =</span> <span class="kw">c</span>(custom_group_<span class="dv">1</span>, custom_group_<span class="dv">2</span>) <span class="co"># optional</span>
-  )
-)</code></pre>
-<p>The behavior mimics the Tidyverse. Transformations are just like Tidyverse verbs, and grouping variables are like arguments to <code>dplyr::group_by()</code>. Supported transformations:</p>
-<ul>
-<li><strong>map()</strong>: like <code>purrr::pmap()</code>. Creates a new target for each index along your grouping variables. Grouping variables must have conformable lengths just like columns in <code>data.frame()</code>.</li>
-<li><strong>cross()</strong>: like <code>tidyr::crossing()</code>. Creates a new target for each unique combination of levels of the grouping variables.</li>
-<li><strong>reduce()</strong>: like <code>dplyr::summarize()</code>. Targets are aggregated at each combination of levels of the grouping variables.</li>
-</ul>
-</div>
-<div id="transformations-minimize-typing" class="section level3">
-<h3><span class="header-section-number">6.5.2</span> Transformations minimize typing</h3>
-<p>It can get tiring to write out every single target by hand.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
   <span class="dt">analysis_1_1 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">1</span>),
@@ -543,240 +528,398 @@ plan
   <span class="dt">analysis_10_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">10</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
   <span class="dt">analysis_100_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
   <span class="dt">analysis_1000_2 =</span> <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> <span class="dv">1000</span>, <span class="dt">sd =</span> <span class="dv">2</span>),
-  <span class="co"># uuuuugh my wrists are cramping :( ...</span>
+  <span class="co"># UUUGGGHH my wrists are cramping! :( ...</span>
 )</code></pre>
-<p>Save yourself trouble and apply a transformation.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+<p>Transformations reduce typing. As shown below, the tidy evaluation operator <code>!!</code> is particularly helpful.</p>
+<pre class="sourceCode r"><code class="sourceCode r">lots_of_sds &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="dv">1</span><span class="op">:</span><span class="fl">1e3</span>)
+
+<span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
   <span class="dt">analysis =</span> <span class="kw">target</span>(
-    <span class="kw">fit_model_x</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(
-      <span class="dt">mean =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>),
-      <span class="dt">sd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>)
-    )
+    <span class="kw">fun</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">mean_val =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>), <span class="dt">sd_val =</span> <span class="op">!!</span>lots_of_sds)
   )
 )
-## # A tibble: 25 x 2
-##    target          command                                        
-##    &lt;chr&gt;           &lt;chr&gt;                                          
-##  1 data            get_data()                                     
-##  2 analysis_1_1    fit_model_x(data, mean = mean_val, sd = sd_val)
-##  3 analysis_2_1    fit_model_x(data, mean = mean_val, sd = sd_val)
-##  4 analysis_5_1    fit_model_x(data, mean = mean_val, sd = sd_val)
-##  5 analysis_10_1   fit_model_x(data, mean = mean_val, sd = sd_val)
-##  6 analysis_100_1  fit_model_x(data, mean = mean_val, sd = sd_val)
-##  7 analysis_1000_1 fit_model_x(data, mean = mean_val, sd = sd_val)
-##  8 analysis_1_2    fit_model_x(data, mean = mean_val, sd = sd_val)
-##  9 analysis_2_2    fit_model_x(data, mean = mean_val, sd = sd_val)
-## 10 analysis_5_2    fit_model_x(data, mean = mean_val, sd = sd_val)
-## # … with 15 more rows</code></pre>
-<p>Use <code>map()</code> to move along the indices of your grouping variables.</p>
+## # A tibble: 5,001 x 2
+##    target          command                       
+##    &lt;chr&gt;           &lt;chr&gt;                         
+##  1 data            get_data()                    
+##  2 analysis_2_1    fun(data, mean = 2, sd = 1)   
+##  3 analysis_5_1    fun(data, mean = 5, sd = 1)   
+##  4 analysis_10_1   fun(data, mean = 10, sd = 1)  
+##  5 analysis_100_1  fun(data, mean = 100, sd = 1) 
+##  6 analysis_1000_1 fun(data, mean = 1000, sd = 1)
+##  7 analysis_2_2    fun(data, mean = 2, sd = 2)   
+##  8 analysis_5_2    fun(data, mean = 5, sd = 2)   
+##  9 analysis_10_2   fun(data, mean = 10, sd = 2)  
+## 10 analysis_100_2  fun(data, mean = 100, sd = 2) 
+## # … with 4,991 more rows</code></pre>
+<p>Behind the scenes during a transformation, <code>drake_plan()</code> creates new columns to track what is happening. You can see them with <code>trace = TRUE</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
   <span class="dt">analysis =</span> <span class="kw">target</span>(
-    <span class="kw">fit_model</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
-    <span class="dt">transform =</span> <span class="kw">map</span>(
-      <span class="dt">fit_model =</span> <span class="kw">c</span>(fit_model_x, fit_model_y),
-      <span class="dt">mean_val =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
-      <span class="dt">sd_val =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>)
-    )
+    <span class="kw">analyze</span>(data, mean, sd),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">mean =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>), <span class="dt">sd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+  ),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+## # A tibble: 3 x 5
+##   target       command             mean  sd    analysis    
+##   &lt;chr&gt;        &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       
+## 1 data         get_data()          &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;        
+## 2 analysis_3_1 analyze(data, 3, 1) 3     1     analysis_3_1
+## 3 analysis_4_2 analyze(data, 4, 2) 4     2     analysis_4_2</code></pre>
+<p>Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually <strong>does</strong> matter because <code>drake_plan(transform = TRUE)</code> runs the transformations sequentially from top to bottom. However, after the transformations are all done, the <strong>targets</strong> can sit anywhere in the plan for <code>make()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">small =</span> <span class="kw">get_small_data</span>(),
+  <span class="dt">large =</span> <span class="kw">get_large_data</span>(),
+  <span class="dt">analysis =</span> <span class="kw">target</span>( <span class="co"># Analyze each dataset once with a different mean.</span>
+    <span class="kw">analyze</span>(data, mean),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data =</span> <span class="kw">c</span>(small, large), <span class="dt">mean =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+  ),
+  <span class="co"># Calculate 2 different performance metrics on every model fit.</span>
+  <span class="dt">metric =</span> <span class="kw">target</span>(
+    <span class="kw">metric_fun</span>(analysis),
+    <span class="co"># mse = mean squared error, mae = mean absolute error.</span>
+    <span class="co"># Assume these are functions you write.</span>
+    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">metric_fun =</span> <span class="kw">c</span>(mse, mae), analysis)
+  ),
+  <span class="co"># Summarize the performance metrics for each dataset.</span>
+  <span class="dt">summ_data =</span> <span class="kw">target</span>(<span class="kw">summary</span>(metric), <span class="dt">transform =</span> <span class="kw">combine</span>(data)),
+  <span class="co"># Same, but for each metric type.</span>
+  <span class="dt">summ_metric =</span> <span class="kw">target</span>(<span class="kw">summary</span>(metric), <span class="dt">transform =</span> <span class="kw">combine</span>(metric_fun))
+)
+
+plan
+## # A tibble: 12 x 2
+##    target                command                                           
+##    &lt;chr&gt;                 &lt;chr&gt;                                             
+##  1 small                 get_small_data()                                  
+##  2 large                 get_large_data()                                  
+##  3 analysis_small_1      analyze(small, 1)                                 
+##  4 analysis_large_2      analyze(large, 2)                                 
+##  5 metric_mse_analysis_… mse(analysis_large_2)                             
+##  6 metric_mae_analysis_… mae(analysis_large_2)                             
+##  7 metric_mse_analysis_… mse(analysis_small_1)                             
+##  8 metric_mae_analysis_… mae(analysis_small_1)                             
+##  9 summ_data_large       &quot;summary(list(metric_mse_analysis_large_2 = metri…
+## 10 summ_data_small       &quot;summary(list(metric_mse_analysis_small_1 = metri…
+## 11 summ_metric_mae       &quot;summary(list(metric_mae_analysis_large_2 = metri…
+## 12 summ_metric_mse       &quot;summary(list(metric_mse_analysis_large_2 = metri…
+
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-25db82eb3b31272a5d15" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-25db82eb3b31272a5d15">{"x":{"nodes":{"id":["analysis_large_2","analysis_small_1","large","metric_mae_analysis_large_2","metric_mae_analysis_small_1","metric_mse_analysis_large_2","metric_mse_analysis_small_1","small","summ_data_large","summ_data_small","summ_metric_mae","summ_metric_mse"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["analysis_large_2","analysis_small_1","large","metric_mae_analysis_large_2","metric_mae_analysis_small_1","metric_mse_analysis_large_2","metric_mse_analysis_small_1","small","summ_data_large","summ_data_small","summ_metric_mae","summ_metric_mse"],"command":["analyze(large, 2)","analyze(small, 1)","get_large_data()","mae(analysis_large_2)","mae(analysis_small_1)","mse(analysis_large_2)","mse(analysis_small_1)","get_small_data()","summary(list(metric_mse_analysis_large_2 = metric_mse_analysis_large_2, \n    metric_mae_analysis_large_2 = metric_mae_analysis_large_2))","summary(list(metric_mse_analysis_small_1 = metric_mse_analysis_small_1, \n    metric_mae_analysis_small_1 = metric_mae_analysis_small_1))","summary(list(metric_mae_analysis_large_2 = metric_mae_analysis_large_2, \n    metric_mae_analysis_small_1 = metric_mae_analysis_small_1))","summary(list(metric_mse_analysis_large_2 = metric_mse_analysis_large_2, \n    metric_mse_analysis_small_1 = metric_mse_analysis_small_1))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,1,3,3,3,3,1,4,4,4,4],"title":["analyze(large,&nbsp;2)","analyze(small,&nbsp;1)","get_large_data()","mae(analysis_large_2)","mae(analysis_small_1)","mse(analysis_large_2)","mse(analysis_small_1)","get_small_data()","summary(list(metric_mse_analysis_large_2&nbsp;=&nbsp;met...","summary(list(metric_mse_analysis_small_1&nbsp;=&nbsp;met...","summary(list(metric_mae_analysis_large_2&nbsp;=&nbsp;met...","summary(list(metric_mse_analysis_large_2&nbsp;=&nbsp;met..."],"x":[-0.75,0.75,-0.75,-1,0.25,-0.25,1,0.75,-1,1,-0.25,0.25],"y":[-0.333333333333333,-0.333333333333333,-1,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,-1,1,1,1,1]},"edges":{"from":["small","large","analysis_large_2","analysis_large_2","analysis_small_1","analysis_small_1","metric_mae_analysis_large_2","metric_mae_analysis_large_2","metric_mse_analysis_large_2","metric_mse_analysis_large_2","metric_mae_analysis_small_1","metric_mae_analysis_small_1","metric_mse_analysis_small_1","metric_mse_analysis_small_1"],"to":["analysis_small_1","analysis_large_2","metric_mae_analysis_large_2","metric_mse_analysis_large_2","metric_mae_analysis_small_1","metric_mse_analysis_small_1","summ_data_large","summ_metric_mae","summ_data_large","summ_metric_mse","summ_data_small","summ_metric_mae","summ_data_small","summ_metric_mse"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="the-types-of-transformations" class="section level3">
+<h3><span class="header-section-number">6.5.2</span> The types of transformations</h3>
+<p><code>drake</code> supports three types of transformations: <code>map()</code>, <code>cross()</code>, and <code>combine()</code>. They are not actual functions in <code>drake</code>, but you can treat them as functions when you use them. Each transformation takes after a function from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th><code>drake</code></th>
+<th>Tidyverse analogue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>map()</code></td>
+<td><code>pmap()</code> from <code>purrr</code></td>
+</tr>
+<tr class="even">
+<td><code>cross()</code></td>
+<td><code>crossing()</code> from <code>tidyr</code></td>
+</tr>
+<tr class="odd">
+<td><code>combine()</code></td>
+<td><code>summarize()</code> from <code>dplyr</code></td>
+</tr>
+</tbody>
+</table>
+<div id="map" class="section level4">
+<h4><span class="header-section-number">6.5.2.1</span> <code>map()</code></h4>
+<p><code>map()</code> creates a new target for each row in a grid. The grid comes from column-binding the arguments together, which means the lengths need to be conformable just like with <code>data.frame()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="kw">simulate_data</span>(nrow, ncol),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>))
   )
 )
 ## # A tibble: 3 x 2
-##   target                   command                            
-##   &lt;chr&gt;                    &lt;chr&gt;                              
-## 1 data                     get_data()                         
-## 2 analysis_fit_model_x_0_2 fit_model_x(data, mean = 0, sd = 2)
-## 3 analysis_fit_model_y_1_3 fit_model_y(data, mean = 1, sd = 3)</code></pre>
-<p>Use <code>cross()</code> to get a model for each combination of <code>fit_model</code>, <code>mean_val</code> and <code>sd_val</code>.</p>
+##   target command            
+##   &lt;chr&gt;  &lt;chr&gt;              
+## 1 x_1_4  simulate_data(1, 4)
+## 2 x_2_5  simulate_data(2, 5)
+## 3 x_3_6  simulate_data(3, 6)</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">get_data</span>(),
-  <span class="dt">analysis =</span> <span class="kw">target</span>(
-    <span class="kw">fit_model</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(
-      <span class="dt">fit_model =</span> <span class="kw">c</span>(fit_model_x, fit_model_y),
-      <span class="dt">mean_val =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
-      <span class="dt">sd_val =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>)
-    )
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="kw">simulate_data</span>(nrow, ncol),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="dv">4</span>)
   )
 )
-## # A tibble: 9 x 2
-##   target                   command                            
-##   &lt;chr&gt;                    &lt;chr&gt;                              
-## 1 data                     get_data()                         
-## 2 analysis_fit_model_x_0_2 fit_model_x(data, mean = 0, sd = 2)
-## 3 analysis_fit_model_y_0_2 fit_model_y(data, mean = 0, sd = 2)
-## 4 analysis_fit_model_x_1_2 fit_model_x(data, mean = 1, sd = 2)
-## 5 analysis_fit_model_y_1_2 fit_model_y(data, mean = 1, sd = 2)
-## 6 analysis_fit_model_x_0_3 fit_model_x(data, mean = 0, sd = 3)
-## 7 analysis_fit_model_y_0_3 fit_model_y(data, mean = 0, sd = 3)
-## 8 analysis_fit_model_x_1_3 fit_model_x(data, mean = 1, sd = 3)
-## 9 analysis_fit_model_y_1_3 fit_model_y(data, mean = 1, sd = 3)</code></pre>
-<p>You can use multiple transformations. The code below plans multiple datasets and declares multiple analyses for each one.</p>
+## # A tibble: 3 x 2
+##   target command            
+##   &lt;chr&gt;  &lt;chr&gt;              
+## 1 x_1_4  simulate_data(1, 4)
+## 2 x_2_4  simulate_data(2, 4)
+## 3 x_3_4  simulate_data(3, 4)</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">get_data</span>(name),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>))
-  ),
-  <span class="dt">analysis =</span> <span class="kw">target</span>(
-    <span class="kw">fit_model</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(
-      data,
-      <span class="dt">fit_model =</span> <span class="kw">c</span>(fit_model_x, fit_model_y),
-      <span class="dt">mean_val =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
-      <span class="dt">sd_val =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>)
-    )
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="kw">simulate_data</span>(nrow, ncol),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>))
   )
 )
-## # A tibble: 18 x 2
-##    target                            command                               
-##    &lt;chr&gt;                             &lt;chr&gt;                                 
-##  1 data_.A.                          &quot;get_data(\&quot;A\&quot;)&quot;                     
-##  2 data_.B.                          &quot;get_data(\&quot;B\&quot;)&quot;                     
-##  3 analysis_fit_model_x_0_2_data_.A. fit_model_x(data_.A., mean = 0, sd = …
-##  4 analysis_fit_model_y_0_2_data_.A. fit_model_y(data_.A., mean = 0, sd = …
-##  5 analysis_fit_model_x_1_2_data_.A. fit_model_x(data_.A., mean = 1, sd = …
-##  6 analysis_fit_model_y_1_2_data_.A. fit_model_y(data_.A., mean = 1, sd = …
-##  7 analysis_fit_model_x_0_3_data_.A. fit_model_x(data_.A., mean = 0, sd = …
-##  8 analysis_fit_model_y_0_3_data_.A. fit_model_y(data_.A., mean = 0, sd = …
-##  9 analysis_fit_model_x_1_3_data_.A. fit_model_x(data_.A., mean = 1, sd = …
-## 10 analysis_fit_model_y_1_3_data_.A. fit_model_y(data_.A., mean = 1, sd = …
-## 11 analysis_fit_model_x_0_2_data_.B. fit_model_x(data_.B., mean = 0, sd = …
-## 12 analysis_fit_model_y_0_2_data_.B. fit_model_y(data_.B., mean = 0, sd = …
-## 13 analysis_fit_model_x_1_2_data_.B. fit_model_x(data_.B., mean = 1, sd = …
-## 14 analysis_fit_model_y_1_2_data_.B. fit_model_y(data_.B., mean = 1, sd = …
-## 15 analysis_fit_model_x_0_3_data_.B. fit_model_x(data_.B., mean = 0, sd = …
-## 16 analysis_fit_model_y_0_3_data_.B. fit_model_y(data_.B., mean = 0, sd = …
-## 17 analysis_fit_model_x_1_3_data_.B. fit_model_x(data_.B., mean = 1, sd = …
-## 18 analysis_fit_model_y_1_3_data_.B. fit_model_y(data_.B., mean = 1, sd = …</code></pre>
-<p>For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator <code>!!</code> to plug in the values.</p>
-<pre class="sourceCode r"><code class="sourceCode r">data_names &lt;-<span class="st"> </span>LETTERS
-model_functions &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(<span class="kw">c</span>(<span class="st">&quot;fit_model_x&quot;</span>, <span class="st">&quot;fit_model_y&quot;</span>))
-mean_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>
-sd_vals &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>
-
-<span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">get_data</span>(name),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">name =</span> <span class="op">!!</span>data_names)
-  ),
-  <span class="dt">analysis =</span> <span class="kw">target</span>(
-    <span class="kw">fit_model</span>(data, <span class="dt">mean =</span> mean_val, <span class="dt">sd =</span> sd_val),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(
-      data,
-      <span class="dt">fit_model =</span> <span class="op">!!</span>model_functions,
-      <span class="dt">mean_val =</span> <span class="op">!!</span>mean_vals,
-      <span class="dt">sd_val =</span> <span class="op">!!</span>sd_vals
-    )
+## Error: Failed to make a grid of grouping variables for map().
+## Grouping variables in map() must have suitable lengths for coercion to a data frame.
+## Possibly uneven groupings detected in map(nrow = c(1, 2, 3), ncol = c(4, 5)):
+##   c(&quot;1&quot;, &quot;2&quot;, &quot;3&quot;)
+##   c(&quot;4&quot;, &quot;5&quot;)</code></pre>
+</div>
+<div id="cross" class="section level4">
+<h4><span class="header-section-number">6.5.2.2</span> <code>cross()</code></h4>
+<p><code>cross()</code> creates a new target for each combination of argument values.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="kw">simulate_data</span>(nrow, ncol),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>))
   )
 )
-## # A tibble: 234 x 2
-##    target   command          
-##    &lt;chr&gt;    &lt;chr&gt;            
-##  1 data_.A. &quot;get_data(\&quot;A\&quot;)&quot;
-##  2 data_.B. &quot;get_data(\&quot;B\&quot;)&quot;
-##  3 data_.C. &quot;get_data(\&quot;C\&quot;)&quot;
-##  4 data_.D. &quot;get_data(\&quot;D\&quot;)&quot;
-##  5 data_.E. &quot;get_data(\&quot;E\&quot;)&quot;
-##  6 data_.F. &quot;get_data(\&quot;F\&quot;)&quot;
-##  7 data_.G. &quot;get_data(\&quot;G\&quot;)&quot;
-##  8 data_.H. &quot;get_data(\&quot;H\&quot;)&quot;
-##  9 data_.I. &quot;get_data(\&quot;I\&quot;)&quot;
-## 10 data_.J. &quot;get_data(\&quot;J\&quot;)&quot;
-## # … with 224 more rows</code></pre>
-<p>A reduction gathers targets into named lists, which you are free to post-process with <code>do.call()</code> or similar.</p>
+## # A tibble: 6 x 2
+##   target command            
+##   &lt;chr&gt;  &lt;chr&gt;              
+## 1 x_1_4  simulate_data(1, 4)
+## 2 x_2_4  simulate_data(2, 4)
+## 3 x_3_4  simulate_data(3, 4)
+## 4 x_1_5  simulate_data(1, 5)
+## 5 x_2_5  simulate_data(2, 5)
+## 6 x_3_5  simulate_data(3, 5)</code></pre>
+</div>
+<div id="combine" class="section level4">
+<h4><span class="header-section-number">6.5.2.3</span> <code>combine()</code></h4>
+<p><code>combine()</code> aggregates other targets together into named lists, which you can further process with <code>do.call()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
   ),
-  <span class="kw">target</span>(
+  <span class="dt">larger =</span> <span class="kw">target</span>(
     <span class="kw">do.call</span>(rbind, data),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>()
+    <span class="dt">transform =</span> <span class="kw">combine</span>()
   )
 )
 
 plan
 ## # A tibble: 3 x 2
-##   target         command                                                   
-##   &lt;chr&gt;          &lt;chr&gt;                                                     
-## 1 data_1_3       sim_data(mean = 1, sd = 3)                                
-## 2 data_2_4       sim_data(mean = 2, sd = 4)                                
-## 3 drake_target_1 do.call(rbind, list(data_1_3 = data_1_3, data_2_4 = data_…
-
-config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
-<span class="kw">vis_drake_graph</span>(config)</code></pre>
-<div id="htmlwidget-25db82eb3b31272a5d15" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-25db82eb3b31272a5d15">{"x":{"nodes":{"id":["data_1_3","data_2_4","drake_target_1"],"imported":[false,false,false],"label":["data_1_3","data_2_4","drake_target_1"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3 = data_1_3, data_2_4 = data_2_4))"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3&nbsp;=&nbsp;data_1_3,&nbsp;data_..."],"x":[-1,1,0],"y":[-1,-1,1]},"edges":{"from":["data_1_3","data_2_4"],"to":["drake_target_1","drake_target_1"],"arrows":["to","to"],"smooth":[true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>You can configure <code>reduce()</code> to give you a summary for each combination of grouping levels.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
-  ),
-  <span class="kw">target</span>(
-    <span class="kw">do.call</span>(rbind, data),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>(x)
-  )
-)
+##   target   command                                                       
+##   &lt;chr&gt;    &lt;chr&gt;                                                         
+## 1 data_1_3 sim_data(mean = 1, sd = 3)                                    
+## 2 data_2_4 sim_data(mean = 2, sd = 4)                                    
+## 3 larger   do.call(rbind, list(data_1_3 = data_1_3, data_2_4 = data_2_4))
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-dda5858bd620d236e22c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["data_1_3","data_1_4","data_2_3","data_2_4","drake_target_1_1","drake_target_1_2"],"imported":[false,false,false,false,false,false],"label":["data_1_3","data_1_4","data_2_3","data_2_4","drake_target_1_1","drake_target_1_2"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 1, sd = 4)","sim_data(mean = 2, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3 = data_1_3, data_1_4 = data_1_4))","do.call(rbind, list(data_2_3 = data_2_3, data_2_4 = data_2_4))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,2,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3&nbsp;=&nbsp;data_1_3,&nbsp;data_...","do.call(rbind,&nbsp;list(data_2_3&nbsp;=&nbsp;data_2_3,&nbsp;data_..."],"x":[-1,-0.333333333333333,0.333333333333333,1,-0.666666666666667,0.666666666666667],"y":[-1,-1,-1,-1,1,1]},"edges":{"from":["data_1_3","data_2_3","data_1_4","data_2_4"],"to":["drake_target_1_1","drake_target_1_2","drake_target_1_1","drake_target_1_2"],"arrows":["to","to","to","to"],"smooth":[true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>Groupings for <code>reduce()</code> propagate downstream. Click and drag the nodes in the graph to see the results of the transformations.</p>
+<script type="application/json" data-for="htmlwidget-dda5858bd620d236e22c">{"x":{"nodes":{"id":["data_1_3","data_2_4","larger"],"imported":[false,false,false],"label":["data_1_3","data_2_4","larger"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3 = data_1_3, data_2_4 = data_2_4))"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3&nbsp;=&nbsp;data_1_3,&nbsp;data_..."],"x":[-1,1,0],"y":[-1,-1,1]},"edges":{"from":["data_1_3","data_2_4"],"to":["larger","larger"],"arrows":["to","to"],"smooth":[true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>As with <code>group_by()</code> from <code>dplyr</code>, you can aggregate separately for each combination of levels of the arguments.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">small =</span> <span class="kw">simulate</span>(<span class="dv">48</span>),
-  <span class="dt">large =</span> <span class="kw">simulate</span>(<span class="dv">64</span>),
-  <span class="dt">reg =</span> <span class="kw">target</span>(
-    <span class="kw">reg_fun</span>(data),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">reg_fun =</span> <span class="kw">c</span>(reg1, reg2), <span class="dt">data =</span> <span class="kw">c</span>(small, large))
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y, <span class="dt">skew =</span> z),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>), <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">6</span>))
   ),
-  <span class="dt">summ =</span> <span class="kw">target</span>(
-    <span class="kw">sum_fun</span>(data, reg),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">sum_fun =</span> <span class="kw">c</span>(coef, residuals), reg)
-  ),
-  <span class="dt">winners =</span> <span class="kw">target</span>(
-    <span class="kw">min</span>(summ),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>(data, sum_fun)
-  ),
-  <span class="dt">others =</span> <span class="kw">target</span>(
-    <span class="kw">analyze</span>(<span class="kw">list</span>(<span class="kw">c</span>(summ), <span class="kw">c</span>(data))),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>(data, sum_fun)
-  ),
-  <span class="dt">final_winner =</span> <span class="kw">target</span>(
-    <span class="kw">min</span>(winners),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>()
+  <span class="kw">target</span>(
+    <span class="kw">do.call</span>(rbind, data),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(x, y)
   )
 )
+
+plan
+## # A tibble: 12 x 2
+##    target           command                                                
+##    &lt;chr&gt;            &lt;chr&gt;                                                  
+##  1 data_1_3_5       sim_data(mean = 1, sd = 3, skew = 5)                   
+##  2 data_2_3_5       sim_data(mean = 2, sd = 3, skew = 5)                   
+##  3 data_1_4_5       sim_data(mean = 1, sd = 4, skew = 5)                   
+##  4 data_2_4_5       sim_data(mean = 2, sd = 4, skew = 5)                   
+##  5 data_1_3_6       sim_data(mean = 1, sd = 3, skew = 6)                   
+##  6 data_2_3_6       sim_data(mean = 2, sd = 3, skew = 6)                   
+##  7 data_1_4_6       sim_data(mean = 1, sd = 4, skew = 6)                   
+##  8 data_2_4_6       sim_data(mean = 2, sd = 4, skew = 6)                   
+##  9 drake_target_1_… do.call(rbind, list(data_1_3_5 = data_1_3_5, data_1_3_…
+## 10 drake_target_1_… do.call(rbind, list(data_2_3_5 = data_2_3_5, data_2_3_…
+## 11 drake_target_1_… do.call(rbind, list(data_1_4_5 = data_1_4_5, data_1_4_…
+## 12 drake_target_1_… do.call(rbind, list(data_2_4_5 = data_2_4_5, data_2_4_…
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-e9f90e3194077d960e00" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e9f90e3194077d960e00">{"x":{"nodes":{"id":["final_winner","large","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","others_large_coef","others_large_residuals","others_small_coef","others_small_residuals","random_rows","reg_reg1_large","reg_reg1_small","reg_reg2_large","reg_reg2_small","reg1","reg2","simulate","small","summ_coef_reg_reg1_large","summ_coef_reg_reg1_small","summ_coef_reg_reg2_large","summ_coef_reg_reg2_small","summ_residuals_reg_reg1_large","summ_residuals_reg_reg1_small","summ_residuals_reg_reg2_large","summ_residuals_reg_reg2_small","winners_large_coef","winners_large_residuals","winners_small_coef","winners_small_residuals","x3"],"imported":[false,false,true,false,false,false,false,true,false,false,false,false,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,true],"label":["final_winner","large","datasets::mtcars","others_large_coef","others_large_residuals","others_small_coef","others_small_residuals","random_rows","reg_reg1_large","reg_reg1_small","reg_reg2_large","reg_reg2_small","reg1","reg2","simulate","small","summ_coef_reg_reg1_large","summ_coef_reg_reg1_small","summ_coef_reg_reg2_large","summ_coef_reg_reg2_small","summ_residuals_reg_reg1_large","summ_residuals_reg_reg1_small","summ_residuals_reg_reg2_large","summ_residuals_reg_reg2_small","winners_large_coef","winners_large_residuals","winners_small_coef","winners_small_residuals","x3"],"command":["min(list(winners_large_coef = winners_large_coef, winners_small_coef = winners_small_coef, \n    winners_large_residuals = winners_large_residuals, winners_small_residuals = winners_small_residuals))","simulate(64)",null,"analyze(list(c(list(summ_coef_reg_reg1_large = summ_coef_reg_reg1_large, \n    summ_coef_reg_reg2_large = summ_coef_reg_reg2_large)), c(list(\n    large = large))))","analyze(list(c(list(summ_residuals_reg_reg1_large = summ_residuals_reg_reg1_large, \n    summ_residuals_reg_reg2_large = summ_residuals_reg_reg2_large)), \n    c(list(large = large))))","analyze(list(c(list(summ_coef_reg_reg1_small = summ_coef_reg_reg1_small, \n    summ_coef_reg_reg2_small = summ_coef_reg_reg2_small)), c(list(\n    small = small))))","analyze(list(c(list(summ_residuals_reg_reg1_small = summ_residuals_reg_reg1_small, \n    summ_residuals_reg_reg2_small = summ_residuals_reg_reg2_small)), \n    c(list(small = small))))",null,"reg1(large)","reg1(small)","reg2(large)","reg2(small)",null,null,null,"simulate(48)","coef(large, reg_reg1_large)","coef(small, reg_reg1_small)","coef(large, reg_reg2_large)","coef(small, reg_reg2_small)","residuals(large, reg_reg1_large)","residuals(small, reg_reg1_small)","residuals(large, reg_reg2_large)","residuals(small, reg_reg2_small)","min(list(summ_coef_reg_reg1_large = summ_coef_reg_reg1_large, \n    summ_coef_reg_reg2_large = summ_coef_reg_reg2_large))","min(list(summ_residuals_reg_reg1_large = summ_residuals_reg_reg1_large, \n    summ_residuals_reg_reg2_large = summ_residuals_reg_reg2_large))","min(list(summ_coef_reg_reg1_small = summ_coef_reg_reg1_small, \n    summ_coef_reg_reg2_small = summ_coef_reg_reg2_small))","min(list(summ_residuals_reg_reg1_small = summ_residuals_reg_reg1_small, \n    summ_residuals_reg_reg2_small = summ_residuals_reg_reg2_small))",null],"status":["outdated","outdated","imported","outdated","outdated","outdated","outdated","imported","outdated","outdated","outdated","outdated","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","imported"],"type":["object","object","object","object","object","object","object","function","object","object","object","object","function","function","function","object","object","object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#1874CD","#000000","#000000","#000000","#000000","#1874CD","#000000","#000000","#000000","#000000","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#1874CD"],"shape":["dot","dot","dot","dot","dot","dot","dot","triangle","dot","dot","dot","dot","triangle","triangle","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[7,3,1,6,6,6,6,1,4,4,4,4,1,2,2,3,5,5,5,5,5,5,5,5,6,6,6,6,1],"title":["min(list(winners_large_coef&nbsp;=&nbsp;winners_large_co...","simulate(64)","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","analyze(list(c(list(summ_coef_reg_reg1_large&nbsp;=...","analyze(list(c(list(summ_residuals_reg_reg1_la...","analyze(list(c(list(summ_coef_reg_reg1_small&nbsp;=...","analyze(list(c(list(summ_residuals_reg_reg1_sm...","function&nbsp;(data,&nbsp;n)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;<-&nbsp;n&nbsp;+&nbsp;1<br>&nbsp;&nbsp;&nbsp;&nbsp;data[sample.int(n&nbsp;=&nbsp;nrow(data),&nbsp;size&nbsp;=&nbsp;n,&nbsp;...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>}","reg1(large)","reg1(small)","reg2(large)","reg2(small)","function&nbsp;(d)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;lm(y&nbsp;~&nbsp;+x,&nbsp;data&nbsp;=&nbsp;d)<br>}","function&nbsp;(d)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;d$x3&nbsp;<-&nbsp;d$x^3<br>&nbsp;&nbsp;&nbsp;&nbsp;lm(y&nbsp;~&nbsp;x3,&nbsp;data&nbsp;=&nbsp;d)<br>}","function&nbsp;(n)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;<-&nbsp;random_rows(data&nbsp;=&nbsp;datasets::mtcar...<br>&nbsp;&nbsp;&nbsp;&nbsp;data.frame(x&nbsp;=&nbsp;data$wt,&nbsp;y&nbsp;=&nbsp;data$mpg)<br>}","simulate(48)","coef(large,&nbsp;reg_reg1_large)","coef(small,&nbsp;reg_reg1_small)","coef(large,&nbsp;reg_reg2_large)","coef(small,&nbsp;reg_reg2_small)","residuals(large,&nbsp;reg_reg1_large)","residuals(small,&nbsp;reg_reg1_small)","residuals(large,&nbsp;reg_reg2_large)","residuals(small,&nbsp;reg_reg2_small)","min(list(summ_coef_reg_reg1_large&nbsp;=&nbsp;summ_coef_...","min(list(summ_residuals_reg_reg1_large&nbsp;=&nbsp;summ_...","min(list(summ_coef_reg_reg1_small&nbsp;=&nbsp;summ_coef_...","min(list(summ_residuals_reg_reg1_small&nbsp;=&nbsp;summ_...","x3"],"x":[-0.84,-0.68,0.2,0.04,0.2,0.36,0.84,1,-0.68,0.92,-0.44,0.44,0.04,-0.12,0.28,0.76,-0.6,1,-1,0.52,-0.44,0.84,-0.28,0.36,-1,-0.76,-0.12,-0.28,-0.68],"y":[1,-0.333333333333333,-1,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1,0,0,0,0,-1,-0.666666666666667,-0.666666666666667,-0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,0.666666666666667,0.666666666666667,0.666666666666667,-1]},"edges":{"from":["x3","random_rows","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","reg1","reg1","simulate","simulate","small","small","small","small","small","small","small","small","reg2","reg2","large","large","large","large","large","large","large","large","reg_reg1_large","reg_reg1_large","reg_reg1_small","reg_reg1_small","reg_reg2_large","reg_reg2_large","reg_reg2_small","reg_reg2_small","summ_coef_reg_reg2_large","summ_coef_reg_reg2_large","summ_coef_reg_reg1_large","summ_coef_reg_reg1_large","summ_coef_reg_reg2_small","summ_coef_reg_reg2_small","summ_coef_reg_reg1_small","summ_coef_reg_reg1_small","summ_residuals_reg_reg2_large","summ_residuals_reg_reg2_large","summ_residuals_reg_reg1_large","summ_residuals_reg_reg1_large","summ_residuals_reg_reg2_small","summ_residuals_reg_reg2_small","summ_residuals_reg_reg1_small","summ_residuals_reg_reg1_small","winners_small_residuals","winners_small_coef","winners_large_coef","winners_large_residuals"],"to":["reg2","simulate","simulate","reg_reg1_large","reg_reg1_small","small","large","reg_reg1_small","reg_reg2_small","summ_coef_reg_reg2_small","summ_coef_reg_reg1_small","summ_residuals_reg_reg2_small","summ_residuals_reg_reg1_small","others_small_coef","others_small_residuals","reg_reg2_large","reg_reg2_small","reg_reg1_large","reg_reg2_large","summ_coef_reg_reg2_large","summ_coef_reg_reg1_large","summ_residuals_reg_reg2_large","summ_residuals_reg_reg1_large","others_large_coef","others_large_residuals","summ_coef_reg_reg1_large","summ_residuals_reg_reg1_large","summ_coef_reg_reg1_small","summ_residuals_reg_reg1_small","summ_coef_reg_reg2_large","summ_residuals_reg_reg2_large","summ_coef_reg_reg2_small","summ_residuals_reg_reg2_small","winners_large_coef","others_large_coef","winners_large_coef","others_large_coef","winners_small_coef","others_small_coef","winners_small_coef","others_small_coef","winners_large_residuals","others_large_residuals","winners_large_residuals","others_large_residuals","winners_small_residuals","others_small_residuals","winners_small_residuals","others_small_residuals","final_winner","final_winner","final_winner","final_winner"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","triangle"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,8]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>You can even define custom post-hoc groupings for further control. Just supply new symbols to <code>group</code>.</p>
+<script type="application/json" data-for="htmlwidget-e9f90e3194077d960e00">{"x":{"nodes":{"id":["data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6","drake_target_1_1_3","drake_target_1_1_4","drake_target_1_2_3","drake_target_1_2_4"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6","drake_target_1_1_3","drake_target_1_1_4","drake_target_1_2_3","drake_target_1_2_4"],"command":["sim_data(mean = 1, sd = 3, skew = 5)","sim_data(mean = 1, sd = 3, skew = 6)","sim_data(mean = 1, sd = 4, skew = 5)","sim_data(mean = 1, sd = 4, skew = 6)","sim_data(mean = 2, sd = 3, skew = 5)","sim_data(mean = 2, sd = 3, skew = 6)","sim_data(mean = 2, sd = 4, skew = 5)","sim_data(mean = 2, sd = 4, skew = 6)","do.call(rbind, list(data_1_3_5 = data_1_3_5, data_1_3_6 = data_1_3_6))","do.call(rbind, list(data_1_4_5 = data_1_4_5, data_1_4_6 = data_1_4_6))","do.call(rbind, list(data_2_3_5 = data_2_3_5, data_2_3_6 = data_2_3_6))","do.call(rbind, list(data_2_4_5 = data_2_4_5, data_2_4_6 = data_2_4_6))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,1,1,1,2,2,2,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)","do.call(rbind,&nbsp;list(data_1_3_5&nbsp;=&nbsp;data_1_3_5,&nbsp;d...","do.call(rbind,&nbsp;list(data_1_4_5&nbsp;=&nbsp;data_1_4_5,&nbsp;d...","do.call(rbind,&nbsp;list(data_2_3_5&nbsp;=&nbsp;data_2_3_5,&nbsp;d...","do.call(rbind,&nbsp;list(data_2_4_5&nbsp;=&nbsp;data_2_4_5,&nbsp;d..."],"x":[-1,-0.714285714285714,-0.428571428571429,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1,-0.857142857142857,-0.285714285714286,0.285714285714286,0.857142857142857],"y":[-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1]},"edges":{"from":["data_1_3_5","data_2_3_5","data_1_4_5","data_2_4_5","data_1_3_6","data_2_3_6","data_1_4_6","data_2_4_6"],"to":["drake_target_1_1_3","drake_target_1_2_3","drake_target_1_1_4","drake_target_1_2_4","drake_target_1_1_3","drake_target_1_2_3","drake_target_1_1_4","drake_target_1_2_4"],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="grouping-variables" class="section level3">
+<h3><span class="header-section-number">6.5.3</span> Grouping variables</h3>
+<p>With the exception of <code>.tag_in</code> and <code>.tag_out</code> (more on that later) a grouping variables is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code>. Grouping variables can be literals or symbols, and grouping symbols can be passed with names or as unnamed arguments.</p>
+<div id="literal-arguments" class="section level4">
+<h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
+<p>When you pass literals, you must use explicit argument names. One does not simply write <code>map(c(1, 2))</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))))
+## # A tibble: 2 x 2
+##   target command
+##   &lt;chr&gt;  &lt;chr&gt;  
+## 1 x_1    sqrt(1)
+## 2 x_2    sqrt(2)</code></pre>
+<p>And if you supply integer sequences the usual way, you may notice some rows are missing.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)))
+## # A tibble: 2 x 2
+##   target command
+##   &lt;chr&gt;  &lt;chr&gt;  
+## 1 x_1    sqrt(1)
+## 2 x_3    sqrt(3)</code></pre>
+<p>Tidy evaluation and <code>as.numeric()</code> make sure all the data points show up.</p>
+<pre class="sourceCode r"><code class="sourceCode r">y_vals &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+<span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>y_vals)))
+## # A tibble: 3 x 2
+##   target command
+##   &lt;chr&gt;  &lt;chr&gt;  
+## 1 x_1    sqrt(1)
+## 2 x_2    sqrt(2)
+## 3 x_3    sqrt(3)</code></pre>
+<p>Character vectors usually work without a hitch.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>))))
+## # A tibble: 2 x 2
+##   target command          
+##   &lt;chr&gt;  &lt;chr&gt;            
+## 1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;
+## 2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">y_vals &lt;-<span class="st"> </span>letters
+<span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>y_vals)))
+## # A tibble: 26 x 2
+##    target command          
+##    &lt;chr&gt;  &lt;chr&gt;            
+##  1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;
+##  2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;
+##  3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;
+##  4 x_.d.  &quot;get_data(\&quot;d\&quot;)&quot;
+##  5 x_.e.  &quot;get_data(\&quot;e\&quot;)&quot;
+##  6 x_.f.  &quot;get_data(\&quot;f\&quot;)&quot;
+##  7 x_.g.  &quot;get_data(\&quot;g\&quot;)&quot;
+##  8 x_.h.  &quot;get_data(\&quot;h\&quot;)&quot;
+##  9 x_.i.  &quot;get_data(\&quot;i\&quot;)&quot;
+## 10 x_.j.  &quot;get_data(\&quot;j\&quot;)&quot;
+## # … with 16 more rows</code></pre>
+</div>
+<div id="named-symbol-arguments" class="section level4">
+<h4><span class="header-section-number">6.5.3.2</span> Named symbol arguments</h4>
+<p>Only valid for the <code>map()</code> and <code>cross()</code> transformations. Symbols passed as named arguments define new groupings of existing targets on the fly. Transformations in subsequent rows can refer back to those groupings using unnamed symbol arguments.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>))),
+  <span class="dt">y =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">1</span>))),
+  <span class="dt">z =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(val), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">val =</span> <span class="kw">c</span>(x, y))),
+  <span class="dt">w =</span> <span class="kw">target</span>(z <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">transform =</span> <span class="kw">map</span>(val))
+)
+## # A tibble: 6 x 2
+##   target command                 
+##   &lt;chr&gt;  &lt;chr&gt;                   
+## 1 x      abs(mean(rnorm(10)))    
+## 2 y      abs(mean(rnorm(100, 1)))
+## 3 z_x    sqrt(x)                 
+## 4 z_y    sqrt(y)                 
+## 5 w_x    z_x + 1                 
+## 6 w_y    z_y + 1</code></pre>
+<p><code>drake_plan(trace = TRUE)</code> gives us a hint as to why. First, <code>val</code> is defined for the <code>z_*</code> targets and the <code>val</code> column is appended the plan. So when <code>drake_plan()</code> moves on to the <code>w_*</code> targets, the <code>z</code> column is already there.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>))),
+  <span class="dt">y =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">1</span>))),
+  <span class="dt">z =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(val), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">val =</span> <span class="kw">c</span>(x, y))),
+  <span class="dt">w =</span> <span class="kw">target</span>(z <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">transform =</span> <span class="kw">map</span>(val)),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+## # A tibble: 6 x 5
+##   target command                  val   z     w    
+##   &lt;chr&gt;  &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
+## 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
+## 3 z_x    sqrt(x)                  x     z_x   &lt;NA&gt; 
+## 4 z_y    sqrt(y)                  y     z_y   &lt;NA&gt; 
+## 5 w_x    z_x + 1                  x     z_x   w_x  
+## 6 w_y    z_y + 1                  y     z_y   w_y</code></pre>
+<p>To generate long symbol lists, use the <code>syms()</code> function from the <code>rlang</code> package. Remember to use the tidy evaluation operator <code>!!</code> inside the transformation.</p>
+<pre class="sourceCode r"><code class="sourceCode r">vals &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(letters)
+<span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>vals)))
+## # A tibble: 26 x 2
+##    target command    
+##    &lt;chr&gt;  &lt;chr&gt;      
+##  1 x_a    get_data(a)
+##  2 x_b    get_data(b)
+##  3 x_c    get_data(c)
+##  4 x_d    get_data(d)
+##  5 x_e    get_data(e)
+##  6 x_f    get_data(f)
+##  7 x_g    get_data(g)
+##  8 x_h    get_data(h)
+##  9 x_i    get_data(i)
+## 10 x_j    get_data(j)
+## # … with 16 more rows</code></pre>
+</div>
+</div>
+<div id="tags" class="section level3">
+<h3><span class="header-section-number">6.5.4</span> Tags</h3>
+<p>Tags are special optional grouping variables that get added to the plan after a transformation is done, and they decrease the typing you need for writing complicated plans. There are two types of tags:</p>
+<ol style="list-style-type: decimal">
+<li>In-tags, which contain the target name you start with, and</li>
+<li>Out-tags, which contain the target names generated by transformations.</li>
+</ol>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    command,
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> from, <span class="dt">.tag_out =</span> <span class="kw">c</span>(to, out))
+  ),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+## # A tibble: 2 x 7
+##   target command y     x     from  to    out  
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 x_1    command 1     x_1   x     x_1   x_1  
+## 2 x_2    command 2     x_2   x     x_2   x_2</code></pre>
+<p>Subsequent transformations can add to existing tags, and more importantly, use tags as grouping variables.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">data_sim =</span> <span class="kw">target</span>(
-    <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>)),
-    <span class="dt">group =</span> <span class="kw">c</span>(data, sim)
+  <span class="dt">prep_work =</span> <span class="kw">do_prep_work</span>(),
+  <span class="dt">local =</span> <span class="kw">target</span>(
+    <span class="kw">get_local_data</span>(n, prep_work),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)
   ),
-  <span class="dt">data_download =</span> <span class="kw">target</span>(
-    <span class="kw">download_data</span>(<span class="dt">url =</span> x),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="st">&quot;http://url_1&quot;</span>, <span class="st">&quot;http://url_2&quot;</span>)),
-    <span class="dt">group =</span> data
+  <span class="dt">online =</span> <span class="kw">target</span>(
+    <span class="kw">get_online_data</span>(n, prep_work, <span class="dt">port =</span> <span class="st">&quot;8080&quot;</span>),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)
   ),
-  <span class="dt">summaries =</span> <span class="kw">target</span>(
-    <span class="kw">compare_datasets</span>(data),
-    <span class="dt">transform =</span> <span class="kw">reduce</span>()
+  <span class="dt">summary =</span> <span class="kw">target</span>(
+    <span class="kw">summarize</span>(data),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(data_source)
+  ),
+  <span class="dt">summ_num =</span> <span class="kw">target</span>(
+    <span class="kw">summarize</span>(data),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(n)
   )
 )
+
+plan
+## # A tibble: 9 x 2
+##   target         command                                                  
+##   &lt;chr&gt;          &lt;chr&gt;                                                    
+## 1 prep_work      do_prep_work()                                           
+## 2 local_1        get_local_data(1, prep_work)                             
+## 3 local_2        get_local_data(2, prep_work)                             
+## 4 online_1       &quot;get_online_data(1, prep_work, port = \&quot;8080\&quot;)&quot;         
+## 5 online_2       &quot;get_online_data(2, prep_work, port = \&quot;8080\&quot;)&quot;         
+## 6 summary_local  summarize(list(local_1 = local_1, local_2 = local_2))    
+## 7 summary_online summarize(list(online_1 = online_1, online_2 = online_2))
+## 8 summ_num_1     summarize(list(local_1 = local_1, online_1 = online_1))  
+## 9 summ_num_2     summarize(list(local_2 = local_2, online_2 = online_2))
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-270cf12dee99691b5d50" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-270cf12dee99691b5d50">{"x":{"nodes":{"id":["data_download_.http...url_1.","data_download_.http...url_2.","data_sim_1_3","data_sim_1_4","data_sim_2_3","data_sim_2_4","summaries"],"imported":[false,false,false,false,false,false,false],"label":["data_download_.http...url_1.","data_download_.http...url_2.","data_sim_1_3","data_sim_1_4","data_sim_2_3","data_sim_2_4","summaries"],"command":["download_data(url = \"http://url_1\")","download_data(url = \"http://url_2\")","sim_data(mean = 1, sd = 3)","sim_data(mean = 1, sd = 4)","sim_data(mean = 2, sd = 3)","sim_data(mean = 2, sd = 4)","compare_datasets(list(data_sim_1_3 = data_sim_1_3, data_sim_2_3 = data_sim_2_3, \n    data_sim_1_4 = data_sim_1_4, data_sim_2_4 = data_sim_2_4, \n    data_download_.http...url_1. = data_download_.http...url_1., \n    data_download_.http...url_2. = data_download_.http...url_2.))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,1,2],"title":["download_data(url&nbsp;=&nbsp;\"http://url_1\")","download_data(url&nbsp;=&nbsp;\"http://url_2\")","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","compare_datasets(list(data_sim_1_3&nbsp;=&nbsp;data_sim_..."],"x":[-1,-0.6,-0.2,0.2,0.6,1,0],"y":[-1,-1,-1,-1,-1,-1,1]},"edges":{"from":["data_sim_1_3","data_sim_2_3","data_sim_1_4","data_sim_2_4","data_download_.http...url_1.","data_download_.http...url_2."],"to":["summaries","summaries","summaries","summaries","summaries","summaries"],"arrows":["to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p><br></p>
+<script type="application/json" data-for="htmlwidget-270cf12dee99691b5d50">{"x":{"nodes":{"id":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"imported":[false,false,false,false,false,false,false,false,false],"label":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"command":["get_local_data(1, prep_work)","get_local_data(2, prep_work)","get_online_data(1, prep_work, port = \"8080\")","get_online_data(2, prep_work, port = \"8080\")","do_prep_work()","summarize(list(local_1 = local_1, online_1 = online_1))","summarize(list(local_2 = local_2, online_2 = online_2))","summarize(list(local_1 = local_1, local_2 = local_2))","summarize(list(online_1 = online_1, online_2 = online_2))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,3,3,3,3],"title":["get_local_data(1,&nbsp;prep_work)","get_local_data(2,&nbsp;prep_work)","get_online_data(1,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","get_online_data(2,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","do_prep_work()","summarize(list(local_1&nbsp;=&nbsp;local_1,&nbsp;online_1&nbsp;=&nbsp;o...","summarize(list(local_2&nbsp;=&nbsp;local_2,&nbsp;online_2&nbsp;=&nbsp;o...","summarize(list(local_1&nbsp;=&nbsp;local_1,&nbsp;local_2&nbsp;=&nbsp;lo...","summarize(list(online_1&nbsp;=&nbsp;online_1,&nbsp;online_2&nbsp;=..."],"x":[-1,-0.25,0.25,1,0,-0.25,0.25,-1,1],"y":[0,0,0,0,-1,1,1,1,1]},"edges":{"from":["prep_work","prep_work","prep_work","prep_work","local_1","local_1","local_2","local_2","online_1","online_1","online_2","online_2"],"to":["local_1","local_2","online_1","online_2","summary_local","summ_num_1","summary_local","summ_num_2","summary_online","summ_num_1","summary_online","summ_num_2"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="create-large-plans-the-old-way" class="section level2">
