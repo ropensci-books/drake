@@ -167,7 +167,7 @@ drake_plan(
 )
 ```
 
-Instead, use a transformation. As below, the tidy evaluation operator `!!` helps generate massive plans.
+Transformations reduce typing. As shown below, the tidy evaluation operator `!!` is particularly helpful.
 
 ```{r draketrans1}
 lots_of_sds <- as.numeric(1:1e3)
@@ -181,7 +181,7 @@ drake_plan(
 )
 ```
 
-Behind the scenes, `drake_plan()` creates new columns as the transformation is happening. You can see those columns with `trace = TRUE`.
+Behind the scenes during a transformation, `drake_plan()` creates new columns to track what is happening. You can see them with `trace = TRUE`.
 
 ```{r draketrans3}
 drake_plan(
@@ -194,7 +194,7 @@ drake_plan(
 )
 ```
 
-Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually **does** matter. `drake_plan(transform = TRUE)` runs the transformations sequentially from top to bottom. However, after the transformations are done, the **targets** can be in any order for `make()`.
+Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually **does** matter because `drake_plan(transform = TRUE)` runs the transformations sequentially from top to bottom. However, after the transformations are all done, the **targets** can sit anywhere in the plan for `make()`.
 
 ```{r draketrans4}
 plan <- drake_plan(
@@ -223,19 +223,19 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-### Types of transformations
+### The types of transformations
 
-`drake` supports three types of transformations: `map()`, `cross()`, and `combine()`. They are not actual functions in `drake`, but you can treat them as functions when you pass them to `transform`. Each transformation is modeled after a function from the [Tidyverse](https://www.tidyverse.org/).
+`drake` supports three types of transformations: `map()`, `cross()`, and `combine()`. They are not actual functions in `drake`, but you can treat them as functions when you use them. Each transformation takes after a function from the [Tidyverse](https://www.tidyverse.org/).
 
-| `drake`    | Tidyverse                  |
-|------------|----------------------------|
-| `map()`    | `pmap()` from `purrr`      |
-| `cross()`  | `crossing()` from `tidyr`  |
-| `combine()` | `summarize()` from `dplyr` |
+| `drake`     | Tidyverse analogue          |
+|-------------|-----------------------------|
+| `map()`     | `pmap()` from `purrr`       |
+| `cross()`   | `crossing()` from `tidyr`   |
+| `combine()` | `summarize()` from `dplyr`  |
 
 #### `map()`
 
-`map()` creates a new target for each row in a grid. The grid comes from column-binding the arguments, so the lengths need to be conformal just like with `data.frame()`.
+`map()` creates a new target for each row in a grid. The grid comes from column-binding the arguments together, which means the lengths need to be conformable just like with `data.frame()`.
 
 ```{r drakemap1}
 drake_plan(
@@ -279,7 +279,7 @@ drake_plan(
 
 #### `combine()`
 
-`combine()` aggregates other targets together into lists, which you can further process with `do.call()`.
+`combine()` aggregates other targets together into named lists, which you can further process with `do.call()`.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -287,7 +287,7 @@ plan <- drake_plan(
     sim_data(mean = x, sd = y),
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
-  target(
+  larger = target(
     do.call(rbind, data),
     transform = combine()
   )
@@ -299,8 +299,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-
-You can aggregate separately for each combination of argument levels.
+As with `group_by()` from `dplyr`, you can aggregate separately for each combination of levels of the arguments.
 
 ```{r transform6}
 plan <- drake_plan(
@@ -322,23 +321,23 @@ vis_drake_graph(config)
 
 ### Grouping variables
 
-With the exception of `.tag_in` and `.tag_out` (more on that later) a grouping variables is an argument to `map()`, `cross()`, or `combine()`. Grouping variables can be literals or symbols, and grouping symbols can be passed as named or unnamed arguments. 
+With the exception of `.tag_in` and `.tag_out` (more on that later) a grouping variables is an argument to `map()`, `cross()`, or `combine()`. Grouping variables can be literals or symbols, and grouping symbols can be passed with names or as unnamed arguments. 
 
 #### Literal arguments
 
-It is usually straightforward to supply named literals to transformations. Below, the grouping variable is named in the sense that `y` is given explicitly as an argument to `map()`. One does not simply write `map(c(1, 2))`.
+When you pass literals, you must use explicit argument names. One does not simply write `map(c(1, 2))`.
 
 ```{r namedlittrans}
 drake_plan(x = target(sqrt(y), transform = map(y = c(1, 2))))
 ```
 
-If you try to supply integer sequences, you may notice some rows are missing.
+And if you supply integer sequences the usual way, you may notice some rows are missing.
 
 ```{r namedlittrans2}
 drake_plan(x = target(sqrt(y), transform = map(y = 1:3)))
 ```
 
-Tidy evaluation and `as.numeric()` really help here.
+Tidy evaluation and `as.numeric()` make sure all the data points show up.
 
 ```{r namedlittrans3}
 y_vals <- as.numeric(1:3)
@@ -358,7 +357,7 @@ drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
 
 #### Named symbol arguments
 
-Only valid for the `map()` and `cross()` transformations. Symbols passed as named arguments define new groupings of existing targets on the fly. Transformations in subsequent rows can refer back to those groupings with unnamed symbols.
+Only valid for the `map()` and `cross()` transformations. Symbols passed as named arguments define new groupings of existing targets on the fly. Transformations in subsequent rows can refer back to those groupings using unnamed symbol arguments.
 
 ```{r mapsym}
 drake_plan(
@@ -369,7 +368,7 @@ drake_plan(
 )
 ```
 
-To see why, run `drake_plan()` with `trace = TRUE`.
+`drake_plan(trace = TRUE)` gives us a hint as to why. First, `val` is defined for the `z_*` targets and the `val` column is appended the plan. So when `drake_plan()` moves on to the `w_*` targets, the `z` column is already there.
 
 ```{r mapsym2}
 drake_plan(
@@ -381,7 +380,7 @@ drake_plan(
 )
 ```
 
-To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!`.
+To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
 
 ```{r mapsym3}
 vals <- rlang::syms(letters)
@@ -390,7 +389,7 @@ drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
 
 ### Tags
 
-Tags are special grouping variables you add after the transformation is done, and they decrease the typing you need for writing intricate plans. There are two types of tags:
+Tags are special optional grouping variables that get added to the plan after a transformation is done, and they decrease the typing you need for writing complicated plans. There are two types of tags:
 
 1. In-tags, which contain the target name you start with, and
 2. Out-tags, which contain the target names generated by transformations.
@@ -405,7 +404,7 @@ drake_plan(
 )
 ```
 
-Subsequent transformations can add to existing tags and/or use tags as grouping variables.
+Subsequent transformations can add to existing tags, and more importantly, use tags as grouping variables.
 
 ```{r draketrans2}
 plan <- drake_plan(
