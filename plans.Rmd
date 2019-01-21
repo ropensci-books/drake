@@ -183,7 +183,7 @@ drake_plan(
 
 Behind the scenes, `drake_plan()` creates new columns as the transformation is happening. You can see those columns with `trace = TRUE`.
 
-```{r draketrans2}
+```{r draketrans3}
 drake_plan(
   data = get_data(),
   analysis = target(
@@ -196,7 +196,7 @@ drake_plan(
 
 Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually **does** matter. `drake_plan(transform = TRUE)` runs the transformations sequentially from top to bottom. However, after the transformations are done, the **targets** can be in any order for `make()`.
 
-```{r draketrans2}
+```{r draketrans4}
 plan <- drake_plan(
   small = get_small_data(),
   large = get_large_data(),
@@ -268,7 +268,7 @@ drake_plan(
 
 `cross()` creates a new target for each combination of argument values.
 
-```{r drakemap2}
+```{r drakecross}
 drake_plan(
   x = target(
     simulate_data(nrow, ncol),
@@ -302,7 +302,7 @@ vis_drake_graph(config)
 
 You can aggregate separately for each combination of argument levels.
 
-```{r transform5}
+```{r transform6}
 plan <- drake_plan(
   data = target(
     sim_data(mean = x, sd = y, skew = z),
