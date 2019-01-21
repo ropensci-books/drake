@@ -167,7 +167,7 @@ drake_plan(
 )
 ```
 
-Instead, use a transformation.
+Instead, use a transformation. As below, the tidy evaluation operator `!!` helps generate massive plans.
 
 ```{r draketrans1}
 lots_of_sds <- as.numeric(1:1e3)
@@ -194,7 +194,7 @@ drake_plan(
 )
 ```
 
-Those columns let you to chain transformations together to create complex pipelines.
+Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually **does** matter. `drake_plan(transform = TRUE)` runs the transformations sequentially from top to bottom. However, after the transformations are done, the **targets** can be in any order for `make()`.
 
 ```{r draketrans2}
 plan <- drake_plan(
@@ -212,9 +212,9 @@ plan <- drake_plan(
     transform = cross(metric_fun = c(mse, mae), analysis)
   ),
   # Summarize the performance metrics for each dataset.
-  summ_data = target(summary(metric), transform = reduce(data)),
+  summ_data = target(summary(metric), transform = combine(data)),
   # Same, but for each metric type.
-  summ_metric = target(summary(metric), transform = reduce(metric_fun))
+  summ_metric = target(summary(metric), transform = combine(metric_fun))
 )
 
 plan
@@ -225,13 +225,13 @@ vis_drake_graph(config)
 
 ### Types of transformations
 
-`drake` supports three types of transformations: `map()`, `cross()`, and `reduce()`. They are not actual functions in `drake`, but you can treat them as functions when you pass them to `transform`. Each transformation is modeled after a function from the [Tidyverse](https://www.tidyverse.org/).
+`drake` supports three types of transformations: `map()`, `cross()`, and `combine()`. They are not actual functions in `drake`, but you can treat them as functions when you pass them to `transform`. Each transformation is modeled after a function from the [Tidyverse](https://www.tidyverse.org/).
 
 | `drake`    | Tidyverse                  |
 |------------|----------------------------|
 | `map()`    | `pmap()` from `purrr`      |
 | `cross()`  | `crossing()` from `tidyr`  |
-| `reduce()` | `summarize()` from `dplyr` |
+| `combine()` | `summarize()` from `dplyr` |
 
 #### `map()`
 
@@ -277,146 +277,9 @@ drake_plan(
 )
 ```
 
+#### `combine()`
 
-
-
-
-
-
-
-Transformations let you generate targets from templates. The general syntax is
-
-```{r transformat, eval = FALSE}
-drake_plan(
-  template_target = target(
-    your_command,
-    transform = supported_transformation(grouping_variables),
-    group = c(custom_group_1, custom_group_2) # optional
-  )
-)
-```
-
-The behavior mimics the Tidyverse. Transformations are just like Tidyverse verbs, and grouping variables are like arguments to `dplyr::group_by()`. Supported transformations:
-
-- **map()**: like `purrr::pmap()`. Creates a new target for each index along your grouping variables. Grouping variables must have conformable lengths just like columns in `data.frame()`.
-- **cross()**: like `tidyr::crossing()`. Creates a new target for each unique combination of levels of the grouping variables.
-- **reduce()**: like `dplyr::summarize()`. Targets are aggregated at each combination of levels of the grouping variables.
-
-### Transformations minimize typing
-
-It can get tiring to write out every single target by hand.
-
-```{r fulldrakeplanlongstats, eval = FALSE}
-drake_plan(
-  data = get_data(),
-  analysis_1_1 = fit_model_x(data, mean = 1, sd = 1),
-  analysis_2_1 = fit_model_x(data, mean = 2, sd = 1),
-  analysis_5_1 = fit_model_x(data, mean = 5, sd = 1),
-  analysis_10_1 = fit_model_x(data, mean = 10, sd = 1),
-  analysis_100_1 = fit_model_x(data, mean = 100, sd = 1),
-  analysis_1000_1 = fit_model_x(data, mean = 1000, sd = 1),
-  analysis_1_2 = fit_model_x(data, mean = 1, sd = 2),
-  analysis_2_2 = fit_model_x(data, mean = 2, sd = 2),
-  analysis_5_2 = fit_model_x(data, mean = 5, sd = 2),
-  analysis_10_2 = fit_model_x(data, mean = 10, sd = 2),
-  analysis_100_2 = fit_model_x(data, mean = 100, sd = 2),
-  analysis_1000_2 = fit_model_x(data, mean = 1000, sd = 2),
-  # uuuuugh my wrists are cramping :( ...
-)
-```
-
-Save yourself trouble and apply a transformation.
-
-```{r transform1}
-drake_plan(
-  data = get_data(),
-  analysis = target(
-    fit_model_x(data, mean = mean_val, sd = sd_val),
-    transform = cross(
-      mean = c(1, 2, 5, 10, 100, 1000),
-      sd = c(1, 2, 5, 10)
-    )
-  )
-)
-```
-
-Use `map()` to move along the indices of your grouping variables.
-
-```{r transform1b}
-drake_plan(
-  data = get_data(),
-  analysis = target(
-    fit_model(data, mean = mean_val, sd = sd_val),
-    transform = map(
-      fit_model = c(fit_model_x, fit_model_y),
-      mean_val = c(0, 1),
-      sd_val = c(2, 3)
-    )
-  )
-)
-```
-
-Use `cross()` to get a model for each combination of `fit_model`, `mean_val` and `sd_val`.
-
-```{r transform2}
-drake_plan(
-  data = get_data(),
-  analysis = target(
-    fit_model(data, mean = mean_val, sd = sd_val),
-    transform = cross(
-      fit_model = c(fit_model_x, fit_model_y),
-      mean_val = c(0, 1),
-      sd_val = c(2, 3)
-    )
-  )
-)
-```
-
-You can use multiple transformations. The code below plans multiple datasets and declares multiple analyses for each one.
-
-```{r transform3}
-drake_plan(
-  data = target(
-    get_data(name),
-    transform = map(name = c("A", "B"))
-  ),
-  analysis = target(
-    fit_model(data, mean = mean_val, sd = sd_val),
-    transform = cross(
-      data,
-      fit_model = c(fit_model_x, fit_model_y),
-      mean_val = c(0, 1),
-      sd_val = c(2, 3)
-    )
-  )
-)
-```
-
-For really huge plans, you can define the grouping variables in advance and use the tidy evaluation operator `!!` to plug in the values.
-
-```{r transform4}
-data_names <- LETTERS
-model_functions <- rlang::syms(c("fit_model_x", "fit_model_y"))
-mean_vals <- 1:1000
-sd_vals <- 1:1000
-
-drake_plan(
-  data = target(
-    get_data(name),
-    transform = map(name = !!data_names)
-  ),
-  analysis = target(
-    fit_model(data, mean = mean_val, sd = sd_val),
-    transform = cross(
-      data,
-      fit_model = !!model_functions,
-      mean_val = !!mean_vals,
-      sd_val = !!sd_vals
-    )
-  )
-)
-```
-A reduction gathers targets into named lists, which you are free to post-process with `do.call()` or similar.
+`combine()` aggregates other targets together into lists, which you can further process with `do.call()`.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -426,7 +289,7 @@ plan <- drake_plan(
   ),
   target(
     do.call(rbind, data),
-    transform = reduce()
+    transform = combine()
   )
 )
 
@@ -436,81 +299,101 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-You can configure `reduce()` to give you a summary for each combination of grouping levels.
 
-```{r transform6}
+You can aggregate separately for each combination of argument levels.
+
+```{r transform5}
 plan <- drake_plan(
   data = target(
-    sim_data(mean = x, sd = y),
-    transform = cross(x = c(1, 2), y = c(3, 4))
+    sim_data(mean = x, sd = y, skew = z),
+    transform = cross(x = c(1, 2), y = c(3, 4), z = c(5, 6))
   ),
   target(
     do.call(rbind, data),
-    transform = reduce(x)
+    transform = combine(x, y)
   )
 )
+
+plan
 
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Groupings for `reduce()` propagate downstream. Click and drag the nodes in the graph to see the results of the transformations.
+### Grouping variables
 
-```{r groupings9}
-plan <- drake_plan(
-  small = simulate(48),
-  large = simulate(64),
-  reg = target(
-    reg_fun(data),
-    transform = cross(reg_fun = c(reg1, reg2), data = c(small, large))
-  ),
-  summ = target(
-    sum_fun(data, reg),
-    transform = cross(sum_fun = c(coef, residuals), reg)
-  ),
-  winners = target(
-    min(summ),
-    transform = reduce(data, sum_fun)
-  ),
-  others = target(
-    analyze(list(c(summ), c(data))),
-    transform = reduce(data, sum_fun)
-  ),
-  final_winner = target(
-    min(winners),
-    transform = reduce()
-  )
-)
+With the exception of `.tag_in` and `.tag_out` (more on that later) a grouping variables is an argument to `map()`, `cross()`, or `reduce()`. Grouping variables can be literals or symbols, and grouping symbols can be passed as named or unnamed arguments. 
 
-config <- drake_config(plan)
-vis_drake_graph(config)
+#### Literal arguments
+
+It is usually straightforward to supply named literals to transformations. Below, the grouping variable is named in the sense that `y` is given explicitly as an argument to `map()`. One does not simply write `map(c(1, 2))`.
+
+```{r namedlittrans}
+drake_plan(x = target(sqrt(y), transform = map(y = c(1, 2))))
 ```
 
- You can even define custom post-hoc groupings for further control. Just supply new symbols to `group`.
+If you try to supply integer sequences, you may notice some rows are missing.
 
-```{r groupings8}
-plan <- drake_plan(
-  data_sim = target(
-    sim_data(mean = x, sd = y),
-    transform = cross(x = c(1, 2), y = c(3, 4)),
-    group = c(data, sim)
-  ),
-  data_download = target(
-    download_data(url = x),
-    transform = map(x = c("http://url_1", "http://url_2")),
-    group = data
-  ),
-  summaries = target(
-    compare_datasets(data),
-    transform = reduce()
-  )
-)
-
-config <- drake_config(plan)
-vis_drake_graph(config)
+```{r namedlittrans2}
+drake_plan(x = target(sqrt(y), transform = map(y = 1:3)))
 ```
 
-<br>
+Tidy evaluation and `as.numeric()` really help here.
+
+```{r namedlittrans3}
+y_vals <- as.numeric(1:3)
+drake_plan(x = target(sqrt(y), transform = map(y = !!y_vals)))
+```
+
+Character vectors usually work without a hitch.
+
+```{r namedlittrans4}
+drake_plan(x = target(get_data(y), transform = map(y = c("a", "b"))))
+```
+
+```{r namedlittrans5}
+y_vals <- letters
+drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
+```
+
+#### Named symbol arguments
+
+Only valid for the `map()` and `cross()` transformations. Symbols passed as named arguments define new groupings of existing targets on the fly. Transformations in subsequent rows can refer back to those groupings with unnamed symbols.
+
+```{r mapsym}
+drake_plan(
+  x = abs(mean(rnorm(10))),
+  y = abs(mean(rnorm(100, 1))),
+  z = target(sqrt(val), transform = map(val = c(x, y))),
+  w = target(z + 1, transform = map(val))
+)
+```
+
+To see why, run `drake_plan()` with `trace = TRUE`.
+
+```{r mapsym2}
+drake_plan(
+  x = abs(mean(rnorm(10))),
+  y = abs(mean(rnorm(100, 1))),
+  z = target(sqrt(val), transform = map(val = c(x, y))),
+  w = target(z + 1, transform = map(val)),
+  trace = TRUE
+)
+```
+
+To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!`.
+
+```{r mapsym3}
+vals <- rlang::syms(letters)
+drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
+```
+
+### Tags
+
+
+
+
+
 
 ## Create large plans the *old* way
 
