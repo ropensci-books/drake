@@ -615,7 +615,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 </div>
 <div id="the-types-of-transformations" class="section level3">
 <h3><span class="header-section-number">6.5.2</span> The types of transformations</h3>
-<p><code>drake</code> supports three types of transformations: <code>map()</code>, <code>cross()</code>, and <code>combine()</code>. They are not actual functions in <code>drake</code>, but you can treat them as functions when you use them. Each transformation takes after a function from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
+<p><code>drake</code> supports three types of transformations: <code>map()</code>, <code>cross()</code>, and <code>combine()</code>. These are not actual functions, but you can treat them as functions when you use them. Each transformation takes after a function from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
 <table>
 <thead>
 <tr class="header">
@@ -640,7 +640,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 </table>
 <div id="map" class="section level4">
 <h4><span class="header-section-number">6.5.2.1</span> <code>map()</code></h4>
-<p><code>map()</code> creates a new target for each row in a grid. The grid comes from column-binding the arguments together, which means the lengths need to be conformable just like with <code>data.frame()</code>.</p>
+<p><code>map()</code> creates a new target for each row in a grid. The grid comes from column-binding the arguments together, which means the lengths need to be conformable just as with <code>data.frame()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
     <span class="kw">simulate_data</span>(nrow, ncol),
@@ -698,7 +698,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 </div>
 <div id="combine" class="section level4">
 <h4><span class="header-section-number">6.5.2.3</span> <code>combine()</code></h4>
-<p><code>combine()</code> aggregates other targets together into named lists, which you can further process with <code>do.call()</code>.</p>
+<p><code>combine()</code> aggregates other targets together into lists, which you can further process with <code>do.call()</code> and friends if you choose.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
@@ -803,7 +803,7 @@ plan
 </div>
 <div id="grouping-variables" class="section level3">
 <h3><span class="header-section-number">6.5.3</span> Grouping variables</h3>
-<p>With the exception of <code>.tag_in</code> and <code>.tag_out</code> (more on that later) a grouping variables is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code>. Grouping variables can be literals or symbols, and grouping symbols can be passed with names or as unnamed arguments.</p>
+<p>A grouping variable is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code> that identifies a subcollection of target names. Grouping variables can be either literals or symbols, and those symbols can be passed with names or as unnamed arguments.</p>
 <div id="literal-arguments" class="section level4">
 <h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
 <p>When you pass literals, you must use explicit argument names. One does not simply write <code>map(c(1, 2))</code>.</p>
