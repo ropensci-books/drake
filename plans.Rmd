@@ -319,25 +319,6 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-If you need the aggregated list elements to have names, set `.use_names` to `TRUE`. The default is `FALSE` because names usually make the commands quite long.
-
-```{r transform7combinenamed}
-plan <- drake_plan(
-  data = target(
-    sim_data(mean = x, sd = y, skew = z),
-    transform = cross(x = c(1, 2), y = c(3, 4), z = c(5, 6))
-  ),
-  target(
-    do.call(rbind, data),
-    transform = combine(x, y, .use_names = TRUE)
-  )
-)
-
-plan
-
-drake_plan_source(plan)
-```
-
 
 ### Grouping variables
 
