@@ -638,7 +638,7 @@ evaluate_plan(
 )
 ```
 
-Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a workflow plan with your metrics and let the wildcard templating expand over the available schools.
+Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a `drake` plan with your metrics and let the wildcard templating expand over the available schools.
 
 ```{r schoolswildcards1}
 hard_plan <- drake_plan(
@@ -654,7 +654,7 @@ evaluate_plan(
 )
 ```
 
-But what if some metrics do not make sense? For example, what if `schoolC` is a completely privately-funded school? With no public funds, `check_public_funds(schoolC)` may quit in error if we are not careful. This is where setting up workflow plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.
+But what if some metrics do not make sense? For example, what if `schoolC` is a completely privately-funded school? With no public funds, `check_public_funds(schoolC)` may quit in error if we are not careful. This is where setting up `drake` plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.
 
 ```{r schoolsplanfinal}
 plan_template <- drake_plan(
@@ -778,7 +778,7 @@ See also `reduce_by()` to do reductions on multiple groups of targets based on o
 
 ### Custom metaprogramming
 
-The workflow plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don't even need the `drake_plan()` function.
+The `drake` plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don't even need the `drake_plan()` function.
 
 The following example could more easily be implemented with `map_plan()`, but we use other techniques to demonstrate the versatility of custom metaprogramming. Let's consider a file-based example workflow. Here, our targets execute Linux commands to process input files and create output files.
 
@@ -854,7 +854,7 @@ meta_plan <- tribble(
   print
 ```
 
-Finally, we create our workflow plan without any built-in `drake` functions.
+Finally, we create our `drake` plan without any built-in `drake` functions.
 
 ```{r tidyevalplan3}
 plan <- tibble(

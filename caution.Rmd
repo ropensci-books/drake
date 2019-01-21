@@ -22,7 +22,7 @@ It is common practice to divide the work of a project into multiple R files, but
 
 ### Commands are NOT perfectly flexible.
 
-In your workflow plan data frame (produced by `drake_plan()` and accepted by `make()`), your commands can usually be flexible R expressions.
+In your `drake` plan (produced by `drake_plan()` and accepted by `make()`), your commands can usually be flexible R expressions.
 
 ```{r tidyplancaution11}
 drake_plan(
@@ -31,7 +31,7 @@ drake_plan(
 )
 ```
 
-However, please try to avoid formulas and function definitions in your commands. You may be able to get away with `drake_plan(f = function(x){x + 1})` or `drake_plan(f = y ~ x)` in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let `make()` import them. (Alternatively, use the `envir` argument to `make()` to tightly control which imported functions are available.) Use the `check_plan()` function to help screen and quality-control your workflow plan data frame, use `tracked()` to see the items that are reproducibly tracked, and use `vis_drake_graph()` and `build_drake_graph()` to see the dependency structure of your project.
+However, please try to avoid formulas and function definitions in your commands. You may be able to get away with `drake_plan(f = function(x){x + 1})` or `drake_plan(f = y ~ x)` in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let `make()` import them. (Alternatively, use the `envir` argument to `make()` to tightly control which imported functions are available.) Use the `check_plan()` function to help screen and quality-control your `drake` plan, use `tracked()` to see the items that are reproducibly tracked, and use `vis_drake_graph()` and `build_drake_graph()` to see the dependency structure of your project.
 
 ## Execution
 
@@ -49,7 +49,7 @@ Your workflow may depend on external packages such as
 Running commands in your R console is not always exactly like running them with `make()`. That's because `make()` uses tidy evaluation as implemented in the [`rlang` package](https://github.com/tidyverse/rlang).
 
 ```{r demotidyeval11}
-## This workflow plan uses rlang's quasiquotation operator `!!`.
+## This `drake` plan uses rlang's quasiquotation operator `!!`.
 my_plan <- drake_plan(list = c(
   little_b = "\"b\"",
   letter = "!!little_b"
@@ -78,7 +78,7 @@ drake_plan(
 )
 ```
 
-For instances of `!!` that remain in the workflow plan, `make()` will run these commands in tidy fashion, evaluating the `!!` operator using the environment you provided.
+For instances of `!!` that remain in the `drake` plan, `make()` will run these commands in tidy fashion, evaluating the `!!` operator using the environment you provided.
 
 ### Find and diagnose your errors.
 
@@ -256,7 +256,7 @@ This is unavoidable because `drake` uses static code analysis to detect dependen
 
 ### File outputs in imported functions.
 
-Do not call `file_out()` inside imported functions that you write. Only targets in your workflow plan data frame should have file outputs.
+Do not call `file_out()` inside imported functions that you write. Only targets in your `drake` plan should have file outputs.
 
 ```{r fileimportsfunctions11}
 ## toally_fine() will depend on the imported data.csv file.
@@ -293,7 +293,7 @@ Some R functions use `.Call()` to run compiled code in the backend. The R code i
 
 ### Directories (folders) are not reproducibly tracked.
 
-In your workflow plan, you can use `file_in()`, `file_out()`, and `knitr_in()` to assert that some targets/imports are external files. However, entire directories (i.e. folders) cannot be reproducibly tracked this way. Please see [issue 12](https://github.com/ropensci/drake/issues/12) for a discussion.
+In your `drake` plan, you can use `file_in()`, `file_out()`, and `knitr_in()` to assert that some targets/imports are external files. However, entire directories (i.e. folders) cannot be reproducibly tracked this way. Please see [issue 12](https://github.com/ropensci/drake/issues/12) for a discussion.
 
 ### Packages are not tracked as dependencies.
 

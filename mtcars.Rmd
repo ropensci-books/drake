@@ -1,4 +1,4 @@
-# The mtcars example and workflow plan generation {#mtcars}
+# The mtcars example and `drake` plan generation {#mtcars}
 
 ```{r suppression04, echo = F}
 suppressMessages(suppressWarnings(library(drake)))
@@ -136,9 +136,9 @@ and saved files from your file system.
 list.files()
 ```
 
-## The workflow plan data frame
+## The `drake` plan
 
-Now that your workspace of imports is prepared, we can outline the real work step by step in a workflow plan data frame.
+Now that your workspace of imports is prepared, we can outline the real work step by step in a `drake` plan.
 
 ```{r previewmyplan}
 load_mtcars_example() # Get the code with drake_example("mtcars").
@@ -373,7 +373,7 @@ outdated(config)
 
 **Advanced**: To get a rough idea of why a target is out of date, you can use `dependency_profile()`. It will tell you if any of the following changed since the last `make()`:
 
-- The command in the workflow plan data frame.
+- The command in the `drake` plan.
 - At least one non-file dependency. (For this, the imports have to be up to date and cached, either with `make()`, `make(skip_targets = TRUE)`, `outdated()`, or similar.)
 - At least one input file declared with `file_in()` or `knitr_in()`.
 - At least one output file declared with `file_out()`.
@@ -416,7 +416,7 @@ outdated(config)
 make(my_plan)
 ```
 
-Need to add new work on the fly? Just append rows to the workflow plan. If the rest of your workflow is up to date, only the new work is run.
+Need to add new work on the fly? Just append rows to the `drake` plan. If the rest of your workflow is up to date, only the new work is run.
 
 ```{r newstuff}
 new_simulation <- function(n){

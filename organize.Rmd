@@ -50,7 +50,7 @@ source("my_functions.R")
 get_data <- analyze_data <- summarize_results <- function(){}
 ```
 
-Then, set up your workflow plan data frame.
+Then, set up your `drake` plan.
 
 ```{r storecode1}
 good_plan <- drake_plan(
@@ -85,7 +85,7 @@ Some people are accustomed to dividing their work into R scripts and then callin
 - `analyze_data.R`
 - `summarize_results.R`
 
-If you migrate to `drake`, you may be tempted to set up a workflow plan like this.
+If you migrate to `drake`, you may be tempted to set up a `drake` plan like this.
 
 ```{r badsource}
 bad_plan <- drake_plan(
@@ -116,7 +116,7 @@ lapply(files, file.remove)
 Dangers:
 
 1. In the first `make(bad_plan, jobs = 2)`, `drake` will try to build `my_data` and `my_analysis` at the same time even though `my_data` must finish before `my_analysis` begins.
-2. `drake` is oblivious to `data.csv` since it is not explicitly mentioned in a workflow plan command. So when `data.csv` changes, `make(bad_plan)` will not rebuild `my_data`.
+2. `drake` is oblivious to `data.csv` since it is not explicitly mentioned in a `drake` plan command. So when `data.csv` changes, `make(bad_plan)` will not rebuild `my_data`.
 3. `my_analysis` will not update when `my_data` changes.
 4. The return value of `source()` is formatted counter-intuitively. If `source(file_in("get_data.R"))` is the command for `my_data`, then `my_data` will always be a list with elements `"value"` and `"visible"`. In other words, `source(file_in("get_data.R"))$value` is really what you would want.
 

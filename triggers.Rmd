@@ -29,7 +29,7 @@ When you call `make()`, `drake` tries to skip as many targets as possible. If it
 To figure out whether it can skip a target, `drake` goes through an intricate checklist of **triggers**:
 
 1. The **missing** trigger: Do we lack a return value from a previous `make()`? Maybe you are building the target for the first time or you removed it from the cache with `clean()`.
-2. The **command** trigger: did the command in the workflow plan data frame change nontrivially since the last `make()`? Changes to spacing, formatting, and comments are ignored.
+2. The **command** trigger: did the command in the `drake` plan change nontrivially since the last `make()`? Changes to spacing, formatting, and comments are ignored.
 3. The **depend** trigger: did any non-file dependencies change since the last `make()`? These could be:
     - Other targets.
     - Imported objects.
@@ -64,7 +64,7 @@ plan <- drake_plan(
 make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
 ```
 
-You can also give different targets to different triggers. Triggers in the workflow plan data frame override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if it has never been built before.
+You can also give different targets to different triggers. Triggers in the `drake` plan override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if it has never been built before.
 
 ```{r missingtrigger3}
 plan <- drake_plan(
