@@ -803,7 +803,7 @@ plan
 </div>
 <div id="grouping-variables" class="section level3">
 <h3><span class="header-section-number">6.5.3</span> Grouping variables</h3>
-<p>A grouping variable is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code> that identifies a sub-collection of target names. Grouping variables can be either literals or symbols, and those symbols can be passed with names or as unnamed arguments.</p>
+<p>A grouping variable is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code> that identifies a sub-collection of target names. Grouping variables can be either literals or symbols. Symbols can be scalars or vectors, and you can pass them to transformations with or without argument names.</p>
 <div id="literal-arguments" class="section level4">
 <h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
 <p>When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write <code>map(c(1, 2))</code>.</p>
@@ -829,13 +829,14 @@ plan
 ## 1 x_1    sqrt(1)
 ## 2 x_2    sqrt(2)
 ## 3 x_3    sqrt(3)</code></pre>
-<p>Character vectors usually work without a hitch.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>))))
-## # A tibble: 2 x 2
+<p>Character vectors usually work without a hitch, and quotes are converted into dots to make valid target names.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>))))
+## # A tibble: 3 x 2
 ##   target command          
 ##   &lt;chr&gt;  &lt;chr&gt;            
 ## 1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;
-## 2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;</code></pre>
+## 2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;
+## 3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">y_vals &lt;-<span class="st"> </span>letters
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>y_vals)))
 ## # A tibble: 26 x 2
@@ -855,7 +856,7 @@ plan
 </div>
 <div id="named-symbol-arguments" class="section level4">
 <h4><span class="header-section-number">6.5.3.2</span> Named symbol arguments</h4>
-<p>Symbol vectors passed with explicit argument names define new groupings of existing targets on the fly, and only the <code>map()</code> and <code>cross()</code> transformations can accept them. These new groupings carry over to subsequent transformations in the plan.</p>
+<p>Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the <code>map()</code> and <code>cross()</code> transformations can accept them this ways. These new groupings carry over to subsequent transformations in the plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>))),
   <span class="dt">y =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">1</span>))),
