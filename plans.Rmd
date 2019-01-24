@@ -404,14 +404,14 @@ drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
 
 Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the `map()` and `cross()` transformations can accept them this ways. To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
 
-```{r mapsym3}
+```{r mapsym2}
 vals <- rlang::syms(letters)
 drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
 ```
 
 The new groupings carry over to downstream targets by default, which you can see with `trace = TRUE`. Below, the rows for targets `w_x` and `w_y` have entries in the and `z` column.
 
-```{r mapsym2}
+```{r mapsym3}
 drake_plan(
   x = abs(mean(rnorm(10))),
   y = abs(mean(rnorm(100, 1))),
@@ -423,7 +423,7 @@ drake_plan(
 
 However, this is *incorrect* because `w` does not depend on `z_x` or `z_y`. So for `w`, you should write `map(val = c(x, y))` instead of `map(val)` to tell `drake` to clear the trace. Then, you will see `NA`s in the `z` column for `w_x` and `w_y`, which is right and proper.
 
-```{r mapsym3}
+```{r mapsym4}
 drake_plan(
   x = abs(mean(rnorm(10))),
   y = abs(mean(rnorm(100, 1))),
