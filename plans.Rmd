@@ -194,10 +194,10 @@ drake_plan(
 )
 ```
 
-Those columns let you to chain transformations together to create complex pipelines. Here, the order of the transformations actually **does** matter because `drake_plan(transform = TRUE)` runs the transformations sequentially from top to bottom. However, after the transformations are all done, the **targets** can sit anywhere in the plan for `make()`.
+Because of those columns, you can chain transformations together in complex pipelines.
 
 ```{r draketrans4}
-plan <- drake_plan(
+plan1 <- drake_plan(
   small = get_small_data(),
   large = get_large_data(),
   analysis = target( # Analyze each dataset once with a different mean.
@@ -212,15 +212,56 @@ plan <- drake_plan(
     transform = cross(metric_fun = c(mse, mae), analysis)
   ),
   # Summarize the performance metrics for each dataset.
-  summ_data = target(summary(metric), transform = combine(data)),
+  summ_data = target(
+    summary(metric),
+    transform = combine(metric, .by = data)
+  ),
   # Same, but for each metric type.
-  summ_metric = target(summary(metric), transform = combine(metric_fun))
+  summ_metric = target(
+    summary(metric),
+    transform = combine(metric, .by = metric_fun)
+  )
 )
 
-plan
+plan1
 
-config <- drake_config(plan)
-vis_drake_graph(config)
+config1 <- drake_config(plan1)
+vis_drake_graph(config1)
+```
+
+And you can write the transformations in any order. The following plan is equivalent to `plan1` despite the rearranged rows.
+
+```{r draketrans4b}
+plan2 <- drake_plan(
+  # Calculate 2 different performance metrics on every model fit.
+  summ_metric = target(
+    summary(metric),
+    transform = combine(metric, .by = metric_fun)
+  ),
+  metric = target(
+    metric_fun(analysis),
+    # mse = mean squared error, mae = mean absolute error.
+    # Assume these are functions you write.
+    transform = cross(metric_fun = c(mse, mae), analysis)
+  ),
+  small = get_small_data(),
+  analysis = target( # Analyze each dataset once with a different mean.
+    analyze(data, mean),
+    transform = map(data = c(small, large), mean = c(1, 2))
+  ),
+  # Summarize the performance metrics for each dataset.
+  summ_data = target(
+    summary(metric),
+    transform = combine(metric, .by = data)
+  ),
+  large = get_large_data()
+  # Same, but for each metric type.
+)
+
+plan2
+
+config2 <- drake_config(plan2)
+vis_drake_graph(config2)
 ```
 
 ### The types of transformations
@@ -279,7 +320,7 @@ drake_plan(
 
 #### `combine()`
 
-`combine()` aggregates other targets together into lists, which you can further process with `do.call()` and friends if you choose.
+In `combine()`, you can replace symbols in a command with lists of other targets. You must tell `combine()` which symbols you wish to replace.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -288,8 +329,11 @@ plan <- drake_plan(
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
   larger = target(
+    # Turn the list of data frames into a monolithic data frame.
     do.call(rbind, data),
-    transform = combine()
+    # Replace the symbol `data` with a list of all the targets
+    # declared by map() above.
+    transform = combine(data)
   )
 )
 
@@ -299,7 +343,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-As with `group_by()` from `dplyr`, you can aggregate separately for each combination of levels of the arguments.
+As with `group_by()` from `dplyr`, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional `.by` argument of `combine()`.
 
 ```{r transform6}
 plan <- drake_plan(
@@ -309,7 +353,7 @@ plan <- drake_plan(
   ),
   combined = target(
     do.call(rbind, data),
-    transform = combine(x, y)
+    transform = combine(data, .by = c(x, y))
   )
 )
 
@@ -358,34 +402,35 @@ drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
 
 #### Named symbol arguments
 
-Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the `map()` and `cross()` transformations can accept them this ways. These new groupings carry over to subsequent transformations in the plan.
+Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the `map()` and `cross()` transformations can accept them this ways. To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
 
-```{r mapsym}
-drake_plan(
-  x = abs(mean(rnorm(10))),
-  y = abs(mean(rnorm(100, 1))),
-  z = target(sqrt(val), transform = map(val = c(x, y))),
-  w = target(z + 1, transform = map(val))
-)
+```{r mapsym3}
+vals <- rlang::syms(letters)
+drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
 ```
 
-Again, `trace = TRUE` helps us understand what is happening. First, `val` is defined for the `z_*` targets and the `val` column is appended the plan. Then, when `drake_plan()` moves on to the `w_*` targets, the `z` column is already there.
+The new groupings carry over to downstream targets by default, which you can see with `trace = TRUE`. Below, the rows for targets `w_x` and `w_y` have entries in the and `z` column.
 
 ```{r mapsym2}
 drake_plan(
   x = abs(mean(rnorm(10))),
   y = abs(mean(rnorm(100, 1))),
   z = target(sqrt(val), transform = map(val = c(x, y))),
-  w = target(z + 1, transform = map(val)),
+  w = target(val + 1, transform = map(val)),
   trace = TRUE
 )
 ```
 
-To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
+However, this is *incorrect* because `w` does not depend on `z_x` or `z_y`. So for `w`, you should write `map(val = c(x, y))` instead of `map(val)` to tell `drake` to clear the trace. Then, you will see `NA`s in the `z` column for `w_x` and `w_y`, which is right and proper.
 
 ```{r mapsym3}
-vals <- rlang::syms(letters)
-drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
+drake_plan(
+  x = abs(mean(rnorm(10))),
+  y = abs(mean(rnorm(100, 1))),
+  z = target(sqrt(val), transform = map(val = c(x, y))),
+  w = target(val + 1, transform = map(val = c(x, y))),
+  trace = TRUE
+)
 ```
 
 ### Tags
@@ -420,11 +465,11 @@ plan <- drake_plan(
   ),
   summary = target(
     summarize(data),
-    transform = combine(data_source)
+    transform = combine(data, .by = data_source)
   ),
   summ_num = target(
     summarize(data),
-    transform = combine(n)
+    transform = combine(data, .by = n)
   )
 )
 
