@@ -363,6 +363,39 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
+Sometimes, a list like `list(data_1_3, data_2_4)` is not enough. You may need the values of `x` and `y` that underly `data_1_3` and `data_2_4`. Solution: get the trace and the target names. We define a new plan
+
+```{r transform7}
+plan <- drake_plan(
+  data = target(
+    sim_data(mean = x, sd = y),
+    transform = map(x = c(1, 2), y = c(3, 4))
+  ),
+  larger = target(
+    post_process(data, ignore(plan)),
+    transform = combine(data)
+  ),
+  trace = TRUE
+)
+
+plan
+```
+
+and a new function
+
+```{r transform8, eval = FALSE}
+post_process <- function(data_list, plan_with_trace) {
+  # Get the names of the targets contained in data_list.
+  names(data_list) <- all.vars(match.call()$data_list)
+  
+  # Get the trace of those targets.
+  data_trace <- filter(plan_with_trace, target %in% names(data_list))
+  
+  # Do post-processing with data_list and data_trace.
+}
+```
+
+For more discussion, please see [this thread on GitHub](https://github.com/ropensci/drake/issues/693). Please post a comment there if you have questions.
 
 ### Grouping variables
 
