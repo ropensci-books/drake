@@ -578,11 +578,11 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 )
 
  plan
-## # A tibble: 2 x 3
-##   target command                                                      cores
-##   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;
-## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     4
-## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   target command                                                      cores</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     4</span>
+<span class="co">#&gt; 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</span></code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
 <p>The above <code>make()</code> may fail because <a href="https://github.com/ropensci/drake/issues/664#issuecomment-453163562"><code>make()</code> locks your environment</a> and <a href="https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones"><code>mclapply()</code> tries to add new variables to it</a>. If that happens, try <code>make(plan, lock_envir = FALSE)</code> or other parallel computing functions like <code>parLapply()</code> or <code>furrr::future_map()</code>. See <a href="https://github.com/ropensci/drake/issues/675#issuecomment-454403818">this comment</a> and the ensuing discussion.</p>
 <p>But usually, parallelism <em>among</em> targets happens through a cluster.</p>
@@ -596,11 +596,11 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 <pre class="sourceCode r"><code class="sourceCode r">plan<span class="op">$</span>cores &lt;-<span class="st"> </span><span class="dv">2</span>
 
 plan
-## # A tibble: 2 x 3
-##   target command                                                      cores
-##   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;
-## 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     2
-## 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   target command                                                      cores</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     2</span>
+<span class="co">#&gt; 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</span></code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 </div>
 <div id="hasty-mode" class="section level3">

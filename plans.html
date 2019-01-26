@@ -372,68 +372,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   )
 )
 plan
-## # A tibble: 5 x 2
-##   target   command                                                         
-##   &lt;chr&gt;    &lt;chr&gt;                                                           
-## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                
-## 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    
-## 3 hist     create_plot(data)                                               
-## 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   
-## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</code></pre>
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   target   command                                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                                           </span>
+<span class="co">#&gt; 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                </span>
+<span class="co">#&gt; 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    </span>
+<span class="co">#&gt; 3 hist     create_plot(data)                                               </span>
+<span class="co">#&gt; 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   </span>
+<span class="co">#&gt; 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</span></code></pre>
 <p><code>drake_plan()</code> does not run the workflow, it only creates the plan. To build the actual targets, we need to run <code>make()</code>. Creating the plan is like writing an R script, and running <code>make(your_plan)</code> is like calling <a href="https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source"><code>source(&quot;your_script.R&quot;)</code></a>.</p>
 </div>
 <div id="plans-are-similar-to-r-scripts." class="section level2">
 <h2><span class="header-section-number">6.2</span> Plans are similar to R scripts.</h2>
 <p>Your <code>drake</code> plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions <a href="https://ropensci.github.io/drake/reference/plan_to_code.html"><code>plan_to_code()</code></a> and <a href="https://ropensci.github.io/drake/reference/code_to_plan.html"><code>code_to_plan()</code></a> (with some <a href="https://ropensci.github.io/drake/reference/code_to_plan.html#details">caveats</a>).</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan_to_code</span>(plan, <span class="st">&quot;new_script.R&quot;</span>)
-## Loading required namespace: styler
+<span class="co">#&gt; Loading required namespace: styler</span>
 <span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_script.R&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))
-## data &lt;- raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))
-## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)
-## hist &lt;- create_plot(data)
-## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),
-##   output_file = file_out(&quot;report.html&quot;),
-##   quiet = TRUE
-## )
+<span class="co">#&gt; raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))</span>
+<span class="co">#&gt; data &lt;- raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))</span>
+<span class="co">#&gt; fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)</span>
+<span class="co">#&gt; hist &lt;- create_plot(data)</span>
+<span class="co">#&gt; report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),</span>
+<span class="co">#&gt;   output_file = file_out(&quot;report.html&quot;),</span>
+<span class="co">#&gt;   quiet = TRUE</span>
+<span class="co">#&gt; )</span>
 
 <span class="kw">code_to_plan</span>(<span class="st">&quot;new_script.R&quot;</span>)
-## # A tibble: 5 x 2
-##   target   command                                                         
-##   &lt;chr&gt;    &lt;chr&gt;                                                           
-## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                
-## 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    
-## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   
-## 4 hist     create_plot(data)                                               
-## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</code></pre>
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   target   command                                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                                           </span>
+<span class="co">#&gt; 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                </span>
+<span class="co">#&gt; 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    </span>
+<span class="co">#&gt; 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   </span>
+<span class="co">#&gt; 4 hist     create_plot(data)                                               </span>
+<span class="co">#&gt; 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</span></code></pre>
 <p>And <a href="https://ropensci.github.io/drake/reference/plan_to_notebook.html"><code>plan_to_notebook()</code></a> turns plans into <a href="https://bookdown.org/yihui/rmarkdown/notebook.html">R notebooks</a>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan_to_notebook</span>(plan, <span class="st">&quot;new_notebook.Rmd&quot;</span>)
 <span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-## ---
-## title: &quot;My Notebook&quot;
-## output: html_notebook
-## ---
-## 
-## ```{r my_code}
-## raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))
-## data &lt;- raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))
-## fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)
-## hist &lt;- create_plot(data)
-## report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),
-##   output_file = file_out(&quot;report.html&quot;),
-##   quiet = TRUE
-## )
-## ```
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; title: &quot;My Notebook&quot;</span>
+<span class="co">#&gt; output: html_notebook</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ```{r my_code}</span>
+<span class="co">#&gt; raw_data &lt;- readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))</span>
+<span class="co">#&gt; data &lt;- raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))</span>
+<span class="co">#&gt; fit &lt;- lm(Sepal.Width ~ Petal.Width + Species, data)</span>
+<span class="co">#&gt; hist &lt;- create_plot(data)</span>
+<span class="co">#&gt; report &lt;- rmarkdown::render(knitr_in(&quot;report.Rmd&quot;),</span>
+<span class="co">#&gt;   output_file = file_out(&quot;report.html&quot;),</span>
+<span class="co">#&gt;   quiet = TRUE</span>
+<span class="co">#&gt; )</span>
+<span class="co">#&gt; ```</span>
 
 <span class="kw">code_to_plan</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>)
-## # A tibble: 5 x 2
-##   target   command                                                         
-##   &lt;chr&gt;    &lt;chr&gt;                                                           
-## 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                
-## 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    
-## 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   
-## 4 hist     create_plot(data)                                               
-## 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</code></pre>
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   target   command                                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                                           </span>
+<span class="co">#&gt; 1 raw_data &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                </span>
+<span class="co">#&gt; 2 data     raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))    </span>
+<span class="co">#&gt; 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                   </span>
+<span class="co">#&gt; 4 hist     create_plot(data)                                               </span>
+<span class="co">#&gt; 5 report   &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file…</span></code></pre>
 </div>
 <div id="so-why-do-we-use-plans" class="section level2">
 <h2><span class="header-section-number">6.3</span> So why do we use plans?</h2>
@@ -451,15 +451,15 @@ plan
 }
 
 <span class="kw">deps_code</span>(create_plot)
-## $globals
-## [1] &quot;geom_histogram&quot; &quot;ggplot&quot;         &quot;aes_string&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;geom_histogram&quot; &quot;ggplot&quot;         &quot;aes_string&quot;</span>
 
 <span class="kw">deps_code</span>(<span class="st">&quot;create_plot(datasets::iris)&quot;</span>)
-## $globals
-## [1] &quot;create_plot&quot;
-## 
-## $namespaced
-## [1] &quot;datasets::iris&quot;</code></pre>
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;create_plot&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $namespaced</span>
+<span class="co">#&gt; [1] &quot;datasets::iris&quot;</span></code></pre>
 <p>Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares <code>file</code> before <code>plot</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">small_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">file =</span> <span class="kw">ggsave</span>(<span class="kw">file_out</span>(<span class="st">&quot;plot.png&quot;</span>), plot, <span class="dt">width =</span> <span class="dv">7</span>, <span class="dt">height =</span> <span class="dv">5</span>),
@@ -473,17 +473,17 @@ plan
 <p>So <code>make()</code> builds <code>plot</code> first.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
 <span class="kw">make</span>(small_plan)
-## target plot
-## target file</code></pre>
+<span class="co">#&gt; target plot</span>
+<span class="co">#&gt; target file</span></code></pre>
 </div>
 </div>
 <div id="special-custom-columns-in-your-plan." class="section level2">
 <h2><span class="header-section-number">6.4</span> Special custom columns in your plan.</h2>
 <p>You can add other columns besides the required <code>target</code> and <code>command</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cbind</span>(small_plan, <span class="dt">cpu =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
-##   target                                                   command cpu
-## 1   file ggsave(file_out(&quot;plot.png&quot;), plot, width = 7, height = 5)   1
-## 2   plot                               create_plot(datasets::iris)   2</code></pre>
+<span class="co">#&gt;   target                                                   command cpu</span>
+<span class="co">#&gt; 1   file ggsave(file_out(&quot;plot.png&quot;), plot, width = 7, height = 5)   1</span>
+<span class="co">#&gt; 2   plot                               create_plot(datasets::iris)   2</span></code></pre>
 <p>Within <code>drake_plan()</code>, <code>target()</code> lets you create any custom column except <code>target</code>, <code>command</code>, and <code>transform</code>, the last of which <a href="https://ropenscilabs.github.io/drake-manual/plans.html#create-large-plans-the-easy-way">has a special meaning</a>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">file =</span> <span class="kw">target</span>(
@@ -492,11 +492,11 @@ plan
   ),
   <span class="kw">create_plot</span>(datasets<span class="op">::</span>iris)
 )
-## # A tibble: 2 x 3
-##   target         command                                elapsed
-##   &lt;chr&gt;          &lt;chr&gt;                                    &lt;dbl&gt;
-## 1 file           &quot;ggsave(file_out(\&quot;plot.png\&quot;), plot)&quot;      10
-## 2 drake_target_1 create_plot(datasets::iris)                 NA</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   target         command                                elapsed</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;                                    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 file           &quot;ggsave(file_out(\&quot;plot.png\&quot;), plot)&quot;      10</span>
+<span class="co">#&gt; 2 drake_target_1 create_plot(datasets::iris)                 NA</span></code></pre>
 <p>The following columns have special meanings for <code>make()</code>.</p>
 <ul>
 <li><code>elapsed</code> and <code>cpu</code>: number of seconds to wait for the target to build before timing out (<code>elapsed</code> for elapsed time and <code>cpu</code> for CPU time).</li>
@@ -541,20 +541,20 @@ plan
     <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">mean_val =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>), <span class="dt">sd_val =</span> <span class="op">!!</span>lots_of_sds)
   )
 )
-## # A tibble: 5,001 x 2
-##    target          command                       
-##    &lt;chr&gt;           &lt;chr&gt;                         
-##  1 data            get_data()                    
-##  2 analysis_2_1    fun(data, mean = 2, sd = 1)   
-##  3 analysis_5_1    fun(data, mean = 5, sd = 1)   
-##  4 analysis_10_1   fun(data, mean = 10, sd = 1)  
-##  5 analysis_100_1  fun(data, mean = 100, sd = 1) 
-##  6 analysis_1000_1 fun(data, mean = 1000, sd = 1)
-##  7 analysis_2_2    fun(data, mean = 2, sd = 2)   
-##  8 analysis_5_2    fun(data, mean = 5, sd = 2)   
-##  9 analysis_10_2   fun(data, mean = 10, sd = 2)  
-## 10 analysis_100_2  fun(data, mean = 100, sd = 2) 
-## # … with 4,991 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 5,001 x 2</span>
+<span class="co">#&gt;    target          command                       </span>
+<span class="co">#&gt;    &lt;chr&gt;           &lt;chr&gt;                         </span>
+<span class="co">#&gt;  1 data            get_data()                    </span>
+<span class="co">#&gt;  2 analysis_2_1    fun(data, mean = 2, sd = 1)   </span>
+<span class="co">#&gt;  3 analysis_5_1    fun(data, mean = 5, sd = 1)   </span>
+<span class="co">#&gt;  4 analysis_10_1   fun(data, mean = 10, sd = 1)  </span>
+<span class="co">#&gt;  5 analysis_100_1  fun(data, mean = 100, sd = 1) </span>
+<span class="co">#&gt;  6 analysis_1000_1 fun(data, mean = 1000, sd = 1)</span>
+<span class="co">#&gt;  7 analysis_2_2    fun(data, mean = 2, sd = 2)   </span>
+<span class="co">#&gt;  8 analysis_5_2    fun(data, mean = 5, sd = 2)   </span>
+<span class="co">#&gt;  9 analysis_10_2   fun(data, mean = 10, sd = 2)  </span>
+<span class="co">#&gt; 10 analysis_100_2  fun(data, mean = 100, sd = 2) </span>
+<span class="co">#&gt; # … with 4,991 more rows</span></code></pre>
 <p>Behind the scenes during a transformation, <code>drake_plan()</code> creates new columns to track what is happening. You can see them with <code>trace = TRUE</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">get_data</span>(),
@@ -564,12 +564,12 @@ plan
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
-## # A tibble: 3 x 5
-##   target       command             mean  sd    analysis    
-##   &lt;chr&gt;        &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       
-## 1 data         get_data()          &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;        
-## 2 analysis_3_1 analyze(data, 3, 1) 3     1     analysis_3_1
-## 3 analysis_4_2 analyze(data, 4, 2) 4     2     analysis_4_2</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 5</span>
+<span class="co">#&gt;   target       command             mean  sd    analysis    </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       </span>
+<span class="co">#&gt; 1 data         get_data()          &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;        </span>
+<span class="co">#&gt; 2 analysis_3_1 analyze(data, 3, 1) 3     1     analysis_3_1</span>
+<span class="co">#&gt; 3 analysis_4_2 analyze(data, 4, 2) 4     2     analysis_4_2</span></code></pre>
 <p>Because of those columns, you can chain transformations together in complex pipelines.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan1 &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">small =</span> <span class="kw">get_small_data</span>(),
@@ -598,21 +598,21 @@ plan
 )
 
 plan1
-## # A tibble: 12 x 2
-##    target                command                                           
-##    &lt;chr&gt;                 &lt;chr&gt;                                             
-##  1 small                 get_small_data()                                  
-##  2 large                 get_large_data()                                  
-##  3 analysis_small_1      analyze(small, 1)                                 
-##  4 analysis_large_2      analyze(large, 2)                                 
-##  5 metric_mse_analysis_… mse(analysis_large_2)                             
-##  6 metric_mae_analysis_… mae(analysis_large_2)                             
-##  7 metric_mse_analysis_… mse(analysis_small_1)                             
-##  8 metric_mae_analysis_… mae(analysis_small_1)                             
-##  9 summ_data_large       summary(list(metric_mse_analysis_large_2, metric_…
-## 10 summ_data_small       summary(list(metric_mse_analysis_small_1, metric_…
-## 11 summ_metric_mae       summary(list(metric_mae_analysis_large_2, metric_…
-## 12 summ_metric_mse       summary(list(metric_mse_analysis_large_2, metric_…
+<span class="co">#&gt; # A tibble: 12 x 2</span>
+<span class="co">#&gt;    target                command                                           </span>
+<span class="co">#&gt;    &lt;chr&gt;                 &lt;chr&gt;                                             </span>
+<span class="co">#&gt;  1 small                 get_small_data()                                  </span>
+<span class="co">#&gt;  2 large                 get_large_data()                                  </span>
+<span class="co">#&gt;  3 analysis_small_1      analyze(small, 1)                                 </span>
+<span class="co">#&gt;  4 analysis_large_2      analyze(large, 2)                                 </span>
+<span class="co">#&gt;  5 metric_mse_analysis_… mse(analysis_large_2)                             </span>
+<span class="co">#&gt;  6 metric_mae_analysis_… mae(analysis_large_2)                             </span>
+<span class="co">#&gt;  7 metric_mse_analysis_… mse(analysis_small_1)                             </span>
+<span class="co">#&gt;  8 metric_mae_analysis_… mae(analysis_small_1)                             </span>
+<span class="co">#&gt;  9 summ_data_large       summary(list(metric_mse_analysis_large_2, metric_…</span>
+<span class="co">#&gt; 10 summ_data_small       summary(list(metric_mse_analysis_small_1, metric_…</span>
+<span class="co">#&gt; 11 summ_metric_mae       summary(list(metric_mae_analysis_large_2, metric_…</span>
+<span class="co">#&gt; 12 summ_metric_mse       summary(list(metric_mse_analysis_large_2, metric_…</span>
 
 config1 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan1)
 <span class="kw">vis_drake_graph</span>(config1)</code></pre>
@@ -646,21 +646,21 @@ config1 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan1
 )
 
 plan2
-## # A tibble: 12 x 2
-##    target                command                                           
-##    &lt;chr&gt;                 &lt;chr&gt;                                             
-##  1 summ_metric_mae       summary(list(metric_mae_analysis_large_2, metric_…
-##  2 summ_metric_mse       summary(list(metric_mse_analysis_large_2, metric_…
-##  3 metric_mse_analysis_… mse(analysis_large_2)                             
-##  4 metric_mae_analysis_… mae(analysis_large_2)                             
-##  5 metric_mse_analysis_… mse(analysis_small_1)                             
-##  6 metric_mae_analysis_… mae(analysis_small_1)                             
-##  7 small                 get_small_data()                                  
-##  8 analysis_small_1      analyze(small, 1)                                 
-##  9 analysis_large_2      analyze(large, 2)                                 
-## 10 summ_data_large       summary(list(metric_mse_analysis_large_2, metric_…
-## 11 summ_data_small       summary(list(metric_mse_analysis_small_1, metric_…
-## 12 large                 get_large_data()
+<span class="co">#&gt; # A tibble: 12 x 2</span>
+<span class="co">#&gt;    target                command                                           </span>
+<span class="co">#&gt;    &lt;chr&gt;                 &lt;chr&gt;                                             </span>
+<span class="co">#&gt;  1 summ_metric_mae       summary(list(metric_mae_analysis_large_2, metric_…</span>
+<span class="co">#&gt;  2 summ_metric_mse       summary(list(metric_mse_analysis_large_2, metric_…</span>
+<span class="co">#&gt;  3 metric_mse_analysis_… mse(analysis_large_2)                             </span>
+<span class="co">#&gt;  4 metric_mae_analysis_… mae(analysis_large_2)                             </span>
+<span class="co">#&gt;  5 metric_mse_analysis_… mse(analysis_small_1)                             </span>
+<span class="co">#&gt;  6 metric_mae_analysis_… mae(analysis_small_1)                             </span>
+<span class="co">#&gt;  7 small                 get_small_data()                                  </span>
+<span class="co">#&gt;  8 analysis_small_1      analyze(small, 1)                                 </span>
+<span class="co">#&gt;  9 analysis_large_2      analyze(large, 2)                                 </span>
+<span class="co">#&gt; 10 summ_data_large       summary(list(metric_mse_analysis_large_2, metric_…</span>
+<span class="co">#&gt; 11 summ_data_small       summary(list(metric_mse_analysis_small_1, metric_…</span>
+<span class="co">#&gt; 12 large                 get_large_data()</span>
 
 config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2)
 <span class="kw">vis_drake_graph</span>(config2)</code></pre>
@@ -701,35 +701,35 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>))
   )
 )
-## # A tibble: 3 x 2
-##   target command            
-##   &lt;chr&gt;  &lt;chr&gt;              
-## 1 x_1_4  simulate_data(1, 4)
-## 2 x_2_5  simulate_data(2, 5)
-## 3 x_3_6  simulate_data(3, 6)</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command            </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;              </span>
+<span class="co">#&gt; 1 x_1_4  simulate_data(1, 4)</span>
+<span class="co">#&gt; 2 x_2_5  simulate_data(2, 5)</span>
+<span class="co">#&gt; 3 x_3_6  simulate_data(3, 6)</span></code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
     <span class="kw">simulate_data</span>(nrow, ncol),
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="dv">4</span>)
   )
 )
-## # A tibble: 3 x 2
-##   target command            
-##   &lt;chr&gt;  &lt;chr&gt;              
-## 1 x_1_4  simulate_data(1, 4)
-## 2 x_2_4  simulate_data(2, 4)
-## 3 x_3_4  simulate_data(3, 4)</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command            </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;              </span>
+<span class="co">#&gt; 1 x_1_4  simulate_data(1, 4)</span>
+<span class="co">#&gt; 2 x_2_4  simulate_data(2, 4)</span>
+<span class="co">#&gt; 3 x_3_4  simulate_data(3, 4)</span></code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
     <span class="kw">simulate_data</span>(nrow, ncol),
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>))
   )
 )
-## Error: Failed to make a grid of grouping variables for map().
-## Grouping variables in map() must have suitable lengths for coercion to a data frame.
-## Possibly uneven groupings detected in map(nrow = c(1, 2, 3), ncol = c(4, 5)):
-##   c(&quot;1&quot;, &quot;2&quot;, &quot;3&quot;)
-##   c(&quot;4&quot;, &quot;5&quot;)</code></pre>
+<span class="co">#&gt; Error: Failed to make a grid of grouping variables for map().</span>
+<span class="co">#&gt; Grouping variables in map() must have suitable lengths for coercion to a data frame.</span>
+<span class="co">#&gt; Possibly uneven groupings detected in map(nrow = c(1, 2, 3), ncol = c(4, 5)):</span>
+<span class="co">#&gt;   c(&quot;1&quot;, &quot;2&quot;, &quot;3&quot;)</span>
+<span class="co">#&gt;   c(&quot;4&quot;, &quot;5&quot;)</span></code></pre>
 </div>
 <div id="cross" class="section level4">
 <h4><span class="header-section-number">6.5.2.2</span> <code>cross()</code></h4>
@@ -740,15 +740,15 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
     <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>))
   )
 )
-## # A tibble: 6 x 2
-##   target command            
-##   &lt;chr&gt;  &lt;chr&gt;              
-## 1 x_1_4  simulate_data(1, 4)
-## 2 x_2_4  simulate_data(2, 4)
-## 3 x_3_4  simulate_data(3, 4)
-## 4 x_1_5  simulate_data(1, 5)
-## 5 x_2_5  simulate_data(2, 5)
-## 6 x_3_5  simulate_data(3, 5)</code></pre>
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   target command            </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;              </span>
+<span class="co">#&gt; 1 x_1_4  simulate_data(1, 4)</span>
+<span class="co">#&gt; 2 x_2_4  simulate_data(2, 4)</span>
+<span class="co">#&gt; 3 x_3_4  simulate_data(3, 4)</span>
+<span class="co">#&gt; 4 x_1_5  simulate_data(1, 5)</span>
+<span class="co">#&gt; 5 x_2_5  simulate_data(2, 5)</span>
+<span class="co">#&gt; 6 x_3_5  simulate_data(3, 5)</span></code></pre>
 </div>
 <div id="combine" class="section level4">
 <h4><span class="header-section-number">6.5.2.3</span> <code>combine()</code></h4>
@@ -768,12 +768,12 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
 )
 
 plan
-## # A tibble: 3 x 2
-##   target   command                                 
-##   &lt;chr&gt;    &lt;chr&gt;                                   
-## 1 data_1_3 sim_data(mean = 1, sd = 3)              
-## 2 data_2_4 sim_data(mean = 2, sd = 4)              
-## 3 larger   do.call(rbind, list(data_1_3, data_2_4))
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target   command                                 </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                   </span>
+<span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)              </span>
+<span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)              </span>
+<span class="co">#&gt; 3 larger   do.call(rbind, list(data_1_3, data_2_4))</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
@@ -792,26 +792,57 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 )
 
 plan
-## # A tibble: 12 x 2
-##    target       command                                     
-##    &lt;chr&gt;        &lt;chr&gt;                                       
-##  1 data_1_3_5   sim_data(mean = 1, sd = 3, skew = 5)        
-##  2 data_2_3_5   sim_data(mean = 2, sd = 3, skew = 5)        
-##  3 data_1_4_5   sim_data(mean = 1, sd = 4, skew = 5)        
-##  4 data_2_4_5   sim_data(mean = 2, sd = 4, skew = 5)        
-##  5 data_1_3_6   sim_data(mean = 1, sd = 3, skew = 6)        
-##  6 data_2_3_6   sim_data(mean = 2, sd = 3, skew = 6)        
-##  7 data_1_4_6   sim_data(mean = 1, sd = 4, skew = 6)        
-##  8 data_2_4_6   sim_data(mean = 2, sd = 4, skew = 6)        
-##  9 combined_1_3 do.call(rbind, list(data_1_3_5, data_1_3_6))
-## 10 combined_2_3 do.call(rbind, list(data_2_3_5, data_2_3_6))
-## 11 combined_1_4 do.call(rbind, list(data_1_4_5, data_1_4_6))
-## 12 combined_2_4 do.call(rbind, list(data_2_4_5, data_2_4_6))
+<span class="co">#&gt; # A tibble: 12 x 2</span>
+<span class="co">#&gt;    target       command                                     </span>
+<span class="co">#&gt;    &lt;chr&gt;        &lt;chr&gt;                                       </span>
+<span class="co">#&gt;  1 data_1_3_5   sim_data(mean = 1, sd = 3, skew = 5)        </span>
+<span class="co">#&gt;  2 data_2_3_5   sim_data(mean = 2, sd = 3, skew = 5)        </span>
+<span class="co">#&gt;  3 data_1_4_5   sim_data(mean = 1, sd = 4, skew = 5)        </span>
+<span class="co">#&gt;  4 data_2_4_5   sim_data(mean = 2, sd = 4, skew = 5)        </span>
+<span class="co">#&gt;  5 data_1_3_6   sim_data(mean = 1, sd = 3, skew = 6)        </span>
+<span class="co">#&gt;  6 data_2_3_6   sim_data(mean = 2, sd = 3, skew = 6)        </span>
+<span class="co">#&gt;  7 data_1_4_6   sim_data(mean = 1, sd = 4, skew = 6)        </span>
+<span class="co">#&gt;  8 data_2_4_6   sim_data(mean = 2, sd = 4, skew = 6)        </span>
+<span class="co">#&gt;  9 combined_1_3 do.call(rbind, list(data_1_3_5, data_1_3_6))</span>
+<span class="co">#&gt; 10 combined_2_3 do.call(rbind, list(data_2_3_5, data_2_3_6))</span>
+<span class="co">#&gt; 11 combined_1_4 do.call(rbind, list(data_1_4_5, data_1_4_6))</span>
+<span class="co">#&gt; 12 combined_2_4 do.call(rbind, list(data_2_4_5, data_2_4_6))</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-c76a9266172c8658d3a3" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-c76a9266172c8658d3a3">{"x":{"nodes":{"id":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"command":["do.call(rbind, list(data_1_3_5, data_1_3_6))","do.call(rbind, list(data_1_4_5, data_1_4_6))","do.call(rbind, list(data_2_3_5, data_2_3_6))","do.call(rbind, list(data_2_4_5, data_2_4_6))","sim_data(mean = 1, sd = 3, skew = 5)","sim_data(mean = 1, sd = 3, skew = 6)","sim_data(mean = 1, sd = 4, skew = 5)","sim_data(mean = 1, sd = 4, skew = 6)","sim_data(mean = 2, sd = 3, skew = 5)","sim_data(mean = 2, sd = 3, skew = 6)","sim_data(mean = 2, sd = 4, skew = 5)","sim_data(mean = 2, sd = 4, skew = 6)"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,1,1,1,1,1,1,1],"title":["do.call(rbind,&nbsp;list(data_1_3_5,&nbsp;data_1_3_6))","do.call(rbind,&nbsp;list(data_1_4_5,&nbsp;data_1_4_6))","do.call(rbind,&nbsp;list(data_2_3_5,&nbsp;data_2_3_6))","do.call(rbind,&nbsp;list(data_2_4_5,&nbsp;data_2_4_6))","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)"],"x":[-0.857142857142857,-0.285714285714286,0.285714285714286,0.857142857142857,-1,-0.714285714285714,-0.428571428571429,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1],"y":[1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1]},"edges":{"from":["data_1_3_5","data_2_3_5","data_1_4_5","data_2_4_5","data_1_3_6","data_2_3_6","data_1_4_6","data_2_4_6"],"to":["combined_1_3","combined_2_3","combined_1_4","combined_2_4","combined_1_3","combined_2_3","combined_1_4","combined_2_4"],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>Sometimes, a list like <code>list(data_1_3, data_2_4)</code> is not enough. You may need the values of <code>x</code> and <code>y</code> that underly <code>data_1_3</code> and <code>data_2_4</code>. Solution: get the trace and the target names. We define a new plan</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
+  ),
+  <span class="dt">larger =</span> <span class="kw">target</span>(
+    <span class="kw">post_process</span>(data, <span class="kw">ignore</span>(plan)),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(data)
+  ),
+  <span class="dt">trace =</span> <span class="ot">TRUE</span>
+)
+
+plan
+<span class="co">#&gt; # A tibble: 3 x 6</span>
+<span class="co">#&gt;   target   command                               x     y     data    larger</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                 &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span>
+<span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)            1     3     data_1… &lt;NA&gt;  </span>
+<span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)            2     4     data_2… &lt;NA&gt;  </span>
+<span class="co">#&gt; 3 larger   post_process(list(data_1_3, data_2_4… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;    larger</span></code></pre>
+<p>and a new function</p>
+<pre class="sourceCode r"><code class="sourceCode r">post_process &lt;-<span class="st"> </span><span class="cf">function</span>(data_list, plan_with_trace) {
+  <span class="co"># Get the names of the targets contained in data_list.</span>
+  <span class="kw">names</span>(data_list) &lt;-<span class="st"> </span><span class="kw">all.vars</span>(<span class="kw">match.call</span>()<span class="op">$</span>data_list)
+  
+  <span class="co"># Get the trace of those targets.</span>
+  data_trace &lt;-<span class="st"> </span><span class="kw">filter</span>(plan_with_trace, target <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(data_list))
+  
+  <span class="co"># Do post-processing with data_list and data_trace.</span>
+}</code></pre>
+<p>For more discussion, please see <a href="https://github.com/ropensci/drake/issues/693">this thread on GitHub</a>. Please post a comment there if you have questions.</p>
 </div>
 </div>
 <div id="grouping-variables" class="section level3">
@@ -821,71 +852,71 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
 <p>When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write <code>map(c(1, 2))</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))))
-## # A tibble: 2 x 2
-##   target command
-##   &lt;chr&gt;  &lt;chr&gt;  
-## 1 x_1    sqrt(1)
-## 2 x_2    sqrt(2)</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 x_1    sqrt(1)</span>
+<span class="co">#&gt; 2 x_2    sqrt(2)</span></code></pre>
 <p>And if you supply integer sequences the usual way, you may notice some rows are missing.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)))
-## # A tibble: 2 x 2
-##   target command
-##   &lt;chr&gt;  &lt;chr&gt;  
-## 1 x_1    sqrt(1)
-## 2 x_3    sqrt(3)</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 x_1    sqrt(1)</span>
+<span class="co">#&gt; 2 x_3    sqrt(3)</span></code></pre>
 <p>Tidy evaluation and <code>as.numeric()</code> make sure all the data points show up.</p>
 <pre class="sourceCode r"><code class="sourceCode r">y_vals &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>y_vals)))
-## # A tibble: 3 x 2
-##   target command
-##   &lt;chr&gt;  &lt;chr&gt;  
-## 1 x_1    sqrt(1)
-## 2 x_2    sqrt(2)
-## 3 x_3    sqrt(3)</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 x_1    sqrt(1)</span>
+<span class="co">#&gt; 2 x_2    sqrt(2)</span>
+<span class="co">#&gt; 3 x_3    sqrt(3)</span></code></pre>
 <p>Character vectors usually work without a hitch, and quotes are converted into dots to make valid target names.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>))))
-## # A tibble: 3 x 2
-##   target command          
-##   &lt;chr&gt;  &lt;chr&gt;            
-## 1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;
-## 2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;
-## 3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command          </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;            </span>
+<span class="co">#&gt; 1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;</span>
+<span class="co">#&gt; 2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;</span>
+<span class="co">#&gt; 3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;</span></code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">y_vals &lt;-<span class="st"> </span>letters
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>y_vals)))
-## # A tibble: 26 x 2
-##    target command          
-##    &lt;chr&gt;  &lt;chr&gt;            
-##  1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;
-##  2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;
-##  3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;
-##  4 x_.d.  &quot;get_data(\&quot;d\&quot;)&quot;
-##  5 x_.e.  &quot;get_data(\&quot;e\&quot;)&quot;
-##  6 x_.f.  &quot;get_data(\&quot;f\&quot;)&quot;
-##  7 x_.g.  &quot;get_data(\&quot;g\&quot;)&quot;
-##  8 x_.h.  &quot;get_data(\&quot;h\&quot;)&quot;
-##  9 x_.i.  &quot;get_data(\&quot;i\&quot;)&quot;
-## 10 x_.j.  &quot;get_data(\&quot;j\&quot;)&quot;
-## # … with 16 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 26 x 2</span>
+<span class="co">#&gt;    target command          </span>
+<span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt;            </span>
+<span class="co">#&gt;  1 x_.a.  &quot;get_data(\&quot;a\&quot;)&quot;</span>
+<span class="co">#&gt;  2 x_.b.  &quot;get_data(\&quot;b\&quot;)&quot;</span>
+<span class="co">#&gt;  3 x_.c.  &quot;get_data(\&quot;c\&quot;)&quot;</span>
+<span class="co">#&gt;  4 x_.d.  &quot;get_data(\&quot;d\&quot;)&quot;</span>
+<span class="co">#&gt;  5 x_.e.  &quot;get_data(\&quot;e\&quot;)&quot;</span>
+<span class="co">#&gt;  6 x_.f.  &quot;get_data(\&quot;f\&quot;)&quot;</span>
+<span class="co">#&gt;  7 x_.g.  &quot;get_data(\&quot;g\&quot;)&quot;</span>
+<span class="co">#&gt;  8 x_.h.  &quot;get_data(\&quot;h\&quot;)&quot;</span>
+<span class="co">#&gt;  9 x_.i.  &quot;get_data(\&quot;i\&quot;)&quot;</span>
+<span class="co">#&gt; 10 x_.j.  &quot;get_data(\&quot;j\&quot;)&quot;</span>
+<span class="co">#&gt; # … with 16 more rows</span></code></pre>
 </div>
 <div id="named-symbol-arguments" class="section level4">
 <h4><span class="header-section-number">6.5.3.2</span> Named symbol arguments</h4>
 <p>Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the <code>map()</code> and <code>cross()</code> transformations can accept them this ways. To generate long symbol lists, use the <code>syms()</code> function from the <code>rlang</code> package. Remember to use the tidy evaluation operator <code>!!</code> inside the transformation.</p>
 <pre class="sourceCode r"><code class="sourceCode r">vals &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(letters)
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>vals)))
-## # A tibble: 26 x 2
-##    target command    
-##    &lt;chr&gt;  &lt;chr&gt;      
-##  1 x_a    get_data(a)
-##  2 x_b    get_data(b)
-##  3 x_c    get_data(c)
-##  4 x_d    get_data(d)
-##  5 x_e    get_data(e)
-##  6 x_f    get_data(f)
-##  7 x_g    get_data(g)
-##  8 x_h    get_data(h)
-##  9 x_i    get_data(i)
-## 10 x_j    get_data(j)
-## # … with 16 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 26 x 2</span>
+<span class="co">#&gt;    target command    </span>
+<span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt;      </span>
+<span class="co">#&gt;  1 x_a    get_data(a)</span>
+<span class="co">#&gt;  2 x_b    get_data(b)</span>
+<span class="co">#&gt;  3 x_c    get_data(c)</span>
+<span class="co">#&gt;  4 x_d    get_data(d)</span>
+<span class="co">#&gt;  5 x_e    get_data(e)</span>
+<span class="co">#&gt;  6 x_f    get_data(f)</span>
+<span class="co">#&gt;  7 x_g    get_data(g)</span>
+<span class="co">#&gt;  8 x_h    get_data(h)</span>
+<span class="co">#&gt;  9 x_i    get_data(i)</span>
+<span class="co">#&gt; 10 x_j    get_data(j)</span>
+<span class="co">#&gt; # … with 16 more rows</span></code></pre>
 <p>The new groupings carry over to downstream targets by default, which you can see with <code>trace = TRUE</code>. Below, the rows for targets <code>w_x</code> and <code>w_y</code> have entries in the and <code>z</code> column.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>))),
@@ -894,15 +925,15 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
   <span class="dt">w =</span> <span class="kw">target</span>(val <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">transform =</span> <span class="kw">map</span>(val)),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
-## # A tibble: 6 x 5
-##   target command                  val   z     w    
-##   &lt;chr&gt;  &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
-## 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
-## 3 z_x    sqrt(x)                  x     z_x   &lt;NA&gt; 
-## 4 z_y    sqrt(y)                  y     z_y   &lt;NA&gt; 
-## 5 w_x    x + 1                    x     z_x   w_x  
-## 6 w_y    y + 1                    y     z_y   w_y</code></pre>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   target command                  val   z     w    </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span>
+<span class="co">#&gt; 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
+<span class="co">#&gt; 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
+<span class="co">#&gt; 3 z_x    sqrt(x)                  x     z_x   &lt;NA&gt; </span>
+<span class="co">#&gt; 4 z_y    sqrt(y)                  y     z_y   &lt;NA&gt; </span>
+<span class="co">#&gt; 5 w_x    x + 1                    x     z_x   w_x  </span>
+<span class="co">#&gt; 6 w_y    y + 1                    y     z_y   w_y</span></code></pre>
 <p>However, this is <em>incorrect</em> because <code>w</code> does not depend on <code>z_x</code> or <code>z_y</code>. So for <code>w</code>, you should write <code>map(val = c(x, y))</code> instead of <code>map(val)</code> to tell <code>drake</code> to clear the trace. Then, you will see <code>NA</code>s in the <code>z</code> column for <code>w_x</code> and <code>w_y</code>, which is right and proper.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">abs</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>))),
@@ -911,15 +942,15 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
   <span class="dt">w =</span> <span class="kw">target</span>(val <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">val =</span> <span class="kw">c</span>(x, y))),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
-## # A tibble: 6 x 5
-##   target command                  val   w     z    
-##   &lt;chr&gt;  &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
-## 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; 
-## 3 z_x    sqrt(x)                  x     &lt;NA&gt;  z_x  
-## 4 z_y    sqrt(y)                  y     &lt;NA&gt;  z_y  
-## 5 w_x    x + 1                    x     w_x   &lt;NA&gt; 
-## 6 w_y    y + 1                    y     w_y   &lt;NA&gt;</code></pre>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   target command                  val   w     z    </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span>
+<span class="co">#&gt; 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
+<span class="co">#&gt; 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
+<span class="co">#&gt; 3 z_x    sqrt(x)                  x     &lt;NA&gt;  z_x  </span>
+<span class="co">#&gt; 4 z_y    sqrt(y)                  y     &lt;NA&gt;  z_y  </span>
+<span class="co">#&gt; 5 w_x    x + 1                    x     w_x   &lt;NA&gt; </span>
+<span class="co">#&gt; 6 w_y    y + 1                    y     w_y   &lt;NA&gt;</span></code></pre>
 </div>
 </div>
 <div id="tags" class="section level3">
@@ -936,11 +967,11 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
-## # A tibble: 2 x 7
-##   target command y     x     from  to    out  
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 x_1    command 1     x_1   x     x_1   x_1  
-## 2 x_2    command 2     x_2   x     x_2   x_2</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 7</span>
+<span class="co">#&gt;   target command y     x     from  to    out  </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span>
+<span class="co">#&gt; 1 x_1    command 1     x_1   x     x_1   x_1  </span>
+<span class="co">#&gt; 2 x_2    command 2     x_2   x     x_2   x_2</span></code></pre>
 <p>Subsequent transformations can use tags as grouping variables and add to existing tags.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">prep_work =</span> <span class="kw">do_prep_work</span>(),
@@ -963,18 +994,18 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 )
 
 plan
-## # A tibble: 9 x 2
-##   target         command                                         
-##   &lt;chr&gt;          &lt;chr&gt;                                           
-## 1 prep_work      do_prep_work()                                  
-## 2 local_1        get_local_data(1, prep_work)                    
-## 3 local_2        get_local_data(2, prep_work)                    
-## 4 online_1       &quot;get_online_data(1, prep_work, port = \&quot;8080\&quot;)&quot;
-## 5 online_2       &quot;get_online_data(2, prep_work, port = \&quot;8080\&quot;)&quot;
-## 6 summary_local  summarize(list(local_1, local_2))               
-## 7 summary_online summarize(list(online_1, online_2))             
-## 8 summ_num_1     summarize(list(local_1, online_1))              
-## 9 summ_num_2     summarize(list(local_2, online_2))
+<span class="co">#&gt; # A tibble: 9 x 2</span>
+<span class="co">#&gt;   target         command                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;                                           </span>
+<span class="co">#&gt; 1 prep_work      do_prep_work()                                  </span>
+<span class="co">#&gt; 2 local_1        get_local_data(1, prep_work)                    </span>
+<span class="co">#&gt; 3 local_2        get_local_data(2, prep_work)                    </span>
+<span class="co">#&gt; 4 online_1       &quot;get_online_data(1, prep_work, port = \&quot;8080\&quot;)&quot;</span>
+<span class="co">#&gt; 5 online_2       &quot;get_online_data(2, prep_work, port = \&quot;8080\&quot;)&quot;</span>
+<span class="co">#&gt; 6 summary_local  summarize(list(local_1, local_2))               </span>
+<span class="co">#&gt; 7 summary_online summarize(list(online_1, online_2))             </span>
+<span class="co">#&gt; 8 summ_num_1     summarize(list(local_1, online_1))              </span>
+<span class="co">#&gt; 9 summ_num_2     summarize(list(local_2, online_2))</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
@@ -1017,36 +1048,36 @@ args &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="
 args<span class="op">$</span>data &lt;-<span class="st"> &quot;mtcars&quot;</span>
 
 args
-## # A tibble: 45 x 3
-##    x1    x2    data  
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; 
-##  1 cyl   disp  mtcars
-##  2 cyl   hp    mtcars
-##  3 cyl   drat  mtcars
-##  4 cyl   wt    mtcars
-##  5 cyl   qsec  mtcars
-##  6 cyl   vs    mtcars
-##  7 cyl   am    mtcars
-##  8 cyl   gear  mtcars
-##  9 cyl   carb  mtcars
-## 10 disp  hp    mtcars
-## # … with 35 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 45 x 3</span>
+<span class="co">#&gt;    x1    x2    data  </span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; </span>
+<span class="co">#&gt;  1 cyl   disp  mtcars</span>
+<span class="co">#&gt;  2 cyl   hp    mtcars</span>
+<span class="co">#&gt;  3 cyl   drat  mtcars</span>
+<span class="co">#&gt;  4 cyl   wt    mtcars</span>
+<span class="co">#&gt;  5 cyl   qsec  mtcars</span>
+<span class="co">#&gt;  6 cyl   vs    mtcars</span>
+<span class="co">#&gt;  7 cyl   am    mtcars</span>
+<span class="co">#&gt;  8 cyl   gear  mtcars</span>
+<span class="co">#&gt;  9 cyl   carb  mtcars</span>
+<span class="co">#&gt; 10 disp  hp    mtcars</span>
+<span class="co">#&gt; # … with 35 more rows</span></code></pre>
 <p>Each row of <code>args</code> corresponds to a call to <code>my_model_fit()</code>. To actually write out all those function calls, we use <code>map_plan()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit)
-## # A tibble: 45 x 2
-##    target              command                                             
-##    &lt;chr&gt;               &lt;chr&gt;                                               
-##  1 my_model_fit_501e0… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = \…
-##  2 my_model_fit_d5de1… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;m…
-##  3 my_model_fit_eac6c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = \…
-##  4 my_model_fit_3900e… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = \&quot;m…
-##  5 my_model_fit_a2d79… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = \…
-##  6 my_model_fit_f5c0a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = \&quot;m…
-##  7 my_model_fit_507d2… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = \&quot;m…
-##  8 my_model_fit_b5f9a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = \…
-##  9 my_model_fit_8c4c5… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = \…
-## 10 my_model_fit_f9bb9… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;…
-## # … with 35 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 45 x 2</span>
+<span class="co">#&gt;    target              command                                             </span>
+<span class="co">#&gt;    &lt;chr&gt;               &lt;chr&gt;                                               </span>
+<span class="co">#&gt;  1 my_model_fit_501e0… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = \…</span>
+<span class="co">#&gt;  2 my_model_fit_d5de1… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;m…</span>
+<span class="co">#&gt;  3 my_model_fit_eac6c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = \…</span>
+<span class="co">#&gt;  4 my_model_fit_3900e… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = \&quot;m…</span>
+<span class="co">#&gt;  5 my_model_fit_a2d79… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = \…</span>
+<span class="co">#&gt;  6 my_model_fit_f5c0a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = \&quot;m…</span>
+<span class="co">#&gt;  7 my_model_fit_507d2… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = \&quot;m…</span>
+<span class="co">#&gt;  8 my_model_fit_b5f9a… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = \…</span>
+<span class="co">#&gt;  9 my_model_fit_8c4c5… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = \…</span>
+<span class="co">#&gt; 10 my_model_fit_f9bb9… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = \&quot;…</span>
+<span class="co">#&gt; # … with 35 more rows</span></code></pre>
 <p>We now have a plan, but it has a couple issues.</p>
 <ol style="list-style-type: decimal">
 <li>The <code>data</code> argument should be a symbol. In other words, we want <code>my_model_fit(data = mtcars)</code>, not <code>my_model_fit(data = &quot;mtcars&quot;)</code>. So we use the <a href="https://rlang.r-lib.org/reference/sym.html"><code>syms()</code></a> function from the <a href="https://github.com/r-lib/rlang"><code>rlang</code></a> package turn <code>args$data</code> into a list of symbols.</li>
@@ -1062,64 +1093,64 @@ args<span class="op">$</span>data &lt;-<span class="st"> </span>rlang<span class
 args<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;fit_&quot;</span>, args<span class="op">$</span>x1, <span class="st">&quot;_&quot;</span>, args<span class="op">$</span>x2)
 
 args
-## # A tibble: 45 x 4
-##    x1    x2    data   id          
-##    &lt;chr&gt; &lt;chr&gt; &lt;list&gt; &lt;chr&gt;       
-##  1 cyl   disp  &lt;sym&gt;  fit_cyl_disp
-##  2 cyl   hp    &lt;sym&gt;  fit_cyl_hp  
-##  3 cyl   drat  &lt;sym&gt;  fit_cyl_drat
-##  4 cyl   wt    &lt;sym&gt;  fit_cyl_wt  
-##  5 cyl   qsec  &lt;sym&gt;  fit_cyl_qsec
-##  6 cyl   vs    &lt;sym&gt;  fit_cyl_vs  
-##  7 cyl   am    &lt;sym&gt;  fit_cyl_am  
-##  8 cyl   gear  &lt;sym&gt;  fit_cyl_gear
-##  9 cyl   carb  &lt;sym&gt;  fit_cyl_carb
-## 10 disp  hp    &lt;sym&gt;  fit_disp_hp 
-## # … with 35 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 45 x 4</span>
+<span class="co">#&gt;    x1    x2    data   id          </span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;list&gt; &lt;chr&gt;       </span>
+<span class="co">#&gt;  1 cyl   disp  &lt;sym&gt;  fit_cyl_disp</span>
+<span class="co">#&gt;  2 cyl   hp    &lt;sym&gt;  fit_cyl_hp  </span>
+<span class="co">#&gt;  3 cyl   drat  &lt;sym&gt;  fit_cyl_drat</span>
+<span class="co">#&gt;  4 cyl   wt    &lt;sym&gt;  fit_cyl_wt  </span>
+<span class="co">#&gt;  5 cyl   qsec  &lt;sym&gt;  fit_cyl_qsec</span>
+<span class="co">#&gt;  6 cyl   vs    &lt;sym&gt;  fit_cyl_vs  </span>
+<span class="co">#&gt;  7 cyl   am    &lt;sym&gt;  fit_cyl_am  </span>
+<span class="co">#&gt;  8 cyl   gear  &lt;sym&gt;  fit_cyl_gear</span>
+<span class="co">#&gt;  9 cyl   carb  &lt;sym&gt;  fit_cyl_carb</span>
+<span class="co">#&gt; 10 disp  hp    &lt;sym&gt;  fit_disp_hp </span>
+<span class="co">#&gt; # … with 35 more rows</span></code></pre>
 <p>Much better.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">map_plan</span>(args, my_model_fit)
 plan
-## # A tibble: 45 x 2
-##    target       command                                                   
-##    &lt;chr&gt;        &lt;chr&gt;                                                     
-##  1 fit_cyl_disp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = mtcars)&quot;
-##  2 fit_cyl_hp   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot;  
-##  3 fit_cyl_drat &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = mtcars)&quot;
-##  4 fit_cyl_wt   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = mtcars)&quot;  
-##  5 fit_cyl_qsec &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = mtcars)&quot;
-##  6 fit_cyl_vs   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = mtcars)&quot;  
-##  7 fit_cyl_am   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = mtcars)&quot;  
-##  8 fit_cyl_gear &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = mtcars)&quot;
-##  9 fit_cyl_carb &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = mtcars)&quot;
-## 10 fit_disp_hp  &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot; 
-## # … with 35 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 45 x 2</span>
+<span class="co">#&gt;    target       command                                                   </span>
+<span class="co">#&gt;    &lt;chr&gt;        &lt;chr&gt;                                                     </span>
+<span class="co">#&gt;  1 fit_cyl_disp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;disp\&quot;, data = mtcars)&quot;</span>
+<span class="co">#&gt;  2 fit_cyl_hp   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot;  </span>
+<span class="co">#&gt;  3 fit_cyl_drat &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;drat\&quot;, data = mtcars)&quot;</span>
+<span class="co">#&gt;  4 fit_cyl_wt   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;wt\&quot;, data = mtcars)&quot;  </span>
+<span class="co">#&gt;  5 fit_cyl_qsec &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;qsec\&quot;, data = mtcars)&quot;</span>
+<span class="co">#&gt;  6 fit_cyl_vs   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;vs\&quot;, data = mtcars)&quot;  </span>
+<span class="co">#&gt;  7 fit_cyl_am   &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;am\&quot;, data = mtcars)&quot;  </span>
+<span class="co">#&gt;  8 fit_cyl_gear &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;gear\&quot;, data = mtcars)&quot;</span>
+<span class="co">#&gt;  9 fit_cyl_carb &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = \&quot;carb\&quot;, data = mtcars)&quot;</span>
+<span class="co">#&gt; 10 fit_disp_hp  &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 = \&quot;hp\&quot;, data = mtcars)&quot; </span>
+<span class="co">#&gt; # … with 35 more rows</span></code></pre>
 <p>We may also want to retain information about the constituent function arguments of each target. With <code>map_plan(trace = TRUE)</code>, we can append the columns of <code>args</code> alongside the usual <code>&quot;target&quot;</code> and <code>&quot;command&quot;</code> columns of our plan.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map_plan</span>(args, my_model_fit, <span class="dt">trace =</span> <span class="ot">TRUE</span>)
-## # A tibble: 45 x 6
-##    target     command                            x1    x2    data  id      
-##    &lt;chr&gt;      &lt;chr&gt;                              &lt;chr&gt; &lt;chr&gt; &lt;lis&gt; &lt;chr&gt;   
-##  1 fit_cyl_d… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   disp  &lt;sym&gt; fit_cyl…
-##  2 fit_cyl_hp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   hp    &lt;sym&gt; fit_cyl…
-##  3 fit_cyl_d… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   drat  &lt;sym&gt; fit_cyl…
-##  4 fit_cyl_wt &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   wt    &lt;sym&gt; fit_cyl…
-##  5 fit_cyl_q… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   qsec  &lt;sym&gt; fit_cyl…
-##  6 fit_cyl_vs &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   vs    &lt;sym&gt; fit_cyl…
-##  7 fit_cyl_am &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   am    &lt;sym&gt; fit_cyl…
-##  8 fit_cyl_g… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   gear  &lt;sym&gt; fit_cyl…
-##  9 fit_cyl_c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   carb  &lt;sym&gt; fit_cyl…
-## 10 fit_disp_… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 =… disp  hp    &lt;sym&gt; fit_dis…
-## # … with 35 more rows</code></pre>
+<span class="co">#&gt; # A tibble: 45 x 6</span>
+<span class="co">#&gt;    target     command                            x1    x2    data  id      </span>
+<span class="co">#&gt;    &lt;chr&gt;      &lt;chr&gt;                              &lt;chr&gt; &lt;chr&gt; &lt;lis&gt; &lt;chr&gt;   </span>
+<span class="co">#&gt;  1 fit_cyl_d… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   disp  &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  2 fit_cyl_hp &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   hp    &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  3 fit_cyl_d… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   drat  &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  4 fit_cyl_wt &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   wt    &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  5 fit_cyl_q… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   qsec  &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  6 fit_cyl_vs &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   vs    &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  7 fit_cyl_am &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   am    &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  8 fit_cyl_g… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   gear  &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt;  9 fit_cyl_c… &quot;my_model_fit(x1 = \&quot;cyl\&quot;, x2 = … cyl   carb  &lt;sym&gt; fit_cyl…</span>
+<span class="co">#&gt; 10 fit_disp_… &quot;my_model_fit(x1 = \&quot;disp\&quot;, x2 =… disp  hp    &lt;sym&gt; fit_dis…</span>
+<span class="co">#&gt; # … with 35 more rows</span></code></pre>
 <p>In any case, we can now fit our models.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre>
 <p>And inspect the output.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(fit_cyl_disp)
-## 
-## Call:
-## lm(formula = as.formula(paste(&quot;mpg ~&quot;, x1, &quot;+&quot;, x2)), data = data)
-## 
-## Coefficients:
-## (Intercept)          cyl         disp  
-##    34.66099     -1.58728     -0.02058</code></pre>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Call:</span>
+<span class="co">#&gt; lm(formula = as.formula(paste(&quot;mpg ~&quot;, x1, &quot;+&quot;, x2)), data = data)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients:</span>
+<span class="co">#&gt; (Intercept)          cyl         disp  </span>
+<span class="co">#&gt;    34.66099     -1.58728     -0.02058</span></code></pre>
 </div>
 <div id="wildcard-templating" class="section level3">
 <h3><span class="header-section-number">6.6.2</span> Wildcard templating</h3>
@@ -1148,20 +1179,20 @@ plan
   <span class="dt">normal =</span> <span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dt">mean =</span> mean__, <span class="dt">sd =</span> <span class="dv">1</span>)
 )
 <span class="kw">evaluate_plan</span>(plan, <span class="dt">wildcard =</span> <span class="st">&quot;mean__&quot;</span>, <span class="dt">values =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">9</span>)
-## # A tibble: 11 x 2
-##    target   command                      
-##    &lt;chr&gt;    &lt;chr&gt;                        
-##  1 t        rt(1000, df = 5)             
-##  2 normal_0 runif(1000, mean = 0, sd = 1)
-##  3 normal_1 runif(1000, mean = 1, sd = 1)
-##  4 normal_2 runif(1000, mean = 2, sd = 1)
-##  5 normal_3 runif(1000, mean = 3, sd = 1)
-##  6 normal_4 runif(1000, mean = 4, sd = 1)
-##  7 normal_5 runif(1000, mean = 5, sd = 1)
-##  8 normal_6 runif(1000, mean = 6, sd = 1)
-##  9 normal_7 runif(1000, mean = 7, sd = 1)
-## 10 normal_8 runif(1000, mean = 8, sd = 1)
-## 11 normal_9 runif(1000, mean = 9, sd = 1)</code></pre>
+<span class="co">#&gt; # A tibble: 11 x 2</span>
+<span class="co">#&gt;    target   command                      </span>
+<span class="co">#&gt;    &lt;chr&gt;    &lt;chr&gt;                        </span>
+<span class="co">#&gt;  1 t        rt(1000, df = 5)             </span>
+<span class="co">#&gt;  2 normal_0 runif(1000, mean = 0, sd = 1)</span>
+<span class="co">#&gt;  3 normal_1 runif(1000, mean = 1, sd = 1)</span>
+<span class="co">#&gt;  4 normal_2 runif(1000, mean = 2, sd = 1)</span>
+<span class="co">#&gt;  5 normal_3 runif(1000, mean = 3, sd = 1)</span>
+<span class="co">#&gt;  6 normal_4 runif(1000, mean = 4, sd = 1)</span>
+<span class="co">#&gt;  7 normal_5 runif(1000, mean = 5, sd = 1)</span>
+<span class="co">#&gt;  8 normal_6 runif(1000, mean = 6, sd = 1)</span>
+<span class="co">#&gt;  9 normal_7 runif(1000, mean = 7, sd = 1)</span>
+<span class="co">#&gt; 10 normal_8 runif(1000, mean = 8, sd = 1)</span>
+<span class="co">#&gt; 11 normal_9 runif(1000, mean = 9, sd = 1)</span></code></pre>
 <p>You can specify multiple wildcards at once. If multiple wildcards appear in the same command, you will get a new target for each unique combination of values.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> df__),
@@ -1175,16 +1206,16 @@ plan
     <span class="dt">df__ =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span>
   )
 )
-## # A tibble: 7 x 2
-##   target     command                      
-##   &lt;chr&gt;      &lt;chr&gt;                        
-## 1 t_5        rt(1000, df = 5)             
-## 2 t_6        rt(1000, df = 6)             
-## 3 t_7        rt(1000, df = 7)             
-## 4 normal_0_3 runif(1000, mean = 0, sd = 3)
-## 5 normal_0_4 runif(1000, mean = 0, sd = 4)
-## 6 normal_1_3 runif(1000, mean = 1, sd = 3)
-## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</code></pre>
+<span class="co">#&gt; # A tibble: 7 x 2</span>
+<span class="co">#&gt;   target     command                      </span>
+<span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;                        </span>
+<span class="co">#&gt; 1 t_5        rt(1000, df = 5)             </span>
+<span class="co">#&gt; 2 t_6        rt(1000, df = 6)             </span>
+<span class="co">#&gt; 3 t_7        rt(1000, df = 7)             </span>
+<span class="co">#&gt; 4 normal_0_3 runif(1000, mean = 0, sd = 3)</span>
+<span class="co">#&gt; 5 normal_0_4 runif(1000, mean = 0, sd = 4)</span>
+<span class="co">#&gt; 6 normal_1_3 runif(1000, mean = 1, sd = 3)</span>
+<span class="co">#&gt; 7 normal_1_4 runif(1000, mean = 1, sd = 4)</span></code></pre>
 <p>Wildcards for <code>evaluate_plan()</code> do not need to have the double-underscore suffix. Any valid symbol will do.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">t  =</span> <span class="kw">rt</span>(<span class="dv">1000</span>, <span class="dt">df =</span> .DF.),
@@ -1198,16 +1229,16 @@ plan
     <span class="dt">.DF. =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">7</span>
   )
 )
-## # A tibble: 7 x 2
-##   target     command                      
-##   &lt;chr&gt;      &lt;chr&gt;                        
-## 1 t_5        rt(1000, df = 5)             
-## 2 t_6        rt(1000, df = 6)             
-## 3 t_7        rt(1000, df = 7)             
-## 4 normal_0_3 runif(1000, mean = 0, sd = 3)
-## 5 normal_0_4 runif(1000, mean = 0, sd = 4)
-## 6 normal_1_3 runif(1000, mean = 1, sd = 3)
-## 7 normal_1_4 runif(1000, mean = 1, sd = 4)</code></pre>
+<span class="co">#&gt; # A tibble: 7 x 2</span>
+<span class="co">#&gt;   target     command                      </span>
+<span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;                        </span>
+<span class="co">#&gt; 1 t_5        rt(1000, df = 5)             </span>
+<span class="co">#&gt; 2 t_6        rt(1000, df = 6)             </span>
+<span class="co">#&gt; 3 t_7        rt(1000, df = 7)             </span>
+<span class="co">#&gt; 4 normal_0_3 runif(1000, mean = 0, sd = 3)</span>
+<span class="co">#&gt; 5 normal_0_4 runif(1000, mean = 0, sd = 4)</span>
+<span class="co">#&gt; 6 normal_1_3 runif(1000, mean = 1, sd = 3)</span>
+<span class="co">#&gt; 7 normal_1_4 runif(1000, mean = 1, sd = 4)</span></code></pre>
 <p>Set <code>expand</code> to <code>FALSE</code> to disable expansion.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">t  =</span> <span class="kw">rpois</span>(samples__, <span class="dt">lambda =</span> mean__),
@@ -1221,11 +1252,11 @@ plan
   ),
   <span class="dt">expand =</span> <span class="ot">FALSE</span>
 )
-## # A tibble: 2 x 2
-##   target command              
-##   &lt;chr&gt;  &lt;chr&gt;                
-## 1 t      rpois(50, lambda = 1)
-## 2 normal runif(100, mean = 5)</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command              </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                </span>
+<span class="co">#&gt; 1 t      rpois(50, lambda = 1)</span>
+<span class="co">#&gt; 2 normal runif(100, mean = 5)</span></code></pre>
 <p>Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a <code>drake</code> plan with your metrics and let the wildcard templating expand over the available schools.</p>
 <pre class="sourceCode r"><code class="sourceCode r">hard_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">credits =</span> <span class="kw">check_credit_hours</span>(school__),
@@ -1238,21 +1269,21 @@ plan
   hard_plan,
   <span class="dt">rules =</span> <span class="kw">list</span>(<span class="dt">school__ =</span> <span class="kw">c</span>(<span class="st">&quot;schoolA&quot;</span>, <span class="st">&quot;schoolB&quot;</span>, <span class="st">&quot;schoolC&quot;</span>))
 )
-## # A tibble: 12 x 2
-##    target               command                      
-##    &lt;chr&gt;                &lt;chr&gt;                        
-##  1 credits_schoolA      check_credit_hours(schoolA)  
-##  2 credits_schoolB      check_credit_hours(schoolB)  
-##  3 credits_schoolC      check_credit_hours(schoolC)  
-##  4 students_schoolA     check_students(schoolA)      
-##  5 students_schoolB     check_students(schoolB)      
-##  6 students_schoolC     check_students(schoolC)      
-##  7 grads_schoolA        check_graduations(schoolA)   
-##  8 grads_schoolB        check_graduations(schoolB)   
-##  9 grads_schoolC        check_graduations(schoolC)   
-## 10 public_funds_schoolA check_public_funding(schoolA)
-## 11 public_funds_schoolB check_public_funding(schoolB)
-## 12 public_funds_schoolC check_public_funding(schoolC)</code></pre>
+<span class="co">#&gt; # A tibble: 12 x 2</span>
+<span class="co">#&gt;    target               command                      </span>
+<span class="co">#&gt;    &lt;chr&gt;                &lt;chr&gt;                        </span>
+<span class="co">#&gt;  1 credits_schoolA      check_credit_hours(schoolA)  </span>
+<span class="co">#&gt;  2 credits_schoolB      check_credit_hours(schoolB)  </span>
+<span class="co">#&gt;  3 credits_schoolC      check_credit_hours(schoolC)  </span>
+<span class="co">#&gt;  4 students_schoolA     check_students(schoolA)      </span>
+<span class="co">#&gt;  5 students_schoolB     check_students(schoolB)      </span>
+<span class="co">#&gt;  6 students_schoolC     check_students(schoolC)      </span>
+<span class="co">#&gt;  7 grads_schoolA        check_graduations(schoolA)   </span>
+<span class="co">#&gt;  8 grads_schoolB        check_graduations(schoolB)   </span>
+<span class="co">#&gt;  9 grads_schoolC        check_graduations(schoolC)   </span>
+<span class="co">#&gt; 10 public_funds_schoolA check_public_funding(schoolA)</span>
+<span class="co">#&gt; 11 public_funds_schoolB check_public_funding(schoolB)</span>
+<span class="co">#&gt; 12 public_funds_schoolC check_public_funding(schoolC)</span></code></pre>
 <p>But what if some metrics do not make sense? For example, what if <code>schoolC</code> is a completely privately-funded school? With no public funds, <code>check_public_funds(schoolC)</code> may quit in error if we are not careful. This is where setting up <code>drake</code> plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan_template &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">school =</span> <span class="kw">get_school_data</span>(<span class="st">&quot;school__&quot;</span>),
@@ -1269,23 +1300,23 @@ plan
     <span class="dt">public_schools__ =</span> <span class="kw">c</span>(<span class="st">&quot;school_A&quot;</span>, <span class="st">&quot;school_B&quot;</span>)
   )
 )
-## # A tibble: 14 x 2
-##    target                command                       
-##    &lt;chr&gt;                 &lt;chr&gt;                         
-##  1 school_A              &quot;get_school_data(\&quot;A\&quot;)&quot;      
-##  2 school_B              &quot;get_school_data(\&quot;B\&quot;)&quot;      
-##  3 school_C              &quot;get_school_data(\&quot;C\&quot;)&quot;      
-##  4 credits_school_A      check_credit_hours(school_A)  
-##  5 credits_school_B      check_credit_hours(school_B)  
-##  6 credits_school_C      check_credit_hours(school_C)  
-##  7 students_school_A     check_students(school_A)      
-##  8 students_school_B     check_students(school_B)      
-##  9 students_school_C     check_students(school_C)      
-## 10 grads_school_A        check_graduations(school_A)   
-## 11 grads_school_B        check_graduations(school_B)   
-## 12 grads_school_C        check_graduations(school_C)   
-## 13 public_funds_school_A check_public_funding(school_A)
-## 14 public_funds_school_B check_public_funding(school_B)</code></pre>
+<span class="co">#&gt; # A tibble: 14 x 2</span>
+<span class="co">#&gt;    target                command                       </span>
+<span class="co">#&gt;    &lt;chr&gt;                 &lt;chr&gt;                         </span>
+<span class="co">#&gt;  1 school_A              &quot;get_school_data(\&quot;A\&quot;)&quot;      </span>
+<span class="co">#&gt;  2 school_B              &quot;get_school_data(\&quot;B\&quot;)&quot;      </span>
+<span class="co">#&gt;  3 school_C              &quot;get_school_data(\&quot;C\&quot;)&quot;      </span>
+<span class="co">#&gt;  4 credits_school_A      check_credit_hours(school_A)  </span>
+<span class="co">#&gt;  5 credits_school_B      check_credit_hours(school_B)  </span>
+<span class="co">#&gt;  6 credits_school_C      check_credit_hours(school_C)  </span>
+<span class="co">#&gt;  7 students_school_A     check_students(school_A)      </span>
+<span class="co">#&gt;  8 students_school_B     check_students(school_B)      </span>
+<span class="co">#&gt;  9 students_school_C     check_students(school_C)      </span>
+<span class="co">#&gt; 10 grads_school_A        check_graduations(school_A)   </span>
+<span class="co">#&gt; 11 grads_school_B        check_graduations(school_B)   </span>
+<span class="co">#&gt; 12 grads_school_C        check_graduations(school_C)   </span>
+<span class="co">#&gt; 13 public_funds_school_A check_public_funding(school_A)</span>
+<span class="co">#&gt; 14 public_funds_school_B check_public_funding(school_B)</span></code></pre>
 <p>Thanks to <a href="https://github.com/AlexAxthelm">Alex Axthelm</a> for this use case in <a href="https://github.com/ropensci/drake/issues/235">issue 235</a>.</p>
 </div>
 <div id="wildcard-clusters" class="section level3">
@@ -1308,25 +1339,25 @@ plan &lt;-<span class="st"> </span><span class="kw">evaluate_plan</span>(
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
 plan
-## # A tibble: 14 x 8
-##    target command school__ school___from all_schools__ all_schools___f…
-##    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;           
-##  1 schoo… &quot;get_s… A        school        &lt;NA&gt;          &lt;NA&gt;            
-##  2 schoo… &quot;get_s… B        school        &lt;NA&gt;          &lt;NA&gt;            
-##  3 schoo… &quot;get_s… C        school        &lt;NA&gt;          &lt;NA&gt;            
-##  4 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      credits         
-##  5 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      credits         
-##  6 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      credits         
-##  7 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      students        
-##  8 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      students        
-##  9 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      students        
-## 10 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      grads           
-## 11 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      grads           
-## 12 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      grads           
-## 13 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
-## 14 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            
-## # … with 2 more variables: public_schools__ &lt;chr&gt;,
-## #   public_schools___from &lt;chr&gt;</code></pre>
+<span class="co">#&gt; # A tibble: 14 x 8</span>
+<span class="co">#&gt;    target command school__ school___from all_schools__ all_schools___f…</span>
+<span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;           </span>
+<span class="co">#&gt;  1 schoo… &quot;get_s… A        school        &lt;NA&gt;          &lt;NA&gt;            </span>
+<span class="co">#&gt;  2 schoo… &quot;get_s… B        school        &lt;NA&gt;          &lt;NA&gt;            </span>
+<span class="co">#&gt;  3 schoo… &quot;get_s… C        school        &lt;NA&gt;          &lt;NA&gt;            </span>
+<span class="co">#&gt;  4 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      credits         </span>
+<span class="co">#&gt;  5 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      credits         </span>
+<span class="co">#&gt;  6 credi… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      credits         </span>
+<span class="co">#&gt;  7 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      students        </span>
+<span class="co">#&gt;  8 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      students        </span>
+<span class="co">#&gt;  9 stude… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      students        </span>
+<span class="co">#&gt; 10 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_A      grads           </span>
+<span class="co">#&gt; 11 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_B      grads           </span>
+<span class="co">#&gt; 12 grads… check_… &lt;NA&gt;     &lt;NA&gt;          school_C      grads           </span>
+<span class="co">#&gt; 13 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            </span>
+<span class="co">#&gt; 14 publi… check_… &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;          &lt;NA&gt;            </span>
+<span class="co">#&gt; # … with 2 more variables: public_schools__ &lt;chr&gt;,</span>
+<span class="co">#&gt; #   public_schools___from &lt;chr&gt;</span></code></pre>
 <p>And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(
@@ -1348,15 +1379,15 @@ plan
   <span class="dt">bootstrapped_data =</span> <span class="kw">bootstrap_from_real_data</span>(real_data)
 )
 <span class="kw">expand_plan</span>(plan, <span class="dt">values =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
-## # A tibble: 6 x 2
-##   target              command                            
-##   &lt;chr&gt;               &lt;chr&gt;                              
-## 1 fake_data_1         simulate_from_model()              
-## 2 fake_data_2         simulate_from_model()              
-## 3 fake_data_3         simulate_from_model()              
-## 4 bootstrapped_data_1 bootstrap_from_real_data(real_data)
-## 5 bootstrapped_data_2 bootstrap_from_real_data(real_data)
-## 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</code></pre>
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   target              command                            </span>
+<span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                              </span>
+<span class="co">#&gt; 1 fake_data_1         simulate_from_model()              </span>
+<span class="co">#&gt; 2 fake_data_2         simulate_from_model()              </span>
+<span class="co">#&gt; 3 fake_data_3         simulate_from_model()              </span>
+<span class="co">#&gt; 4 bootstrapped_data_1 bootstrap_from_real_data(real_data)</span>
+<span class="co">#&gt; 5 bootstrapped_data_2 bootstrap_from_real_data(real_data)</span>
+<span class="co">#&gt; 6 bootstrapped_data_3 bootstrap_from_real_data(real_data)</span></code></pre>
 </div>
 <div id="gather_plan-and-gather_by" class="section level4">
 <h4><span class="header-section-number">6.6.4.2</span> <code>gather_plan()</code> and <code>gather_by()</code></h4>
@@ -1366,16 +1397,16 @@ plan
   <span class="dt">large =</span> <span class="kw">data.frame</span>(<span class="dt">type =</span> <span class="st">&quot;large&quot;</span>, <span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="dv">1000</span>))
 )
 <span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>)
-## # A tibble: 1 x 2
-##   target   command                           
-##   &lt;chr&gt;    &lt;chr&gt;                             
-## 1 combined list(small = small, large = large)</code></pre>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   target   command                           </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                             </span>
+<span class="co">#&gt; 1 combined list(small = small, large = large)</span></code></pre>
 <p>In this case, <code>small</code> and <code>large</code> are data frames, so it may be more convenient to combine the rows together.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gather_plan</span>(plan, <span class="dt">target =</span> <span class="st">&quot;combined&quot;</span>, <span class="dt">gather =</span> <span class="st">&quot;rbind&quot;</span>)
-## # A tibble: 1 x 2
-##   target   command                            
-##   &lt;chr&gt;    &lt;chr&gt;                              
-## 1 combined rbind(small = small, large = large)</code></pre>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   target   command                            </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                              </span>
+<span class="co">#&gt; 1 combined rbind(small = small, large = large)</span></code></pre>
 <p>See also <code>gather_by()</code> to gather multiple groups of targets based on other columns in the plan (e.g. from <code>evaluate_plan(trace = TRUE)</code>).</p>
 </div>
 <div id="reduce_plan-and-reduce_by" class="section level4">
@@ -1388,20 +1419,20 @@ plan
   <span class="dt">d =</span> <span class="dv">4</span>
 )
 <span class="kw">reduce_plan</span>(plan)
-## # A tibble: 3 x 2
-##   target   command            
-##   &lt;chr&gt;    &lt;chr&gt;              
-## 1 target_1 a + b              
-## 2 target_2 c + d              
-## 3 target   target_1 + target_2</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target   command            </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;              </span>
+<span class="co">#&gt; 1 target_1 a + b              </span>
+<span class="co">#&gt; 2 target_2 c + d              </span>
+<span class="co">#&gt; 3 target   target_1 + target_2</span></code></pre>
 <p>You can control how each pair of targets gets combined.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reduce_plan</span>(plan, <span class="dt">begin =</span> <span class="st">&quot;c(&quot;</span>, <span class="dt">op =</span> <span class="st">&quot;, &quot;</span>, <span class="dt">end =</span> <span class="st">&quot;)&quot;</span>)
-## # A tibble: 3 x 2
-##   target   command              
-##   &lt;chr&gt;    &lt;chr&gt;                
-## 1 target_1 c(a, b)              
-## 2 target_2 c(c, d)              
-## 3 target   c(target_1, target_2)</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target   command              </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                </span>
+<span class="co">#&gt; 1 target_1 c(a, b)              </span>
+<span class="co">#&gt; 2 target_2 c(c, d)              </span>
+<span class="co">#&gt; 3 target   c(target_1, target_2)</span></code></pre>
 <p>See also <code>reduce_by()</code> to do reductions on multiple groups of targets based on other columns in the plan (e.g. from <code>evaluate_plan(trace = TRUE)</code>).</p>
 </div>
 </div>
@@ -1421,8 +1452,8 @@ cat in2.txt > out2.txt
   ),
   <span class="st">&quot;cat {inputs} &gt; {outputs}&quot;</span>
 )
-## cat in1.txt &gt; out1.txt
-## cat in2.txt &gt; out2.txt</code></pre>
+<span class="co">#&gt; cat in1.txt &gt; out1.txt</span>
+<span class="co">#&gt; cat in2.txt &gt; out2.txt</span></code></pre>
 <p>Our <code>drake</code> commands will use <code>system()</code> to execute the Linux commands that <a href="https://github.com/tidyverse/glue"><code>glue</code></a> generates. Technically, we could use <code>drake_plan()</code> if we wanted.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="kw">drake_plan</span>(
@@ -1435,10 +1466,10 @@ cat in2.txt > out2.txt
   ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">lapply</span>(<span class="dt">FUN =</span> system)
 )
-## # A tibble: 1 x 2
-##   target        command                                                    
-##   &lt;chr&gt;         &lt;chr&gt;                                                      
-## 1 drake_target… &quot;glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.txt\…</code></pre>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   target        command                                                    </span>
+<span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;                                                      </span>
+<span class="co">#&gt; 1 drake_target… &quot;glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.txt\…</span></code></pre>
 <p>But what if we want to <em>generate</em> these <a href="https://github.com/tidyverse/glue"><code>glue</code></a> commands instead of writing them literally in our plan? This is a job for custom metaprogramming with <a href="https://www.youtube.com/watch?v=nERXS3ssntw">tidy evaluation</a>. First, we create a function to generate the <code>drake</code> command of an arbitrary target.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rlang) <span class="co"># for tidy evaluation</span>
 write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd, <span class="dt">inputs =</span> <span class="ot">NULL</span> , <span class="dt">outputs =</span> <span class="ot">NULL</span>){
@@ -1463,11 +1494,11 @@ write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd
   <span class="dt">outputs =</span> <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>)
 ) <span class="op">%&gt;%</span>
 <span class="st">  </span>cat
-## {
-##     glue_data(list(inputs = file_in(c(&quot;in1.txt&quot;, &quot;in2.txt&quot;)), 
-##         outputs = file_out(c(&quot;out1.txt&quot;, &quot;out2.txt&quot;))), &quot;cat {inputs} &gt; {outputs}&quot;) %&gt;% 
-##         lapply(FUN = system)
-## }</code></pre>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     glue_data(list(inputs = file_in(c(&quot;in1.txt&quot;, &quot;in2.txt&quot;)), </span>
+<span class="co">#&gt;         outputs = file_out(c(&quot;out1.txt&quot;, &quot;out2.txt&quot;))), &quot;cat {inputs} &gt; {outputs}&quot;) %&gt;% </span>
+<span class="co">#&gt;         lapply(FUN = system)</span>
+<span class="co">#&gt; }</span></code></pre>
 <p>Then, we lay out all the arguments we will pass to <code>write_command()</code>. Here, each row corresponds to a separate target.</p>
 <pre class="sourceCode r"><code class="sourceCode r">meta_plan &lt;-<span class="st"> </span><span class="kw">tribble</span>(
   <span class="op">~</span>cmd, <span class="op">~</span>inputs, <span class="op">~</span>outputs,
@@ -1475,22 +1506,22 @@ write_command &lt;-<span class="st"> </span><span class="cf">function</span>(cmd
   <span class="st">&quot;cat {inputs} {inputs} &gt; {outputs}&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;out1.txt&quot;</span>, <span class="st">&quot;out2.txt&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;out3.txt&quot;</span>, <span class="st">&quot;out4.txt&quot;</span>)
 ) <span class="op">%&gt;%</span>
 <span class="st">  </span>print
-## # A tibble: 2 x 3
-##   cmd                               inputs    outputs  
-##   &lt;chr&gt;                             &lt;list&gt;    &lt;list&gt;   
-## 1 cat {inputs} &gt; {outputs}          &lt;chr [2]&gt; &lt;chr [2]&gt;
-## 2 cat {inputs} {inputs} &gt; {outputs} &lt;chr [2]&gt; &lt;chr [2]&gt;</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   cmd                               inputs    outputs  </span>
+<span class="co">#&gt;   &lt;chr&gt;                             &lt;list&gt;    &lt;list&gt;   </span>
+<span class="co">#&gt; 1 cat {inputs} &gt; {outputs}          &lt;chr [2]&gt; &lt;chr [2]&gt;</span>
+<span class="co">#&gt; 2 cat {inputs} {inputs} &gt; {outputs} &lt;chr [2]&gt; &lt;chr [2]&gt;</span></code></pre>
 <p>Finally, we create our <code>drake</code> plan without any built-in <code>drake</code> functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
   <span class="dt">target =</span> <span class="kw">paste0</span>(<span class="st">&quot;target_&quot;</span>, <span class="kw">seq_len</span>(<span class="kw">nrow</span>(meta_plan))),
   <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)
 ) <span class="op">%&gt;%</span>
 <span class="st">  </span>print
-## # A tibble: 2 x 2
-##   target   command                                                         
-##   &lt;chr&gt;    &lt;chr&gt;                                                           
-## 1 target_1 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.tx…
-## 2 target_2 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;out1.txt\&quot;, \&quot;out2.…
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target   command                                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                                           </span>
+<span class="co">#&gt; 1 target_1 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;in1.txt\&quot;, \&quot;in2.tx…</span>
+<span class="co">#&gt; 2 target_2 &quot;{\n    glue_data(list(inputs = file_in(c(\&quot;out1.txt\&quot;, \&quot;out2.…</span>
 <span class="kw">writeLines</span>(<span class="st">&quot;in1&quot;</span>, <span class="st">&quot;in1.txt&quot;</span>)
 <span class="kw">writeLines</span>(<span class="st">&quot;in2&quot;</span>, <span class="st">&quot;in2.txt&quot;</span>)
 <span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</code></pre>
@@ -1527,11 +1558,11 @@ plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
   <span class="dt">command =</span> <span class="kw">pmap_chr</span>(meta_plan, write_command)
 ) <span class="op">%&gt;%</span>
 <span class="st">  </span>print
-## # A tibble: 2 x 2
-##   target   command                                                         
-##   &lt;chr&gt;    &lt;chr&gt;                                                           
-## 1 target_1 &quot;command_function(cmd = \&quot;cat {inputs} &gt; {outputs}\&quot;, inputs = …
-## 2 target_2 &quot;command_function(cmd = \&quot;cat {inputs} {inputs} &gt; {outputs}\&quot;, …</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target   command                                                         </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                                                           </span>
+<span class="co">#&gt; 1 target_1 &quot;command_function(cmd = \&quot;cat {inputs} &gt; {outputs}\&quot;, inputs = …</span>
+<span class="co">#&gt; 2 target_2 &quot;command_function(cmd = \&quot;cat {inputs} {inputs} &gt; {outputs}\&quot;, …</span></code></pre>
 <p>Metaprogramming gets much simpler if you do not need to construct literal calls to <code>file_in()</code>, <code>file_out()</code>, etc. in your commands. The construction of <code>model_plan</code> in the <a href="gsp.html#gsp">gross state product exmaple</a> is an example.</p>
 <p>Thanks to <a href="https://github.com/cfhammill">Chris Hammill</a> for <a href="https://github.com/ropensci/drake/issues/451">presenting this scenario and contributing to the solution</a>.</p>
 

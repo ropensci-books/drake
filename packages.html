@@ -368,14 +368,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This small data analysis project explores some trends in R package downloads over time. The datasets are downloaded using the <a href="https://github.com/metacran/cranlogs">cranlogs package</a>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(cranlogs)
 <span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)
-##         date count package
-## 1 2019-01-17 28227   dplyr
-## 2 2019-01-18 24468   dplyr
-## 3 2019-01-19 13286   dplyr
-## 4 2019-01-20 12486   dplyr
-## 5 2019-01-21 26985   dplyr
-## 6 2019-01-22 34903   dplyr
-## 7 2019-01-23 28638   dplyr</code></pre>
+<span class="co">#&gt;         date count package</span>
+<span class="co">#&gt; 1 2019-01-19 13286   dplyr</span>
+<span class="co">#&gt; 2 2019-01-20 12486   dplyr</span>
+<span class="co">#&gt; 3 2019-01-21 26985   dplyr</span>
+<span class="co">#&gt; 4 2019-01-22 34903   dplyr</span>
+<span class="co">#&gt; 5 2019-01-23 28638   dplyr</span>
+<span class="co">#&gt; 6 2019-01-24 27633   dplyr</span>
+<span class="co">#&gt; 7 2019-01-25 24670   dplyr</span></code></pre>
 <p>Above, each count is the number of times <code>dplyr</code> was downloaded from the RStudio CRAN mirror on the given day. To stay up to date with the latest download statistics, we need to refresh the data frequently. With <code>drake</code>, we can bring all our work up to date without restarting everything from scratch.</p>
 </div>
 <div id="analysis" class="section level2">
@@ -438,30 +438,30 @@ make_my_plot &lt;-<span class="st"> </span><span class="cf">function</span>(down
 The results will be summarized in the knitted report, <code>report.md</code>,
 but you can also read the results directly from the cache.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-## target older
-## target recent
-## target averages_older
-## target plot_older
-## target averages_recent
-## target plot_recent
-## target report
-## Used non-default triggers. Some targets may not be up to date.
+<span class="co">#&gt; target older</span>
+<span class="co">#&gt; target recent</span>
+<span class="co">#&gt; target averages_older</span>
+<span class="co">#&gt; target plot_older</span>
+<span class="co">#&gt; target averages_recent</span>
+<span class="co">#&gt; target plot_recent</span>
+<span class="co">#&gt; target report</span>
+<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 
 <span class="kw">readd</span>(averages_recent)
-## # A tibble: 3 x 2
-##   package mean_downloads
-##   &lt;chr&gt;            &lt;dbl&gt;
-## 1 ggplot2         19940.
-## 2 knitr           13040.
-## 3 Rcpp            22408.
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   package mean_downloads</span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ggplot2         21143.</span>
+<span class="co">#&gt; 2 knitr           13759.</span>
+<span class="co">#&gt; 3 Rcpp            23745.</span>
 
 <span class="kw">readd</span>(averages_older)
-## # A tibble: 3 x 2
-##   package mean_downloads
-##   &lt;chr&gt;            &lt;dbl&gt;
-## 1 ggplot2         14641.
-## 2 knitr            9069.
-## 3 Rcpp            14408.
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   package mean_downloads</span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ggplot2         14641.</span>
+<span class="co">#&gt; 2 knitr            9069.</span>
+<span class="co">#&gt; 3 Rcpp            14408.</span>
 
 <span class="kw">readd</span>(plot_recent)</code></pre>
 <p><img src="drake-manual_files/figure-html/firstmakepackages-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -470,13 +470,13 @@ but you can also read the results directly from the cache.</p>
 <p><img src="drake-manual_files/figure-html/firstmakepackages-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>If we run <code>make()</code> again right away, we see that everything is up to date. But if we wait until a new day’s log is uploaded, <code>make()</code> will update <code>recent</code> and everything that depends on it.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-## All targets are already up to date.
-## Used non-default triggers. Some targets may not be up to date.</code></pre>
+<span class="co">#&gt; All targets are already up to date.</span>
+<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
 <p>To visualize the build behavior, you can plot the dependency network.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-e2045036e7a6211c2d88" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e2045036e7a6211c2d88">{"x":{"nodes":{"id":["averages_older","averages_recent","latest_log_date","make_my_plot","make_my_table","older","p-OJSXA33SOQXFE3LE","p-OJSXA33SOQXG2ZA","plot_older","plot_recent","recent","report"],"imported":[false,false,true,true,true,false,true,false,false,false,false,false],"label":["averages_older\n0.006s","averages_recent\n0.009s","latest_log_date","make_my_plot","make_my_table","older\n0.143s","file report.Rmd","file report.md","plot_older\n0.022s","plot_recent\n0.024s","recent\n0.58s","report\n2.099s"],"command":["make_my_table(older)","make_my_table(recent)",null,null,null,"cran_downloads(packages = c(\"knitr\", \"Rcpp\", \"ggplot2\"), from = \"2016-11-01\", \n    to = \"2016-12-01\", )",null,"knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)","make_my_plot(older)","make_my_plot(recent)","cran_downloads(packages = c(\"knitr\", \"Rcpp\", \"ggplot2\"), when = \"last-month\")","knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)"],"trigger":[null,null,null,null,null,null,null,null,null,null,"trigger(change = latest_log_date())",null],"status":["up to date","up to date","imported","imported","imported","up to date","imported","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","function","function","function","object","file","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#228B22","#228B22","#1874CD","#1874CD","#1874CD","#228B22","#1874CD","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","triangle","triangle","triangle","dot","square","square","dot","dot","dot","dot"],"level":[2,3,1,1,1,1,1,5,2,3,2,4],"title":["make_my_table(older)","make_my_table(recent)","function&nbsp;()&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;read_html(\"http://cran-logs...","function&nbsp;(downloads)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;ggplot(downloads)&nbsp;...","function&nbsp;(downloads)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;group_by(downloads...","cran_downloads(packages&nbsp;=&nbsp;c(\"knitr\",&nbsp;\"Rcpp\",&nbsp;\"...","---<br>title: \"Results report: package downloads exam...<br>author: \"William Michael Landau\"<br>output: html_document<br>---<br><br>```{r setuppackagesreport, echo = FALSE}<br>suppressPackageStartupMessages(library(drake))<br>suppressPackageStartupMessages(library(Ecdat))<br>...","knit(knitr_in(\"report.Rmd\"),&nbsp;file_out(\"report....","make_my_plot(older)","make_my_plot(recent)","cran_downloads(packages&nbsp;=&nbsp;c(\"knitr\",&nbsp;\"Rcpp\",&nbsp;\"...","knit(knitr_in(\"report.Rmd\"),&nbsp;file_out(\"report...."],"x":[0.636363636363636,-0.454545454545455,-1,-0.454545454545455,0.0909090909090908,0.636363636363636,1,0.0909090909090908,0.0909090909090908,-0.818181818181818,-0.636363636363636,0.0909090909090908],"y":[-0.5,0,-1,-1,-1,-1,-1,1,-0.5,0,-0.5,0.5]},"edges":{"from":["latest_log_date","make_my_table","make_my_table","make_my_plot","make_my_plot","older","older","recent","recent","averages_recent","averages_older","plot_recent","plot_older","p-OJSXA33SOQXFE3LE","report"],"to":["recent","averages_recent","averages_older","plot_recent","plot_older","averages_older","plot_older","averages_recent","plot_recent","report","report","report","report","report","p-OJSXA33SOQXG2ZA"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Function","File"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-e2045036e7a6211c2d88">{"x":{"nodes":{"id":["averages_older","averages_recent","latest_log_date","make_my_plot","make_my_table","older","p-OJSXA33SOQXFE3LE","p-OJSXA33SOQXG2ZA","plot_older","plot_recent","recent","report"],"imported":[false,false,true,true,true,false,true,false,false,false,false,false],"label":["averages_older\n0.007s","averages_recent\n0.009s","latest_log_date","make_my_plot","make_my_table","older\n0.186s","file report.Rmd","file report.md","plot_older\n0.023s","plot_recent\n0.025s","recent\n0.483s","report\n2.126s"],"command":["make_my_table(older)","make_my_table(recent)",null,null,null,"cran_downloads(packages = c(\"knitr\", \"Rcpp\", \"ggplot2\"), from = \"2016-11-01\", \n    to = \"2016-12-01\", )",null,"knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)","make_my_plot(older)","make_my_plot(recent)","cran_downloads(packages = c(\"knitr\", \"Rcpp\", \"ggplot2\"), when = \"last-month\")","knit(knitr_in(\"report.Rmd\"), file_out(\"report.md\"), quiet = TRUE)"],"trigger":[null,null,null,null,null,null,null,null,null,null,"trigger(change = latest_log_date())",null],"status":["up to date","up to date","imported","imported","imported","up to date","imported","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","function","function","function","object","file","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#228B22","#228B22","#1874CD","#1874CD","#1874CD","#228B22","#1874CD","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","triangle","triangle","triangle","dot","square","square","dot","dot","dot","dot"],"level":[2,3,1,1,1,1,1,5,2,3,2,4],"title":["make_my_table(older)","make_my_table(recent)","function&nbsp;()&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;read_html(\"http://cran-logs...","function&nbsp;(downloads)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;ggplot(downloads)&nbsp;...","function&nbsp;(downloads)&nbsp;<br>{<br>&nbsp;&nbsp;&nbsp;&nbsp;group_by(downloads...","cran_downloads(packages&nbsp;=&nbsp;c(\"knitr\",&nbsp;\"Rcpp\",&nbsp;\"...","---<br>title: \"Results report: package downloads exam...<br>author: \"William Michael Landau\"<br>output: html_document<br>---<br><br>```{r setuppackagesreport, echo = FALSE}<br>suppressPackageStartupMessages(library(drake))<br>suppressPackageStartupMessages(library(Ecdat))<br>...","knit(knitr_in(\"report.Rmd\"),&nbsp;file_out(\"report....","make_my_plot(older)","make_my_plot(recent)","cran_downloads(packages&nbsp;=&nbsp;c(\"knitr\",&nbsp;\"Rcpp\",&nbsp;\"...","knit(knitr_in(\"report.Rmd\"),&nbsp;file_out(\"report...."],"x":[0.636363636363636,-0.454545454545455,-1,-0.454545454545455,0.0909090909090908,0.636363636363636,1,0.0909090909090908,0.0909090909090908,-0.818181818181818,-0.636363636363636,0.0909090909090908],"y":[-0.5,0,-1,-1,-1,-1,-1,1,-0.5,0,-0.5,0.5]},"edges":{"from":["latest_log_date","make_my_table","make_my_table","make_my_plot","make_my_plot","older","older","recent","recent","averages_recent","averages_older","plot_recent","plot_older","p-OJSXA33SOQXFE3LE","report"],"to":["recent","averages_recent","averages_older","plot_recent","plot_older","averages_older","plot_older","averages_recent","plot_recent","report","report","report","report","report","p-OJSXA33SOQXG2ZA"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Function","File"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="other-ways-to-trigger-downloads" class="section level2">
 <h2><span class="header-section-number">3.4</span> Other ways to trigger downloads</h2>
@@ -485,7 +485,7 @@ but you can also read the results directly from the cache.</p>
 <p>We can track the modification date using the <a href="https://github.com/r-lib/httr"><code>httr</code></a> package.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span>
 <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]
-## [1] &quot;Mon, 12 Feb 2018 16:34:48 GMT&quot;</code></pre>
+<span class="co">#&gt; [1] &quot;Mon, 12 Feb 2018 16:34:48 GMT&quot;</span></code></pre>
 <p>In our <code>drake</code> plan, we can track this timestamp and trigger a download whenever it changes.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">logs =</span> <span class="kw">target</span>(
@@ -494,10 +494,10 @@ but you can also read the results directly from the cache.</p>
   )
 )
 plan
-## # A tibble: 1 x 3
-##   target command       trigger                                             
-##   &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;                                               
-## 1 logs   get_logs(url) &quot;trigger(change = HEAD(url)$headers[[\&quot;last-modifie…</code></pre>
+<span class="co">#&gt; # A tibble: 1 x 3</span>
+<span class="co">#&gt;   target command       trigger                                             </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;                                               </span>
+<span class="co">#&gt; 1 logs   get_logs(url) &quot;trigger(change = HEAD(url)$headers[[\&quot;last-modifie…</span></code></pre>
 <p>where</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span>
 <span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span>
@@ -510,15 +510,15 @@ get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url){
 }</code></pre>
 <p>When we are ready, we run the workflow.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-## target logs
-## Used non-default triggers. Some targets may not be up to date.
+<span class="co">#&gt; target logs</span>
+<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 
 <span class="kw">readd</span>(logs)
-##         date     time     size version  os country ip_id
-## 1 2018-02-09 13:01:13 82375220   3.4.3 win      RO     1
-## 2 2018-02-09 13:02:06 74286541   3.3.3 win      US     2
-## 3 2018-02-09 13:02:10 82375216   3.4.3 win      US     3
-## 4 2018-02-09 13:03:30 82375220   3.4.3 win      IS     4</code></pre>
+<span class="co">#&gt;         date     time     size version  os country ip_id</span>
+<span class="co">#&gt; 1 2018-02-09 13:01:13 82375220   3.4.3 win      RO     1</span>
+<span class="co">#&gt; 2 2018-02-09 13:02:06 74286541   3.3.3 win      US     2</span>
+<span class="co">#&gt; 3 2018-02-09 13:02:10 82375216   3.4.3 win      US     3</span>
+<span class="co">#&gt; 4 2018-02-09 13:03:30 82375220   3.4.3 win      IS     4</span></code></pre>
 <p>If the log file at the <code>url</code> ever changes, the timestamp will update remotely, and <code>make()</code> will download the file again.</p>
 
 </div>

@@ -374,156 +374,156 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <h3><span class="header-section-number">9.1.2</span> Check specific dependency information.</h3>
 <p>With the <code>deps_code()</code> function, you can see for yourself how <code>drake</code> detects first-order dependencies from code.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(simulate)
-## function (n) 
-## {
-##     data &lt;- random_rows(data = datasets::mtcars, n = n)
-##     data.frame(x = data$wt, y = data$mpg)
-## }
+<span class="co">#&gt; function (n) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     data &lt;- random_rows(data = datasets::mtcars, n = n)</span>
+<span class="co">#&gt;     data.frame(x = data$wt, y = data$mpg)</span>
+<span class="co">#&gt; }</span>
 
 <span class="kw">deps_code</span>(simulate)
-## $globals
-## [1] &quot;data.frame&quot;  &quot;mpg&quot;         &quot;wt&quot;          &quot;random_rows&quot;
-## 
-## $namespaced
-## [1] &quot;datasets::mtcars&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;data.frame&quot;  &quot;mpg&quot;         &quot;wt&quot;          &quot;random_rows&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $namespaced</span>
+<span class="co">#&gt; [1] &quot;datasets::mtcars&quot;</span>
 
 <span class="co"># knitr_in() makes sure your target depends on `report.Rmd`</span>
 <span class="co"># and any dependencies loaded with loadd() and readd()</span>
 <span class="co"># in the report&#39;s active code chunks.</span>
 <span class="kw">cat</span>(my_plan<span class="op">$</span>command[<span class="dv">1</span>])
-## knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), quiet = TRUE)
+<span class="co">#&gt; knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), quiet = TRUE)</span>
 
 <span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="dv">1</span>])
-## $globals
-## [1] &quot;knit&quot;
-## 
-## $loadd
-## [1] &quot;large&quot;
-## 
-## $readd
-## [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;
-## 
-## $file_out
-## [1] &quot;report.md&quot;
-## 
-## $knitr_in
-## [1] &quot;report.Rmd&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;knit&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $loadd</span>
+<span class="co">#&gt; [1] &quot;large&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $readd</span>
+<span class="co">#&gt; [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $file_out</span>
+<span class="co">#&gt; [1] &quot;report.md&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $knitr_in</span>
+<span class="co">#&gt; [1] &quot;report.Rmd&quot;</span>
 
 <span class="kw">cat</span>(my_plan<span class="op">$</span>command[<span class="kw">nrow</span>(my_plan)])
-## suppressWarnings(summary(regression2_large))$coefficients
+<span class="co">#&gt; suppressWarnings(summary(regression2_large))$coefficients</span>
 
 <span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="kw">nrow</span>(my_plan)])
-## $globals
-## [1] &quot;summary&quot;           &quot;suppressWarnings&quot;  &quot;regression2_large&quot;
-## [4] &quot;coefficients&quot;</code></pre>
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;summary&quot;           &quot;suppressWarnings&quot;  &quot;regression2_large&quot;</span>
+<span class="co">#&gt; [4] &quot;coefficients&quot;</span></code></pre>
 <p>With <code>deps_target()</code>, you can see the dependencies that <code>drake</code> has already detected for your targets and imports.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_target</span>(<span class="st">&quot;simulate&quot;</span>, config)
-## $globals
-## [1] &quot;random_rows&quot;
-## 
-## $namespaced
-## [1] &quot;datasets::mtcars&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;random_rows&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $namespaced</span>
+<span class="co">#&gt; [1] &quot;datasets::mtcars&quot;</span>
 
 <span class="kw">deps_target</span>(<span class="st">&quot;small&quot;</span>, config)
-## $globals
-## [1] &quot;simulate&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;simulate&quot;</span>
 
 <span class="kw">deps_target</span>(<span class="st">&quot;report&quot;</span>, config)
-## $loadd
-## [1] &quot;large&quot;
-## 
-## $readd
-## [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;
-## 
-## $file_out
-## [1] &quot;report.md&quot;
-## 
-## $knitr_in
-## [1] &quot;report.Rmd&quot;</code></pre>
+<span class="co">#&gt; $loadd</span>
+<span class="co">#&gt; [1] &quot;large&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $readd</span>
+<span class="co">#&gt; [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $file_out</span>
+<span class="co">#&gt; [1] &quot;report.md&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $knitr_in</span>
+<span class="co">#&gt; [1] &quot;report.Rmd&quot;</span></code></pre>
 <p>And with <code>tracked()</code>, you can list all the reproducibly tracked objects and files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(config)
-##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
-##  [5] &quot;large&quot;                  &quot;datasets::mtcars&quot;      
-##  [7] &quot;file report.Rmd&quot;        &quot;file report.md&quot;        
-##  [9] &quot;random_rows&quot;            &quot;reg1&quot;                  
-## [11] &quot;reg2&quot;                   &quot;regression1_large&quot;     
-## [13] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
-## [15] &quot;regression2_small&quot;      &quot;report&quot;                
-## [17] &quot;simulate&quot;               &quot;small&quot;                 
-## [19] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;
-## [21] &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;
-## [23] &quot;x2&quot;</code></pre>
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;datasets::mtcars&quot;      </span>
+<span class="co">#&gt;  [7] &quot;file report.Rmd&quot;        &quot;file report.md&quot;        </span>
+<span class="co">#&gt;  [9] &quot;random_rows&quot;            &quot;reg1&quot;                  </span>
+<span class="co">#&gt; [11] &quot;reg2&quot;                   &quot;regression1_large&quot;     </span>
+<span class="co">#&gt; [13] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt; [15] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [17] &quot;simulate&quot;               &quot;small&quot;                 </span>
+<span class="co">#&gt; [19] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;</span>
+<span class="co">#&gt; [21] &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;</span>
+<span class="co">#&gt; [23] &quot;x2&quot;</span></code></pre>
 </div>
 <div id="outdated-targets-and-missing-dependencies" class="section level3">
 <h3><span class="header-section-number">9.1.3</span> Outdated targets and missing dependencies</h3>
 <p><code>missed()</code> shows any imports missing from your environment</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">missed</span>(config) <span class="co"># Nothing is missing right now.</span>
-## character(0)</code></pre>
+<span class="co">#&gt; character(0)</span></code></pre>
 <p><code>outdated()</code> reports any targets that are outdated.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config)
-##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
-##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
-##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
-##  [9] &quot;regression2_small&quot;      &quot;report&quot;                
-## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
-## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
-## [15] &quot;summ_regression2_small&quot;
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span>
+<span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span>
+<span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span>
+<span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span>
 
 <span class="kw">make</span>(my_plan)
-## target large
-## target small
-## target regression1_large
-## target regression2_large
-## target regression1_small
-## target regression2_small
-## target summ_regression1_large
-## target coef_regression1_large
-## target summ_regression2_large
-## target coef_regression2_large
-## target summ_regression1_small
-## target coef_regression1_small
-## target coef_regression2_small
-## target summ_regression2_small
-## target report
+<span class="co">#&gt; target large</span>
+<span class="co">#&gt; target small</span>
+<span class="co">#&gt; target regression1_large</span>
+<span class="co">#&gt; target regression2_large</span>
+<span class="co">#&gt; target regression1_small</span>
+<span class="co">#&gt; target regression2_small</span>
+<span class="co">#&gt; target summ_regression1_large</span>
+<span class="co">#&gt; target coef_regression1_large</span>
+<span class="co">#&gt; target summ_regression2_large</span>
+<span class="co">#&gt; target coef_regression2_large</span>
+<span class="co">#&gt; target summ_regression1_small</span>
+<span class="co">#&gt; target coef_regression1_small</span>
+<span class="co">#&gt; target coef_regression2_small</span>
+<span class="co">#&gt; target summ_regression2_small</span>
+<span class="co">#&gt; target report</span>
 
 <span class="kw">outdated</span>(config)
-## character(0)</code></pre>
+<span class="co">#&gt; character(0)</span></code></pre>
 </div>
 <div id="but-why-are-my-targets-out-of-date" class="section level3">
 <h3><span class="header-section-number">9.1.4</span> But <em>why</em> are my targets out of date?</h3>
 <p><code>drake</code> has the option to produce a cache log with the fingerprint of every target and import.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">drake_cache_log</span>())
-## # A tibble: 6 x 3
-##   hash             type   name                        
-##   &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                       
-## 1 4e6e4d4c0bcda263 target coef_regression1_large      
-## 2 5ad25785a84e0cac target coef_regression1_small      
-## 3 b2662785d55b28c1 target coef_regression2_large      
-## 4 23c66b36be56905b target coef_regression2_small      
-## 5 7b6504d4c0dcceab target large                       
-## 6 f4b89e63bc92af79 import n-MRQXIYLTMV2HGOR2NV2GGYLSOM</code></pre>
+<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt;   hash             type   name                        </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                       </span>
+<span class="co">#&gt; 1 4e6e4d4c0bcda263 target coef_regression1_large      </span>
+<span class="co">#&gt; 2 5ad25785a84e0cac target coef_regression1_small      </span>
+<span class="co">#&gt; 3 b2662785d55b28c1 target coef_regression2_large      </span>
+<span class="co">#&gt; 4 23c66b36be56905b target coef_regression2_small      </span>
+<span class="co">#&gt; 5 7b6504d4c0dcceab target large                       </span>
+<span class="co">#&gt; 6 f4b89e63bc92af79 import n-MRQXIYLTMV2HGOR2NV2GGYLSOM</span></code></pre>
 <p>We highly recommend that you automatically produce a cache log file on every <code>make()</code> and put it under <a href="https://github.com">version control</a> with the rest of your project.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">cache_log_file =</span> <span class="st">&quot;cache_log.txt&quot;</span>)
-## All targets are already up to date.
+<span class="co">#&gt; All targets are already up to date.</span>
 
 <span class="kw">read.table</span>(<span class="st">&quot;cache_log.txt&quot;</span>, <span class="dt">nrows =</span> <span class="dv">6</span>, <span class="dt">header =</span> <span class="ot">TRUE</span>)
-##               hash   type                         name
-## 1 4e6e4d4c0bcda263 target       coef_regression1_large
-## 2 5ad25785a84e0cac target       coef_regression1_small
-## 3 b2662785d55b28c1 target       coef_regression2_large
-## 4 23c66b36be56905b target       coef_regression2_small
-## 5 7b6504d4c0dcceab target                        large
-## 6 f4b89e63bc92af79 import n-MRQXIYLTMV2HGOR2NV2GGYLSOM</code></pre>
+<span class="co">#&gt;               hash   type                         name</span>
+<span class="co">#&gt; 1 4e6e4d4c0bcda263 target       coef_regression1_large</span>
+<span class="co">#&gt; 2 5ad25785a84e0cac target       coef_regression1_small</span>
+<span class="co">#&gt; 3 b2662785d55b28c1 target       coef_regression2_large</span>
+<span class="co">#&gt; 4 23c66b36be56905b target       coef_regression2_small</span>
+<span class="co">#&gt; 5 7b6504d4c0dcceab target                        large</span>
+<span class="co">#&gt; 6 f4b89e63bc92af79 import n-MRQXIYLTMV2HGOR2NV2GGYLSOM</span></code></pre>
 <p>Suppose we go back and add input checking to one of our functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(random_rows)
-## function (data, n) 
-## {
-##     data[sample.int(n = nrow(data), size = n, replace = TRUE), 
-##         ]
-## }
-## &lt;bytecode: 0xcd77d48&gt;
+<span class="co">#&gt; function (data, n) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
+<span class="co">#&gt;         ]</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x10caa278&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -531,41 +531,41 @@ random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data,
 }</code></pre>
 <p>Then, we forget to run <code>make()</code> again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config)
-##  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;
-##  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;
-##  [5] &quot;large&quot;                  &quot;regression1_large&quot;     
-##  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     
-##  [9] &quot;regression2_small&quot;      &quot;report&quot;                
-## [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;
-## [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;
-## [15] &quot;summ_regression2_small&quot;</code></pre>
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span>
+<span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span>
+<span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span>
+<span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span></code></pre>
 <p>At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to <code>outdated()</code> already re-cached the imports, so any changed imports will show up in the new log file.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_cache_log_file</span>(<span class="dt">file =</span> <span class="st">&quot;cache_log2.txt&quot;</span>)
 
 <span class="kw">system2</span>(<span class="st">&quot;diff&quot;</span>, <span class="st">&quot;cache_log.txt cache_log2.txt&quot;</span>, <span class="dt">stdout =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">cat</span>(<span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-## Warning in system2(&quot;diff&quot;, &quot;cache_log.txt cache_log2.txt&quot;, stdout = TRUE):
-## running command &#39;&#39;diff&#39; cache_log.txt cache_log2.txt&#39; had status 1
-## 10c10
-## &lt; db84c9f752635a13 import random_rows
-## ---
-## &gt; 089a5c1023c1c51a import random_rows
-## 18c18
-## &lt; f4d57e5ba38b744b import simulate
-## ---
-## &gt; 739a28336ceb4da2 import simulate</code></pre>
+<span class="co">#&gt; Warning in system2(&quot;diff&quot;, &quot;cache_log.txt cache_log2.txt&quot;, stdout = TRUE):</span>
+<span class="co">#&gt; running command &#39;&#39;diff&#39; cache_log.txt cache_log2.txt&#39; had status 1</span>
+<span class="co">#&gt; 10c10</span>
+<span class="co">#&gt; &lt; db84c9f752635a13 import random_rows</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; &gt; 089a5c1023c1c51a import random_rows</span>
+<span class="co">#&gt; 18c18</span>
+<span class="co">#&gt; &lt; f4d57e5ba38b744b import simulate</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; &gt; 739a28336ceb4da2 import simulate</span></code></pre>
 <p>Now, we see that <code>random_rows()</code> has changed since last time, and we have a new dependency <code>stopifnot()</code>. <code>simulate()</code> shows up in the changes too, but only because <code>random_rows()</code> is nested in the body of <code>simulate()</code>. If we revert <code>random_rows()</code> to its original state, all our targets are up to date again.</p>
 <pre class="sourceCode r"><code class="sourceCode r">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   data[<span class="kw">sample.int</span>(<span class="dt">n =</span> <span class="kw">nrow</span>(data), <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>), ]
 }
 
 <span class="kw">outdated</span>(config)
-## character(0)
+<span class="co">#&gt; character(0)</span>
 
 <span class="kw">drake_cache_log_file</span>(<span class="dt">file =</span> <span class="st">&quot;cache_log3.txt&quot;</span>)
 
 <span class="kw">system2</span>(<span class="st">&quot;diff&quot;</span>, <span class="st">&quot;cache_log.txt cache_log3.txt&quot;</span>, <span class="dt">stdout =</span> <span class="ot">TRUE</span>)
-## character(0)</code></pre>
+<span class="co">#&gt; character(0)</span></code></pre>
 </div>
 </div>
 <div id="diagnose-failures." class="section level2">
@@ -584,48 +584,48 @@ bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 )
 
 bad_plan
-## # A tibble: 3 x 2
-##   target    command
-##   &lt;chr&gt;     &lt;chr&gt;  
-## 1 a         12     
-## 2 b         -a     
-## 3 my_target f(b)
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target    command</span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 a         12     </span>
+<span class="co">#&gt; 2 b         -a     </span>
+<span class="co">#&gt; 3 my_target f(b)</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="dt">new =</span> <span class="kw">stdout</span>(),
   <span class="kw">make</span>(bad_plan)
 )
-## target a
-## target b
-## target my_target
-## fail my_target
-## Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:
-##   `x` cannot be negative.
+<span class="co">#&gt; target a</span>
+<span class="co">#&gt; target b</span>
+<span class="co">#&gt; target my_target</span>
+<span class="co">#&gt; fail my_target</span>
+<span class="co">#&gt; Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:</span>
+<span class="co">#&gt;   `x` cannot be negative.</span>
 
 <span class="kw">failed</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># from the last make() only</span>
-## [1] &quot;my_target&quot;
+<span class="co">#&gt; [1] &quot;my_target&quot;</span>
 
 <span class="co"># See also warnings and messages.</span>
 error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(my_target, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)<span class="op">$</span>error
 
 error<span class="op">$</span>message
-## [1] &quot;`x` cannot be negative.&quot;
+<span class="co">#&gt; [1] &quot;`x` cannot be negative.&quot;</span>
 
 error<span class="op">$</span>call
-## f(b)
+<span class="co">#&gt; f(b)</span>
 
 <span class="kw">str</span>(error<span class="op">$</span>calls) <span class="co"># View the traceback.</span>
-## List of 8
-##  $ : language local({     f(b) ...
-##  $ : language eval.parent(substitute(eval(quote(expr), envir)))
-##  $ : language eval(expr, p)
-##  $ : language eval(expr, p)
-##  $ : language eval(quote({     f(b) ...
-##  $ : language eval(quote({     f(b) ...
-##  $ : language f(b)
-##  $ : language stop(&quot;`x` cannot be negative.&quot;)
-##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3
-##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x16cd6ba0&gt;</code></pre>
+<span class="co">#&gt; List of 8</span>
+<span class="co">#&gt;  $ : language local({     f(b) ...</span>
+<span class="co">#&gt;  $ : language eval.parent(substitute(eval(quote(expr), envir)))</span>
+<span class="co">#&gt;  $ : language eval(expr, p)</span>
+<span class="co">#&gt;  $ : language eval(expr, p)</span>
+<span class="co">#&gt;  $ : language eval(quote({     f(b) ...</span>
+<span class="co">#&gt;  $ : language eval(quote({     f(b) ...</span>
+<span class="co">#&gt;  $ : language f(b)</span>
+<span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
+<span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x14794c48&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -635,38 +635,38 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span 
 
 <span class="co"># my_target depends on b.</span>
 <span class="st">&quot;b&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>()
-## [1] FALSE
+<span class="co">#&gt; [1] FALSE</span>
 
 <span class="co"># Try to build my_target until the error is fixed.</span>
 <span class="co"># Skip all that pesky work checking dependencies.</span>
 <span class="kw">drake_build</span>(my_target, <span class="dt">config =</span> config) <span class="co"># See also drake_debug().</span>
-## target my_target
-## fail my_target
-## Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:
-##   `x` cannot be negative.
+<span class="co">#&gt; target my_target</span>
+<span class="co">#&gt; fail my_target</span>
+<span class="co">#&gt; Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:</span>
+<span class="co">#&gt;   `x` cannot be negative.</span>
 
 <span class="co"># The target failed, but the dependency was loaded.</span>
 <span class="st">&quot;b&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>()
-## [1] FALSE
+<span class="co">#&gt; [1] FALSE</span>
 
 <span class="co"># What was `b` again?</span>
 b
-## Error in eval(expr, envir, enclos): object &#39;b&#39; not found
+<span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;b&#39; not found</span>
 
 <span class="co"># How was `b` used?</span>
 <span class="kw">diagnose</span>(my_target)<span class="op">$</span>message
-## NULL
+<span class="co">#&gt; NULL</span>
 
 <span class="kw">diagnose</span>(my_target)<span class="op">$</span>call
-## NULL
+<span class="co">#&gt; NULL</span>
 
 f
-## function(x){
-##   if (x &lt; 0){
-##     stop(&quot;`x` cannot be negative.&quot;)
-##   }
-##   x
-## }
+<span class="co">#&gt; function(x){</span>
+<span class="co">#&gt;   if (x &lt; 0){</span>
+<span class="co">#&gt;     stop(&quot;`x` cannot be negative.&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   x</span>
+<span class="co">#&gt; }</span>
 
 <span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
 f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
@@ -681,10 +681,10 @@ f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
 <span class="co"># Since you called make() previously, `config` is read from the cache</span>
 <span class="co"># if you do not supply it.</span>
 <span class="kw">drake_build</span>(my_target) <span class="co"># See also drake_debug().</span>
-## Error in loadd(list = target, deps = TRUE, envir = config$eval, cache = config$cache, : cannot find drake cache.
+<span class="co">#&gt; Error in loadd(list = target, deps = TRUE, envir = config$eval, cache = config$cache, : cannot find drake cache.</span>
 
 <span class="kw">readd</span>(my_target)
-## Error: key &#39;my_target&#39; (&#39;objects&#39;) not found</code></pre>
+<span class="co">#&gt; Error: key &#39;my_target&#39; (&#39;objects&#39;) not found</span></code></pre>
 </div>
 <div id="timeouts-and-retries" class="section level2">
 <h2><span class="header-section-number">9.3</span> Timeouts and retries</h2>
@@ -695,46 +695,46 @@ f &lt;-<span class="st"> </span><span class="cf">function</span>(...){
 }
 debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))
 debug_plan
-## # A tibble: 2 x 2
-##   target command
-##   &lt;chr&gt;  &lt;chr&gt;  
-## 1 x      1      
-## 2 y      f(x)
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 x      1      </span>
+<span class="co">#&gt; 2 y      f(x)</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="kw">stdout</span>(),
   <span class="kw">make</span>(debug_plan, <span class="dt">timeout =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)
 )
-## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
-## instead.
+<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
+<span class="co">#&gt; instead.</span>
 
-## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
-## instead.
-## target x
-## target y</code></pre>
+<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
+<span class="co">#&gt; instead.</span>
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt; target y</span></code></pre>
 <p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 debug_plan<span class="op">$</span>timeout &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
 debug_plan<span class="op">$</span>retries &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>
 
 debug_plan
-## # A tibble: 2 x 4
-##   target command timeout retries
-##   &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;   &lt;int&gt;
-## 1 x      1         0.001       1
-## 2 y      f(x)      0.002       2
+<span class="co">#&gt; # A tibble: 2 x 4</span>
+<span class="co">#&gt;   target command timeout retries</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;   &lt;int&gt;</span>
+<span class="co">#&gt; 1 x      1         0.001       1</span>
+<span class="co">#&gt; 2 y      f(x)      0.002       2</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="dt">new =</span> <span class="kw">stdout</span>(),
   <span class="kw">make</span>(debug_plan, <span class="dt">timeout =</span> <span class="ot">Inf</span>, <span class="dt">retries =</span> <span class="dv">0</span>)
 )
-## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
-## instead.
+<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
+<span class="co">#&gt; instead.</span>
 
-## Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`
-## instead.
-## target x
-## target y</code></pre>
+<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
+<span class="co">#&gt; instead.</span>
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt; target y</span></code></pre>
 </div>
 <div id="consider-hasty-mode" class="section level2">
 <h2><span class="header-section-number">9.4</span> Consider hasty mode</h2>

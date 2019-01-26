@@ -370,11 +370,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <span class="dt">target1 =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sqrt</span>(<span class="dv">3</span>)),
   <span class="dt">target2 =</span> <span class="kw">my_function</span>(web_scraped_data) <span class="op">%&gt;%</span><span class="st"> </span>my_tidy
 )
-## # A tibble: 2 x 2
-##   target  command                                  
-##   &lt;chr&gt;   &lt;chr&gt;                                    
-## 1 target1 1 + 1 - sqrt(sqrt(3))                    
-## 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target  command                                  </span>
+<span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;                                    </span>
+<span class="co">#&gt; 1 target1 1 + 1 - sqrt(sqrt(3))                    </span>
+<span class="co">#&gt; 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</span></code></pre>
 <p>However, please try to avoid formulas and function definitions in your commands. You may be able to get away with <code>drake_plan(f = function(x){x + 1})</code> or <code>drake_plan(f = y ~ x)</code> in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let <code>make()</code> import them. (Alternatively, use the <code>envir</code> argument to <code>make()</code> to tightly control which imported functions are available.) Use the <code>check_plan()</code> function to help screen and quality-control your <code>drake</code> plan, use <code>tracked()</code> to see the items that are reproducibly tracked, and use <code>vis_drake_graph()</code> and <code>build_drake_graph()</code> to see the dependency structure of your project.</p>
 </div>
 </div>
@@ -398,16 +398,16 @@ my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span c
   <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span>
 ))
 my_plan
-## # A tibble: 2 x 2
-##   target   command   
-##   &lt;chr&gt;    &lt;chr&gt;     
-## 1 little_b &quot;\&quot;b\&quot;&quot;   
-## 2 letter   !!little_b
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target   command   </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 little_b &quot;\&quot;b\&quot;&quot;   </span>
+<span class="co">#&gt; 2 letter   !!little_b</span>
 <span class="kw">make</span>(my_plan)
-## target little_b
-## target letter
+<span class="co">#&gt; target little_b</span>
+<span class="co">#&gt; target letter</span>
 <span class="kw">readd</span>(letter)
-## [1] &quot;b&quot;</code></pre>
+<span class="co">#&gt; [1] &quot;b&quot;</span></code></pre>
 <p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_evaluation = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
 <pre class="sourceCode r"><code class="sourceCode r">my_variable &lt;-<span class="st"> </span><span class="dv">5</span>
 
@@ -416,12 +416,12 @@ my_plan
   <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
   <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)
 )
-## # A tibble: 3 x 2
-##   target command      
-##   &lt;chr&gt;  &lt;chr&gt;        
-## 1 a      5            
-## 2 b      5 + 1        
-## 3 d      !!my_variable
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command      </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;        </span>
+<span class="co">#&gt; 1 a      5            </span>
+<span class="co">#&gt; 2 b      5 + 1        </span>
+<span class="co">#&gt; 3 d      !!my_variable</span>
 
 <span class="kw">drake_plan</span>(
   <span class="dt">a =</span> <span class="op">!!</span>my_variable,
@@ -429,12 +429,12 @@ my_plan
   <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),
   <span class="dt">tidy_evaluation =</span> <span class="ot">FALSE</span>
 )
-## # A tibble: 3 x 2
-##   target command          
-##   &lt;chr&gt;  &lt;chr&gt;            
-## 1 a      !!my_variable    
-## 2 b      !!my_variable + 1
-## 3 d      !!my_variable</code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target command          </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;            </span>
+<span class="co">#&gt; 1 a      !!my_variable    </span>
+<span class="co">#&gt; 2 b      !!my_variable + 1</span>
+<span class="co">#&gt; 3 d      !!my_variable</span></code></pre>
 <p>For instances of <code>!!</code> that remain in the <code>drake</code> plan, <code>make()</code> will run these commands in tidy fashion, evaluating the <code>!!</code> operator using the environment you provided.</p>
 </div>
 <div id="find-and-diagnose-your-errors." class="section level3">
@@ -442,7 +442,7 @@ my_plan
 <p>When <code>make()</code> fails, use <code>failed()</code> and <code>diagnose()</code> to debug. Try the following out yourself.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## Targets with available diagnostic metadata, incluing errors, warnings, etc.
 <span class="kw">diagnose</span>()
-## [1] &quot;letter&quot;   &quot;little_b&quot;
+<span class="co">#&gt; [1] &quot;letter&quot;   &quot;little_b&quot;</span>
 
 f &lt;-<span class="st"> </span><span class="cf">function</span>(){
   <span class="kw">stop</span>(<span class="st">&quot;unusual error&quot;</span>)
@@ -454,52 +454,52 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="kw">stdout</span>(),
   <span class="kw">make</span>(bad_plan)
 )
-## target target
-## fail target
-## Error: Target `target` failed. Call `diagnose(target)` for details. Error message:
-##   unusual error
+<span class="co">#&gt; target target</span>
+<span class="co">#&gt; fail target</span>
+<span class="co">#&gt; Error: Target `target` failed. Call `diagnose(target)` for details. Error message:</span>
+<span class="co">#&gt;   unusual error</span>
 
 <span class="kw">failed</span>() <span class="co"># From the last make() only</span>
-## [1] &quot;target&quot;
+<span class="co">#&gt; [1] &quot;target&quot;</span>
 
 error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(target)<span class="op">$</span>error <span class="co"># See also warnings and messages.</span>
 
 error<span class="op">$</span>message
-## [1] &quot;unusual error&quot;
+<span class="co">#&gt; [1] &quot;unusual error&quot;</span>
 
 error<span class="op">$</span>call
-## f()
+<span class="co">#&gt; f()</span>
 
 error<span class="op">$</span>calls <span class="co"># View the traceback.</span>
-## [[1]]
-## local({
-##     f()
-## })
-## 
-## [[2]]
-## eval.parent(substitute(eval(quote(expr), envir)))
-## 
-## [[3]]
-## eval(expr, p)
-## 
-## [[4]]
-## eval(expr, p)
-## 
-## [[5]]
-## eval(quote({
-##     f()
-## }), new.env())
-## 
-## [[6]]
-## eval(quote({
-##     f()
-## }), new.env())
-## 
-## [[7]]
-## f()
-## 
-## [[8]]
-## stop(&quot;unusual error&quot;)</code></pre>
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt; local({</span>
+<span class="co">#&gt;     f()</span>
+<span class="co">#&gt; })</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt; eval.parent(substitute(eval(quote(expr), envir)))</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[3]]</span>
+<span class="co">#&gt; eval(expr, p)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[4]]</span>
+<span class="co">#&gt; eval(expr, p)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[5]]</span>
+<span class="co">#&gt; eval(quote({</span>
+<span class="co">#&gt;     f()</span>
+<span class="co">#&gt; }), new.env())</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[6]]</span>
+<span class="co">#&gt; eval(quote({</span>
+<span class="co">#&gt;     f()</span>
+<span class="co">#&gt; }), new.env())</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[7]]</span>
+<span class="co">#&gt; f()</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[8]]</span>
+<span class="co">#&gt; stop(&quot;unusual error&quot;)</span></code></pre>
 </div>
 <div id="refresh-the-drake_config-list-early-and-often." class="section level3">
 <h3><span class="header-section-number">B.2.5</span> Refresh the <code>drake_config()</code> list early and often.</h3>
@@ -551,10 +551,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-## [1] &quot;45dc8c6568dc5c16e44b5632fb273b07&quot;
+<span class="co">#&gt; [1] &quot;b1598bb0d37139e750b215c56f54e522&quot;</span>
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-## [1] &quot;9216e8456e7daf818a71adcaf9e59b9d&quot;
+<span class="co">#&gt; [1] &quot;3a6a5a8bdbd0c025d855e3a9d40e6a91&quot;</span>
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -563,10 +563,10 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
 )
 <span class="kw">make</span>(plan) <span class="co"># `circle_class` changes because it is referenced.</span>
-## target circle
-## target area
+<span class="co">#&gt; target circle</span>
+<span class="co">#&gt; target area</span>
 <span class="kw">make</span>(plan) <span class="co"># Builds `circle` again because `circle_class` changed.</span>
-## target circle</code></pre>
+<span class="co">#&gt; target circle</span></code></pre>
 <p>The solution is to define your <code>R6</code> class inside a function. <code>drake</code> does the right thing when it comes to tracking changes to functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
 new_circle &lt;-<span class="st"> </span><span class="cf">function</span>(radius){
@@ -589,10 +589,10 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">area =</span> circle<span class="op">$</span><span class="kw">area</span>()
 )
 <span class="kw">make</span>(plan)
-## target circle
-## target area
+<span class="co">#&gt; target circle</span>
+<span class="co">#&gt; target area</span>
 <span class="kw">make</span>(plan)
-## All targets are already up to date.</code></pre>
+<span class="co">#&gt; All targets are already up to date.</span></code></pre>
 </div>
 <div id="dependencies-are-not-tracked-in-some-edge-cases." class="section level3">
 <h3><span class="header-section-number">B.3.2</span> Dependencies are not tracked in some edge cases.</h3>
@@ -607,22 +607,22 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 }
 
 <span class="kw">deps_code</span>(f)
-## $globals
-## [1] &quot;globalenv&quot;       &quot;file_dependency&quot; &quot;get&quot;            
-## 
-## $namespaced
-## [1] &quot;digest::digest&quot;
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;globalenv&quot;       &quot;file_dependency&quot; &quot;get&quot;            </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $namespaced</span>
+<span class="co">#&gt; [1] &quot;digest::digest&quot;</span>
 
 command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span>
 <span class="kw">deps_code</span>(command)
-## $globals
-## [1] &quot;assign&quot;
-## 
-## $namespaced
-## [1] &quot;digest::digest&quot;
-## 
-## $file_in
-## [1] &quot;input_file.rds&quot;</code></pre>
+<span class="co">#&gt; $globals</span>
+<span class="co">#&gt; [1] &quot;assign&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $namespaced</span>
+<span class="co">#&gt; [1] &quot;digest::digest&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $file_in</span>
+<span class="co">#&gt; [1] &quot;input_file.rds&quot;</span></code></pre>
 <p><code>drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
 </div>
 <div id="dependencies-of-knitr-reports" class="section level3">
@@ -635,12 +635,12 @@ command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> base<span class="op">::</span><span class="kw">print</span>(<span class="kw">data.frame</span>(<span class="dt">y =</span> <span class="dv">1</span>)))
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_environment</span>()
 <span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)
-## target x
-##   y
-## 1 1
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt;   y</span>
+<span class="co">#&gt; 1 1</span>
 <span class="kw">readd</span>(<span class="st">&quot;base::print&quot;</span>, <span class="dt">character_only =</span> <span class="ot">TRUE</span>, <span class="dt">cache =</span> cache)
-## [1] &quot;function (x, ...) \nUseMethod(\&quot;print\&quot;)&quot;
-## [2] &quot;&quot;</code></pre>
+<span class="co">#&gt; [1] &quot;function (x, ...) \nUseMethod(\&quot;print\&quot;)&quot;</span>
+<span class="co">#&gt; [2] &quot;&quot;</span></code></pre>
 <p>But <code>print()</code> itself is not actually very helpful. Because of S3, <code>print.data.frame()</code> is actually doing the work. If you were to write your own S3 system and change a specific method like <code>print.data.frame()</code>, changes would not be reproducibly tracked because <code>drake</code> only finds the generic function.</p>
 <p>This is unavoidable because <code>drake</code> uses static code analysis to detect dependencies. It finds generics like <code>print()</code>, but it has no way of knowing in advance what method will actually be called.</p>
 </div>
