@@ -561,47 +561,37 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 </div>
 <div id="parallel-computing-within-targets" class="section level3">
 <h3><span class="header-section-number">10.6.6</span> Parallel computing <em>within</em> targets</h3>
-<p>In addition to parallism <em>among</em> targets on a cluster, you may wish to invoke parallelism <em>within</em> each target locally on its compute node. One successful approach is to</p>
-<ol style="list-style-type: decimal">
-<li>Define a custom plan column with the number of local workers for each target, and</li>
-<li>Use the <code>from_plan()</code> function to get number of workers inside each command.</li>
-</ol>
+<p>You may wish to invoke parallel computing within individual targets, e.g.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, sqrt, <span class="dt">mc.cores =</span> <span class="dv">4</span>),
+  <span class="dt">b =</span> parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, sqrt, <span class="dt">mc.cores =</span> <span class="dv">2</span>)
+)</code></pre>
+<p>or even</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">a =</span> <span class="kw">target</span>(
-    parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, sqrt, <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)),
-    <span class="dt">cores =</span> <span class="dv">4</span>
+    parallel<span class="op">::</span><span class="kw">mclapply</span>(
+      <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>,
+      sqrt,
+      <span class="co"># You can change the # of cores without changing the command.</span>
+      <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)
+    ),
+    <span class="dt">cores =</span> <span class="dv">4</span> <span class="co"># Changes to this number do not invalidate `a`.</span>
   ),
   <span class="dt">b =</span> <span class="kw">target</span>(
     parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, sqrt, <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)),
     <span class="dt">cores =</span> <span class="dv">2</span>
   )
-)
-
- plan
-<span class="co">#&gt; # A tibble: 2 x 3</span>
-<span class="co">#&gt;   target command                                                      cores</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     4</span>
-<span class="co">#&gt; 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</span></code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)</code></pre>
-<p>The above <code>make()</code> may fail because <a href="https://github.com/ropensci/drake/issues/664#issuecomment-453163562"><code>make()</code> locks your environment</a> and <a href="https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones"><code>mclapply()</code> tries to add new variables to it</a>. If that happens, try <code>make(plan, lock_envir = FALSE)</code> or other parallel computing functions like <code>parLapply()</code> or <code>furrr::future_map()</code>. See <a href="https://github.com/ropensci/drake/issues/675#issuecomment-454403818">this comment</a> and the ensuing discussion.</p>
-<p>But usually, parallelism <em>among</em> targets happens through a cluster.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Edit by hand.</span>
-<span class="kw">options</span>(
-  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>,
-  <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span>,
-)
-<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
-<p>If you change the <code>cores</code> column and then run <code>make()</code> a second time, the targets will stay up to date. This is appropriate because changes to <code>mc.cores</code> do not actually affect the output values of the targets.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan<span class="op">$</span>cores &lt;-<span class="st"> </span><span class="dv">2</span>
-
-plan
-<span class="co">#&gt; # A tibble: 2 x 3</span>
-<span class="co">#&gt;   target command                                                      cores</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                                        &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 a      &quot;parallel::mclapply(1:8, sqrt, mc.cores = from_plan(\&quot;cores…     2</span>
-<span class="co">#&gt; 2 b      &quot;parallel::mclapply(1:4, sqrt, mc.cores = from_plan(\&quot;cores…     2</span></code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
+)</code></pre>
+<p>Unfortunately, for reasons described <a href="https://github.com/ropensci/drake/issues/675">here</a> and <a href="https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o">here</a>, <code>make(plan)</code> will fail in each case. Workarounds:</p>
+<ul>
+<li>Avoid <code>mclapply()</code>. <a href="https://davisvaughan.github.io/furrr/"><code>furrr::map()</code></a> and <code>parallel::parLapply()</code> are more dependable alternatives anyway. In the case of <a href="https://davisvaughan.github.io/furrr/"><code>furrr</code></a>, invoke <a href="https://github.com/HenrikBengtsson/future.callr"><code>future::plan(future.callr::callr)</code></a> or <code>future::plan(future::multisession)</code> first.</li>
+<li>In <code>make()</code>, set the <code>lock_envir</code> argument to <code>FALSE</code>. This approach deactivates important reproducibility guardrails, so use with caution.</li>
+<li>In <code>mclapply()</code>, set the <code>mc.set.seed</code> argument to <code>FALSE</code>. If your computations require pseudo-random numbers (<code>rnorm()</code>, <code>runif()</code>, etc.) you will need to manually set a different seed for each parallel process, e.g.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dt">X =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">mc.cores =</span> <span class="dv">4</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(i) {
+  <span class="kw">set.seed</span>(<span class="kw">sum</span>(.Random.seed) <span class="op">+</span><span class="st"> </span>i)
+  <span class="co"># Do some work...</span>
+})</code></pre>
 </div>
 <div id="hasty-mode" class="section level3">
 <h3><span class="header-section-number">10.6.7</span> Hasty mode</h3>
