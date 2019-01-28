@@ -265,55 +265,46 @@ This feature is very advanced, and you should only attempt it in production if y
 
 ### Parallel computing *within* targets
 
-In addition to parallism *among* targets on a cluster, you may wish to invoke parallelism *within* each target locally on its compute node. One successful approach is to
-
-1. Define a custom plan column with the number of local workers for each target, and
-2. Use the `from_plan()` function to get number of workers inside each command.
+You may wish to invoke parallel computing within individual targets, e.g.
 
 ```{r fromplanworkershpc}
 plan <- drake_plan(
+  a = parallel::mclapply(1:8, sqrt, mc.cores = 4),
+  b = parallel::mclapply(1:4, sqrt, mc.cores = 2)
+)
+```
+
+or even
+
+```{r fromplanworkershpc2}
+plan <- drake_plan(
   a = target(
-    parallel::mclapply(1:8, sqrt, mc.cores = from_plan("cores")),
-    cores = 4
+    parallel::mclapply(
+      1:8,
+      sqrt,
+      # You can change the # of cores without changing the command.
+      mc.cores = from_plan("cores")
+    ),
+    cores = 4 # Changes to this number do not invalidate `a`.
   ),
   b = target(
     parallel::mclapply(1:4, sqrt, mc.cores = from_plan("cores")),
     cores = 2
   )
 )
-
- plan
 ```
 
+Unfortunately, for reasons described [here](https://github.com/ropensci/drake/issues/675) and [here](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o), `make(plan)` will fail in each case. Workarounds:
 
-```{r fromplannorun2, eval = FALSE}
-make(plan)
-```
+- Avoid `mclapply()`.  [`furrr::map()`](https://davisvaughan.github.io/furrr/) and `parallel::parLapply()` are more dependable alternatives anyway. In the case of [`furrr`](https://davisvaughan.github.io/furrr/), invoke [`future::plan(future.callr::callr)`](https://github.com/HenrikBengtsson/future.callr) or `future::plan(future::multisession)` first.
+- In `make()`, set the `lock_envir` argument to `FALSE`. This approach deactivates important reproducibility guardrails, so use with caution.
+- In `mclapply()`, set the `mc.set.seed` argument to `FALSE`. If your computations require pseudo-random numbers (`rnorm()`, `runif()`, etc.) you will need to manually set a different seed for each parallel process, e.g.
 
-The above `make()` may fail because [`make()` locks your environment](https://github.com/ropensci/drake/issues/664#issuecomment-453163562) and [`mclapply()` tries to add new variables to it](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones). If that happens, try `make(plan, lock_envir = FALSE)` or other parallel computing functions like `parLapply()` or `furrr::future_map()`. See [this  comment](https://github.com/ropensci/drake/issues/675#issuecomment-454403818) and the ensuing discussion.
-
-But usually, parallelism *among* targets happens through a cluster.
-
-```{r cmqsetup2, eval = FALSE}
-drake_hpc_template_file("slurm_clustermq.tmpl") # Edit by hand.
-options(
-  clustermq.scheduler = "slurm",
-  clustermq.template = "slurm_clustermq.tmpl",
-)
-make(plan, parallelism = "clustermq", jobs = 2)
-```
-
-If you change the `cores` column and then run `make()` a second time, the targets will stay up to date. This is appropriate because changes to `mc.cores` do not actually affect the output values of the targets.
-
-```{r fromplanworkershpc3}
-plan$cores <- 2
-
-plan
-```
-
-
-```{r fromplannorun3, eval = FALSE}
-make(plan, parallelism = "clustermq", jobs = 2)
+```{r setseedself, eval = FALSE}
+parallel::mclapply(X = 1:4, mc.cores = 4, FUN = function(i) {
+  set.seed(sum(.Random.seed) + i)
+  # Do some work...
+})
 ```
 
 ### Hasty mode
