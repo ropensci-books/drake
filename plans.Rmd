@@ -397,16 +397,18 @@ post_process <- function(data_list, plan_with_trace) {
 
 `match.call()` captures the function call itself, including the names of the symbols passed to the arguments. This is handy in a variety of similar use cases.
 
-```{r transform9, eval = FALSE}
+```{r transform9}
 f <- function(x, y, ...) {
   this_call <- match.call(expand.dots = FALSE)
   print(this_call)
-  print(mode(this_call))
-  print(typeof(this_call))
-  print(as.character(this_call$x))
-  print(all.vars(this_call$y))
-  print(as.character(this_call$...$z))
+  cat("mode:", mode(this_call), "\n")
+  cat("type:", typeof(this_call), "\n")
+  cat("x:", as.character(this_call$x), "\n")
+  cat("y:", all.vars(this_call$y), "\n")
+  cat("z:", as.character(this_call$...$z), "\n")
 }
+
+f(x = a, y = c(b, c), z = d)
 ```
 
 To learn more about metaprogramming, you can consult the [metaprogramming chapters in Advanced R](https://adv-r.hadley.nz/introduction-16.html). For more discussion on this use case of `drake`, please see [this thread on GitHub](https://github.com/ropensci/drake/issues/693). Comments, questions, etc. are welcome. Please feel free to post.
