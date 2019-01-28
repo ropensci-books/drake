@@ -846,12 +846,20 @@ plan
 <pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, ...) {
   this_call &lt;-<span class="st"> </span><span class="kw">match.call</span>(<span class="dt">expand.dots =</span> <span class="ot">FALSE</span>)
   <span class="kw">print</span>(this_call)
-  <span class="kw">print</span>(<span class="kw">mode</span>(this_call))
-  <span class="kw">print</span>(<span class="kw">typeof</span>(this_call))
-  <span class="kw">print</span>(<span class="kw">as.character</span>(this_call<span class="op">$</span>x))
-  <span class="kw">print</span>(<span class="kw">all.vars</span>(this_call<span class="op">$</span>y))
-  <span class="kw">print</span>(<span class="kw">as.character</span>(this_call<span class="op">$</span>...<span class="op">$</span>z))
-}</code></pre>
+  <span class="kw">cat</span>(<span class="st">&quot;mode:&quot;</span>, <span class="kw">mode</span>(this_call), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+  <span class="kw">cat</span>(<span class="st">&quot;type:&quot;</span>, <span class="kw">typeof</span>(this_call), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+  <span class="kw">cat</span>(<span class="st">&quot;x:&quot;</span>, <span class="kw">as.character</span>(this_call<span class="op">$</span>x), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+  <span class="kw">cat</span>(<span class="st">&quot;y:&quot;</span>, <span class="kw">all.vars</span>(this_call<span class="op">$</span>y), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+  <span class="kw">cat</span>(<span class="st">&quot;z:&quot;</span>, <span class="kw">as.character</span>(this_call<span class="op">$</span>...<span class="op">$</span>z), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+}
+
+<span class="kw">f</span>(<span class="dt">x =</span> a, <span class="dt">y =</span> <span class="kw">c</span>(b, c), <span class="dt">z =</span> d)
+<span class="co">#&gt; f(x = a, y = c(b, c), ... = pairlist(z = d))</span>
+<span class="co">#&gt; mode: call </span>
+<span class="co">#&gt; type: language </span>
+<span class="co">#&gt; x: a </span>
+<span class="co">#&gt; y: b c </span>
+<span class="co">#&gt; z: d</span></code></pre>
 <p>To learn more about metaprogramming, you can consult the <a href="https://adv-r.hadley.nz/introduction-16.html">metaprogramming chapters in Advanced R</a>. For more discussion on this use case of <code>drake</code>, please see <a href="https://github.com/ropensci/drake/issues/693">this thread on GitHub</a>. Comments, questions, etc. are welcome. Please feel free to post.</p>
 </div>
 </div>
