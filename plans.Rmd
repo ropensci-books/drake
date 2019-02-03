@@ -20,7 +20,10 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 
 ## What is a `drake` plan?
 
-A`drake` plan is a data frame with columns named `target` and `command`. Each target is an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the `drake_plan()` function is particularly convenient. Recall the plan from our [previous example](#main):
+A`drake` plan is a data frame with columns named `target` and `command`. Each target is an R object, and each command is an [expression](http://adv-r.had.co.nz/Expressions.html) to produce it.[^1] The `drake_plan()` function is the best way to set up plans.[^2] Recall the plan from our [previous example](#main):
+
+[^1]: You can turn the `command` column of your plan into a character vector (e.g. `plan$command <- purrr::map_chr(plan$command, rlang::expr_text)`) and `drake` will still understand you. However, the recommended format is a list of [expressions](http://adv-r.had.co.nz/Expressions.html). `drake_plan()` and friends always supply [expression](http://adv-r.had.co.nz/Expressions.html) lists.
+[^2]: `drake_plan()` is the best way to create plans, but you can create plans any way you like. `drake` will understand plans you create directly using `data.frame()` or `tibble()`.
 
 ```{r firstexampleplan}
 plan <- drake_plan(
@@ -38,19 +41,7 @@ plan <- drake_plan(
 plan
 ```
 
-By default, the commands are [expressions](http://adv-r.had.co.nz/Expressions.html) (note the `<expr>` heading in the above `tibble`). You can convert them to character strings, but this is not recommended.
-
-```{r firstexampleplan2}
-str(plan$command)
-
-text <- unname(purrr::map_chr(plan$command, rlang::expr_text))
-
-text
-
-# Optional but not recommended: plan$command <- text
-```
-
-Anyway, `drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
+`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
 
 ## Plans are similar to R scripts.
 
