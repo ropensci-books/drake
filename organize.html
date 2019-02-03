@@ -251,8 +251,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.2</b> Diagnose failures.</a></li>
 <li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#timeouts-and-retries"><i class="fa fa-check"></i><b>9.3</b> Timeouts and retries</a></li>
-<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#consider-hasty-mode"><i class="fa fa-check"></i><b>9.4</b> Consider hasty mode</a></li>
-<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.5</b> More help</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.4</b> More help</a></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing</a><ul>
 <li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
@@ -284,7 +283,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>11.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="11.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>11.2</b> Customization</a></li>
 <li class="chapter" data-level="11.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>11.3</b> Alternative trigger modes</a></li>
-<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode-1"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
+<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
 <li class="chapter" data-level="11.5" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>11.5</b> A more practical example</a></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>12</b> Time: logging, prediction, and strategy</a><ul>
@@ -386,8 +385,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 good_plan
 <span class="co">#&gt; # A tibble: 3 x 2</span>
 <span class="co">#&gt;   target       command                                </span>
-<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                                  </span>
-<span class="co">#&gt; 1 my_data      &quot;get_data(file_in(\&quot;data.csv\&quot;))&quot;      </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;S3: langs&gt;                            </span>
+<span class="co">#&gt; 1 my_data      get_data(file_in(&quot;data.csv&quot;))          </span>
 <span class="co">#&gt; 2 my_analysis  analyze_data(my_data)                  </span>
 <span class="co">#&gt; 3 my_summaries summarize_results(my_data, my_analysis)</span></code></pre>
 <p><code>drake</code> knows that <code>my_analysis</code> depends on <code>my_data</code> because <code>my_data</code> is an argument to <code>analyze_data()</code>, which is part of the command for <code>my_analysis</code>.</p>
@@ -418,32 +417,16 @@ good_plan
 
 bad_plan
 <span class="co">#&gt; # A tibble: 3 x 2</span>
-<span class="co">#&gt;   target       command                                </span>
-<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                                  </span>
-<span class="co">#&gt; 1 my_data      &quot;source(file_in(\&quot;get_data.R\&quot;))&quot;      </span>
-<span class="co">#&gt; 2 my_analysis  &quot;source(file_in(\&quot;analyze_data.R\&quot;))&quot;  </span>
-<span class="co">#&gt; 3 my_summaries &quot;source(file_in(\&quot;summarize_data.R\&quot;))&quot;</span></code></pre>
+<span class="co">#&gt;   target       command                            </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;S3: langs&gt;                        </span>
+<span class="co">#&gt; 1 my_data      source(file_in(&quot;get_data.R&quot;))      </span>
+<span class="co">#&gt; 2 my_analysis  source(file_in(&quot;analyze_data.R&quot;))  </span>
+<span class="co">#&gt; 3 my_summaries source(file_in(&quot;summarize_data.R&quot;))</span></code></pre>
 <p>But now, the dependency structure of your work is broken. Your R script files are dependencies, but since <code>my_data</code> is not mentioned in a function or command, <code>drake</code> does not know that <code>my_analysis</code> depends on it.</p>
-<pre><code>#&gt; [[1]]
-#&gt; [1] TRUE
-#&gt; 
-#&gt; [[2]]
-#&gt; [1] TRUE
-#&gt; 
-#&gt; [[3]]
-#&gt; [1] TRUE</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(bad_plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-8389d587c1365d305edc" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-8389d587c1365d305edc">{"x":{"nodes":{"id":["my_analysis","my_data","my_summaries","p-M5SXIX3EMF2GCLSS","p-MFXGC3DZPJSV6ZDBORQS4UQ","p-ON2W23LBOJUXUZK7MRQXIYJOKI"],"imported":[false,false,false,true,true,true],"label":["my_analysis","my_data","my_summaries","file get_data.R","file analyze_data.R","file summarize_data.R"],"command":["source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))",null,null,null],"status":["outdated","outdated","outdated","imported","imported","imported"],"type":["object","object","object","file","file","file"],"font.size":[20,20,20,20,20,20],"color":["#000000","#000000","#000000","#1874CD","#1874CD","#1874CD"],"shape":["dot","dot","dot","square","square","square"],"level":[2,2,2,1,1,1],"title":["source(file_in(\"analyze_data.R\"))","source(file_in(\"get_data.R\"))","source(file_in(\"summarize_data.R\"))","","",""],"x":[-1,0,1,0,-1,1],"y":[1,1,1,-1,-1,-1]},"edges":{"from":["p-M5SXIX3EMF2GCLSS","p-MFXGC3DZPJSV6ZDBORQS4UQ","p-ON2W23LBOJUXUZK7MRQXIYJOKI"],"to":["my_data","my_analysis","my_summaries"],"arrows":["to","to","to"],"smooth":[true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","File"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","square"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<pre><code>#&gt; [[1]]
-#&gt; [1] TRUE
-#&gt; 
-#&gt; [[2]]
-#&gt; [1] TRUE
-#&gt; 
-#&gt; [[3]]
-#&gt; [1] TRUE</code></pre>
 <p>Dangers:</p>
 <ol style="list-style-type: decimal">
 <li>In the first <code>make(bad_plan, jobs = 2)</code>, <code>drake</code> will try to build <code>my_data</code> and <code>my_analysis</code> at the same time even though <code>my_data</code> must finish before <code>my_analysis</code> begins.</li>

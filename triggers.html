@@ -251,8 +251,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.2</b> Diagnose failures.</a></li>
 <li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#timeouts-and-retries"><i class="fa fa-check"></i><b>9.3</b> Timeouts and retries</a></li>
-<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#consider-hasty-mode"><i class="fa fa-check"></i><b>9.4</b> Consider hasty mode</a></li>
-<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.5</b> More help</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.4</b> More help</a></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing</a><ul>
 <li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
@@ -284,7 +283,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>11.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="11.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>11.2</b> Customization</a></li>
 <li class="chapter" data-level="11.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>11.3</b> Alternative trigger modes</a></li>
-<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode-1"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
+<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
 <li class="chapter" data-level="11.5" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>11.5</b> A more practical example</a></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>12</b> Time: logging, prediction, and strategy</a><ul>
@@ -407,8 +406,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 plan
 <span class="co">#&gt; # A tibble: 2 x 3</span>
 <span class="co">#&gt;   target command                         trigger                       </span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                           &lt;chr&gt;                         </span>
-<span class="co">#&gt; 1 psi_1  (sqrt(5) + 1)/2 + 9999999999999 &lt;NA&gt;                          </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;S3: langs&gt;                     &lt;S3: langs&gt;                   </span>
+<span class="co">#&gt; 1 psi_1  (sqrt(5) + 1)/2 + 9999999999999 NA                            </span>
 <span class="co">#&gt; 2 psi_2  (sqrt(5) - 1)/2 - 9999999999999 trigger(condition = psi_1 &gt; 0)</span>
 <span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
 <span class="co">#&gt; target psi_2</span>
@@ -419,32 +418,33 @@ plan
 <p>Interestingly, <code>psi_2</code> now depends on <code>psi_1</code>. Since <code>psi_1</code> is part of the because of the <strong>condition</strong> trigger, it needs to be up to date before we attempt <code>psi_2</code>. However, since <code>psi_1</code> is not part of the command, changing it will not trip the other triggers such as <strong>depend</strong>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</code></pre>
 <div id="htmlwidget-8d27908a7c387e5c88b8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8d27908a7c387e5c88b8">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.003s","psi_2\n0.003s"],"command":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999"],"trigger":[null,"trigger(condition = psi_1 > 0)"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"title":["(sqrt(5)&nbsp;+&nbsp;1)/2&nbsp;+&nbsp;9999999999999","(sqrt(5)&nbsp;-&nbsp;1)/2&nbsp;-&nbsp;9999999999999"],"x":[null,null],"y":[-1,1]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>In the next toy example below, <code>drake</code> flips a coin to decide whether to build <code>x</code>. Try it out.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">0</span>)
-plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+<script type="application/json" data-for="htmlwidget-8d27908a7c387e5c88b8">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.003s","psi_2\n0.003s"],"command":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999"],"trigger":["NA","trigger(condition = psi_1 > 0)"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"title":["(sqrt(5)&nbsp;+&nbsp;1)/2&nbsp;+&nbsp;9999999999999","(sqrt(5)&nbsp;-&nbsp;1)/2&nbsp;-&nbsp;9999999999999"],"x":[null,null],"y":[-1,1]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>In the next toy example below, <code>drake</code> reads from a file to decide whether to build <code>x</code>. Try it out.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
     <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
-    <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">runif</span>(<span class="dv">1</span>) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>)
+    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">file_in</span>(<span class="kw">readRDS</span>(<span class="st">&quot;file.rds&quot;</span>)))
   )
 )
-<span class="co">#&gt; Error: Column 2 must be named.</span>
-<span class="co">#&gt; Use .name_repair to specify repair.</span>
+<span class="kw">saveRDS</span>(<span class="ot">TRUE</span>, <span class="st">&quot;file.rds&quot;</span>)
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target psi_1</span>
-<span class="co">#&gt; target psi_2</span>
+<span class="co">#&gt; target x</span>
 <span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target psi_2</span>
+<span class="co">#&gt; target x</span>
 <span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target psi_2</span>
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
+<span class="kw">saveRDS</span>(<span class="ot">FALSE</span>, <span class="st">&quot;file.rds&quot;</span>)
+<span class="kw">make</span>(plan)
+<span class="co">#&gt; All targets are already up to date.</span>
 <span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target psi_2</span>
+<span class="co">#&gt; All targets are already up to date.</span>
 <span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target psi_2</span>
+<span class="co">#&gt; All targets are already up to date.</span>
 <span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
 <p>In a real project with remote data sources, you may want to use the <strong>condition</strong> trigger to limit your builds to times when enough bandwidth is available for a large download. For example,</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
@@ -454,7 +454,8 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   )
 )</code></pre>
 <p>Since the <strong>change</strong> trigger can return any value, it is often easier to use than the <strong>condition</strong> trigger.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>)
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
     <span class="dt">command =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,
     <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">sqrt</span>(y))
@@ -501,7 +502,7 @@ y &lt;-<span class="st"> </span><span class="dv">2</span>
 <li><code>trigger(mode = &quot;condition&quot;)</code>: here, the <code>condition</code> trigger is the only decider, and we ignore all the other triggers. We <em>rebuild</em> target whenever <code>condition</code> evaluates to <code>TRUE</code> and <em>skip</em> it whenever <code>condition</code> evaluates to <code>FALSE</code>.</li>
 </ul>
 </div>
-<div id="consider-hasty-mode-1" class="section level2">
+<div id="consider-hasty-mode" class="section level2">
 <h2><span class="header-section-number">11.4</span> Consider hasty mode</h2>
 <p>In hasty mode, <code>drake</code> acts as a job scheduler without watching dependencies. In other words, <code>make(parallelism = &quot;hasty&quot;)</code> always runs all the targets, and computational overhead is dramatically reduced. Read more <a href="https://ropenscilabs.github.io/drake-manual/hpc.html#hasty-mode">here</a>.</p>
 </div>

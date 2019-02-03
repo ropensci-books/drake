@@ -251,8 +251,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="9.2" data-path="debug.html"><a href="debug.html#diagnose-failures."><i class="fa fa-check"></i><b>9.2</b> Diagnose failures.</a></li>
 <li class="chapter" data-level="9.3" data-path="debug.html"><a href="debug.html#timeouts-and-retries"><i class="fa fa-check"></i><b>9.3</b> Timeouts and retries</a></li>
-<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#consider-hasty-mode"><i class="fa fa-check"></i><b>9.4</b> Consider hasty mode</a></li>
-<li class="chapter" data-level="9.5" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.5</b> More help</a></li>
+<li class="chapter" data-level="9.4" data-path="debug.html"><a href="debug.html#more-help"><i class="fa fa-check"></i><b>9.4</b> More help</a></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>10</b> High-performance computing</a><ul>
 <li class="chapter" data-level="10.1" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>10.1</b> Batch mode for long workflows</a></li>
@@ -284,7 +283,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>11.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="11.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>11.2</b> Customization</a></li>
 <li class="chapter" data-level="11.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>11.3</b> Alternative trigger modes</a></li>
-<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode-1"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
+<li class="chapter" data-level="11.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode"><i class="fa fa-check"></i><b>11.4</b> Consider hasty mode</a></li>
 <li class="chapter" data-level="11.5" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>11.5</b> A more practical example</a></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>12</b> Time: logging, prediction, and strategy</a><ul>
@@ -390,10 +389,10 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <span class="co"># knitr_in() makes sure your target depends on `report.Rmd`</span>
 <span class="co"># and any dependencies loaded with loadd() and readd()</span>
 <span class="co"># in the report&#39;s active code chunks.</span>
-<span class="kw">cat</span>(my_plan<span class="op">$</span>command[<span class="dv">1</span>])
+my_plan<span class="op">$</span>command[[<span class="dv">1</span>]]
 <span class="co">#&gt; knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), quiet = TRUE)</span>
 
-<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="dv">1</span>])
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="dv">1</span>]])
 <span class="co">#&gt; $globals</span>
 <span class="co">#&gt; [1] &quot;knit&quot;</span>
 <span class="co">#&gt; </span>
@@ -409,10 +408,10 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <span class="co">#&gt; $knitr_in</span>
 <span class="co">#&gt; [1] &quot;report.Rmd&quot;</span>
 
-<span class="kw">cat</span>(my_plan<span class="op">$</span>command[<span class="kw">nrow</span>(my_plan)])
+my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt; suppressWarnings(summary(regression2_large))$coefficients</span>
 
-<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[<span class="kw">nrow</span>(my_plan)])
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]])
 <span class="co">#&gt; $globals</span>
 <span class="co">#&gt; [1] &quot;summary&quot;           &quot;suppressWarnings&quot;  &quot;regression2_large&quot;</span>
 <span class="co">#&gt; [4] &quot;coefficients&quot;</span></code></pre>
@@ -523,7 +522,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x12108f58&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0xee6da00&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -585,10 +584,10 @@ bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 
 bad_plan
 <span class="co">#&gt; # A tibble: 3 x 2</span>
-<span class="co">#&gt;   target    command</span>
-<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;  </span>
-<span class="co">#&gt; 1 a         12     </span>
-<span class="co">#&gt; 2 b         -a     </span>
+<span class="co">#&gt;   target    command    </span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;S3: langs&gt;</span>
+<span class="co">#&gt; 1 a         12         </span>
+<span class="co">#&gt; 2 b         -a         </span>
 <span class="co">#&gt; 3 my_target f(b)</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
@@ -625,7 +624,7 @@ error<span class="op">$</span>call
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x10b96770&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xedd8800&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -680,15 +679,15 @@ f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
 <span class="co"># Now it works!</span>
 <span class="co"># Since you called make() previously, `config` is read from the cache</span>
 <span class="co"># if you do not supply it.</span>
-<span class="kw">drake_build</span>(my_target) <span class="co"># See also drake_debug().</span>
-<span class="co">#&gt; Error in loadd(list = target, deps = TRUE, envir = config$eval, cache = config$cache, : cannot find drake cache.</span>
+<span class="kw">drake_build</span>(my_target, config) <span class="co"># See also drake_debug().</span>
+<span class="co">#&gt; target my_target</span>
 
 <span class="kw">readd</span>(my_target)
-<span class="co">#&gt; Error: key &#39;my_target&#39; (&#39;objects&#39;) not found</span></code></pre>
+<span class="co">#&gt; [1] 12</span></code></pre>
 </div>
 <div id="timeouts-and-retries" class="section level2">
 <h2><span class="header-section-number">9.3</span> Timeouts and retries</h2>
-<p>See the <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, and <code>retries</code> argument to <code>make()</code>.</p>
+<p>See the <code>elapsed</code>, <code>cpu</code>, and <code>retries</code> argument to <code>make()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
 f &lt;-<span class="st"> </span><span class="cf">function</span>(...){
   <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
@@ -696,52 +695,46 @@ f &lt;-<span class="st"> </span><span class="cf">function</span>(...){
 debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))
 debug_plan
 <span class="co">#&gt; # A tibble: 2 x 2</span>
-<span class="co">#&gt;   target command</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
-<span class="co">#&gt; 1 x      1      </span>
+<span class="co">#&gt;   target command    </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;S3: langs&gt;</span>
+<span class="co">#&gt; 1 x      1          </span>
 <span class="co">#&gt; 2 y      f(x)</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="kw">stdout</span>(),
-  <span class="kw">make</span>(debug_plan, <span class="dt">timeout =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)
+  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)
 )
-<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
-<span class="co">#&gt; instead.</span>
-
-<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
-<span class="co">#&gt; instead.</span>
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; target y</span></code></pre>
-<p>To tailor these settings to each individual target, create new <code>timeout</code>, <code>cpu</code>, <code>elapsed</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
+<span class="co">#&gt; target y</span>
+<span class="co">#&gt; retry y: 1 of 2</span>
+<span class="co">#&gt; retry y: 2 of 2</span>
+<span class="co">#&gt; fail y</span>
+<span class="co">#&gt; Error: Target `y` failed. Call `diagnose(y)` for details. Error message:</span>
+<span class="co">#&gt;   reached elapsed time limit</span></code></pre>
+<p>To tailor these settings to each individual target, create new <code>elapsed</code>, <code>cpu</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
-debug_plan<span class="op">$</span>timeout &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
+debug_plan<span class="op">$</span>elapsed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
 debug_plan<span class="op">$</span>retries &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>
 
 debug_plan
 <span class="co">#&gt; # A tibble: 2 x 4</span>
-<span class="co">#&gt;   target command timeout retries</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;   &lt;int&gt;</span>
-<span class="co">#&gt; 1 x      1         0.001       1</span>
-<span class="co">#&gt; 2 y      f(x)      0.002       2</span>
+<span class="co">#&gt;   target command     elapsed retries</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;S3: langs&gt;   &lt;dbl&gt;   &lt;int&gt;</span>
+<span class="co">#&gt; 1 x      1             0.001       1</span>
+<span class="co">#&gt; 2 y      f(x)          0.002       2</span>
 
 withr<span class="op">::</span><span class="kw">with_message_sink</span>(
   <span class="dt">new =</span> <span class="kw">stdout</span>(),
-  <span class="kw">make</span>(debug_plan, <span class="dt">timeout =</span> <span class="ot">Inf</span>, <span class="dt">retries =</span> <span class="dv">0</span>)
+  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="ot">Inf</span>, <span class="dt">retries =</span> <span class="dv">0</span>)
 )
-<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
-<span class="co">#&gt; instead.</span>
-
-<span class="co">#&gt; Warning: Argument `timeout` is deprecated. Use `elapsed` and/or `cpu`</span>
-<span class="co">#&gt; instead.</span>
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; target y</span></code></pre>
-</div>
-<div id="consider-hasty-mode" class="section level2">
-<h2><span class="header-section-number">9.4</span> Consider hasty mode</h2>
-<p>In hasty mode, <code>drake</code> acts as a job scheduler without watching dependencies. In other words, <code>make(parallelism = &quot;hasty&quot;)</code> always runs all the targets, and computational overhead is dramatically reduced. Because it helps deploy targets much faster, hasty mode may be a nice way to test a workflow before running it in production. Read more <a href="https://ropenscilabs.github.io/drake-manual/hpc.html#hasty-mode">here</a>.</p>
+<span class="co">#&gt; target y</span>
+<span class="co">#&gt; fail y</span>
+<span class="co">#&gt; Error: Target `y` failed. Call `diagnose(y)` for details. Error message:</span>
+<span class="co">#&gt;   reached elapsed time limit</span></code></pre>
 </div>
 <div id="more-help" class="section level2">
-<h2><span class="header-section-number">9.5</span> More help</h2>
+<h2><span class="header-section-number">9.4</span> More help</h2>
 <p>Please also see the <a href="caution.html#caution">compendium of cautionary notes</a>, which addresses <code>drake</code>’s known edge cases, pitfalls, and weaknesses that may or may not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the <a href="https://github.com/ropensci/drake/issues">issue tracker</a>, where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version.</p>
 
 </div>
