@@ -371,7 +371,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 )
 <span class="co">#&gt; # A tibble: 2 x 2</span>
 <span class="co">#&gt;   target  command                                  </span>
-<span class="co">#&gt;   &lt;chr&gt;   &lt;S3: langs&gt;                              </span>
+<span class="co">#&gt;   &lt;chr&gt;   &lt;expr&gt;                                   </span>
 <span class="co">#&gt; 1 target1 1 + 1 - sqrt(sqrt(3))                    </span>
 <span class="co">#&gt; 2 target2 my_function(web_scraped_data) %&gt;% my_tidy</span></code></pre>
 <p>However, please try to avoid formulas and function definitions in your commands. You may be able to get away with <code>drake_plan(f = function(x){x + 1})</code> or <code>drake_plan(f = y ~ x)</code> in some use cases, but be careful. It is generally to define functions and formulas in your workspace and then let <code>make()</code> import them. (Alternatively, use the <code>envir</code> argument to <code>make()</code> to tightly control which imported functions are available.) Use the <code>check_plan()</code> function to help screen and quality-control your <code>drake</code> plan, use <code>tracked()</code> to see the items that are reproducibly tracked, and use <code>vis_drake_graph()</code> and <code>build_drake_graph()</code> to see the dependency structure of your project.</p>
@@ -404,7 +404,7 @@ my_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span c
 my_plan
 <span class="co">#&gt; # A tibble: 15 x 2</span>
 <span class="co">#&gt;    target              command                                             </span>
-<span class="co">#&gt;    &lt;chr&gt;               &lt;S3: langs&gt;                                         </span>
+<span class="co">#&gt;    &lt;chr&gt;               &lt;expr&gt;                                              </span>
 <span class="co">#&gt;  1 report              knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;),…</span>
 <span class="co">#&gt;  2 small               simulate(48)                                       …</span>
 <span class="co">#&gt;  3 large               simulate(64)                                       …</span>
@@ -450,10 +450,10 @@ my_plan
 <span class="co">#&gt; Use the interface described at https://ropenscilabs.github.io/drake-manual/</span>
 <span class="co">#&gt; plans.html#large-plans.</span>
 <span class="co">#&gt; # A tibble: 3 x 2</span>
-<span class="co">#&gt;   target command    </span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;S3: langs&gt;</span>
-<span class="co">#&gt; 1 a      5          </span>
-<span class="co">#&gt; 2 b      5 + 1      </span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span>
+<span class="co">#&gt; 1 a      5      </span>
+<span class="co">#&gt; 2 b      5 + 1  </span>
 <span class="co">#&gt; 3 d      5</span>
 
 <span class="kw">drake_plan</span>(
@@ -468,7 +468,7 @@ my_plan
 <span class="co">#&gt; plans.html#large-plans.</span>
 <span class="co">#&gt; # A tibble: 3 x 2</span>
 <span class="co">#&gt;   target command                  </span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;S3: langs&gt;              </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                   </span>
 <span class="co">#&gt; 1 a      !!my_variable            </span>
 <span class="co">#&gt; 2 b      !!my_variable + 1        </span>
 <span class="co">#&gt; 3 d      expression(!!my_variable)</span></code></pre>
@@ -591,10 +591,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-<span class="co">#&gt; [1] &quot;1ea36bee08511b603774dacbca015eff&quot;</span>
+<span class="co">#&gt; [1] &quot;4584596a452d2de9ab6daef7b73ecf8d&quot;</span>
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-<span class="co">#&gt; [1] &quot;3d7e4519f0cbd0dd92cadc0eb2985084&quot;</span>
+<span class="co">#&gt; [1] &quot;68692a1c459e55f5cf7e6463ef2abc3c&quot;</span>
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
