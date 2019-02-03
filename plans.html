@@ -357,7 +357,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 6</span> <code>drake</code> plans</h1>
 <div id="what-is-a-drake-plan" class="section level2">
 <h2><span class="header-section-number">6.1</span> What is a <code>drake</code> plan?</h2>
-<p>A<code>drake</code> plan is a data frame with columns named <code>target</code> and <code>command</code>. Each target is an R object produced in your workflow, and each command is the R code to produce it. You can create plans any way you like, and the <code>drake_plan()</code> function is particularly convenient. Recall the plan from our <a href="main.html#main">previous example</a>:</p>
+<p>A<code>drake</code> plan is a data frame with columns named <code>target</code> and <code>command</code>. Each target is an R object, and each command is an <a href="http://adv-r.had.co.nz/Expressions.html">expression</a> to produce it.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The <code>drake_plan()</code> function is the best way to set up plans.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Recall the plan from our <a href="main.html#main">previous example</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),
   <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span>
@@ -379,26 +379,7 @@ plan
 <span class="co">#&gt; 3 hist     create_plot(data)                                              …</span>
 <span class="co">#&gt; 4 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  …</span>
 <span class="co">#&gt; 5 report   rmarkdown::render(knitr_in(&quot;report.Rmd&quot;), output_file = file_ou…</span></code></pre>
-<p>By default, the commands are <a href="http://adv-r.had.co.nz/Expressions.html">expressions</a> (note the <code>&lt;expr&gt;</code> heading in the above <code>tibble</code>). You can convert them to character strings, but this is not recommended.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(plan<span class="op">$</span>command)
-<span class="co">#&gt; List of 5</span>
-<span class="co">#&gt;  $ raw_data: language readxl::read_excel(file_in(&quot;raw_data.xlsx&quot;))</span>
-<span class="co">#&gt;  $ data    : language raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))</span>
-<span class="co">#&gt;  $ hist    : language create_plot(data)</span>
-<span class="co">#&gt;  $ fit     : language lm(Sepal.Width ~ Petal.Width + Species, data)</span>
-<span class="co">#&gt;  $ report  : language rmarkdown::render(knitr_in(&quot;report.Rmd&quot;), output_file = file_out(&quot;report.html&quot;),      quiet = TRUE)</span>
-
-text &lt;-<span class="st"> </span><span class="kw">unname</span>(purrr<span class="op">::</span><span class="kw">map_chr</span>(plan<span class="op">$</span>command, rlang<span class="op">::</span>expr_text))
-
-text
-<span class="co">#&gt; [1] &quot;readxl::read_excel(file_in(\&quot;raw_data.xlsx\&quot;))&quot;                                                          </span>
-<span class="co">#&gt; [2] &quot;raw_data %&gt;% mutate(Species = forcats::fct_inorder(Species))&quot;                                            </span>
-<span class="co">#&gt; [3] &quot;create_plot(data)&quot;                                                                                       </span>
-<span class="co">#&gt; [4] &quot;lm(Sepal.Width ~ Petal.Width + Species, data)&quot;                                                           </span>
-<span class="co">#&gt; [5] &quot;rmarkdown::render(knitr_in(\&quot;report.Rmd\&quot;), output_file = file_out(\&quot;report.html\&quot;), \n    quiet = TRUE)&quot;</span>
-
-<span class="co"># Optional but not recommended: plan$command &lt;- text</span></code></pre>
-<p>Anyway, <code>drake_plan()</code> does not run the workflow, it only creates the plan. To build the actual targets, we need to run <code>make()</code>. Creating the plan is like writing an R script, and running <code>make(your_plan)</code> is like calling <a href="https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source"><code>source(&quot;your_script.R&quot;)</code></a>.</p>
+<p><code>drake_plan()</code> does not run the workflow, it only creates the plan. To build the actual targets, we need to run <code>make()</code>. Creating the plan is like writing an R script, and running <code>make(your_plan)</code> is like calling <a href="https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source"><code>source(&quot;your_script.R&quot;)</code></a>.</p>
 </div>
 <div id="plans-are-similar-to-r-scripts." class="section level2">
 <h2><span class="header-section-number">6.2</span> Plans are similar to R scripts.</h2>
@@ -1604,6 +1585,13 @@ plan &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p>You can turn the <code>command</code> column of your plan into a character vector (e.g. <code>plan$command &lt;- purrr::map_chr(plan$command, rlang::expr_text)</code>) and <code>drake</code> will still understand you. However, the recommended format is a list of <a href="http://adv-r.had.co.nz/Expressions.html">expressions</a>. <code>drake_plan()</code> and friends always supply <a href="http://adv-r.had.co.nz/Expressions.html">expression</a> lists.<a href="plans.html#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><code>drake_plan()</code> is the best way to create plans, but you can create plans any way you like. <code>drake</code> will understand plans you create directly using <code>data.frame()</code> or <code>tibble()</code>.<a href="plans.html#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">
   Copyright Eli Lilly and Company
