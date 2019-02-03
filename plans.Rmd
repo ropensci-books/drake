@@ -38,18 +38,19 @@ plan <- drake_plan(
 plan
 ```
 
-By default, the commands are [language objects](http://adv-r.had.co.nz/Expressions.html). You can turn `plan$command` into a character if you want, but this is not recommended.
+By default, the commands are [expressions](http://adv-r.had.co.nz/Expressions.html) (note the `<expr>` heading in the above `tibble`). You can convert them to character strings, but this is not recommended.
 
 ```{r firstexampleplan2}
 str(plan$command)
 
 text <- unname(purrr::map_chr(plan$command, rlang::expr_text))
-# Optional: plan$command <- text
 
 text
+
+# Optional but not recommended: plan$command <- text
 ```
 
-`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
+Anyway, `drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
 
 ## Plans are similar to R scripts.
 
