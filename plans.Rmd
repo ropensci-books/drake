@@ -38,6 +38,17 @@ plan <- drake_plan(
 plan
 ```
 
+By default, the commands are [language objects](http://adv-r.had.co.nz/Expressions.html). You can turn `plan$command` into a character if you want, but this is not recommended.
+
+```{r firstexampleplan2}
+str(plan$command)
+
+text <- unname(purrr::map_chr(plan$command, rlang::expr_text))
+# Optional: plan$command <- text
+
+text
+```
+
 `drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
 
 ## Plans are similar to R scripts.
@@ -80,7 +91,7 @@ create_plot <- function(data) {
 
 deps_code(create_plot)
 
-deps_code("create_plot(datasets::iris)")
+deps_code(quote(create_plot(datasets::iris)))
 ```
 
 Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares `file` before `plot`.

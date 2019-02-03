@@ -80,18 +80,20 @@ Interestingly, `psi_2` now depends on `psi_1`. Since `psi_1` is part of the beca
 vis_drake_graph(drake_config(plan))
 ```
 
-In the next toy example below, `drake` flips a coin to decide whether to build `x`. Try it out.
+In the next toy example below, `drake` reads from a file to decide whether to build `x`. Try it out.
 
 ```{r randomcondition}
-set.seed(0)
 plan <- drake_plan(
   x = target(
     1 + 1,
-    trigger(condition = runif(1) > 0.5)
+    trigger = trigger(condition = file_in(readRDS("file.rds")))
   )
 )
+saveRDS(TRUE, "file.rds")
 make(plan)
 make(plan)
+make(plan)
+saveRDS(FALSE, "file.rds")
 make(plan)
 make(plan)
 make(plan)
@@ -111,6 +113,7 @@ drake_plan(
 Since the **change** trigger can return any value, it is often easier to use than the **condition** trigger.
 
 ```{r changetrigger}
+clean(destroy = TRUE)
 plan <- drake_plan(
   x = target(
     command = 1 + 1,
@@ -173,7 +176,7 @@ clean(destroy = TRUE, verbose = FALSE)
 unlink(
   c(
     "main", "Makefile", "report.Rmd", "raw_data.xlsx",
-    "shell.sh", "STDIN.o*", "Thumbs.db"
+    "shell.sh", "STDIN.o*", "Thumbs.db", "file.rds"
   ),
   recursive = TRUE
 )

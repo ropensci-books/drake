@@ -157,9 +157,9 @@ You can also check the dependencies of individual targets and imported functions
 ```{r checkdeps}
 deps_code(reg2)
 
-deps_code(my_plan$command[1]) # Files like report.Rmd are single-quoted.
+deps_code(my_plan$command[[1]])
 
-deps_code(my_plan$command[nrow(my_plan)])
+deps_code(my_plan$command[[nrow(my_plan)]])
 ```
 
 List all the reproducibly-tracked objects and files.
@@ -344,9 +344,7 @@ rm(small)
 
 cached()
 
-progress()
-
-# drake_session() # sessionInfo() of the last make() # nolint
+drake::progress()
 ```
 
 The next time you run `make(my_plan)`, nothing will build because `drake` knows everything is already up to date.

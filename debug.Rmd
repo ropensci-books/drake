@@ -42,13 +42,13 @@ deps_code(simulate)
 # knitr_in() makes sure your target depends on `report.Rmd`
 # and any dependencies loaded with loadd() and readd()
 # in the report's active code chunks.
-cat(my_plan$command[1])
+my_plan$command[[1]]
 
-deps_code(my_plan$command[1])
+deps_code(my_plan$command[[1]])
 
-cat(my_plan$command[nrow(my_plan)])
+my_plan$command[[nrow(my_plan)]]
 
-deps_code(my_plan$command[nrow(my_plan)])
+deps_code(my_plan$command[[nrow(my_plan)]])
 ```
 
 With `deps_target()`, you can see the dependencies that `drake` has already detected for your targets and imports.
@@ -219,14 +219,14 @@ f <- function(x){
 # Now it works!
 # Since you called make() previously, `config` is read from the cache
 # if you do not supply it.
-drake_build(my_target) # See also drake_debug().
+drake_build(my_target, config) # See also drake_debug().
 
 readd(my_target)
 ```
 
 ## Timeouts and retries
 
-See the `timeout`, `cpu`, `elapsed`, and `retries` argument to `make()`.
+See the `elapsed`, `cpu`, and `retries` argument to `make()`.
 
 ```{r timeoutretry}
 clean(verbose = FALSE)
@@ -238,28 +238,24 @@ debug_plan
 
 withr::with_message_sink(
   stdout(),
-  make(debug_plan, timeout = 1e-3, retries = 2)
+  make(debug_plan, elapsed = 1e-3, retries = 2)
 )
 ```
 
-To tailor these settings to each individual target, create new `timeout`, `cpu`, `elapsed`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
+To tailor these settings to each individual target, create new `elapsed`, `cpu`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
 
 ```{r timeoutretry2}
 clean(verbose = FALSE)
-debug_plan$timeout <- c(1e-3, 2e-3)
+debug_plan$elapsed <- c(1e-3, 2e-3)
 debug_plan$retries <- 1:2
 
 debug_plan
 
 withr::with_message_sink(
   new = stdout(),
-  make(debug_plan, timeout = Inf, retries = 0)
+  make(debug_plan, elapsed = Inf, retries = 0)
 )
 ```
-
-## Consider hasty mode
-
-In hasty mode, `drake` acts as a job scheduler without watching dependencies. In other words, `make(parallelism = "hasty")` always runs all the targets, and computational overhead is dramatically reduced. Because it helps deploy targets much faster, hasty mode may be a nice way to test a workflow before running it in production. Read more [here](https://ropenscilabs.github.io/drake-manual/hpc.html#hasty-mode).
 
 ## More help
 
