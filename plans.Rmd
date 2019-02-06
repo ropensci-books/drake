@@ -279,7 +279,7 @@ vis_drake_graph(config2)
 
 #### `map()`
 
-`map()` creates a new target for each row in a grid. The grid comes from column-binding the arguments together, which means the lengths need to be conformable just as with `data.frame()`.
+`map()` creates a new target for each row in a grid.
 
 ```{r drakemap1}
 drake_plan(
@@ -290,14 +290,7 @@ drake_plan(
 )
 ```
 
-```{r drakemap2}
-drake_plan(
-  x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2, 3), ncol = 4)
-  )
-)
-```
+The grid comes from column-binding the arguments together, which means the lengths need to be conformable just as with `data.frame()`.
 
 ```{r drakemaperr, error = TRUE}
 drake_plan(
@@ -307,6 +300,75 @@ drake_plan(
   )
 )
 ```
+
+In most cases, grouping variables of unequal length give you sensible results.
+
+```{r drakemap2}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2, 3), ncol = 4)
+  )
+)
+```
+
+Things get tricker when `drake` reuses grouping variables from previous transformations. For example, below, each `x_*` target has an associated `nrow` value. So if you write `transform = map(x)`, then `nrow` goes along for the ride.
+
+```{r drakemap3}
+drake_plan(
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2))
+  ),
+  y = target(
+    process_data(x, nrow),
+    transform = map(x)
+  ),
+  trace = TRUE # Adds extra columns for the grouping variables.
+)
+```
+
+But if other targets have `nrow`'s of their own, `drake_plan()` may not know what to do with them.
+
+```{r drakemap4}
+drake_plan(
+  w = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(3, 4))
+  ),
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2))
+  ),
+  y = target(
+    process_data(w, x, nrow),
+    transform = map(w, x)
+  ),
+  trace = TRUE
+)
+```
+
+The problems is that there are 4 values of `nrow` and only two `x_*` targets (and two `y_*` targets). Even if you explicitly supply `nrow` to the transformation, `map()` can only takes the first two values.
+
+```{r drakemap5}
+drake_plan(
+  w = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(3, 4))
+  ),
+  x = target(
+    simulate_data(nrow, ncol),
+    transform = map(nrow = c(1, 2))
+  ),
+  y = target(
+    process_data(w, x, nrow),
+    transform = map(w, x, nrow)
+  ),
+  trace = TRUE
+)
+```
+
+So always inspect the plan before you run it with `make()`. Once you have a `drake_config()` object, `vis_drake_graph()` and `deps_target()` can help.
 
 #### `cross()`
 
@@ -323,7 +385,7 @@ drake_plan(
 
 #### `combine()`
 
-In `combine()`, you can replace symbols in a command with lists of other targets. You must tell `combine()` which symbols you wish to replace.
+In `combine()`, you can gather lists of targets and insert them into commands. You must tell `combine()` which symbols you wish to replace.
 
 ```{r transform5}
 plan <- drake_plan(
