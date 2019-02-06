@@ -865,12 +865,33 @@ plan
 </div>
 <div id="target-names" class="section level3">
 <h3><span class="header-section-number">6.5.3</span> Target names</h3>
-<p>All three transformations have an optional <code>.id</code> argument. Set it to <code>FALSE</code> to severely shorten the target names.</p>
+<p><code>drake</code>’s default target names are way too long and ugly in some cases.</p>
 <pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> &quot;my/crazy/long/file_path&quot;</span>
 files &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="kw">c</span>(<span class="st">&quot;file1.csv&quot;</span>, <span class="st">&quot;file2.csv&quot;</span>))
 
 files
 <span class="co">#&gt; [1] &quot;my/crazy/long/file_path/file1.csv&quot; &quot;my/crazy/long/file_path/file2.csv&quot;</span>
+
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">file =</span> <span class="op">!!</span>files)
+  )
+)
+
+plan<span class="op">$</span>target
+<span class="co">#&gt; [1] &quot;data_.my.crazy.long.file_path.file1.csv.&quot;</span>
+<span class="co">#&gt; [2] &quot;data_.my.crazy.long.file_path.file2.csv.&quot;</span>
+
+plan
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target                          command                                  </span>
+<span class="co">#&gt;   &lt;chr&gt;                           &lt;expr&gt;                                   </span>
+<span class="co">#&gt; 1 data_.my.crazy.long.file_path.… read.csv(file_in(&quot;my/crazy/long/file_pat…</span>
+<span class="co">#&gt; 2 data_.my.crazy.long.file_path.… read.csv(file_in(&quot;my/crazy/long/file_pat…</span></code></pre>
+<p>Fortunately, all three transformations have an optional <code>.id</code> argument. Set it to <code>FALSE</code> to severely shorten the target names.</p>
+<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> &quot;my/crazy/long/file_path&quot;</span>
+files &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="kw">c</span>(<span class="st">&quot;file1.csv&quot;</span>, <span class="st">&quot;file2.csv&quot;</span>))
 
 <span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
