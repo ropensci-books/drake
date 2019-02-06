@@ -416,6 +416,44 @@ f(x = a, y = c(b, c), z = d)
 
 To learn more about metaprogramming, you can consult the [metaprogramming chapters in Advanced R](https://adv-r.hadley.nz/introduction-16.html). For more discussion on this use case of `drake`, please see [this thread on GitHub](https://github.com/ropensci/drake/issues/693). Comments, questions, etc. are welcome. Please feel free to post.
 
+### Target names
+
+All three transformations have an optional `.id` argument. Set it to `FALSE` to severely shorten the target names.
+
+```{r nametoolong1}
+path <- "my/crazy/long/file_path"
+files <- file.path(path, c("file1.csv", "file2.csv"))
+
+files
+
+drake_plan(
+  data = target(
+    read.csv(file_in(file)),
+    transform = map(file = !!files, .id = FALSE)
+  )
+)
+```
+
+For more suggestive names, you can select the grouping variables for the suffixes. In `map()` and `cross()`, all grouping variables are allowed except tags. In `combine()`, you can only use the symbols passed to `.by`.
+
+```{r nametoolong2}
+plan <- drake_plan(
+  data = target(
+    subset_data(read.csv(file_in(file)), predictor = x, response = y),
+    transform = cross(
+      file = !!files,
+      x = c(income, unemp),
+      y = c(gdp, pop),
+      .id = c(x, y)
+    )
+  )
+)
+
+plan$target
+
+plan
+```
+
 ### Grouping variables
 
 A grouping variable is an argument to `map()`, `cross()`, or `combine()` that identifies a sub-collection of target names. Grouping variables can be either literals or symbols. Symbols can be scalars or vectors, and you can pass them to transformations with or without argument names.
