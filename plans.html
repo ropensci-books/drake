@@ -210,8 +210,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5" data-path="plans.html"><a href="plans.html#large-plans"><i class="fa fa-check"></i><b>6.5</b> Large plans</a><ul>
 <li class="chapter" data-level="6.5.1" data-path="plans.html"><a href="plans.html#how-to-create-large-plans"><i class="fa fa-check"></i><b>6.5.1</b> How to create large plans</a></li>
 <li class="chapter" data-level="6.5.2" data-path="plans.html"><a href="plans.html#the-types-of-transformations"><i class="fa fa-check"></i><b>6.5.2</b> The types of transformations</a></li>
-<li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#grouping-variables"><i class="fa fa-check"></i><b>6.5.3</b> Grouping variables</a></li>
-<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#tags"><i class="fa fa-check"></i><b>6.5.4</b> Tags</a></li>
+<li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#target-names"><i class="fa fa-check"></i><b>6.5.3</b> Target names</a></li>
+<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#grouping-variables"><i class="fa fa-check"></i><b>6.5.4</b> Grouping variables</a></li>
+<li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#tags"><i class="fa fa-check"></i><b>6.5.5</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#create-large-plans-the-old-way"><i class="fa fa-check"></i><b>6.6</b> Create large plans the <em>old</em> way</a><ul>
 <li class="chapter" data-level="6.6.1" data-path="plans.html"><a href="plans.html#map_plan"><i class="fa fa-check"></i><b>6.6.1</b> <code>map_plan()</code></a></li>
@@ -862,11 +863,62 @@ plan
 <p>To learn more about metaprogramming, you can consult the <a href="https://adv-r.hadley.nz/introduction-16.html">metaprogramming chapters in Advanced R</a>. For more discussion on this use case of <code>drake</code>, please see <a href="https://github.com/ropensci/drake/issues/693">this thread on GitHub</a>. Comments, questions, etc. are welcome. Please feel free to post.</p>
 </div>
 </div>
+<div id="target-names" class="section level3">
+<h3><span class="header-section-number">6.5.3</span> Target names</h3>
+<p>All three transformations have an optional <code>.id</code> argument. Set it to <code>FALSE</code> to severely shorten the target names.</p>
+<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> &quot;my/crazy/long/file_path&quot;</span>
+files &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="kw">c</span>(<span class="st">&quot;file1.csv&quot;</span>, <span class="st">&quot;file2.csv&quot;</span>))
+
+files
+<span class="co">#&gt; [1] &quot;my/crazy/long/file_path/file1.csv&quot; &quot;my/crazy/long/file_path/file2.csv&quot;</span>
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">file =</span> <span class="op">!!</span>files, <span class="dt">.id =</span> <span class="ot">FALSE</span>)
+  )
+)
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command                                               </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                                                </span>
+<span class="co">#&gt; 1 data   read.csv(file_in(&quot;my/crazy/long/file_path/file1.csv&quot;))</span>
+<span class="co">#&gt; 2 data.1 read.csv(file_in(&quot;my/crazy/long/file_path/file2.csv&quot;))</span></code></pre>
+<p>For more suggestive names, you can select the grouping variables for the suffixes. In <code>map()</code> and <code>cross()</code>, all grouping variables are allowed except tags. In <code>combine()</code>, you can only use the symbols passed to <code>.by</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">subset_data</span>(<span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)), <span class="dt">predictor =</span> x, <span class="dt">response =</span> y),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(
+      <span class="dt">file =</span> <span class="op">!!</span>files,
+      <span class="dt">x =</span> <span class="kw">c</span>(income, unemp),
+      <span class="dt">y =</span> <span class="kw">c</span>(gdp, pop),
+      <span class="dt">.id =</span> <span class="kw">c</span>(x, y)
+    )
+  )
+)
+
+plan<span class="op">$</span>target
+<span class="co">#&gt; [1] &quot;data_income_gdp&quot;   &quot;data_income_gdp.1&quot; &quot;data_unemp_gdp&quot;   </span>
+<span class="co">#&gt; [4] &quot;data_unemp_gdp.1&quot;  &quot;data_income_pop&quot;   &quot;data_income_pop.1&quot;</span>
+<span class="co">#&gt; [7] &quot;data_unemp_pop&quot;    &quot;data_unemp_pop.1&quot;</span>
+
+plan
+<span class="co">#&gt; # A tibble: 8 x 2</span>
+<span class="co">#&gt;   target          command                                                  </span>
+<span class="co">#&gt;   &lt;chr&gt;           &lt;expr&gt;                                                   </span>
+<span class="co">#&gt; 1 data_income_gdp subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 2 data_income_gd… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 3 data_unemp_gdp  subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 4 data_unemp_gdp… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 5 data_income_pop subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 6 data_income_po… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 7 data_unemp_pop  subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
+<span class="co">#&gt; 8 data_unemp_pop… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span></code></pre>
+</div>
 <div id="grouping-variables" class="section level3">
-<h3><span class="header-section-number">6.5.3</span> Grouping variables</h3>
+<h3><span class="header-section-number">6.5.4</span> Grouping variables</h3>
 <p>A grouping variable is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code> that identifies a sub-collection of target names. Grouping variables can be either literals or symbols. Symbols can be scalars or vectors, and you can pass them to transformations with or without argument names.</p>
 <div id="literal-arguments" class="section level4">
-<h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
+<h4><span class="header-section-number">6.5.4.1</span> Literal arguments</h4>
 <p>When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write <code>map(c(1, 2))</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))))
 <span class="co">#&gt; # A tibble: 2 x 2</span>
@@ -916,7 +968,7 @@ plan
 <span class="co">#&gt; # … with 16 more rows</span></code></pre>
 </div>
 <div id="named-symbol-arguments" class="section level4">
-<h4><span class="header-section-number">6.5.3.2</span> Named symbol arguments</h4>
+<h4><span class="header-section-number">6.5.4.2</span> Named symbol arguments</h4>
 <p>Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the <code>map()</code> and <code>cross()</code> transformations can accept them this ways. To generate long symbol lists, use the <code>syms()</code> function from the <code>rlang</code> package. Remember to use the tidy evaluation operator <code>!!</code> inside the transformation.</p>
 <pre class="sourceCode r"><code class="sourceCode r">vals &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(letters)
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>vals)))
@@ -971,7 +1023,7 @@ plan
 </div>
 </div>
 <div id="tags" class="section level3">
-<h3><span class="header-section-number">6.5.4</span> Tags</h3>
+<h3><span class="header-section-number">6.5.5</span> Tags</h3>
 <p>Tags are special optional grouping variables. They are ignored while the transformation is happening and then added to the plan to help subsequent transformations. There are two types of tags:</p>
 <ol style="list-style-type: decimal">
 <li>In-tags, which contain the target name you start with, and</li>
