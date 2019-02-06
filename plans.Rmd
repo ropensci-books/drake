@@ -418,13 +418,31 @@ To learn more about metaprogramming, you can consult the [metaprogramming chapte
 
 ### Target names
 
-All three transformations have an optional `.id` argument. Set it to `FALSE` to severely shorten the target names.
+`drake`'s default target names are way too long and ugly in some cases.
 
-```{r nametoolong1}
+```{r nametoolong0}
 path <- "my/crazy/long/file_path"
 files <- file.path(path, c("file1.csv", "file2.csv"))
 
 files
+
+plan <- drake_plan(
+  data = target(
+    read.csv(file_in(file)),
+    transform = map(file = !!files)
+  )
+)
+
+plan$target
+
+plan
+```
+
+Fortunately, all three transformations have an optional `.id` argument. Set it to `FALSE` to severely shorten the target names.
+
+```{r nametoolong1}
+path <- "my/crazy/long/file_path"
+files <- file.path(path, c("file1.csv", "file2.csv"))
 
 drake_plan(
   data = target(
