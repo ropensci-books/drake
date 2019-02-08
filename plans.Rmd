@@ -284,30 +284,54 @@ vis_drake_graph(config2)
 ```{r drakemap1}
 drake_plan(
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2, 3), ncol = c(4, 5, 6))
+    simulate_data(center, scale),
+    transform = map(center = c(2, 1, 0), scale = c(3, 2, 1))
   )
 )
 ```
 
-The grid comes from column-binding the arguments together, which means the lengths need to be conformable just as with `data.frame()`.
+You can supply your own custom grid using the `.data` argument. Note the use of `!!` below.
+
+```{r drakemapgrid}
+my_grid <- tibble(
+  sim_function = c("rnrom", "rt", "rcauchy"),
+  title = c("Normal", "Student t", "Cauchy")
+)
+my_grid$sim_function <- rlang::syms(my_grid$sim_function)
+
+drake_plan(
+  x = target(
+    simulate_data(sim_function, title, center, scale),
+    transform = map(
+      center = c(2, 1, 0),
+      scale = c(3, 2, 1),
+      .data = !!my_grid,
+      .id = sim_function # for pretty target names
+    )
+  )
+)
+```
+
+#### Special considerations in `map()`
+
+`map()` column-binds variables together to create a grid. The lengths of those variables need to be conformable just as with `data.frame()`.
 
 ```{r drakemaperr, error = TRUE}
 drake_plan(
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2, 3), ncol = c(4, 5))
+    simulate_data(center, scale),
+    transform = map(center = c(2, 1, 0), scale = c(3, 2))
   )
 )
 ```
 
-In most cases, grouping variables of unequal length give you sensible results.
+Sometimes, the results are sensible when grouping variable lengths are multiples of each other, but be careful.
 
 ```{r drakemap2}
 drake_plan(
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2, 3), ncol = 4)
+    simulate_data(center, scale),
+    transform = map(center = c(2, 1, 0), scale = 4)
   )
 )
 ```
@@ -317,58 +341,58 @@ Things get tricker when `drake` reuses grouping variables from previous transfor
 ```{r drakemap3}
 drake_plan(
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2))
+    simulate_data(center),
+    transform = map(center = c(1, 2))
   ),
   y = target(
-    process_data(x, nrow),
+    process_data(x, center),
     transform = map(x)
   ),
   trace = TRUE # Adds extra columns for the grouping variables.
 )
 ```
 
-But if other targets have `nrow`'s of their own, `drake_plan()` may not know what to do with them.
+But if other targets have `centers`'s of their own, `drake_plan()` may not know what to do with them.
 
 ```{r drakemap4}
 drake_plan(
   w = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(3, 4))
+    simulate_data(center),
+    transform = map(center = c(3, 4))
   ),
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2))
+    simulate_data_2(center),
+    transform = map(center = c(1, 2))
   ),
   y = target(
-    process_data(w, x, nrow),
+    process_data(w, x, center),
     transform = map(w, x)
   ),
   trace = TRUE
 )
 ```
 
-The problems is that there are 4 values of `nrow` and only two `x_*` targets (and two `y_*` targets). Even if you explicitly supply `nrow` to the transformation, `map()` can only takes the first two values.
+The problems is that there are 4 values of `center` and only two `x_*` targets (and two `y_*` targets). Even if you explicitly supply `center` to the transformation, `map()` can only takes the first two values.
 
 ```{r drakemap5}
 drake_plan(
   w = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(3, 4))
+    simulate_data(center),
+    transform = map(center = c(3, 4))
   ),
   x = target(
-    simulate_data(nrow, ncol),
-    transform = map(nrow = c(1, 2))
+    simulate_data_2(center),
+    transform = map(center = c(1, 2))
   ),
   y = target(
-    process_data(w, x, nrow),
-    transform = map(w, x, nrow)
+    process_data(w, x, center),
+    transform = map(w, x, center)
   ),
   trace = TRUE
 )
 ```
 
-So always inspect the plan before you run it with `make()`. Once you have a `drake_config()` object, `vis_drake_graph()` and `deps_target()` can help.
+So please inspect the plan before you run it with `make()`. Once you have a `drake_config()` object, `vis_drake_graph()` and `deps_target()` can help.
 
 #### `cross()`
 
