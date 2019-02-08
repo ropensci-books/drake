@@ -697,114 +697,141 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
 <p><code>map()</code> creates a new target for each row in a grid.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>))
+    <span class="kw">simulate_data</span>(center, scale),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">scale =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>))
   )
 )
 <span class="co">#&gt; # A tibble: 3 x 2</span>
 <span class="co">#&gt;   target command            </span>
 <span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;             </span>
-<span class="co">#&gt; 1 x_1_4  simulate_data(1, 4)</span>
-<span class="co">#&gt; 2 x_2_5  simulate_data(2, 5)</span>
-<span class="co">#&gt; 3 x_3_6  simulate_data(3, 6)</span></code></pre>
-<p>The grid comes from column-binding the arguments together, which means the lengths need to be conformable just as with <code>data.frame()</code>.</p>
+<span class="co">#&gt; 1 x_2_3  simulate_data(2, 3)</span>
+<span class="co">#&gt; 2 x_1_2  simulate_data(1, 2)</span>
+<span class="co">#&gt; 3 x_0_1  simulate_data(0, 1)</span></code></pre>
+<p>You can supply your own custom grid using the <code>.data</code> argument. Note the use of <code>!!</code> below.</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_grid &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">sim_function =</span> <span class="kw">c</span>(<span class="st">&quot;rnrom&quot;</span>, <span class="st">&quot;rt&quot;</span>, <span class="st">&quot;rcauchy&quot;</span>),
+  <span class="dt">title =</span> <span class="kw">c</span>(<span class="st">&quot;Normal&quot;</span>, <span class="st">&quot;Student t&quot;</span>, <span class="st">&quot;Cauchy&quot;</span>)
+)
+my_grid<span class="op">$</span>sim_function &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(my_grid<span class="op">$</span>sim_function)
+
+<span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> <span class="kw">target</span>(
+    <span class="kw">simulate_data</span>(sim_function, title, center, scale),
+    <span class="dt">transform =</span> <span class="kw">map</span>(
+      <span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>),
+      <span class="dt">scale =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>),
+      <span class="dt">.data =</span> <span class="op">!!</span>my_grid,
+      <span class="dt">.id =</span> sim_function <span class="co"># for pretty target names</span>
+    )
+  )
+)
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target    command                               </span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;expr&gt;                                </span>
+<span class="co">#&gt; 1 x_rnrom   simulate_data(rnrom, &quot;Normal&quot;, 2, 3)  </span>
+<span class="co">#&gt; 2 x_rt      simulate_data(rt, &quot;Student t&quot;, 1, 2)  </span>
+<span class="co">#&gt; 3 x_rcauchy simulate_data(rcauchy, &quot;Cauchy&quot;, 0, 1)</span></code></pre>
+</div>
+<div id="special-considerations-in-map" class="section level4">
+<h4><span class="header-section-number">6.5.2.2</span> Special considerations in <code>map()</code></h4>
+<p><code>map()</code> column-binds variables together to create a grid. The lengths of those variables need to be conformable just as with <code>data.frame()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">5</span>))
+    <span class="kw">simulate_data</span>(center, scale),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">scale =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">2</span>))
   )
 )
 <span class="co">#&gt; Error: Failed to make a grid of grouping variables for map().</span>
 <span class="co">#&gt; Grouping variables in map() must have suitable lengths for coercion to a data frame.</span>
-<span class="co">#&gt; Possibly uneven groupings detected in map(nrow = c(1, 2, 3), ncol = c(4, 5)):</span>
-<span class="co">#&gt;   c(&quot;1&quot;, &quot;2&quot;, &quot;3&quot;)</span>
-<span class="co">#&gt;   c(&quot;4&quot;, &quot;5&quot;)</span></code></pre>
-<p>In most cases, grouping variables of unequal length give you sensible results.</p>
+<span class="co">#&gt; Possibly uneven groupings detected in map(center = c(2, 1, 0), scale = c(3, 2)):</span>
+<span class="co">#&gt;   c(&quot;2&quot;, &quot;1&quot;, &quot;0&quot;)</span>
+<span class="co">#&gt;   c(&quot;3&quot;, &quot;2&quot;)</span></code></pre>
+<p>Sometimes, the results are sensible when grouping variable lengths are multiples of each other, but be careful.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">ncol =</span> <span class="dv">4</span>)
+    <span class="kw">simulate_data</span>(center, scale),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">scale =</span> <span class="dv">4</span>)
   )
 )
 <span class="co">#&gt; # A tibble: 3 x 2</span>
 <span class="co">#&gt;   target command            </span>
 <span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;             </span>
-<span class="co">#&gt; 1 x_1_4  simulate_data(1, 4)</span>
-<span class="co">#&gt; 2 x_2_4  simulate_data(2, 4)</span>
-<span class="co">#&gt; 3 x_3_4  simulate_data(3, 4)</span></code></pre>
+<span class="co">#&gt; 1 x_2_4  simulate_data(2, 4)</span>
+<span class="co">#&gt; 2 x_1_4  simulate_data(1, 4)</span>
+<span class="co">#&gt; 3 x_0_4  simulate_data(0, 4)</span></code></pre>
 <p>Things get tricker when <code>drake</code> reuses grouping variables from previous transformations. For example, below, each <code>x_*</code> target has an associated <code>nrow</code> value. So if you write <code>transform = map(x)</code>, then <code>nrow</code> goes along for the ride.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+    <span class="kw">simulate_data</span>(center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
   ),
   <span class="dt">y =</span> <span class="kw">target</span>(
-    <span class="kw">process_data</span>(x, nrow),
+    <span class="kw">process_data</span>(x, center),
     <span class="dt">transform =</span> <span class="kw">map</span>(x)
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span> <span class="co"># Adds extra columns for the grouping variables.</span>
 )
 <span class="co">#&gt; # A tibble: 4 x 5</span>
-<span class="co">#&gt;   target command                nrow  x     y    </span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                 &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span>
-<span class="co">#&gt; 1 x_1    simulate_data(1, ncol) 1     x_1   &lt;NA&gt; </span>
-<span class="co">#&gt; 2 x_2    simulate_data(2, ncol) 2     x_2   &lt;NA&gt; </span>
-<span class="co">#&gt; 3 y_x_1  process_data(x_1, 1)   1     x_1   y_x_1</span>
-<span class="co">#&gt; 4 y_x_2  process_data(x_2, 2)   2     x_2   y_x_2</span></code></pre>
-<p>But if other targets have <code>nrow</code>’s of their own, <code>drake_plan()</code> may not know what to do with them.</p>
+<span class="co">#&gt;   target command              center x     y    </span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;               &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;</span>
+<span class="co">#&gt; 1 x_1    simulate_data(1)     1      x_1   &lt;NA&gt; </span>
+<span class="co">#&gt; 2 x_2    simulate_data(2)     2      x_2   &lt;NA&gt; </span>
+<span class="co">#&gt; 3 y_x_1  process_data(x_1, 1) 1      x_1   y_x_1</span>
+<span class="co">#&gt; 4 y_x_2  process_data(x_2, 2) 2      x_2   y_x_2</span></code></pre>
+<p>But if other targets have <code>centers</code>’s of their own, <code>drake_plan()</code> may not know what to do with them.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">w =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
+    <span class="kw">simulate_data</span>(center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
   ),
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+    <span class="kw">simulate_data_2</span>(center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
   ),
   <span class="dt">y =</span> <span class="kw">target</span>(
-    <span class="kw">process_data</span>(w, x, nrow),
+    <span class="kw">process_data</span>(w, x, center),
     <span class="dt">transform =</span> <span class="kw">map</span>(w, x)
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
 <span class="co">#&gt; # A tibble: 6 x 6</span>
-<span class="co">#&gt;   target    command                    nrow  w     x     y        </span>
-<span class="co">#&gt;   &lt;chr&gt;     &lt;expr&gt;                     &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    </span>
-<span class="co">#&gt; 1 w_3       simulate_data(3, ncol)     3     w_3   &lt;NA&gt;  &lt;NA&gt;     </span>
-<span class="co">#&gt; 2 w_4       simulate_data(4, ncol)     4     w_4   &lt;NA&gt;  &lt;NA&gt;     </span>
-<span class="co">#&gt; 3 x_1       simulate_data(1, ncol)     1     &lt;NA&gt;  x_1   &lt;NA&gt;     </span>
-<span class="co">#&gt; 4 x_2       simulate_data(2, ncol)     2     &lt;NA&gt;  x_2   &lt;NA&gt;     </span>
-<span class="co">#&gt; 5 y_w_3_x_1 process_data(w_3, x_1, NA) &lt;NA&gt;  w_3   x_1   y_w_3_x_1</span>
-<span class="co">#&gt; 6 y_w_4_x_2 process_data(w_4, x_2, NA) &lt;NA&gt;  w_4   x_2   y_w_4_x_2</span></code></pre>
-<p>The problems is that there are 4 values of <code>nrow</code> and only two <code>x_*</code> targets (and two <code>y_*</code> targets). Even if you explicitly supply <code>nrow</code> to the transformation, <code>map()</code> can only takes the first two values.</p>
+<span class="co">#&gt;   target    command                    center w     x     y        </span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;expr&gt;                     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 w_3       simulate_data(3)           3      w_3   &lt;NA&gt;  &lt;NA&gt;     </span>
+<span class="co">#&gt; 2 w_4       simulate_data(4)           4      w_4   &lt;NA&gt;  &lt;NA&gt;     </span>
+<span class="co">#&gt; 3 x_1       simulate_data_2(1)         1      &lt;NA&gt;  x_1   &lt;NA&gt;     </span>
+<span class="co">#&gt; 4 x_2       simulate_data_2(2)         2      &lt;NA&gt;  x_2   &lt;NA&gt;     </span>
+<span class="co">#&gt; 5 y_w_3_x_1 process_data(w_3, x_1, NA) &lt;NA&gt;   w_3   x_1   y_w_3_x_1</span>
+<span class="co">#&gt; 6 y_w_4_x_2 process_data(w_4, x_2, NA) &lt;NA&gt;   w_4   x_2   y_w_4_x_2</span></code></pre>
+<p>The problems is that there are 4 values of <code>center</code> and only two <code>x_*</code> targets (and two <code>y_*</code> targets). Even if you explicitly supply <code>center</code> to the transformation, <code>map()</code> can only takes the first two values.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">w =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
+    <span class="kw">simulate_data</span>(center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
   ),
   <span class="dt">x =</span> <span class="kw">target</span>(
-    <span class="kw">simulate_data</span>(nrow, ncol),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">nrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+    <span class="kw">simulate_data_2</span>(center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
   ),
   <span class="dt">y =</span> <span class="kw">target</span>(
-    <span class="kw">process_data</span>(w, x, nrow),
-    <span class="dt">transform =</span> <span class="kw">map</span>(w, x, nrow)
+    <span class="kw">process_data</span>(w, x, center),
+    <span class="dt">transform =</span> <span class="kw">map</span>(w, x, center)
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
 <span class="co">#&gt; # A tibble: 6 x 6</span>
-<span class="co">#&gt;   target      command                   nrow  w     x     y          </span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;expr&gt;                    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      </span>
-<span class="co">#&gt; 1 w_3         simulate_data(3, ncol)    3     w_3   &lt;NA&gt;  &lt;NA&gt;       </span>
-<span class="co">#&gt; 2 w_4         simulate_data(4, ncol)    4     w_4   &lt;NA&gt;  &lt;NA&gt;       </span>
-<span class="co">#&gt; 3 x_1         simulate_data(1, ncol)    1     &lt;NA&gt;  x_1   &lt;NA&gt;       </span>
-<span class="co">#&gt; 4 x_2         simulate_data(2, ncol)    2     &lt;NA&gt;  x_2   &lt;NA&gt;       </span>
-<span class="co">#&gt; 5 y_w_3_x_1_3 process_data(w_3, x_1, 3) 3     w_3   x_1   y_w_3_x_1_3</span>
-<span class="co">#&gt; 6 y_w_4_x_2_4 process_data(w_4, x_2, 4) 4     w_4   x_2   y_w_4_x_2_4</span></code></pre>
-<p>So always inspect the plan before you run it with <code>make()</code>. Once you have a <code>drake_config()</code> object, <code>vis_drake_graph()</code> and <code>deps_target()</code> can help.</p>
+<span class="co">#&gt;   target      command                   center w     x     y          </span>
+<span class="co">#&gt;   &lt;chr&gt;       &lt;expr&gt;                    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      </span>
+<span class="co">#&gt; 1 w_3         simulate_data(3)          3      w_3   &lt;NA&gt;  &lt;NA&gt;       </span>
+<span class="co">#&gt; 2 w_4         simulate_data(4)          4      w_4   &lt;NA&gt;  &lt;NA&gt;       </span>
+<span class="co">#&gt; 3 x_1         simulate_data_2(1)        1      &lt;NA&gt;  x_1   &lt;NA&gt;       </span>
+<span class="co">#&gt; 4 x_2         simulate_data_2(2)        2      &lt;NA&gt;  x_2   &lt;NA&gt;       </span>
+<span class="co">#&gt; 5 y_w_3_x_1_3 process_data(w_3, x_1, 3) 3      w_3   x_1   y_w_3_x_1_3</span>
+<span class="co">#&gt; 6 y_w_4_x_2_4 process_data(w_4, x_2, 4) 4      w_4   x_2   y_w_4_x_2_4</span></code></pre>
+<p>So please inspect the plan before you run it with <code>make()</code>. Once you have a <code>drake_config()</code> object, <code>vis_drake_graph()</code> and <code>deps_target()</code> can help.</p>
 </div>
 <div id="cross" class="section level4">
-<h4><span class="header-section-number">6.5.2.2</span> <code>cross()</code></h4>
+<h4><span class="header-section-number">6.5.2.3</span> <code>cross()</code></h4>
 <p><code>cross()</code> creates a new target for each combination of argument values.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
@@ -823,7 +850,7 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
 <span class="co">#&gt; 6 x_3_5  simulate_data(3, 5)</span></code></pre>
 </div>
 <div id="combine" class="section level4">
-<h4><span class="header-section-number">6.5.2.3</span> <code>combine()</code></h4>
+<h4><span class="header-section-number">6.5.2.4</span> <code>combine()</code></h4>
 <p>In <code>combine()</code>, you can gather lists of targets and insert them into commands. You must tell <code>combine()</code> which symbols you wish to replace.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
