@@ -409,7 +409,7 @@ drake_plan(
 
 #### `combine()`
 
-In `combine()`, you can replace symbols in a command with collections of other targets. You must tell `combine()` about the grouping variables (e.g. `data`) and grouping functions (e.g. `bind_rows()`) in the transformation.
+In `combine()`, you can replace symbols in a command with collections of other targets. Unlike `map()` and `cross()`, `combine()` creates *aggregates* of existing grouping variables instead of the grouping variables themselves. Below, `combine(data = bind_rows(.id = "id")` tells `drake` to splice the levels of `data` into `bind_rows()` and then insert that `bind_rows()` call wherever there is a symbol called `data` in the command.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -418,18 +418,75 @@ plan <- drake_plan(
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
   larger = target(
-    data,
+    arrange(data, sd) %>%
+      head(n = 400),
     transform = combine(data = bind_rows(.id = "id"))
   )
 )
 
 plan
 
+drake_plan_source(plan)
+
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-As with `group_by()` from `dplyr`, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional `.by` argument of `combine()`.
+You can combine multiple groups of targets together.
+
+```{r transform5b}
+plan <- drake_plan(
+  data_group1 = target(
+    sim_data(mean = x, sd = y),
+    transform = map(x = c(1, 2), y = c(3, 4))
+  ),
+  data_group2 = target(
+    pull_data(url),
+    transform = map(url = c("example1.com", "example2.com"))
+  ),
+  larger = target(
+    list(data_group1, data_group2),
+    transform = combine(
+      data_group1 = bind_rows(),
+      data_group2 = bind_rows()
+    )
+  )
+)
+
+drake_plan_source(plan)
+```
+
+To splice different groups of targets together in the same call, use tags (more on that later).
+
+```{r transform5c}
+plan <- drake_plan(
+  data_group1 = target(
+    sim_data(mean = x, sd = y),
+    transform = map(
+      x = c(1, 2),
+      y = c(3, 4),
+      .tag_out = data
+    )
+  ),
+  data_group2 = target(
+    pull_data(url),
+    transform = map(
+      url = c("example1.com", "example2.com"),
+      .tag_out = data
+    )
+  ),
+  larger = target(
+    arrange(data, id),
+    transform = combine(data = bind_rows())
+  )
+)
+
+plan
+
+drake_plan_source(plan)
+```
+
+And as with `group_by()` from `dplyr`, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional `.by` argument of `combine()`.
 
 ```{r transform6}
 plan <- drake_plan(
@@ -438,15 +495,34 @@ plan <- drake_plan(
     transform = cross(x = c(1, 2), y = c(3, 4), z = c(5, 6))
   ),
   combined = target(
-    data,
+    arrange(data, sd) %>%
+      head(n = 400),
     transform = combine(data = bind_rows(.id = "id"), .by = c(x, y))
   )
 )
 
-plan
+drake_plan_source(plan)
 
-config <- drake_config(plan)
-vis_drake_graph(config)
+plan <- drake_plan(
+  data_group1 = target(
+    sim(mean = x, sd = y),
+    transform = cross(x = c(1, 2), y = c(3, 4))
+  ),
+  data_group2 = target(
+    pull(mean = x, sd = y),
+    transform = cross(x = c(1, 2), y = c(3, 4))
+  ),
+  larger = target(
+    list(data_group1, data_group2),
+    transform = combine(
+      data_group1 = bind_rows(),
+      data_group2 = bind_rows(),
+      .by = c(x, y)
+    )
+  )
+)
+
+drake_plan_source(plan)
 ```
 
 In your post-processing, you may need the values of `x` and `y` that underly `data_1_3` and `data_2_4`. Solution: get the trace and the target names. We define a new plan
@@ -458,7 +534,9 @@ plan <- drake_plan(
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
   larger = target(
-    data,
+    data %>%
+      arrange(sd) %>%
+      head(n = 400),
     transform = combine(data = post_process(plan = ignore(plan)))
   ),
   trace = TRUE
