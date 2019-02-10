@@ -210,9 +210,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5" data-path="plans.html"><a href="plans.html#large-plans"><i class="fa fa-check"></i><b>6.5</b> Large plans</a><ul>
 <li class="chapter" data-level="6.5.1" data-path="plans.html"><a href="plans.html#how-to-create-large-plans"><i class="fa fa-check"></i><b>6.5.1</b> How to create large plans</a></li>
 <li class="chapter" data-level="6.5.2" data-path="plans.html"><a href="plans.html#the-types-of-transformations"><i class="fa fa-check"></i><b>6.5.2</b> The types of transformations</a></li>
-<li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#target-names"><i class="fa fa-check"></i><b>6.5.3</b> Target names</a></li>
-<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#grouping-variables"><i class="fa fa-check"></i><b>6.5.4</b> Grouping variables</a></li>
-<li class="chapter" data-level="6.5.5" data-path="plans.html"><a href="plans.html#tags"><i class="fa fa-check"></i><b>6.5.5</b> Tags</a></li>
+<li class="chapter" data-level="6.5.3" data-path="plans.html"><a href="plans.html#grouping-variables"><i class="fa fa-check"></i><b>6.5.3</b> Grouping variables</a></li>
+<li class="chapter" data-level="6.5.4" data-path="plans.html"><a href="plans.html#tags"><i class="fa fa-check"></i><b>6.5.4</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6.6" data-path="plans.html"><a href="plans.html#create-large-plans-the-old-way"><i class="fa fa-check"></i><b>6.6</b> Create large plans the <em>old</em> way</a><ul>
 <li class="chapter" data-level="6.6.1" data-path="plans.html"><a href="plans.html#map_plan"><i class="fa fa-check"></i><b>6.6.1</b> <code>map_plan()</code></a></li>
@@ -588,12 +587,12 @@ plan
   <span class="co"># Summarize the performance metrics for each dataset.</span>
   <span class="dt">summ_data =</span> <span class="kw">target</span>(
     <span class="kw">summary</span>(metric),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(metric, <span class="dt">.by =</span> data)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">metric =</span> <span class="kw">list</span>(), <span class="dt">.by =</span> data)
   ),
   <span class="co"># Same, but for each metric type.</span>
   <span class="dt">summ_metric =</span> <span class="kw">target</span>(
     <span class="kw">summary</span>(metric),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(metric, <span class="dt">.by =</span> metric_fun)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">metric =</span> <span class="kw">list</span>(), <span class="dt">.by =</span> metric_fun)
   )
 )
 
@@ -623,7 +622,7 @@ config1 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan1
   <span class="co"># Calculate 2 different performance metrics on every model fit.</span>
   <span class="dt">summ_metric =</span> <span class="kw">target</span>(
     <span class="kw">summary</span>(metric),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(metric, <span class="dt">.by =</span> metric_fun)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">metric =</span> <span class="kw">list</span>(), <span class="dt">.by =</span> metric_fun)
   ),
   <span class="dt">metric =</span> <span class="kw">target</span>(
     <span class="kw">metric_fun</span>(analysis),
@@ -639,7 +638,7 @@ config1 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan1
   <span class="co"># Summarize the performance metrics for each dataset.</span>
   <span class="dt">summ_data =</span> <span class="kw">target</span>(
     <span class="kw">summary</span>(metric),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(metric, <span class="dt">.by =</span> data)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">metric =</span> <span class="kw">list</span>(), <span class="dt">.by =</span> data)
   ),
   <span class="dt">large =</span> <span class="kw">get_large_data</span>()
   <span class="co"># Same, but for each metric type.</span>
@@ -851,33 +850,30 @@ my_grid<span class="op">$</span>sim_function &lt;-<span class="st"> </span>rlang
 </div>
 <div id="combine" class="section level4">
 <h4><span class="header-section-number">6.5.2.4</span> <code>combine()</code></h4>
-<p>In <code>combine()</code>, you can gather lists of targets and insert them into commands. You must tell <code>combine()</code> which symbols you wish to replace.</p>
+<p>In <code>combine()</code>, you can replace symbols in a command with collections of other targets. You must tell <code>combine()</code> about the grouping variables (e.g. <code>data</code>) and grouping functions (e.g. <code>bind_rows()</code>) in the transformation.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
   ),
   <span class="dt">larger =</span> <span class="kw">target</span>(
-    <span class="co"># Turn the list of data frames into a monolithic data frame.</span>
-    <span class="kw">do.call</span>(rbind, data),
-    <span class="co"># Replace the symbol `data` with a list of all the targets</span>
-    <span class="co"># declared by map() above.</span>
-    <span class="dt">transform =</span> <span class="kw">combine</span>(data)
+    data,
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">data =</span> <span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;id&quot;</span>))
   )
 )
 
 plan
 <span class="co">#&gt; # A tibble: 3 x 2</span>
-<span class="co">#&gt;   target   command                                 </span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;expr&gt;                                  </span>
-<span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)              </span>
-<span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)              </span>
-<span class="co">#&gt; 3 larger   do.call(rbind, list(data_1_3, data_2_4))</span>
+<span class="co">#&gt;   target   command                                  </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;expr&gt;                                   </span>
+<span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)               </span>
+<span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)               </span>
+<span class="co">#&gt; 3 larger   bind_rows(data_1_3, data_2_4, .id = &quot;id&quot;)</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-270cf12dee99691b5d50" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-270cf12dee99691b5d50">{"x":{"nodes":{"id":["data_1_3","data_2_4","larger"],"imported":[false,false,false],"label":["data_1_3","data_2_4","larger"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 2, sd = 4)","do.call(rbind, list(data_1_3, data_2_4))"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","do.call(rbind,&nbsp;list(data_1_3,&nbsp;data_2_4))"],"x":[-1,1,0],"y":[-1,-1,1]},"edges":{"from":["data_1_3","data_2_4"],"to":["larger","larger"],"arrows":["to","to"],"smooth":[true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-270cf12dee99691b5d50">{"x":{"nodes":{"id":["data_1_3","data_2_4","larger"],"imported":[false,false,false],"label":["data_1_3","data_2_4","larger"],"command":["sim_data(mean = 1, sd = 3)","sim_data(mean = 2, sd = 4)","bind_rows(data_1_3, data_2_4, .id = \"id\")"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"title":["sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4)","bind_rows(data_1_3,&nbsp;data_2_4,&nbsp;.id&nbsp;=&nbsp;\"id\")"],"x":[-1,1,0],"y":[-1,-1,1]},"edges":{"from":["data_1_3","data_2_4"],"to":["larger","larger"],"arrows":["to","to"],"smooth":[true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>As with <code>group_by()</code> from <code>dplyr</code>, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional <code>.by</code> argument of <code>combine()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
@@ -885,41 +881,41 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
     <span class="dt">transform =</span> <span class="kw">cross</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>), <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">6</span>))
   ),
   <span class="dt">combined =</span> <span class="kw">target</span>(
-    <span class="kw">do.call</span>(rbind, data),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> <span class="kw">c</span>(x, y))
+    data,
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">data =</span> <span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;id&quot;</span>), <span class="dt">.by =</span> <span class="kw">c</span>(x, y))
   )
 )
 
 plan
 <span class="co">#&gt; # A tibble: 12 x 2</span>
-<span class="co">#&gt;    target       command                                     </span>
-<span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                      </span>
-<span class="co">#&gt;  1 data_1_3_5   sim_data(mean = 1, sd = 3, skew = 5)        </span>
-<span class="co">#&gt;  2 data_2_3_5   sim_data(mean = 2, sd = 3, skew = 5)        </span>
-<span class="co">#&gt;  3 data_1_4_5   sim_data(mean = 1, sd = 4, skew = 5)        </span>
-<span class="co">#&gt;  4 data_2_4_5   sim_data(mean = 2, sd = 4, skew = 5)        </span>
-<span class="co">#&gt;  5 data_1_3_6   sim_data(mean = 1, sd = 3, skew = 6)        </span>
-<span class="co">#&gt;  6 data_2_3_6   sim_data(mean = 2, sd = 3, skew = 6)        </span>
-<span class="co">#&gt;  7 data_1_4_6   sim_data(mean = 1, sd = 4, skew = 6)        </span>
-<span class="co">#&gt;  8 data_2_4_6   sim_data(mean = 2, sd = 4, skew = 6)        </span>
-<span class="co">#&gt;  9 combined_1_3 do.call(rbind, list(data_1_3_5, data_1_3_6))</span>
-<span class="co">#&gt; 10 combined_2_3 do.call(rbind, list(data_2_3_5, data_2_3_6))</span>
-<span class="co">#&gt; 11 combined_1_4 do.call(rbind, list(data_1_4_5, data_1_4_6))</span>
-<span class="co">#&gt; 12 combined_2_4 do.call(rbind, list(data_2_4_5, data_2_4_6))</span>
+<span class="co">#&gt;    target       command                                      </span>
+<span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                       </span>
+<span class="co">#&gt;  1 data_1_3_5   sim_data(mean = 1, sd = 3, skew = 5)         </span>
+<span class="co">#&gt;  2 data_2_3_5   sim_data(mean = 2, sd = 3, skew = 5)         </span>
+<span class="co">#&gt;  3 data_1_4_5   sim_data(mean = 1, sd = 4, skew = 5)         </span>
+<span class="co">#&gt;  4 data_2_4_5   sim_data(mean = 2, sd = 4, skew = 5)         </span>
+<span class="co">#&gt;  5 data_1_3_6   sim_data(mean = 1, sd = 3, skew = 6)         </span>
+<span class="co">#&gt;  6 data_2_3_6   sim_data(mean = 2, sd = 3, skew = 6)         </span>
+<span class="co">#&gt;  7 data_1_4_6   sim_data(mean = 1, sd = 4, skew = 6)         </span>
+<span class="co">#&gt;  8 data_2_4_6   sim_data(mean = 2, sd = 4, skew = 6)         </span>
+<span class="co">#&gt;  9 combined_1_3 bind_rows(data_1_3_5, data_1_3_6, .id = &quot;id&quot;)</span>
+<span class="co">#&gt; 10 combined_2_3 bind_rows(data_2_3_5, data_2_3_6, .id = &quot;id&quot;)</span>
+<span class="co">#&gt; 11 combined_1_4 bind_rows(data_1_4_5, data_1_4_6, .id = &quot;id&quot;)</span>
+<span class="co">#&gt; 12 combined_2_4 bind_rows(data_2_4_5, data_2_4_6, .id = &quot;id&quot;)</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-c76a9266172c8658d3a3" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c76a9266172c8658d3a3">{"x":{"nodes":{"id":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"command":["do.call(rbind, list(data_1_3_5, data_1_3_6))","do.call(rbind, list(data_1_4_5, data_1_4_6))","do.call(rbind, list(data_2_3_5, data_2_3_6))","do.call(rbind, list(data_2_4_5, data_2_4_6))","sim_data(mean = 1, sd = 3, skew = 5)","sim_data(mean = 1, sd = 3, skew = 6)","sim_data(mean = 1, sd = 4, skew = 5)","sim_data(mean = 1, sd = 4, skew = 6)","sim_data(mean = 2, sd = 3, skew = 5)","sim_data(mean = 2, sd = 3, skew = 6)","sim_data(mean = 2, sd = 4, skew = 5)","sim_data(mean = 2, sd = 4, skew = 6)"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,1,1,1,1,1,1,1],"title":["do.call(rbind,&nbsp;list(data_1_3_5,&nbsp;data_1_3_6))","do.call(rbind,&nbsp;list(data_1_4_5,&nbsp;data_1_4_6))","do.call(rbind,&nbsp;list(data_2_3_5,&nbsp;data_2_3_6))","do.call(rbind,&nbsp;list(data_2_4_5,&nbsp;data_2_4_6))","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)"],"x":[-0.857142857142857,-0.285714285714286,0.285714285714286,0.857142857142857,-1,-0.714285714285714,-0.428571428571429,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1],"y":[1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1]},"edges":{"from":["data_1_3_5","data_2_3_5","data_1_4_5","data_2_4_5","data_1_3_6","data_2_3_6","data_1_4_6","data_2_4_6"],"to":["combined_1_3","combined_2_3","combined_1_4","combined_2_4","combined_1_3","combined_2_3","combined_1_4","combined_2_4"],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>Sometimes, a list like <code>list(data_1_3, data_2_4)</code> is not enough. You may need the values of <code>x</code> and <code>y</code> that underly <code>data_1_3</code> and <code>data_2_4</code>. Solution: get the trace and the target names. We define a new plan</p>
+<script type="application/json" data-for="htmlwidget-c76a9266172c8658d3a3">{"x":{"nodes":{"id":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["combined_1_3","combined_1_4","combined_2_3","combined_2_4","data_1_3_5","data_1_3_6","data_1_4_5","data_1_4_6","data_2_3_5","data_2_3_6","data_2_4_5","data_2_4_6"],"command":["bind_rows(data_1_3_5, data_1_3_6, .id = \"id\")","bind_rows(data_1_4_5, data_1_4_6, .id = \"id\")","bind_rows(data_2_3_5, data_2_3_6, .id = \"id\")","bind_rows(data_2_4_5, data_2_4_6, .id = \"id\")","sim_data(mean = 1, sd = 3, skew = 5)","sim_data(mean = 1, sd = 3, skew = 6)","sim_data(mean = 1, sd = 4, skew = 5)","sim_data(mean = 1, sd = 4, skew = 6)","sim_data(mean = 2, sd = 3, skew = 5)","sim_data(mean = 2, sd = 3, skew = 6)","sim_data(mean = 2, sd = 4, skew = 5)","sim_data(mean = 2, sd = 4, skew = 6)"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,1,1,1,1,1,1,1],"title":["bind_rows(data_1_3_5,&nbsp;data_1_3_6,&nbsp;.id&nbsp;=&nbsp;\"id\")","bind_rows(data_1_4_5,&nbsp;data_1_4_6,&nbsp;.id&nbsp;=&nbsp;\"id\")","bind_rows(data_2_3_5,&nbsp;data_2_3_6,&nbsp;.id&nbsp;=&nbsp;\"id\")","bind_rows(data_2_4_5,&nbsp;data_2_4_6,&nbsp;.id&nbsp;=&nbsp;\"id\")","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;1,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;3,&nbsp;skew&nbsp;=&nbsp;6)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;5)","sim_data(mean&nbsp;=&nbsp;2,&nbsp;sd&nbsp;=&nbsp;4,&nbsp;skew&nbsp;=&nbsp;6)"],"x":[-0.857142857142857,-0.285714285714286,0.285714285714286,0.857142857142857,-1,-0.714285714285714,-0.428571428571429,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1],"y":[1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1]},"edges":{"from":["data_1_3_5","data_2_3_5","data_1_4_5","data_2_4_5","data_1_3_6","data_2_3_6","data_1_4_6","data_2_4_6"],"to":["combined_1_3","combined_2_3","combined_1_4","combined_2_4","combined_1_3","combined_2_3","combined_1_4","combined_2_4"],"arrows":["to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>In your post-processing, you may need the values of <code>x</code> and <code>y</code> that underly <code>data_1_3</code> and <code>data_2_4</code>. Solution: get the trace and the target names. We define a new plan</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">sim_data</span>(<span class="dt">mean =</span> x, <span class="dt">sd =</span> y),
     <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))
   ),
   <span class="dt">larger =</span> <span class="kw">target</span>(
-    <span class="kw">post_process</span>(data, <span class="kw">ignore</span>(plan)),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(data)
+    data,
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">data =</span> <span class="kw">post_process</span>(<span class="dt">plan =</span> <span class="kw">ignore</span>(plan)))
   ),
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
@@ -930,115 +926,41 @@ plan
 <span class="co">#&gt;   &lt;chr&gt;    &lt;expr&gt;                                &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span>
 <span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)          … 1     3     data_1… &lt;NA&gt;  </span>
 <span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)          … 2     4     data_2… &lt;NA&gt;  </span>
-<span class="co">#&gt; 3 larger   post_process(list(data_1_3, data_2_4… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;    larger</span></code></pre>
+<span class="co">#&gt; 3 larger   post_process(data_1_3, data_2_4, pla… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;    larger</span>
+
+<span class="kw">drake_plan_source</span>(plan)
+<span class="co">#&gt; drake_plan(</span>
+<span class="co">#&gt;   data_1_3 = target(</span>
+<span class="co">#&gt;     command = sim_data(mean = 1, sd = 3),</span>
+<span class="co">#&gt;     x = &quot;1&quot;,</span>
+<span class="co">#&gt;     y = &quot;3&quot;,</span>
+<span class="co">#&gt;     data = &quot;data_1_3&quot;</span>
+<span class="co">#&gt;   ),</span>
+<span class="co">#&gt;   data_2_4 = target(</span>
+<span class="co">#&gt;     command = sim_data(mean = 2, sd = 4),</span>
+<span class="co">#&gt;     x = &quot;2&quot;,</span>
+<span class="co">#&gt;     y = &quot;4&quot;,</span>
+<span class="co">#&gt;     data = &quot;data_2_4&quot;</span>
+<span class="co">#&gt;   ),</span>
+<span class="co">#&gt;   larger = target(</span>
+<span class="co">#&gt;     command = post_process(data_1_3, data_2_4, plan = ignore(plan)),</span>
+<span class="co">#&gt;     larger = &quot;larger&quot;</span>
+<span class="co">#&gt;   )</span>
+<span class="co">#&gt; )</span></code></pre>
 <p>and a new function</p>
-<pre class="sourceCode r"><code class="sourceCode r">post_process &lt;-<span class="st"> </span><span class="cf">function</span>(data_list, plan_with_trace) {
-  <span class="co"># Get the names of the targets contained in data_list.</span>
-  <span class="kw">names</span>(data_list) &lt;-<span class="st"> </span><span class="kw">all.vars</span>(<span class="kw">match.call</span>()<span class="op">$</span>data_list)
-  
-  <span class="co"># Get the trace of those targets.</span>
-  data_trace &lt;-<span class="st"> </span><span class="kw">filter</span>(plan_with_trace, target <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(data_list))
-  
-  <span class="co"># Do post-processing with data_list and data_trace.</span>
+<pre class="sourceCode r"><code class="sourceCode r">post_process &lt;-<span class="st"> </span><span class="cf">function</span>(..., plan) {
+  args &lt;-<span class="st"> </span><span class="kw">list</span>(...)
+  <span class="kw">names</span>(args) &lt;-<span class="st"> </span><span class="kw">all.vars</span>(<span class="kw">substitute</span>(<span class="kw">list</span>(...)))
+  trace &lt;-<span class="st"> </span><span class="kw">filter</span>(plan, target <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(args))
+  <span class="co"># Do post-processing with args and trace.</span>
 }</code></pre>
-<p><code>match.call()</code> captures the function call itself, including the names of the symbols passed to the arguments. This is handy in a variety of similar use cases.</p>
-<pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, ...) {
-  this_call &lt;-<span class="st"> </span><span class="kw">match.call</span>(<span class="dt">expand.dots =</span> <span class="ot">FALSE</span>)
-  <span class="kw">print</span>(this_call)
-  <span class="kw">cat</span>(<span class="st">&quot;mode:&quot;</span>, <span class="kw">mode</span>(this_call), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-  <span class="kw">cat</span>(<span class="st">&quot;type:&quot;</span>, <span class="kw">typeof</span>(this_call), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-  <span class="kw">cat</span>(<span class="st">&quot;x:&quot;</span>, <span class="kw">as.character</span>(this_call<span class="op">$</span>x), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-  <span class="kw">cat</span>(<span class="st">&quot;y:&quot;</span>, <span class="kw">all.vars</span>(this_call<span class="op">$</span>y), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-  <span class="kw">cat</span>(<span class="st">&quot;z:&quot;</span>, <span class="kw">as.character</span>(this_call<span class="op">$</span>...<span class="op">$</span>z), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-}
-
-<span class="kw">f</span>(<span class="dt">x =</span> a, <span class="dt">y =</span> <span class="kw">c</span>(b, c), <span class="dt">z =</span> d)
-<span class="co">#&gt; f(x = a, y = c(b, c), ... = pairlist(z = d))</span>
-<span class="co">#&gt; mode: call </span>
-<span class="co">#&gt; type: language </span>
-<span class="co">#&gt; x: a </span>
-<span class="co">#&gt; y: b c </span>
-<span class="co">#&gt; z: d</span></code></pre>
-<p>To learn more about metaprogramming, you can consult the <a href="https://adv-r.hadley.nz/introduction-16.html">metaprogramming chapters in Advanced R</a>. For more discussion on this use case of <code>drake</code>, please see <a href="https://github.com/ropensci/drake/issues/693">this thread on GitHub</a>. Comments, questions, etc. are welcome. Please feel free to post.</p>
 </div>
-</div>
-<div id="target-names" class="section level3">
-<h3><span class="header-section-number">6.5.3</span> Target names</h3>
-<p><code>drake</code>’s default target names are way too long and ugly in some cases.</p>
-<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> &quot;my/crazy/long/file_path&quot;</span>
-files &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="kw">c</span>(<span class="st">&quot;file1.csv&quot;</span>, <span class="st">&quot;file2.csv&quot;</span>))
-
-files
-<span class="co">#&gt; [1] &quot;my/crazy/long/file_path/file1.csv&quot; &quot;my/crazy/long/file_path/file2.csv&quot;</span>
-
-plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">file =</span> <span class="op">!!</span>files)
-  )
-)
-
-plan<span class="op">$</span>target
-<span class="co">#&gt; [1] &quot;data_.my.crazy.long.file_path.file1.csv.&quot;</span>
-<span class="co">#&gt; [2] &quot;data_.my.crazy.long.file_path.file2.csv.&quot;</span>
-
-plan
-<span class="co">#&gt; # A tibble: 2 x 2</span>
-<span class="co">#&gt;   target                          command                                  </span>
-<span class="co">#&gt;   &lt;chr&gt;                           &lt;expr&gt;                                   </span>
-<span class="co">#&gt; 1 data_.my.crazy.long.file_path.… read.csv(file_in(&quot;my/crazy/long/file_pat…</span>
-<span class="co">#&gt; 2 data_.my.crazy.long.file_path.… read.csv(file_in(&quot;my/crazy/long/file_pat…</span></code></pre>
-<p>Fortunately, all three transformations have an optional <code>.id</code> argument. Set it to <code>FALSE</code> to severely shorten the target names.</p>
-<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> &quot;my/crazy/long/file_path&quot;</span>
-files &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="kw">c</span>(<span class="st">&quot;file1.csv&quot;</span>, <span class="st">&quot;file2.csv&quot;</span>))
-
-<span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">file =</span> <span class="op">!!</span>files, <span class="dt">.id =</span> <span class="ot">FALSE</span>)
-  )
-)
-<span class="co">#&gt; # A tibble: 2 x 2</span>
-<span class="co">#&gt;   target command                                               </span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                                                </span>
-<span class="co">#&gt; 1 data   read.csv(file_in(&quot;my/crazy/long/file_path/file1.csv&quot;))</span>
-<span class="co">#&gt; 2 data.1 read.csv(file_in(&quot;my/crazy/long/file_path/file2.csv&quot;))</span></code></pre>
-<p>For more suggestive names, you can select the grouping variables for the suffixes. In <code>map()</code> and <code>cross()</code>, all grouping variables are allowed except tags (defined later). In <code>combine()</code>, you can only use the symbols passed to <code>.by</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">data =</span> <span class="kw">target</span>(
-    <span class="kw">subset_data</span>(<span class="kw">read.csv</span>(<span class="kw">file_in</span>(file)), <span class="dt">predictor =</span> x, <span class="dt">response =</span> y),
-    <span class="dt">transform =</span> <span class="kw">cross</span>(
-      <span class="dt">file =</span> <span class="op">!!</span>files,
-      <span class="dt">x =</span> <span class="kw">c</span>(income, unemp),
-      <span class="dt">y =</span> <span class="kw">c</span>(gdp, pop),
-      <span class="dt">.id =</span> <span class="kw">c</span>(x, y)
-    )
-  )
-)
-
-plan<span class="op">$</span>target
-<span class="co">#&gt; [1] &quot;data_income_gdp&quot;   &quot;data_income_gdp.1&quot; &quot;data_unemp_gdp&quot;   </span>
-<span class="co">#&gt; [4] &quot;data_unemp_gdp.1&quot;  &quot;data_income_pop&quot;   &quot;data_income_pop.1&quot;</span>
-<span class="co">#&gt; [7] &quot;data_unemp_pop&quot;    &quot;data_unemp_pop.1&quot;</span>
-
-plan
-<span class="co">#&gt; # A tibble: 8 x 2</span>
-<span class="co">#&gt;   target          command                                                  </span>
-<span class="co">#&gt;   &lt;chr&gt;           &lt;expr&gt;                                                   </span>
-<span class="co">#&gt; 1 data_income_gdp subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 2 data_income_gd… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 3 data_unemp_gdp  subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 4 data_unemp_gdp… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 5 data_income_pop subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 6 data_income_po… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 7 data_unemp_pop  subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span>
-<span class="co">#&gt; 8 data_unemp_pop… subset_data(read.csv(file_in(&quot;my/crazy/long/file_path/fi…</span></code></pre>
 </div>
 <div id="grouping-variables" class="section level3">
-<h3><span class="header-section-number">6.5.4</span> Grouping variables</h3>
+<h3><span class="header-section-number">6.5.3</span> Grouping variables</h3>
 <p>A grouping variable is an argument to <code>map()</code>, <code>cross()</code>, or <code>combine()</code> that identifies a sub-collection of target names. Grouping variables can be either literals or symbols. Symbols can be scalars or vectors, and you can pass them to transformations with or without argument names.</p>
 <div id="literal-arguments" class="section level4">
-<h4><span class="header-section-number">6.5.4.1</span> Literal arguments</h4>
+<h4><span class="header-section-number">6.5.3.1</span> Literal arguments</h4>
 <p>When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write <code>map(c(1, 2))</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">sqrt</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))))
 <span class="co">#&gt; # A tibble: 2 x 2</span>
@@ -1088,7 +1010,7 @@ plan
 <span class="co">#&gt; # … with 16 more rows</span></code></pre>
 </div>
 <div id="named-symbol-arguments" class="section level4">
-<h4><span class="header-section-number">6.5.4.2</span> Named symbol arguments</h4>
+<h4><span class="header-section-number">6.5.3.2</span> Named symbol arguments</h4>
 <p>Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the <code>map()</code> and <code>cross()</code> transformations can accept them this ways. To generate long symbol lists, use the <code>syms()</code> function from the <code>rlang</code> package. Remember to use the tidy evaluation operator <code>!!</code> inside the transformation.</p>
 <pre class="sourceCode r"><code class="sourceCode r">vals &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(letters)
 <span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="kw">target</span>(<span class="kw">get_data</span>(y), <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="op">!!</span>vals)))
@@ -1143,7 +1065,7 @@ plan
 </div>
 </div>
 <div id="tags" class="section level3">
-<h3><span class="header-section-number">6.5.5</span> Tags</h3>
+<h3><span class="header-section-number">6.5.4</span> Tags</h3>
 <p>Tags are special optional grouping variables. They are ignored while the transformation is happening and then added to the plan to help subsequent transformations. There are two types of tags:</p>
 <ol style="list-style-type: decimal">
 <li>In-tags, which contain the target name you start with, and</li>
@@ -1174,32 +1096,32 @@ plan
   ),
   <span class="dt">summary =</span> <span class="kw">target</span>(
     <span class="kw">summarize</span>(data),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> data_source)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">data =</span> <span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>), <span class="dt">.by =</span> data_source)
   ),
   <span class="dt">summ_num =</span> <span class="kw">target</span>(
     <span class="kw">summarize</span>(data),
-    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> n)
+    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">data =</span> <span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>), <span class="dt">.by =</span> n)
   )
 )
 
 plan
 <span class="co">#&gt; # A tibble: 9 x 2</span>
-<span class="co">#&gt;   target         command                                     </span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                      </span>
-<span class="co">#&gt; 1 prep_work      do_prep_work()                              </span>
-<span class="co">#&gt; 2 local_1        get_local_data(1, prep_work)                </span>
-<span class="co">#&gt; 3 local_2        get_local_data(2, prep_work)                </span>
-<span class="co">#&gt; 4 online_1       get_online_data(1, prep_work, port = &quot;8080&quot;)</span>
-<span class="co">#&gt; 5 online_2       get_online_data(2, prep_work, port = &quot;8080&quot;)</span>
-<span class="co">#&gt; 6 summary_local  summarize(list(local_1, local_2))           </span>
-<span class="co">#&gt; 7 summary_online summarize(list(online_1, online_2))         </span>
-<span class="co">#&gt; 8 summ_num_1     summarize(list(local_1, online_1))          </span>
-<span class="co">#&gt; 9 summ_num_2     summarize(list(local_2, online_2))</span>
+<span class="co">#&gt;   target         command                                               </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                                </span>
+<span class="co">#&gt; 1 prep_work      do_prep_work()                                        </span>
+<span class="co">#&gt; 2 local_1        get_local_data(1, prep_work)                          </span>
+<span class="co">#&gt; 3 local_2        get_local_data(2, prep_work)                          </span>
+<span class="co">#&gt; 4 online_1       get_online_data(1, prep_work, port = &quot;8080&quot;)          </span>
+<span class="co">#&gt; 5 online_2       get_online_data(2, prep_work, port = &quot;8080&quot;)          </span>
+<span class="co">#&gt; 6 summary_local  summarize(bind_rows(local_1, local_2, .id = &quot;data&quot;))  </span>
+<span class="co">#&gt; 7 summary_online summarize(bind_rows(online_1, online_2, .id = &quot;data&quot;))</span>
+<span class="co">#&gt; 8 summ_num_1     summarize(bind_rows(local_1, online_1, .id = &quot;data&quot;)) </span>
+<span class="co">#&gt; 9 summ_num_2     summarize(bind_rows(local_2, online_2, .id = &quot;data&quot;))</span>
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-9832503ab331c471346d" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9832503ab331c471346d">{"x":{"nodes":{"id":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"imported":[false,false,false,false,false,false,false,false,false],"label":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"command":["get_local_data(1, prep_work)","get_local_data(2, prep_work)","get_online_data(1, prep_work, port = \"8080\")","get_online_data(2, prep_work, port = \"8080\")","do_prep_work()","summarize(list(local_1, online_1))","summarize(list(local_2, online_2))","summarize(list(local_1, local_2))","summarize(list(online_1, online_2))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,3,3,3,3],"title":["get_local_data(1,&nbsp;prep_work)","get_local_data(2,&nbsp;prep_work)","get_online_data(1,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","get_online_data(2,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","do_prep_work()","summarize(list(local_1,&nbsp;online_1))","summarize(list(local_2,&nbsp;online_2))","summarize(list(local_1,&nbsp;local_2))","summarize(list(online_1,&nbsp;online_2))"],"x":[-1,-0.25,0.25,1,0,-0.25,0.25,-1,1],"y":[0,0,0,0,-1,1,1,1,1]},"edges":{"from":["prep_work","prep_work","prep_work","prep_work","local_1","local_1","local_2","local_2","online_1","online_1","online_2","online_2"],"to":["local_1","local_2","online_1","online_2","summary_local","summ_num_1","summary_local","summ_num_2","summary_online","summ_num_1","summary_online","summ_num_2"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-9832503ab331c471346d">{"x":{"nodes":{"id":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"imported":[false,false,false,false,false,false,false,false,false],"label":["local_1","local_2","online_1","online_2","prep_work","summ_num_1","summ_num_2","summary_local","summary_online"],"command":["get_local_data(1, prep_work)","get_local_data(2, prep_work)","get_online_data(1, prep_work, port = \"8080\")","get_online_data(2, prep_work, port = \"8080\")","do_prep_work()","summarize(bind_rows(local_1, online_1, .id = \"data\"))","summarize(bind_rows(local_2, online_2, .id = \"data\"))","summarize(bind_rows(local_1, local_2, .id = \"data\"))","summarize(bind_rows(online_1, online_2, .id = \"data\"))"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[2,2,2,2,1,3,3,3,3],"title":["get_local_data(1,&nbsp;prep_work)","get_local_data(2,&nbsp;prep_work)","get_online_data(1,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","get_online_data(2,&nbsp;prep_work,&nbsp;port&nbsp;=&nbsp;\"8080\")","do_prep_work()","summarize(bind_rows(local_1,&nbsp;online_1,&nbsp;.id&nbsp;=&nbsp;\"...","summarize(bind_rows(local_2,&nbsp;online_2,&nbsp;.id&nbsp;=&nbsp;\"...","summarize(bind_rows(local_1,&nbsp;local_2,&nbsp;.id&nbsp;=&nbsp;\"d...","summarize(bind_rows(online_1,&nbsp;online_2,&nbsp;.id&nbsp;=&nbsp;..."],"x":[-1,-0.25,0.25,1,0,-0.25,0.25,-1,1],"y":[0,0,0,0,-1,1,1,1,1]},"edges":{"from":["prep_work","prep_work","prep_work","prep_work","local_1","local_1","local_2","local_2","online_1","online_1","online_2","online_2"],"to":["local_1","local_2","online_1","online_2","summary_local","summ_num_1","summary_local","summ_num_2","summary_online","summ_num_1","summary_online","summ_num_2"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"],"smooth":[true,true,true,true,true,true,true,true,true,true,true,true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p><br></p>
 </div>
 </div>
