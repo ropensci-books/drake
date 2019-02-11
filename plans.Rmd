@@ -217,12 +217,12 @@ plan1 <- drake_plan(
   # Summarize the performance metrics for each dataset.
   summ_data = target(
     summary(metric),
-    transform = combine(metric = list(), .by = data)
+    transform = combine(metric, .by = data)
   ),
   # Same, but for each metric type.
   summ_metric = target(
     summary(metric),
-    transform = combine(metric = list(), .by = metric_fun)
+    transform = combine(metric, .by = metric_fun)
   )
 )
 
@@ -239,7 +239,7 @@ plan2 <- drake_plan(
   # Calculate 2 different performance metrics on every model fit.
   summ_metric = target(
     summary(metric),
-    transform = combine(metric = list(), .by = metric_fun)
+    transform = combine(metric, .by = metric_fun)
   ),
   metric = target(
     metric_fun(analysis),
@@ -255,7 +255,7 @@ plan2 <- drake_plan(
   # Summarize the performance metrics for each dataset.
   summ_data = target(
     summary(metric),
-    transform = combine(metric = list(), .by = data)
+    transform = combine(metric, .by = data)
   ),
   large = get_large_data()
   # Same, but for each metric type.
@@ -409,7 +409,7 @@ drake_plan(
 
 #### `combine()`
 
-In `combine()`, you can replace symbols in a command with collections of other targets. Unlike `map()` and `cross()`, `combine()` creates *aggregates* of existing grouping variables instead of the grouping variables themselves. Below, `combine(data = bind_rows(.id = "id")` tells `drake` to splice the levels of `data` into `bind_rows()` and then insert that `bind_rows()` call wherever there is a symbol called `data` in the command.
+In `combine()`, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator `!!!` from the Tidyverse.
 
 ```{r transform5}
 plan <- drake_plan(
@@ -418,9 +418,10 @@ plan <- drake_plan(
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
   larger = target(
-    arrange(data, sd) %>%
+    bind_rows(data, .id = "id") %>%
+      arrange(sd) %>%
       head(n = 400),
-    transform = combine(data = bind_rows(.id = "id"))
+    transform = combine(data)
   )
 )
 
@@ -432,7 +433,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-You can combine multiple groups of targets together.
+You can different groups of targets in the same command.
 
 ```{r transform5b}
 plan <- drake_plan(
@@ -445,43 +446,12 @@ plan <- drake_plan(
     transform = map(url = c("example1.com", "example2.com"))
   ),
   larger = target(
-    list(data_group1, data_group2),
-    transform = combine(
-      data_group1 = bind_rows(),
-      data_group2 = bind_rows()
-    )
+    bind_rows(data_group1, data_group2, .id = "id") %>%
+      arrange(sd) %>%
+      head(n = 400),
+    transform = combine(data_group1, data_group2)
   )
 )
-
-drake_plan_source(plan)
-```
-
-To splice different groups of targets together in the same call, use tags (more on that later).
-
-```{r transform5c}
-plan <- drake_plan(
-  data_group1 = target(
-    sim_data(mean = x, sd = y),
-    transform = map(
-      x = c(1, 2),
-      y = c(3, 4),
-      .tag_out = data
-    )
-  ),
-  data_group2 = target(
-    pull_data(url),
-    transform = map(
-      url = c("example1.com", "example2.com"),
-      .tag_out = data
-    )
-  ),
-  larger = target(
-    arrange(data, id),
-    transform = combine(data = bind_rows())
-  )
-)
-
-plan
 
 drake_plan_source(plan)
 ```
@@ -495,30 +465,10 @@ plan <- drake_plan(
     transform = cross(x = c(1, 2), y = c(3, 4), z = c(5, 6))
   ),
   combined = target(
-    arrange(data, sd) %>%
+    bind_rows(data, .id = "id") %>%
+      arrange(sd) %>%
       head(n = 400),
-    transform = combine(data = bind_rows(.id = "id"), .by = c(x, y))
-  )
-)
-
-drake_plan_source(plan)
-
-plan <- drake_plan(
-  data_group1 = target(
-    sim(mean = x, sd = y),
-    transform = cross(x = c(1, 2), y = c(3, 4))
-  ),
-  data_group2 = target(
-    pull(mean = x, sd = y),
-    transform = cross(x = c(1, 2), y = c(3, 4))
-  ),
-  larger = target(
-    list(data_group1, data_group2),
-    transform = combine(
-      data_group1 = bind_rows(),
-      data_group2 = bind_rows(),
-      .by = c(x, y)
-    )
+    transform = combine(data, .by = c(x, y))
   )
 )
 
@@ -534,15 +484,13 @@ plan <- drake_plan(
     transform = map(x = c(1, 2), y = c(3, 4))
   ),
   larger = target(
-    data %>%
+    post_process(data, plan = ignore(plan)) %>%
       arrange(sd) %>%
       head(n = 400),
-    transform = combine(data = post_process(plan = ignore(plan)))
+    transform = combine(data)
   ),
   trace = TRUE
 )
-
-plan
 
 drake_plan_source(plan)
 ```
@@ -658,12 +606,12 @@ plan <- drake_plan(
     transform = map(n = c(1, 2), .tag_in = data_source, .tag_out = data)
   ),
   summary = target(
-    summarize(data),
-    transform = combine(data = bind_rows(.id = "data"), .by = data_source)
+    summarize(bind_rows(data, .id = "data")),
+    transform = combine(data, .by = data_source)
   ),
-  summ_num = target(
-    summarize(data),
-    transform = combine(data = bind_rows(.id = "data"), .by = n)
+  munged = target(
+    munge(bind_rows(data, .id = "data")),
+    transform = combine(data, .by = n)
   )
 )
 
