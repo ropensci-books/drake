@@ -451,8 +451,8 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
     <span class="dt">transform =</span> <span class="kw">map</span>(model)
   ),
   <span class="dt">rmspe =</span> <span class="kw">target</span>(
-    rmspe_i,
-    <span class="dt">transform =</span> <span class="kw">combine</span>(<span class="dt">rmspe_i =</span> <span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>))
+    <span class="kw">bind_rows</span>(rmspe_i, <span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(rmspe_i)
   ),
   <span class="dt">plot =</span> <span class="kw">ggsave</span>(<span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>), <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe)),
   <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)
