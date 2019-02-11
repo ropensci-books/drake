@@ -385,16 +385,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 )
 <span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
 <span class="co">#&gt; target psi_1</span>
-<span class="co">#&gt; target psi_2</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
+<span class="co">#&gt; target psi_2</span></code></pre>
 <p>Now, even if you wreck all the commands, nothing rebuilds.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,
   <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span>
 )
 <span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
-<span class="co">#&gt; All targets are already up to date.</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
+<span class="co">#&gt; All targets are already up to date.</span></code></pre>
 <p>You can also give different targets to different triggers. Triggers in the <code>drake</code> plan override the <code>trigger</code> argument to <code>make()</code>. Below, <code>psi_2</code> always builds, but <code>psi_1</code> only builds if it has never been built before.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,
@@ -411,14 +409,12 @@ plan
 <span class="co">#&gt; 2 psi_2  (sqrt(5) - 1)/2 - 9999999999999 trigger(condition = psi_1 &gt; 0)</span>
 <span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
 <span class="co">#&gt; target psi_2</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))
-<span class="co">#&gt; target psi_2</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
+<span class="co">#&gt; target psi_2</span></code></pre>
 <p>Interestingly, <code>psi_2</code> now depends on <code>psi_1</code>. Since <code>psi_1</code> is part of the because of the <strong>condition</strong> trigger, it needs to be up to date before we attempt <code>psi_2</code>. However, since <code>psi_1</code> is not part of the command, changing it will not trip the other triggers such as <strong>depend</strong>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</code></pre>
-<div id="htmlwidget-8d27908a7c387e5c88b8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8d27908a7c387e5c88b8">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.003s","psi_2\n0.003s"],"command":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999"],"trigger":["NA","trigger(condition = psi_1 > 0)"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"title":["(sqrt(5)&nbsp;+&nbsp;1)/2&nbsp;+&nbsp;9999999999999","(sqrt(5)&nbsp;-&nbsp;1)/2&nbsp;-&nbsp;9999999999999"],"x":[null,null],"y":[-1,1]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-92df6dc4b24a7010e973" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-92df6dc4b24a7010e973">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.003s","psi_2\n0.004s"],"command":["(sqrt(5) + 1)/2 + 9999999999999","(sqrt(5) - 1)/2 - 9999999999999"],"trigger":["NA","trigger(condition = psi_1 > 0)"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"title":["(sqrt(5)&nbsp;+&nbsp;1)/2&nbsp;+&nbsp;9999999999999","(sqrt(5)&nbsp;-&nbsp;1)/2&nbsp;-&nbsp;9999999999999"],"x":[null,null],"y":[-1,1]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"],"smooth":[true]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>In the next toy example below, <code>drake</code> reads from a file to decide whether to build <code>x</code>. Try it out.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
@@ -429,23 +425,17 @@ plan
 <span class="kw">saveRDS</span>(<span class="ot">TRUE</span>, <span class="st">&quot;file.rds&quot;</span>)
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">saveRDS</span>(<span class="ot">FALSE</span>, <span class="st">&quot;file.rds&quot;</span>)
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; All targets are already up to date.</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; All targets are already up to date.</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; All targets are already up to date.</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
+<span class="co">#&gt; All targets are already up to date.</span></code></pre>
 <p>In a real project with remote data sources, you may want to use the <strong>condition</strong> trigger to limit your builds to times when enough bandwidth is available for a large download. For example,</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
@@ -464,14 +454,11 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 y &lt;-<span class="st"> </span><span class="dv">1</span>
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; target x</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 <span class="kw">make</span>(plan)
 <span class="co">#&gt; All targets are already up to date.</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span>
 y &lt;-<span class="st"> </span><span class="dv">2</span>
 <span class="kw">make</span>(plan)
-<span class="co">#&gt; target x</span>
-<span class="co">#&gt; Used non-default triggers. Some targets may not be up to date.</span></code></pre>
+<span class="co">#&gt; target x</span></code></pre>
 <p>In practice, you may want to use the <strong>change</strong> trigger to check a large remote before downloading it.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
   <span class="dt">x =</span> <span class="kw">target</span>(
