@@ -379,31 +379,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="co">#&gt; # A tibble: 15 x 4</span>
 <span class="co">#&gt;    target                 elapsed        user           system        </span>
 <span class="co">#&gt;    &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;</span>
-<span class="co">#&gt;  1 coef_regression1_large 0.003s         0s             0.004s        </span>
-<span class="co">#&gt;  2 coef_regression1_small 0.004s         0.004s         0s            </span>
+<span class="co">#&gt;  1 coef_regression1_large 0.004s         0.004s         0s            </span>
+<span class="co">#&gt;  2 coef_regression1_small 0.004s         0s             0s            </span>
 <span class="co">#&gt;  3 coef_regression2_large 0.003s         0s             0.004s        </span>
-<span class="co">#&gt;  4 coef_regression2_small 0.003s         0.004s         0s            </span>
-<span class="co">#&gt;  5 large                  0.005s         0.008s         0s            </span>
+<span class="co">#&gt;  4 coef_regression2_small 0.004s         0.004s         0s            </span>
+<span class="co">#&gt;  5 large                  0.004s         0s             0.004s        </span>
 <span class="co">#&gt;  6 regression1_large      0.005s         0.004s         0s            </span>
-<span class="co">#&gt;  7 regression1_small      0.005s         0s             0.004s        </span>
+<span class="co">#&gt;  7 regression1_small      0.005s         0.004s         0s            </span>
 <span class="co">#&gt;  8 regression2_large      0.005s         0.004s         0s            </span>
 <span class="co">#&gt;  9 regression2_small      0.005s         0.004s         0s            </span>
-<span class="co">#&gt; 10 report                 0.054s         0.052s         0s            </span>
+<span class="co">#&gt; 10 report                 0.055s         0.044s         0.012s        </span>
 <span class="co">#&gt; 11 small                  0.004s         0.004s         0s            </span>
-<span class="co">#&gt; 12 summ_regression1_large 0.004s         0.004s         0s            </span>
-<span class="co">#&gt; 13 summ_regression1_small 0.004s         0.004s         0s            </span>
-<span class="co">#&gt; 14 summ_regression2_large 0.003s         0s             0s            </span>
-<span class="co">#&gt; 15 summ_regression2_small 0.003s         0s             0s</span>
+<span class="co">#&gt; 12 summ_regression1_large 0.004s         0s             0.004s        </span>
+<span class="co">#&gt; 13 summ_regression1_small 0.003s         0.004s         0s            </span>
+<span class="co">#&gt; 14 summ_regression2_large 0.005s         0s             0.004s        </span>
+<span class="co">#&gt; 15 summ_regression2_small 0.003s         0.004s         0s</span>
 
 ## `dplyr`-style `tidyselect` commands
 <span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)
 <span class="co">#&gt; # A tibble: 4 x 4</span>
 <span class="co">#&gt;   target                 elapsed        user           system        </span>
 <span class="co">#&gt;   &lt;chr&gt;                  &lt;S4: Duration&gt; &lt;S4: Duration&gt; &lt;S4: Duration&gt;</span>
-<span class="co">#&gt; 1 coef_regression1_large 0.003s         0s             0.004s        </span>
-<span class="co">#&gt; 2 coef_regression1_small 0.004s         0.004s         0s            </span>
+<span class="co">#&gt; 1 coef_regression1_large 0.004s         0.004s         0s            </span>
+<span class="co">#&gt; 2 coef_regression1_small 0.004s         0s             0s            </span>
 <span class="co">#&gt; 3 coef_regression2_large 0.003s         0s             0.004s        </span>
-<span class="co">#&gt; 4 coef_regression2_small 0.003s         0.004s         0s</span></code></pre>
+<span class="co">#&gt; 4 coef_regression2_small 0.004s         0.004s         0s</span></code></pre>
 <div id="predict-total-runtime" class="section level2">
 <h2><span class="header-section-number">12.1</span> Predict total runtime</h2>
 <p><code>drake</code> uses these times to predict the runtime of the next <code>make()</code>. At this moment, everything is up to date in the current example, so the next <code>make()</code> should ideally take no time at all (except for preprocessing overhead).</p>
@@ -417,10 +417,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }
 
 <span class="kw">predict_runtime</span>(config)
-<span class="co">#&gt; [1] &quot;0.076s&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;0.08s&quot;</span></code></pre>
 <p>And what if you plan to delete the cache and build all the targets from scratch?</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict_runtime</span>(config, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; [1] &quot;0.11s&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;0.113s&quot;</span></code></pre>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2">
 <h2><span class="header-section-number">12.2</span> Strategize your high-performance computing</h2>
@@ -439,7 +439,7 @@ known_times
 <span class="co">#&gt;                   7200                   7200                   7200 </span>
 <span class="co">#&gt; coef_regression1_large coef_regression2_small coef_regression2_large </span>
 <span class="co">#&gt;                   7200                   7200                   7200</span></code></pre>
-<p>How many parallel jobs should you use in the next <code>make()</code>? The <code>predict_runtime()</code> function can help you decide. <code>predict_runtime(jobs = n)</code> simulates persistent parallel workers and reports the estimated total runtime of <code>make(jobs = n)</code>. (See also <code>predict_load_balancing()</code>.)</p>
+<p>How many parallel jobs should you use in the next <code>make()</code>? The <code>predict_runtime()</code> function can help you decide. <code>predict_runtime(jobs = n)</code> simulates persistent parallel workers and reports the estimated total runtime of <code>make(jobs = n)</code>. (See also <code>predict_workers()</code>.)</p>
 <pre class="sourceCode r"><code class="sourceCode r">time &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){
   time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(
@@ -458,7 +458,7 @@ known_times
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</code></pre>
 <p><img src="drake-manual_files/figure-html/predictjobs-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of <code>jobs</code> for <code>make()</code> ultimately depends on the runtime you can tolerate and the computing resources at your disposal.</p>
-<p>A final note on predicting runtime: the output of <code>predict_runtime()</code> and <code>predict_load_balancing()</code> also depends the optional <code>workers</code> column of your <code>drake_plan()</code>. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the <a href="hpc.html#hpc">high-performance computing guide</a> for more.</p>
+<p>A final note on predicting runtime: the output of <code>predict_runtime()</code> and <code>predict_workers()</code> also depends the optional <code>workers</code> column of your <code>drake_plan()</code>. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the <a href="hpc.html#hpc">high-performance computing guide</a> for more.</p>
 
 </div>
 </div>

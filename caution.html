@@ -591,10 +591,10 @@ circle_class &lt;-<span class="st"> </span><span class="kw">R6Class</span>(
   )
 )
 <span class="kw">digest</span>(circle_class)
-<span class="co">#&gt; [1] &quot;f9eb5829dc8d2161b6a84fb693b11b66&quot;</span>
+<span class="co">#&gt; [1] &quot;f43d2b2cc0b6acfa5836129e597bf585&quot;</span>
 circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)
 <span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span>
-<span class="co">#&gt; [1] &quot;a57a3885a6c1b7e007ec5b3af1ea4314&quot;</span>
+<span class="co">#&gt; [1] &quot;529136bbb4b7b3c36006856ff2edad3a&quot;</span>
 <span class="kw">rm</span>(circle)</code></pre>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()
@@ -647,22 +647,22 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 }
 
 <span class="kw">deps_code</span>(f)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;globalenv&quot;       &quot;file_dependency&quot; &quot;get&quot;            </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;digest::digest&quot;</span>
+<span class="co">#&gt; # A tibble: 4 x 2</span>
+<span class="co">#&gt;   name            type      </span>
+<span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 globalenv       globals   </span>
+<span class="co">#&gt; 2 file_dependency globals   </span>
+<span class="co">#&gt; 3 get             globals   </span>
+<span class="co">#&gt; 4 digest::digest  namespaced</span>
 
 command &lt;-<span class="st"> &quot;x &lt;- digest::digest(file_in(</span><span class="ch">\&quot;</span><span class="st">input_file.rds</span><span class="ch">\&quot;</span><span class="st">)); assign(</span><span class="ch">\&quot;</span><span class="st">x</span><span class="ch">\&quot;</span><span class="st">, 1); x&quot;</span> <span class="co"># nolint</span>
 <span class="kw">deps_code</span>(command)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;assign&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;digest::digest&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $file_in</span>
-<span class="co">#&gt; [1] &quot;input_file.rds&quot;</span></code></pre>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   name           type      </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 assign         globals   </span>
+<span class="co">#&gt; 2 digest::digest namespaced</span>
+<span class="co">#&gt; 3 input_file.rds file_in</span></code></pre>
 <p><code>drake</code> takes special precautions so that a target/import does not depend on itself. For example, <code>deps_code(f)</code> might return <code>&quot;f&quot;</code> if <code>f()</code> is a recursive function, but <code>make()</code> just ignores this conflict and runs as expected. In other words, <code>make()</code> automatically removes all self-referential loops in the dependency network.</p>
 </div>
 <div id="dependencies-of-knitr-reports" class="section level3">

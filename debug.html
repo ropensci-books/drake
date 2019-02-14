@@ -380,11 +380,14 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 <span class="co">#&gt; }</span>
 
 <span class="kw">deps_code</span>(simulate)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;data.frame&quot;  &quot;mpg&quot;         &quot;wt&quot;          &quot;random_rows&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;datasets::mtcars&quot;</span>
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   name             type      </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 data.frame       globals   </span>
+<span class="co">#&gt; 2 mpg              globals   </span>
+<span class="co">#&gt; 3 wt               globals   </span>
+<span class="co">#&gt; 4 random_rows      globals   </span>
+<span class="co">#&gt; 5 datasets::mtcars namespaced</span>
 
 <span class="co"># knitr_in() makes sure your target depends on `report.Rmd`</span>
 <span class="co"># and any dependencies loaded with loadd() and readd()</span>
@@ -393,52 +396,50 @@ my_plan<span class="op">$</span>command[[<span class="dv">1</span>]]
 <span class="co">#&gt; knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), quiet = TRUE)</span>
 
 <span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="dv">1</span>]])
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;knit&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $loadd</span>
-<span class="co">#&gt; [1] &quot;large&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $readd</span>
-<span class="co">#&gt; [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $file_out</span>
-<span class="co">#&gt; [1] &quot;report.md&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $knitr_in</span>
-<span class="co">#&gt; [1] &quot;report.Rmd&quot;</span>
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   name                   type    </span>
+<span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 knit                   globals </span>
+<span class="co">#&gt; 2 large                  loadd   </span>
+<span class="co">#&gt; 3 small                  readd   </span>
+<span class="co">#&gt; 4 coef_regression2_small readd   </span>
+<span class="co">#&gt; 5 report.md              file_out</span>
+<span class="co">#&gt; 6 report.Rmd             knitr_in</span>
 
 my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt; suppressWarnings(summary(regression2_large))$coefficients</span>
 
 <span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]])
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;summary&quot;           &quot;suppressWarnings&quot;  &quot;regression2_large&quot;</span>
-<span class="co">#&gt; [4] &quot;coefficients&quot;</span></code></pre>
+<span class="co">#&gt; # A tibble: 4 x 2</span>
+<span class="co">#&gt;   name              type   </span>
+<span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 summary           globals</span>
+<span class="co">#&gt; 2 suppressWarnings  globals</span>
+<span class="co">#&gt; 3 regression2_large globals</span>
+<span class="co">#&gt; 4 coefficients      globals</span></code></pre>
 <p>With <code>deps_target()</code>, you can see the dependencies that <code>drake</code> has already detected for your targets and imports.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_target</span>(<span class="st">&quot;simulate&quot;</span>, config)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;random_rows&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;datasets::mtcars&quot;</span>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   name             type      </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 random_rows      globals   </span>
+<span class="co">#&gt; 2 datasets::mtcars namespaced</span>
 
 <span class="kw">deps_target</span>(<span class="st">&quot;small&quot;</span>, config)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;simulate&quot;</span>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   name     type   </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 simulate globals</span>
 
 <span class="kw">deps_target</span>(<span class="st">&quot;report&quot;</span>, config)
-<span class="co">#&gt; $loadd</span>
-<span class="co">#&gt; [1] &quot;large&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $readd</span>
-<span class="co">#&gt; [1] &quot;small&quot;                  &quot;coef_regression2_small&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $file_out</span>
-<span class="co">#&gt; [1] &quot;report.md&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $knitr_in</span>
-<span class="co">#&gt; [1] &quot;report.Rmd&quot;</span></code></pre>
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   name                   type    </span>
+<span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 large                  loadd   </span>
+<span class="co">#&gt; 2 small                  readd   </span>
+<span class="co">#&gt; 3 coef_regression2_small readd   </span>
+<span class="co">#&gt; 4 report.md              file_out</span>
+<span class="co">#&gt; 5 report.Rmd             knitr_in</span></code></pre>
 <p>And with <code>tracked()</code>, you can list all the reproducibly tracked objects and files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(config)
 <span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
@@ -521,7 +522,7 @@ my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0xee074e0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0xc1fbe50&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -623,7 +624,7 @@ error<span class="op">$</span>call
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xe513b28&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xe8fe4c8&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)

@@ -450,15 +450,19 @@ plan
 }
 
 <span class="kw">deps_code</span>(create_plot)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;geom_histogram&quot; &quot;ggplot&quot;         &quot;aes_string&quot;</span>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   name           type   </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 geom_histogram globals</span>
+<span class="co">#&gt; 2 ggplot         globals</span>
+<span class="co">#&gt; 3 aes_string     globals</span>
 
 <span class="kw">deps_code</span>(<span class="kw">quote</span>(<span class="kw">create_plot</span>(datasets<span class="op">::</span>iris)))
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt; [1] &quot;create_plot&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;datasets::iris&quot;</span></code></pre>
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   name           type      </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 create_plot    globals   </span>
+<span class="co">#&gt; 2 datasets::iris namespaced</span></code></pre>
 <p>Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares <code>file</code> before <code>plot</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">small_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">file =</span> <span class="kw">ggsave</span>(<span class="kw">file_out</span>(<span class="st">&quot;plot.png&quot;</span>), plot, <span class="dt">width =</span> <span class="dv">7</span>, <span class="dt">height =</span> <span class="dv">5</span>),
@@ -1096,14 +1100,14 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
   <span class="dt">trace =</span> <span class="ot">TRUE</span>
 )
 <span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt;   target command                  val   w     z    </span>
+<span class="co">#&gt;   target command                  val   z     w    </span>
 <span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span>
 <span class="co">#&gt; 1 x      abs(mean(rnorm(10)))     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
 <span class="co">#&gt; 2 y      abs(mean(rnorm(100, 1))) &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt; </span>
-<span class="co">#&gt; 3 z_x    sqrt(x)                  x     &lt;NA&gt;  z_x  </span>
-<span class="co">#&gt; 4 z_y    sqrt(y)                  y     &lt;NA&gt;  z_y  </span>
-<span class="co">#&gt; 5 w_x    x + 1                    x     w_x   &lt;NA&gt; </span>
-<span class="co">#&gt; 6 w_y    y + 1                    y     w_y   &lt;NA&gt;</span></code></pre>
+<span class="co">#&gt; 3 z_x    sqrt(x)                  x     z_x   &lt;NA&gt; </span>
+<span class="co">#&gt; 4 z_y    sqrt(y)                  y     z_y   &lt;NA&gt; </span>
+<span class="co">#&gt; 5 w_x    x + 1                    x     &lt;NA&gt;  w_x  </span>
+<span class="co">#&gt; 6 w_y    y + 1                    y     &lt;NA&gt;  w_y</span></code></pre>
 </div>
 </div>
 <div id="tags" class="section level3">

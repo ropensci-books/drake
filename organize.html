@@ -474,26 +474,19 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="co"># Because `drake` knows `digest()` is from a package,</span>
 <span class="co"># it ignores these dependencies by default.</span>
 <span class="kw">head</span>(<span class="kw">deps_code</span>(digest), <span class="dv">10</span>)
-<span class="co">#&gt; $globals</span>
-<span class="co">#&gt;  [1] &quot;digest_impl&quot;              &quot;stop&quot;                    </span>
-<span class="co">#&gt;  [3] &quot;pmatch&quot;                   &quot;which&quot;                   </span>
-<span class="co">#&gt;  [5] &quot;as.integer&quot;               &quot;.Call&quot;                   </span>
-<span class="co">#&gt;  [7] &quot;path.expand&quot;              &quot;isTRUE&quot;                  </span>
-<span class="co">#&gt;  [9] &quot;inherits&quot;                 &quot;file.access&quot;             </span>
-<span class="co">#&gt; [11] &quot;paste&quot;                    &quot;warning&quot;                 </span>
-<span class="co">#&gt; [13] &quot;isdir&quot;                    &quot;is.character&quot;            </span>
-<span class="co">#&gt; [15] &quot;if&quot;                       &quot;file.info&quot;               </span>
-<span class="co">#&gt; [17] &quot;names&quot;                    &quot;return&quot;                  </span>
-<span class="co">#&gt; [19] &quot;formals&quot;                  &quot;switch&quot;                  </span>
-<span class="co">#&gt; [21] &quot;invisible&quot;                &quot;is.infinite&quot;             </span>
-<span class="co">#&gt; [23] &quot;file.exists&quot;              &quot;is.na&quot;                   </span>
-<span class="co">#&gt; [25] &quot;any&quot;                      &quot;as.raw&quot;                  </span>
-<span class="co">#&gt; [27] &quot;.getCRC32PreferOldOutput&quot; &quot;missing&quot;                 </span>
-<span class="co">#&gt; [29] &quot;match.arg&quot;                &quot;sub&quot;                     </span>
-<span class="co">#&gt; [31] &quot;.getSerializeVersion&quot;     &quot;c&quot;                       </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $namespaced</span>
-<span class="co">#&gt; [1] &quot;base::serialize&quot;</span></code></pre>
+<span class="co">#&gt; # A tibble: 10 x 2</span>
+<span class="co">#&gt;    name        type   </span>
+<span class="co">#&gt;    &lt;chr&gt;       &lt;chr&gt;  </span>
+<span class="co">#&gt;  1 digest_impl globals</span>
+<span class="co">#&gt;  2 stop        globals</span>
+<span class="co">#&gt;  3 pmatch      globals</span>
+<span class="co">#&gt;  4 which       globals</span>
+<span class="co">#&gt;  5 as.integer  globals</span>
+<span class="co">#&gt;  6 .Call       globals</span>
+<span class="co">#&gt;  7 path.expand globals</span>
+<span class="co">#&gt;  8 isTRUE      globals</span>
+<span class="co">#&gt;  9 inherits    globals</span>
+<span class="co">#&gt; 10 file.access globals</span></code></pre>
 </div>
 <div id="the-solution" class="section level3">
 <h3><span class="header-section-number">7.4.3</span> The solution</h3>
@@ -517,10 +510,9 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)
 <span class="co">#&gt; target x</span>
 <span class="kw">head</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache), <span class="dv">10</span>)
-<span class="co">#&gt; [1] &quot;digest&quot;          &quot;digest_impl&quot;     &quot;f&quot;               &quot;g&quot;              </span>
-<span class="co">#&gt; [5] &quot;base::serialize&quot; &quot;x&quot;</span>
+<span class="co">#&gt; [1] &quot;x&quot;</span>
 <span class="kw">length</span>(<span class="kw">cached</span>(<span class="dt">cache =</span> cache))
-<span class="co">#&gt; [1] 6</span></code></pre>
+<span class="co">#&gt; [1] 1</span></code></pre>
 
 </div>
 </div>
