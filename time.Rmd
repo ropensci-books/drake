@@ -69,7 +69,7 @@ known_times["report"] <- 5
 known_times
 ```
 
-How many parallel jobs should you use in the next `make()`? The `predict_runtime()` function can help you decide. `predict_runtime(jobs = n)` simulates persistent parallel workers and reports the estimated total runtime of `make(jobs = n)`. (See also `predict_load_balancing()`.)
+How many parallel jobs should you use in the next `make()`? The `predict_runtime()` function can help you decide. `predict_runtime(jobs = n)` simulates persistent parallel workers and reports the estimated total runtime of `make(jobs = n)`. (See also `predict_workers()`.)
 
 ```{r predictjobs}
 time <- c()
@@ -92,7 +92,7 @@ ggplot(data.frame(time = time / 3600, jobs = ordered(1:12), group = 1)) +
 
 We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of `jobs` for `make()` ultimately depends on the runtime you can tolerate and the computing resources at your disposal.
 
-A final note on predicting runtime: the output of `predict_runtime()` and `predict_load_balancing()` also depends the optional `workers` column of your `drake_plan()`. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the [high-performance computing guide](#hpc) for more.
+A final note on predicting runtime: the output of `predict_runtime()` and `predict_workers()` also depends the optional `workers` column of your `drake_plan()`. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the [high-performance computing guide](#hpc) for more.
 
 ```{r endofline_timing, echo = F}
 clean(destroy = TRUE, verbose = FALSE)
