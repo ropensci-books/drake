@@ -1,0 +1,195 @@
+# `drake` projects {#projects}
+
+```{r bestpracticesstart, echo = FALSE}
+suppressMessages(suppressWarnings(library(drake)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+clean(destroy = TRUE, verbose = FALSE)
+unlink(
+  c("_drake.R", "R", "main", "Thumbs.db", "raw_data.xlsx", "report.Rmd"),
+  recursive = TRUE
+)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+drake_example("main")
+tmp <- file.copy("main/R", ".", recursive = TRUE)
+tmp <- file.copy("main/_drake.R", ".")
+tmp <- file.copy("main/raw_data.xlsx", ".")
+tmp <- file.copy("main/report.Rmd", ".")
+```
+
+`drake`'s design philosophy is extremely R-focused. It embraces in-memory configuration, in-memory dependencies, interactivity, and flexibility. When you set up the code files for a `drake` project, you are really setting up an R session to call `make()`.
+
+## Code files
+
+`drake` does not usually care about your R script files. You can structure your project's code however you want. However, for the sake of being organized, we usually recommend writing a master R script that
+
+1. Loads your packages, functions, and other in-memory data.
+2. Creates the `drake` plan.
+3. Calls `make()`.
+
+Let's consider the [main example](https://github.com/wlandau/drake-examples/tree/master/main), which you can download with `drake_example("main")`. Here, our master script is called `make.R`.
+
+```{r proj1, eval = FALSE}
+source("R/packages.R")  # loads packages
+source("R/functions.R") # defines the create_plot() function
+source("R/plan.R")      # creates the drake plan
+# options(clustermq.scheduler = "multicore") # optional parallel computing
+make(
+  plan, # defined in R/plan.R
+  verbose = 2
+)
+```
+
+We have an `R` folder containing our supporting files, including `packages.R`,
+
+```{r packagesr, eval = FALSE}
+library(drake)
+require(dplyr)
+require(ggplot2)
+```
+
+`functions.R`,
+
+```{r functionsr, eval = FALSE}
+create_plot <- function(data) {
+  ggplot(data, aes(x = Petal.Width, fill = Species)) +
+    geom_histogram(binwidth = 0.25) +
+    theme_gray(20)
+}
+```
+
+and `plan.R`.
+
+```{r planr, eval = FALSE}
+plan <- drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Species = forcats::fct_inorder(Species)),
+  hist = create_plot(data),
+  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  report = rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  )
+)
+```
+
+There is nothing special about the names `make.R`, `packages.R`, `functions.R`, or `plan.R`. In fact, in larger projects, it may be wise to distribute your functions over several different files. This naming convention is merely a convenient place to start.
+
+To run the specific example project above, we should start a clean new session and run `make.R`. On Mac and Linux, you can open a terminal and run `R CMD BATCH make.R`. On Windows, restart your R session and call `source("make.R")` in the R console.
+
+To inspect your results and examine your workflow, it is best to clean out your R session just to be safe.
+
+```{r visproj, eval = FALSE}
+# Restart R.
+> interactive()
+#> [1] TRUE
+source("R/packages.R")
+source("R/functions.R")
+source("R/plan.R")
+config <- drake_config(plan)
+vis_drake_graph()
+```
+
+## Safe interactivity
+
+If you keep an interactive session running too long, you might accidentally change in-memory dependencies such as `create_plot()`. Targets such as `hist` and `report` could suddenly fall out of date without warning or explanation. If this happens, the quickest fix is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) and friends. [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html)  runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
+
+**Caution: [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) etc. are still experiemntal.**
+
+To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration script, usually called `_drake.R`. Like our master `make.R` script from before, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than `make()`, it ends with a call to `drake_config()`.
+
+```{r supportingscripts, eval = FALSE}
+source("R/packages.R")
+source("R/functions.R")
+source("R/plan.R")
+# options(clustermq.scheduler = "multicore") # optional parallel computing
+drake_config(plan, verbose = 2)
+```
+
+When you call `r_make()`, `drake` first launches a new transient R process with [`callr::r()`](https://github.com/r-lib/callr). This transient process
+
+1. Calls `config <- source("_drake.R")$value` to load your packages, functions, etc. into memory. Here, `config` is the return value of `drake_config()` from the script.
+2. Calls `make(config = config)` to run your project.
+
+[Other `r_*()` functions are available too](https://ropensci.github.io/drake/reference/r_make.html), such as `r_outdated()` and `r_vis_drake_graph()`.
+
+```{r work}
+clean()
+r_outdated()
+
+r_make()
+r_outdated()
+
+library(visNetwork) # so the graph renders in this session
+r_vis_drake_graph(targets_only = TRUE)
+```
+
+Remarks:
+
+- Your configuration script does not have to be named `_drake.R`. You can supply a different file path, e.g. `r_make(source = "my_script.R")` or `options(drake_source = "my_script.R")`.
+- You can choose and configure the underlying [`callr`](https://github.com/r-lib/callr) using arguments `r_fn` and `r_args`, respectively
+
+## R scripts pitfalls
+
+Despite the above discussion of R scripts, `drake` plans rely more on in-memory functions. You might be tempted to write a plan like the following, but then `drake` cannot tell that `my_analysis` depends on `my_data`.
+
+```{r badsource}
+bad_plan <- drake_plan(
+  my_data = source(file_in("get_data.R")),
+  my_analysis = source(file_in("analyze_data.R")),
+  my_summaries = source(file_in("summarize_data.R"))
+)
+bad_config <- drake_config(bad_plan)
+vis_drake_graph(bad_config, targets_only = TRUE)
+```
+
+When it comes to plans, use *functions* instead.
+
+```{r storecode1, eval = FALSE}
+source("my_functions.R") # defines get_data(), analyze_data(), etc.
+good_plan <- drake_plan(
+  my_data = get_data(file_in("data.csv")), # External files need to be in commands explicitly. # nolint
+  my_analysis = analyze_data(my_data),
+  my_summaries = summarize_results(my_data, my_analysis)
+)
+good_config <- drake_config(good_plan)
+vis_drake_graph(good_config, targets_only = TRUE)
+```
+
+```{r storecode2, echo = FALSE}
+good_plan <- drake_plan(
+  my_data = get_data(file_in("data.csv")), # External files need to be in commands explicitly. # nolint
+  my_analysis = analyze_data(my_data),
+  my_summaries = summarize_results(my_data, my_analysis)
+)
+good_config <- drake_config(good_plan)
+vis_drake_graph(good_config, targets_only = TRUE)
+```
+
+## Workflows as R packages
+
+The R package structure is a great way to organize and quality-control a data analysis project. If you write a `drake` workflow as a package, you will need
+
+1. Use `expose_imports()` to properly account for all your nested function dependencies, and
+2. If you load the package with `devtools::load_all()`, set the `prework` argument of `make()`: e.g. `make(prework = "devtools::load_all()")`.
+
+For a minimal example, see [Tiernan Martin](https://github.com/tiernanmartin)'s [`drakepkg`](https://github.com/tiernanmartin/drakepkg).
+
+## Other tools
+
+[`drake`](https://github.com/ropensci/drake) enhances reproducibility, but not in all respects. [Local library managers](https://rstudio.github.io/packrat), [containerization](https://www.docker.com), and [session management tools](https://github.com/tidyverse/reprex) offer more robust solutions in their respective domains. Reproducibility encompasses a [wide variety of tools and techniques](https://github.com/karthik/rstudio2019) all working together. Comprehensive overviews:
+
+- [PLOS article](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510) by Wilson et al.
+- [RStudio Conference 2019 presentation ](https://github.com/karthik/rstudio2019) by [Karthik Ram](https://github.com/karthik).
+- [`rrtools`](https://github.com/benmarwick/rrtools) by [Ben Marwick](https://github.com/benmarwick).
+
+
+```{r endofline_bestpractices, echo = F}
+clean(destroy = TRUE, verbose = FALSE)
+unlink(
+  c("_drake.R", "R", "main", "Thumbs.db", "raw_data.xlsx", "report.Rmd"),
+  recursive = TRUE
+)
+```
