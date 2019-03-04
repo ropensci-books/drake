@@ -98,7 +98,7 @@ vis_drake_graph()
 
 If you keep an interactive session running too long, you might accidentally change in-memory dependencies such as `create_plot()`. Targets such as `hist` and `report` could suddenly fall out of date without warning or explanation. If this happens, the quickest fix is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) and friends. [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html)  runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
 
-To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration script, usually called `_drake.R`. Like our master `make.R` script from before, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than `make()`, it ends with a call to `drake_config()`.
+To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration script, usually called `_drake.R`. Like our master `make.R` script from before, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than `make()`, it ends with a call to `drake_config()`. 
 
 ```{r supportingscripts, eval = FALSE}
 source("R/packages.R")
@@ -107,6 +107,8 @@ source("R/plan.R")
 # options(clustermq.scheduler = "multicore") # optional parallel computing
 drake_config(plan, verbose = 2)
 ```
+
+`drake_config()` collects and sanitizes the multitude of parameters and settings that `make()` needs to do its job: the plan, the environment of functions, parallel computing instructions, verbosity level, etc. Other functions such as `outdated()`, `vis_drake_graph()`, and `predict_runtime()` require output from `drake_config()` for the `config` argument. If you supply a `drake_config()` object to the `config` argument of `make()`, all other arguments are ignored.
 
 When you call `r_make()`, `drake` first launches a new transient R process with [`callr::r()`](https://github.com/r-lib/callr). This transient process
 
