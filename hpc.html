@@ -504,7 +504,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 #$ -pe smp {{ n_slots | 1 }}       # request n_slots cores per job
 module load R
 ulimit -v $(( 1024 * {{ memory | 4096 }} ))
-R --no-save --no-restore -e &#39;clustermq:::worker(&quot;{{ master }}&quot;)&#39;</code></pre>
+CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(&quot;{{ master }}&quot;)&#39;</code></pre>
 <p>Then when you run <code>make()</code>, use the <code>template</code> argument to set <code>n_slots</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span>)
 <span class="kw">library</span>(drake)
