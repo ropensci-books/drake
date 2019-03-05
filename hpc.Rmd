@@ -191,7 +191,7 @@ For more control and flexibility in the [`clustermq`](https://github.com/mschube
 #$ -pe smp {{ n_slots | 1 }}       # request n_slots cores per job
 module load R
 ulimit -v $(( 1024 * {{ memory | 4096 }} ))
-R --no-save --no-restore -e 'clustermq:::worker("{{ master }}")'
+CMQ_AUTH={{ auth }} R --no-save --no-restore -e 'clustermq:::worker("{{ master }}")'
 ```
 
 Then when you run `make()`, use the `template` argument to set `n_slots`.
