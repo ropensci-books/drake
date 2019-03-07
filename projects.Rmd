@@ -17,11 +17,21 @@ tmp <- file.copy("main/raw_data.xlsx", ".")
 tmp <- file.copy("main/report.Rmd", ".")
 ```
 
-`drake`'s design philosophy is extremely R-focused. It embraces in-memory configuration, in-memory dependencies, interactivity, and flexibility. When you set up the code files for a `drake` project, you are really setting up an R session to call `make()`.
+`drake`'s design philosophy is extremely R-focused. It embraces in-memory configuration, in-memory dependencies, interactivity, and flexibility. 
 
 ## Code files
 
-`drake` does not usually care about your R script files. You can structure your project's code however you want. However, for the sake of being organized, we usually recommend writing a master R script that
+The names and locations of the files are entirely up to you, but this pattern is particularly useful to start with.
+
+```
+make.R
+R/
+├── packages.R
+├── functions.R
+└── plan.R
+```
+
+Here, `make.R` is a master script that
 
 1. Loads your packages, functions, and other in-memory data.
 2. Creates the `drake` plan.
@@ -75,11 +85,16 @@ plan <- drake_plan(
 )
 ```
 
-There is nothing special about the names `make.R`, `packages.R`, `functions.R`, or `plan.R`. In fact, in larger projects, it may be wise to distribute your functions over several different files. This naming convention is merely a convenient place to start.
+To run the example project above,
 
-To run the specific example project above, we should start a clean new session and run `make.R`. On Mac and Linux, you can open a terminal and run `R CMD BATCH make.R`. On Windows, restart your R session and call `source("make.R")` in the R console.
+1. Start a clean new R session.
+2. Run the `make.R` script.
 
-To inspect your results and examine your workflow, it is best to clean out your R session just to be safe.
+On Mac and Linux, you can do this by opening a terminal and entering `R CMD BATCH make.R`. On Windows, restart your R session and call `source("make.R")` in the R console.
+
+Note: this part of `drake` does not inherently focus on your script files. There is nothing magical about the names `make.R`, `packages.R`, `functions.R`, or `plan.R`. Different projects may require different file structures.
+
+`drake` has other functions to inspect your results and examine your workflow. Before invoking them interactively, it is best to start with a clean new R session.
 
 ```{r visproj, eval = FALSE}
 # Restart R.
@@ -96,9 +111,23 @@ vis_drake_graph()
 
 **Caution: functions [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) etc. described below are still experiemntal.**
 
-If you keep an interactive session running too long, you might accidentally change in-memory dependencies such as `create_plot()`. Targets such as `hist` and `report` could suddenly fall out of date without warning or explanation. If this happens, the quickest fix is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) and friends. [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html)  runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
+### Motivation
 
-To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration script, usually called `_drake.R`. Like our master `make.R` script from before, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than `make()`, it ends with a call to `drake_config()`. 
+If you keep an interactive session running too long, you might accidentally change in-memory dependencies, such as `create_plot()` from the previous example. That could cause targets such as `hist` and `report` to fall out of date without warning. If this happens, the quickest fix is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) and friends. [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
+
+### Usage
+
+To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration R script. Unless you supply a custom file path (e.g. `r_make(source = "your_file.R")` or `options(drake_source = "your_file.R")`) `drake` assumes this configuration script is called `_drake.R`. (So the file name really *is* magical in this case). The suggested file structure becomes:
+
+```
+_drake.R
+R/
+├── packages.R
+├── functions.R
+└── plan.R
+```
+
+Like our previous `make.R` script, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than calling `make()`, it ends with a call to `drake_config()`.
 
 ```{r supportingscripts, eval = FALSE}
 source("R/packages.R")
@@ -108,14 +137,36 @@ source("R/plan.R")
 drake_config(plan, verbose = 2)
 ```
 
-`drake_config()` collects and sanitizes the multitude of parameters and settings that `make()` needs to do its job: the plan, packages, the environment of functions and initial data objects, parallel computing instructions, verbosity level, etc. Other functions such as `outdated()`, `vis_drake_graph()`, and `predict_runtime()` require output from `drake_config()` for the `config` argument. If you supply a `drake_config()` object to the `config` argument of `make()`, `drake` ignores all the other arguments because it already has everything it needs in `config`.
+Here is what happens when you call `r_make()`.
 
-When you call `r_make()`, `drake` first launches a new transient R process with [`callr::r()`](https://github.com/r-lib/callr). This transient process
+1. `drake` launches a new transient R session using [`callr::r()`](https://github.com/r-lib/callr). The remaining steps all happen within this transient session.
+2. Run the configuration script (e.g. `_drake.R`) to
+    a. Load the packages, functions, global options, `drake` plan, etc. into the session's environnment, and
+    b. Run the call to `drake_config()`and store the results in a variable called `config`.
+3. Execute `make(config = config)`
 
-1. Calls `config <- source("_drake.R")$value` to load your packages, functions, etc. into memory. Here, `config` is the return value of `drake_config()` from the script.
-2. Calls `make(config = config)` to run your project.
+The purpose of `drake_config()` is to collect and sanitize all the parameters and settings that `make()` needs to do its job. In fact, if you do not set the `config` argument explicitly, then `make()` invokes `drake_config()` behind the scenes. `make(plan, parallelism = "clustermq", jobs = 2, verbose = 6)` is equivalent to
 
-[Other `r_*()` functions are available too](https://ropensci.github.io/drake/reference/r_make.html), such as `r_outdated()` and `r_vis_drake_graph()`.
+```{r exconfig, eval = FALSE}
+config <- drake_config(plan, parallelism = "clustermq", jobs = 2, verbose = 6)
+make(config = config)
+```
+
+There are many more `r_*()` functions besides `r_make()`, each of which launches a fresh session and runs an inner `drake` function on the `config` object from `_drake.R`.
+
+Outer function call | Inner function call
+--- | ---
+`r_make()` | `make(config = config)`
+`r_drake_build(...)` | `drake_build(config, ...)`
+`r_outdated(...)` | `outdated(config, ...)`
+`r_missed(...)` | `missed(config, ...)`
+`r_vis_drake_graph(...)` | `vis_drake_graph(config, ...)`
+`r_sankey_drake_graph(...)` | `sankey_drake_graph(config, ...)`
+`r_drake_ggraph(...)` | `drake_ggraph(config, ...)`
+`r_drake_graph_info(...)` | `drake_graph_info(config, ...)`
+`r_predict_runtime(...)` | `predict_runtime(config, ...)`
+`r_predict_workers(...)` | `predict_workers(config, ...)`
+
 
 ```{r work}
 clean()
@@ -129,8 +180,8 @@ r_vis_drake_graph(targets_only = TRUE)
 
 Remarks:
 
-- Your configuration script does not have to be named `_drake.R`. You can supply a different file path, e.g. `r_make(source = "my_script.R")` or `options(drake_source = "my_script.R")`.
-- You can choose and configure the underlying [`callr`](https://github.com/r-lib/callr) using arguments `r_fn` and `r_args`, respectively
+- You can run `r_make()` in an interactive session, but the transient process it launches will not be interactive. Thus, any `browser()` statements in the commands in your `drake` plan will be ignored.
+- You can select and configure the underlying [`callr`](https://github.com/r-lib/callr) function using arguments `r_fn` and `r_args`, respectively.
 - For example code, you can download the updated [main example](https://github.com/wlandau/drake-examples/tree/master/main) (`drake_example("main")`) and experiment with files [`_drake.R`](https://github.com/wlandau/drake-examples/blob/master/main/_drake.R) and [`interactive.R`](https://github.com/wlandau/drake-examples/blob/master/main/interactive.R).
 
 ## R scripts pitfalls
