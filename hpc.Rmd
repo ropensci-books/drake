@@ -99,7 +99,7 @@ After modifying `slurm_clustermq.tmpl` by hand to meet your needs, call `make()`
 make(plan, parallelism = "clustermq", jobs = 4)
 ```
 
-## The `future` backend
+## The `future` backend {#future-backend}
 
 ### Transient workers
 
@@ -153,6 +153,89 @@ Finally, run `make()`.
 ```{r futureslurmmake, eval = FALSE}
 make(plan, parallelism = "future", jobs = 2)
 ```
+
+## Within-target parallelization
+
+### General
+
+You may wish to invoke parallel computing within individual targets, e.g.
+
+```{r fromplanworkershpc}
+plan <- drake_plan(
+  a = parallel::mclapply(1:8, sqrt, mc.cores = 4),
+  b = parallel::mclapply(1:4, sqrt, mc.cores = 2)
+)
+```
+
+or even
+
+```{r fromplanworkershpc2}
+plan <- drake_plan(
+  a = target(
+    parallel::mclapply(
+      1:8,
+      sqrt,
+      # You can change the # of cores without changing the command.
+      mc.cores = from_plan("cores")
+    ),
+    cores = 4 # Changes to this number do not invalidate `a`.
+  ),
+  b = target(
+    parallel::mclapply(1:4, sqrt, mc.cores = from_plan("cores")),
+    cores = 2
+  )
+)
+```
+
+Unfortunately, for reasons described [here](https://github.com/ropensci/drake/issues/675) and [here](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o), `make(plan)` will fail in each case. Workarounds:
+
+- Avoid `mclapply()`.  [`furrr::map()`](https://davisvaughan.github.io/furrr/) and `parallel::parLapply()` are more dependable alternatives anyway. In the case of [`furrr`](https://davisvaughan.github.io/furrr/), invoke [`future::plan(future.callr::callr)`](https://github.com/HenrikBengtsson/future.callr) or `future::plan(future::multisession)` first.
+- In `make()`, set the `lock_envir` argument to `FALSE`. This approach deactivates important reproducibility guardrails, so use with caution.
+- In `mclapply()`, set the `mc.set.seed` argument to `FALSE`. If your computations require pseudo-random numbers (`rnorm()`, `runif()`, etc.) you will need to manually set a different seed for each parallel process, e.g.
+
+```{r setseedself, eval = FALSE}
+parallel::mclapply(X = 1:4, mc.cores = 4, FUN = function(i) {
+  set.seed(sum(.Random.seed) + i)
+  # Do some work...
+})
+```
+
+### `future`-based parallelism 
+
+This section differs to [the section about the future backend](#future-backend) in that it focuses *within-target* parallelism with `future` while the linked section talks about parallelizing targets (= outer level).
+
+Please note the following:
+
+- `future::multisession` is kind of slow in startup (we advise to use `future.callr::callr`)
+- the `future::plan` call needs to be placed in the `make.R` file
+- there can only be one call to a `future::plan()` as otherwise targets will continously become outdated
+- `multicore` only runs on Unix and is known to throw errors when being used with `drake`
+- You need to have functions that can make use of the specified `future` backend, such as `furrr::future_map()` or `future::future_lapply()`.
+
+#### on your local machine
+
+There are differences when using `future`-based within-target parallelism on a single machine and when deploying the plan to a HPC.
+If the plan is executed on a single machine, the call to `future::plan()` needs to be placed in the `make.R` or `_drake.R` file.
+
+```{r}
+library(drake)
+future::plan(future::multisession, workers = 4)
+plan <- drake_plan(x = furrr::future_map(list(1, 1, 1, 1), Sys.sleep))
+make(plan)
+```
+
+The specified plan applies to all functions using the `future` backend in your plan.
+
+#### on a cluster
+
+When executing your plan on a HPC, things are slightly different.
+Here the `future::plan()` setting needs to be passed to each worker that is spawned on the cluster.
+To do so, the `future::plan()` setting needs to be specified in the `prework` argument of `make()` (or `drake_config()` in case you are using the `r_make()` approach).
+
+This way, the settings gets populated to each worker spawned by your respective scheduler.
+Note that if you are using the `clustermq` backend, setting individual resources for a target is [not yet supported](https://github.com/mschubert/clustermq/issues/123).
+
+You might want to try the `future` backend for the target-parallelization level which uses transient workers and [supports the specification](#resources-column) of a `resources` column for each worker.
 
 ## Advanced options
 
@@ -210,7 +293,7 @@ make(
 
 Custom placeholders like `n_slots` are processed with the [`infuser`](https://github.com/Bart6114/infuser) package.
 
-### The `resources` column for transient workers
+### The `resources` column for transient workers {#resources-column}
 
 Different targets may need different resources. For example,
 
@@ -262,50 +345,6 @@ It is possible to supply a custom job scheduler function to the `parallelism` ar
 2. Aggressively optimize `drake` for your specialized computing resources.
 
 This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.
-
-### Parallel computing *within* targets
-
-You may wish to invoke parallel computing within individual targets, e.g.
-
-```{r fromplanworkershpc}
-plan <- drake_plan(
-  a = parallel::mclapply(1:8, sqrt, mc.cores = 4),
-  b = parallel::mclapply(1:4, sqrt, mc.cores = 2)
-)
-```
-
-or even
-
-```{r fromplanworkershpc2}
-plan <- drake_plan(
-  a = target(
-    parallel::mclapply(
-      1:8,
-      sqrt,
-      # You can change the # of cores without changing the command.
-      mc.cores = from_plan("cores")
-    ),
-    cores = 4 # Changes to this number do not invalidate `a`.
-  ),
-  b = target(
-    parallel::mclapply(1:4, sqrt, mc.cores = from_plan("cores")),
-    cores = 2
-  )
-)
-```
-
-Unfortunately, for reasons described [here](https://github.com/ropensci/drake/issues/675) and [here](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o), `make(plan)` will fail in each case. Workarounds:
-
-- Avoid `mclapply()`.  [`furrr::map()`](https://davisvaughan.github.io/furrr/) and `parallel::parLapply()` are more dependable alternatives anyway. In the case of [`furrr`](https://davisvaughan.github.io/furrr/), invoke [`future::plan(future.callr::callr)`](https://github.com/HenrikBengtsson/future.callr) or `future::plan(future::multisession)` first.
-- In `make()`, set the `lock_envir` argument to `FALSE`. This approach deactivates important reproducibility guardrails, so use with caution.
-- In `mclapply()`, set the `mc.set.seed` argument to `FALSE`. If your computations require pseudo-random numbers (`rnorm()`, `runif()`, etc.) you will need to manually set a different seed for each parallel process, e.g.
-
-```{r setseedself, eval = FALSE}
-parallel::mclapply(X = 1:4, mc.cores = 4, FUN = function(i) {
-  set.seed(sum(.Random.seed) + i)
-  # Do some work...
-})
-```
 
 ### Hasty mode
 
