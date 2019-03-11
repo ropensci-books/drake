@@ -522,7 +522,7 @@ my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x1564f1c0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x167c0968&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -540,6 +540,9 @@ random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data,
 <span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span></code></pre>
 <p>At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to <code>outdated()</code> already re-cached the imports, so any changed imports will show up in the new log file.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_cache_log_file</span>(<span class="dt">file =</span> <span class="st">&quot;cache_log2.txt&quot;</span>)
+<span class="co">#&gt; Warning: `drake_cache_log_file()` is deprecated. To ensure cache log</span>
+<span class="co">#&gt; is always up to date, create the cache log using `make()` with the</span>
+<span class="co">#&gt; `cache_log_file` argument.</span>
 
 <span class="kw">system2</span>(<span class="st">&quot;diff&quot;</span>, <span class="st">&quot;cache_log.txt cache_log2.txt&quot;</span>, <span class="dt">stdout =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">cat</span>(<span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
@@ -562,6 +565,9 @@ random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data,
 <span class="co">#&gt; character(0)</span>
 
 <span class="kw">drake_cache_log_file</span>(<span class="dt">file =</span> <span class="st">&quot;cache_log3.txt&quot;</span>)
+<span class="co">#&gt; Warning: `drake_cache_log_file()` is deprecated. To ensure cache log</span>
+<span class="co">#&gt; is always up to date, create the cache log using `make()` with the</span>
+<span class="co">#&gt; `cache_log_file` argument.</span>
 
 <span class="kw">system2</span>(<span class="st">&quot;diff&quot;</span>, <span class="st">&quot;cache_log.txt cache_log3.txt&quot;</span>, <span class="dt">stdout =</span> <span class="ot">TRUE</span>)
 <span class="co">#&gt; character(0)</span></code></pre>
@@ -624,7 +630,7 @@ error<span class="op">$</span>call
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x12ee19c8&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x13fd4110&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -666,7 +672,7 @@ f
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt;   x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x14995550&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x15a85a60&gt;</span>
 
 <span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
 f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
