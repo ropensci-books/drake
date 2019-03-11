@@ -1,5 +1,5 @@
 is_faq <- function(label){
-  identical(label$name, "frequently asked question")
+  identical(label$name, "type: faq")
 }
 
 any_faq_label <- function(issue){
