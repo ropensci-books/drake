@@ -254,6 +254,160 @@ future::plan(batchtools_sge, template = "sge_batchtools.tmpl")
 make(plan, parallelism = "future", jobs = 2)
 ```
 
+### Parallel computing *within* targets
+
+To recruit parallel processes within individual targets, we recommend the [`future.callr`](https://github.com/HenrikBengtsson/future.callr) and [`furrr`](https://github.com/DavisVaughan/furrr) packages. Usage details depend on the parallel backend you choose for `make()`. If you must write custom code with `mclapply()`, please read the subsection below on locked bindings/environments.
+
+#### Locally
+
+Use [`future.callr`](https://github.com/HenrikBengtsson/future.callr) and [`furrr`](https://github.com/DavisVaughan/furrr) normally.
+
+```{r parlocally, eval = FALSE}
+library(drake)
+
+# The targets just collect the process IDs of the callr processes.
+plan <- drake_plan(
+  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+)
+
+# Tell the drake targets to fork up to 4 callr processes.
+future::plan(future.callr::callr, workers = 4L)
+
+# Build the targets.
+make(plan)
+
+# Shows 4 unique process IDs.
+readd(x)
+```
+
+
+#### Persistent workers
+
+Each persistent worker needs its own [`future::plan()`](https://github.com/HenrikBengtsson/future), which we set with the `prework` argument of `make()`. The following example uses [SGE](http://gridscheduler.sourceforge.net/htmlman/manuals.html). To learn about templates for other clusters, please consult the [`clustermq`](https://github.com/mschubert/clustermq) documentation.
+
+```{r parwithinpersistentworkers, eval = FALSE}
+library(drake)
+
+# The targets just collect the process IDs of the callr processes.
+plan <- drake_plan(
+  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+)
+
+# Write a template file for clustermq.
+writeLines(
+  c(
+    "#!/bin/bash",
+    "#$ -N {{ job_name }}               # job name",
+    "#$ -t 1-{{ n_jobs }}               # submit jobs as array",
+    "#$ -j y                            # combine stdout/error in one file",
+    "#$ -o {{ log_file | /dev/null }}   # output file",
+    "#$ -cwd                            # use pwd as work dir",
+    "#$ -V                              # use environment variables",
+    "#$ -pe smp 4                       # request 4 cores per job",
+    "module load R-qualified/3.5.2      # if loading R from an environment module",
+    "ulimit -v $(( 1024 * {{ memory | 4096 }} ))",
+    "CMQ_AUTH={{ auth }} R --no-save --no-restore -e 'clustermq:::worker(\"{{ master }}\")'"
+  ),
+  "sge_clustermq.tmpl"
+)
+
+# Register the scheduler and template file with clustermq.
+options(
+  clustermq.scheduler = "sge",
+  clustermq.template = "sge_clustermq.tmpl"
+)
+
+# Build the targets.
+make(
+  plan,
+  parallelism = "clustermq",
+  jobs = 2,
+  # Each of the two workers can spawn up to 4 local processes.
+  prework = quote(future::plan(future.callr::callr, workers = 4L))
+)
+
+# Shows 4 unique process IDs.
+readd(x) 
+```
+
+#### Transient workers
+
+As explained in the [`future` vignette](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html), we can nest our `future::plans()`. Each target gets its own remote job, and each job can spawn up to 4 local `callr` processes. The following example uses [SGE](http://gridscheduler.sourceforge.net/htmlman/manuals.html). To learn about templates for other clusters, please consult the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) documentation.
+
+```{r parwithintransientworkers, eval = FALSE}
+library(drake)
+
+# The targets just collect the process IDs of the callr processes.
+plan <- drake_plan(
+  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+)
+
+# Write a template file for future.batchtools.
+writeLines(
+  c(
+    "#!/bin/bash",
+    "#$ -cwd                # use pwd as work dir",
+    "#$ -j y                # combine stdout/error in one file",
+    "#$ -o <%= log.file %>  # output file",
+    "#$ -V                  # use environment variables",
+    "#$ -N <%= job.name %>  # job name",
+    "#$ -pe smp 4           # 4 cores per job",
+    "module load R          # if loading R from an environment module",
+    "Rscript -e 'batchtools::doJobCollection(\"<%= uri %>\")'",
+    "exit 0"
+  ),
+  "sge_batchtools.tmpl"
+)
+
+# In our nested plans, each target gets its own remote SGE job,
+# and each worker can spawn up to 4 `callr` processes.
+future::plan(
+  list(
+    future::tweak(
+      future.batchtools::batchtools_sge,
+      template = "sge_batchtools.tmpl"
+    ),
+    future::tweak(future.callr::callr, workers = 4L)
+  )
+)
+
+# Build the targets.
+make(plan, parallelism = "future", jobs = 2)
+
+# Shows 4 unique process IDs.
+readd(x)
+```
+
+#### Locked binding/environment errors
+
+Some workflows unavoidably use `mclapply()`, which is known to modify the global environment against `drake`'s will. If you are stuck, there are two workarounds.
+
+1. Use `make(lock_envir = FALSE)`.
+2. Use the `envir` argument of `make()`. That way, `drake` locks your special custom environment instead of the global environment.
+
+```{r lockenvirworkaround, eval = FALSE}
+# Load the main example: https://github.com/wlandau/drake-examples
+library(drake)
+drake_example("main")
+setwd("main")
+
+# Define and populate a special custom environment.
+envir <- new.env(parent = globalenv())
+source("R/packages.R", local = envir)
+source("R/functions.R", local = envir)
+source("R/plan.R", local = envir)
+
+# Check the contents of your environments.
+ls(envir) # Should have your functions and plan
+ls()         # The global environment should only have what you started with.
+
+# Build the targets using your custom environment
+make(envir$plan, envir = envir)
+```
+
 ### Custom job schedulers
 
 It is possible to supply a custom job scheduler function to the `parallelism` argument of `make()`. The  `backend_future_lapply_staged()` function from the [`drake.future.lapply.staged`](https://github.com/wlandau/drake.future.lapply.staged) package is an example. You might consider writing your own such function if you wish to
@@ -263,53 +417,9 @@ It is possible to supply a custom job scheduler function to the `parallelism` ar
 
 This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.
 
-### Parallel computing *within* targets
-
-You may wish to invoke parallel computing within individual targets, e.g.
-
-```{r fromplanworkershpc}
-plan <- drake_plan(
-  a = parallel::mclapply(1:8, sqrt, mc.cores = 4),
-  b = parallel::mclapply(1:4, sqrt, mc.cores = 2)
-)
-```
-
-or even
-
-```{r fromplanworkershpc2}
-plan <- drake_plan(
-  a = target(
-    parallel::mclapply(
-      1:8,
-      sqrt,
-      # You can change the # of cores without changing the command.
-      mc.cores = from_plan("cores")
-    ),
-    cores = 4 # Changes to this number do not invalidate `a`.
-  ),
-  b = target(
-    parallel::mclapply(1:4, sqrt, mc.cores = from_plan("cores")),
-    cores = 2
-  )
-)
-```
-
-Unfortunately, for reasons described [here](https://github.com/ropensci/drake/issues/675) and [here](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o), `make(plan)` will fail in each case. Workarounds:
-
-- Avoid `mclapply()`.  [`furrr::map()`](https://davisvaughan.github.io/furrr/) and `parallel::parLapply()` are more dependable alternatives anyway. In the case of [`furrr`](https://davisvaughan.github.io/furrr/), invoke [`future::plan(future.callr::callr)`](https://github.com/HenrikBengtsson/future.callr) or `future::plan(future::multisession)` first.
-- In `make()`, set the `lock_envir` argument to `FALSE`. This approach deactivates important reproducibility guardrails, so use with caution.
-- In `mclapply()`, set the `mc.set.seed` argument to `FALSE`. If your computations require pseudo-random numbers (`rnorm()`, `runif()`, etc.) you will need to manually set a different seed for each parallel process, e.g.
-
-```{r setseedself, eval = FALSE}
-parallel::mclapply(X = 1:4, mc.cores = 4, FUN = function(i) {
-  set.seed(sum(.Random.seed) + i)
-  # Do some work...
-})
-```
-
 ### Hasty mode
 
-The [`drake.hasty`](https://github.com/wlandau/drake.hasty) package is a bare-bones spin-off of `drake`. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.
+The [`drake.hasty`](https://github.com/wlandau/drake.hasty) package is a bare-bones experimental spin-off of `drake`. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.
 
 ```{r endoflinehpc, echo = FALSE}
 clean(destroy = TRUE, verbose = FALSE)
