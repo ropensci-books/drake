@@ -261,17 +261,17 @@ library(drake)
 
 # The targets just collect the process IDs of the callr processes.
 plan <- drake_plan(
-  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
-  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+  x = furrr::future_map_int(1:2, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:2, function(x) Sys.getpid())
 )
 
 # Tell the drake targets to fork up to 4 callr processes.
-future::plan(future.callr::callr, workers = 4L)
+future::plan(future.callr::callr)
 
 # Build the targets.
 make(plan)
 
-# Shows 4 unique process IDs.
+# Process IDs of the local workers of x:
 readd(x)
 ```
 
@@ -285,8 +285,8 @@ library(drake)
 
 # The targets just collect the process IDs of the callr processes.
 plan <- drake_plan(
-  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
-  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+  x = furrr::future_map_int(1:2, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:2, function(x) Sys.getpid())
 )
 
 # Write a template file for clustermq.
@@ -319,10 +319,10 @@ make(
   parallelism = "clustermq",
   jobs = 2,
   # Each of the two workers can spawn up to 4 local processes.
-  prework = quote(future::plan(future.callr::callr, workers = 4L))
+  prework = quote(future::plan(future.callr::callr))
 )
 
-# Shows 4 unique process IDs.
+# Process IDs of the local workers of x:
 readd(x) 
 ```
 
@@ -335,8 +335,8 @@ library(drake)
 
 # The targets just collect the process IDs of the callr processes.
 plan <- drake_plan(
-  x = furrr::future_map_int(1:4, function(x) Sys.getpid()),
-  y = furrr::future_map_int(1:4, function(x) Sys.getpid())
+  x = furrr::future_map_int(1:2, function(x) Sys.getpid()),
+  y = furrr::future_map_int(1:2, function(x) Sys.getpid())
 )
 
 # Write a template file for future.batchtools.
@@ -364,16 +364,34 @@ future::plan(
       future.batchtools::batchtools_sge,
       template = "sge_batchtools.tmpl"
     ),
-    future::tweak(future.callr::callr, workers = 4L)
+    future.callr::callr
   )
 )
 
 # Build the targets.
 make(plan, parallelism = "future", jobs = 2)
 
-# Shows 4 unique process IDs.
+# Process IDs of the local workers of x:
 readd(x)
 ```
+
+#### Number of local workers per target
+
+By default, `future::availableCores()` determines the number of local [`callr`](https://github.com/r-lib/callr) workers. To better manage resources, you may wish to further restrict the number of [`callr`](https://github.com/r-lib/callr) workers for all targets in the plan, e.g. `future::plan(future::callr, workers = 4L)` or:
+
+```{r futurecallr4workers, eval = FALSE}
+future::plan(
+  list(
+    future::tweak(
+      future.batchtools::batchtools_sge,
+      template = "sge_batchtools.tmpl"
+    ),
+    future::tweak(future.callr::callr, workers = 4L)
+  )
+)
+```
+
+Alternatively, you can use chunking to prevent individual targets from using too many workers, e.g. `furrr::future_map(.options = furrr::future_options(scheduling = 4))`. Here, the `scheduling` argument sets the average number of futures per worker.
 
 #### Locked binding/environment errors
 
