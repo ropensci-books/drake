@@ -274,8 +274,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#storage"><i class="fa fa-check"></i><b>10.6.2</b> Storage</a></li>
 <li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
 <li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
-<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.5</b> Custom job schedulers</a></li>
-<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.6</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.5</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.6</b> Custom job schedulers</a></li>
 <li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.7</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
@@ -407,10 +407,7 @@ config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_pla
 </div>
 <div id="installation-1" class="section level3">
 <h3><span class="header-section-number">10.4.2</span> Installation</h3>
-<p>You must first install <a href="http://zeromq.org/">ZeroMQ</a> (<a href="http://zeromq.org/intro:get-the-software">instructions here</a>) and then install the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> package.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;clustermq&quot;</span>) <span class="co"># CRAN release</span>
-<span class="co"># Alternatively, install the GitHub development version.</span>
-devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;mschubert/clustermq&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;develop&quot;</span>)</code></pre>
+<p>Persistent workers require the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> R package, which in turn requires <a href="http://zeromq.org/">ZeroMQ</a>. Please refer to the <a href="https://github.com/mschubert/clustermq/blob/master/README.md#installation"><code>clustermq</code> installation guide</a> for specific instructions.</p>
 </div>
 <div id="on-your-local-machine" class="section level3">
 <h3><span class="header-section-number">10.4.3</span> On your local machine</h3>
@@ -549,8 +546,164 @@ exit 0</code></pre>
 future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span>)
 <span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 </div>
+<div id="parallel-computing-within-targets" class="section level3">
+<h3><span class="header-section-number">10.6.5</span> Parallel computing <em>within</em> targets</h3>
+<p>To recruit parallel processes within individual targets, we recommend the <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a> and <a href="https://github.com/DavisVaughan/furrr"><code>furrr</code></a> packages. Usage details depend on the parallel backend you choose for <code>make()</code>. If you must write custom code with <code>mclapply()</code>, please read the subsection below on locked bindings/environments.</p>
+<div id="locally" class="section level4">
+<h4><span class="header-section-number">10.6.5.1</span> Locally</h4>
+<p>Use <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a> and <a href="https://github.com/DavisVaughan/furrr"><code>furrr</code></a> normally.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+
+<span class="co"># The targets just collect the process IDs of the callr processes.</span>
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),
+  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())
+)
+
+<span class="co"># Tell the drake targets to fork up to 4 callr processes.</span>
+future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr)
+
+<span class="co"># Build the targets.</span>
+<span class="kw">make</span>(plan)
+
+<span class="co"># Process IDs of the local workers of x:</span>
+<span class="kw">readd</span>(x)</code></pre>
+</div>
+<div id="persistent-workers-1" class="section level4">
+<h4><span class="header-section-number">10.6.5.2</span> Persistent workers</h4>
+<p>Each persistent worker needs its own <a href="https://github.com/HenrikBengtsson/future"><code>future::plan()</code></a>, which we set with the <code>prework</code> argument of <code>make()</code>. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> documentation.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+
+<span class="co"># The targets just collect the process IDs of the callr processes.</span>
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),
+  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())
+)
+
+<span class="co"># Write a template file for clustermq.</span>
+<span class="kw">writeLines</span>(
+  <span class="kw">c</span>(
+    <span class="st">&quot;#!/bin/bash&quot;</span>,
+    <span class="st">&quot;#$ -N {{ job_name }}               # job name&quot;</span>,
+    <span class="st">&quot;#$ -t 1-{{ n_jobs }}               # submit jobs as array&quot;</span>,
+    <span class="st">&quot;#$ -j y                            # combine stdout/error in one file&quot;</span>,
+    <span class="st">&quot;#$ -o {{ log_file | /dev/null }}   # output file&quot;</span>,
+    <span class="st">&quot;#$ -cwd                            # use pwd as work dir&quot;</span>,
+    <span class="st">&quot;#$ -V                              # use environment variables&quot;</span>,
+    <span class="st">&quot;#$ -pe smp 4                       # request 4 cores per job&quot;</span>,
+    <span class="st">&quot;module load R-qualified/3.5.2      # if loading R from an environment module&quot;</span>,
+    <span class="st">&quot;ulimit -v $(( 1024 * {{ memory | 4096 }} ))&quot;</span>,
+    <span class="st">&quot;CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(</span><span class="ch">\&quot;</span><span class="st">{{ master }}</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span>
+  ),
+  <span class="st">&quot;sge_clustermq.tmpl&quot;</span>
+)
+
+<span class="co"># Register the scheduler and template file with clustermq.</span>
+<span class="kw">options</span>(
+  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>,
+  <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span>
+)
+
+<span class="co"># Build the targets.</span>
+<span class="kw">make</span>(
+  plan,
+  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,
+  <span class="dt">jobs =</span> <span class="dv">2</span>,
+  <span class="co"># Each of the two workers can spawn up to 4 local processes.</span>
+  <span class="dt">prework =</span> <span class="kw">quote</span>(future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr))
+)
+
+<span class="co"># Process IDs of the local workers of x:</span>
+<span class="kw">readd</span>(x) </code></pre>
+</div>
+<div id="transient-workers-1" class="section level4">
+<h4><span class="header-section-number">10.6.5.3</span> Transient workers</h4>
+<p>As explained in the <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html"><code>future</code> vignette</a>, we can nest our <code>future::plans()</code>. Each target gets its own remote job, and each job can spawn up to 4 local <code>callr</code> processes. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> documentation.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
+
+<span class="co"># The targets just collect the process IDs of the callr processes.</span>
+plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),
+  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())
+)
+
+<span class="co"># Write a template file for future.batchtools.</span>
+<span class="kw">writeLines</span>(
+  <span class="kw">c</span>(
+    <span class="st">&quot;#!/bin/bash&quot;</span>,
+    <span class="st">&quot;#$ -cwd                # use pwd as work dir&quot;</span>,
+    <span class="st">&quot;#$ -j y                # combine stdout/error in one file&quot;</span>,
+    <span class="st">&quot;#$ -o &lt;%= log.file %&gt;  # output file&quot;</span>,
+    <span class="st">&quot;#$ -V                  # use environment variables&quot;</span>,
+    <span class="st">&quot;#$ -N &lt;%= job.name %&gt;  # job name&quot;</span>,
+    <span class="st">&quot;#$ -pe smp 4           # 4 cores per job&quot;</span>,
+    <span class="st">&quot;module load R          # if loading R from an environment module&quot;</span>,
+    <span class="st">&quot;Rscript -e &#39;batchtools::doJobCollection(</span><span class="ch">\&quot;</span><span class="st">&lt;%= uri %&gt;</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span>,
+    <span class="st">&quot;exit 0&quot;</span>
+  ),
+  <span class="st">&quot;sge_batchtools.tmpl&quot;</span>
+)
+
+<span class="co"># In our nested plans, each target gets its own remote SGE job,</span>
+<span class="co"># and each worker can spawn up to 4 `callr` processes.</span>
+future<span class="op">::</span><span class="kw">plan</span>(
+  <span class="kw">list</span>(
+    future<span class="op">::</span><span class="kw">tweak</span>(
+      future.batchtools<span class="op">::</span>batchtools_sge,
+      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span>
+    ),
+    future.callr<span class="op">::</span>callr
+  )
+)
+
+<span class="co"># Build the targets.</span>
+<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)
+
+<span class="co"># Process IDs of the local workers of x:</span>
+<span class="kw">readd</span>(x)</code></pre>
+</div>
+<div id="number-of-local-workers-per-target" class="section level4">
+<h4><span class="header-section-number">10.6.5.4</span> Number of local workers per target</h4>
+<p>By default, <code>future::availableCores()</code> determines the number of local <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers. To better manage resources, you may wish to further restrict the number of <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers for all targets in the plan, e.g. <code>future::plan(future::callr, workers = 4L)</code> or:</p>
+<pre class="sourceCode r"><code class="sourceCode r">future<span class="op">::</span><span class="kw">plan</span>(
+  <span class="kw">list</span>(
+    future<span class="op">::</span><span class="kw">tweak</span>(
+      future.batchtools<span class="op">::</span>batchtools_sge,
+      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span>
+    ),
+    future<span class="op">::</span><span class="kw">tweak</span>(future.callr<span class="op">::</span>callr, <span class="dt">workers =</span> 4L)
+  )
+)</code></pre>
+<p>Alternatively, you can use chunking to prevent individual targets from using too many workers, e.g. <code>furrr::future_map(.options = furrr::future_options(scheduling = 4))</code>. Here, the <code>scheduling</code> argument sets the average number of futures per worker.</p>
+</div>
+<div id="locked-bindingenvironment-errors" class="section level4">
+<h4><span class="header-section-number">10.6.5.5</span> Locked binding/environment errors</h4>
+<p>Some workflows unavoidably use <code>mclapply()</code>, which is known to modify the global environment against <code>drake</code>’s will. If you are stuck, there are two workarounds.</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>make(lock_envir = FALSE)</code>.</li>
+<li>Use the <code>envir</code> argument of <code>make()</code>. That way, <code>drake</code> locks your special custom environment instead of the global environment.</li>
+</ol>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load the main example: https://github.com/wlandau/drake-examples</span>
+<span class="kw">library</span>(drake)
+<span class="kw">drake_example</span>(<span class="st">&quot;main&quot;</span>)
+<span class="kw">setwd</span>(<span class="st">&quot;main&quot;</span>)
+
+<span class="co"># Define and populate a special custom environment.</span>
+envir &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">globalenv</span>())
+<span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>, <span class="dt">local =</span> envir)
+<span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>, <span class="dt">local =</span> envir)
+<span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>, <span class="dt">local =</span> envir)
+
+<span class="co"># Check the contents of your environments.</span>
+<span class="kw">ls</span>(envir) <span class="co"># Should have your functions and plan</span>
+<span class="kw">ls</span>()         <span class="co"># The global environment should only have what you started with.</span>
+
+<span class="co"># Build the targets using your custom environment</span>
+<span class="kw">make</span>(envir<span class="op">$</span>plan, <span class="dt">envir =</span> envir)</code></pre>
+</div>
+</div>
 <div id="custom-job-schedulers" class="section level3">
-<h3><span class="header-section-number">10.6.5</span> Custom job schedulers</h3>
+<h3><span class="header-section-number">10.6.6</span> Custom job schedulers</h3>
 <p>It is possible to supply a custom job scheduler function to the <code>parallelism</code> argument of <code>make()</code>. The <code>backend_future_lapply_staged()</code> function from the <a href="https://github.com/wlandau/drake.future.lapply.staged"><code>drake.future.lapply.staged</code></a> package is an example. You might consider writing your own such function if you wish to</p>
 <ol style="list-style-type: decimal">
 <li>Experiment with a more efficient job scheduler before proposing a patch to core <code>drake</code>, or</li>
@@ -558,43 +711,9 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 </ol>
 <p>This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.</p>
 </div>
-<div id="parallel-computing-within-targets" class="section level3">
-<h3><span class="header-section-number">10.6.6</span> Parallel computing <em>within</em> targets</h3>
-<p>You may wish to invoke parallel computing within individual targets, e.g.</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">a =</span> parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, sqrt, <span class="dt">mc.cores =</span> <span class="dv">4</span>),
-  <span class="dt">b =</span> parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, sqrt, <span class="dt">mc.cores =</span> <span class="dv">2</span>)
-)</code></pre>
-<p>or even</p>
-<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
-  <span class="dt">a =</span> <span class="kw">target</span>(
-    parallel<span class="op">::</span><span class="kw">mclapply</span>(
-      <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>,
-      sqrt,
-      <span class="co"># You can change the # of cores without changing the command.</span>
-      <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)
-    ),
-    <span class="dt">cores =</span> <span class="dv">4</span> <span class="co"># Changes to this number do not invalidate `a`.</span>
-  ),
-  <span class="dt">b =</span> <span class="kw">target</span>(
-    parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, sqrt, <span class="dt">mc.cores =</span> <span class="kw">from_plan</span>(<span class="st">&quot;cores&quot;</span>)),
-    <span class="dt">cores =</span> <span class="dv">2</span>
-  )
-)</code></pre>
-<p>Unfortunately, for reasons described <a href="https://github.com/ropensci/drake/issues/675">here</a> and <a href="https://stackoverflow.com/questions/54229295/parallelmclapply-adds-or-removes-bindings-to-the-global-environment-which-o">here</a>, <code>make(plan)</code> will fail in each case. Workarounds:</p>
-<ul>
-<li>Avoid <code>mclapply()</code>. <a href="https://davisvaughan.github.io/furrr/"><code>furrr::map()</code></a> and <code>parallel::parLapply()</code> are more dependable alternatives anyway. In the case of <a href="https://davisvaughan.github.io/furrr/"><code>furrr</code></a>, invoke <a href="https://github.com/HenrikBengtsson/future.callr"><code>future::plan(future.callr::callr)</code></a> or <code>future::plan(future::multisession)</code> first.</li>
-<li>In <code>make()</code>, set the <code>lock_envir</code> argument to <code>FALSE</code>. This approach deactivates important reproducibility guardrails, so use with caution.</li>
-<li>In <code>mclapply()</code>, set the <code>mc.set.seed</code> argument to <code>FALSE</code>. If your computations require pseudo-random numbers (<code>rnorm()</code>, <code>runif()</code>, etc.) you will need to manually set a different seed for each parallel process, e.g.</li>
-</ul>
-<pre class="sourceCode r"><code class="sourceCode r">parallel<span class="op">::</span><span class="kw">mclapply</span>(<span class="dt">X =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">mc.cores =</span> <span class="dv">4</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(i) {
-  <span class="kw">set.seed</span>(<span class="kw">sum</span>(.Random.seed) <span class="op">+</span><span class="st"> </span>i)
-  <span class="co"># Do some work...</span>
-})</code></pre>
-</div>
 <div id="hasty-mode" class="section level3">
 <h3><span class="header-section-number">10.6.7</span> Hasty mode</h3>
-<p>The <a href="https://github.com/wlandau/drake.hasty"><code>drake.hasty</code></a> package is a bare-bones spin-off of <code>drake</code>. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.</p>
+<p>The <a href="https://github.com/wlandau/drake.hasty"><code>drake.hasty</code></a> package is a bare-bones experimental spin-off of <code>drake</code>. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.</p>
 
 </div>
 </div>
