@@ -1,4 +1,4 @@
-# Visualization with drake {#vis}
+# Visualization with drake {#visuals}
 
 ```{r vissetup, echo = FALSE}
 suppressMessages(suppressWarnings(library(drake)))
@@ -61,13 +61,9 @@ visNetwork(nodes = legend_nodes())
 
 ### `drake_ggraph()`
 
-Powered by [`ggraph`](https://github.com/thomasp85/ggraph), these graphs are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`.
+`drake_ggraph()` can handle larger workflows than the other graphing functions. If your project has thousands of targets and `vis_drake_graph()`/`sankey_drake_graph()` does not render properly, consider `drake_ggraph()`. Powered by [`ggraph`](https://github.com/thomasp85/ggraph), `drake_ggraph()`s are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`. 
 
 ```{r static}
-plan <- drake_plan(data = get_data(), model = data, plot = data)
-plan
-get_data <- function(){}
-config <- drake_config(plan)
 drake_ggraph(config)
 ```
 
