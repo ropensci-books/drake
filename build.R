@@ -11,15 +11,3 @@ bookdown::render_book(
   input = "index.Rmd",
   output_format = "bookdown::gitbook"
 )
-try({
-  drake::clean(destroy = TRUE)
-  bookdown::render_book(
-    input = "index.Rmd",
-    output_format = "bookdown::pdf_book",
-    output_dir = "_pdfbook"
-  )
-  file.copy(
-    from = "_pdfbook/ropensci-dev-guide.pdf",
-    to = "_book/ropensci-dev-guide.pdf"
-  )
-})
