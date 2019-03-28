@@ -274,13 +274,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.5.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster-1"><i class="fa fa-check"></i><b>10.5.4</b> On a cluster</a></li>
 </ul></li>
 <li class="chapter" data-level="10.6" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>10.6</b> Advanced options</a><ul>
-<li class="chapter" data-level="10.6.1" data-path="hpc.html"><a href="hpc.html#memory"><i class="fa fa-check"></i><b>10.6.1</b> Memory</a></li>
-<li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#storage"><i class="fa fa-check"></i><b>10.6.2</b> Storage</a></li>
-<li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.3</b> The <code>template</code> argument for persistent workers</a></li>
-<li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>resources</code> column for transient workers</a></li>
-<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.5</b> Parallel computing <em>within</em> targets</a></li>
-<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.6</b> Custom job schedulers</a></li>
-<li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.7</b> Hasty mode</a></li>
+<li class="chapter" data-level="10.6.1" data-path="hpc.html"><a href="hpc.html#selectivity"><i class="fa fa-check"></i><b>10.6.1</b> Selectivity</a></li>
+<li class="chapter" data-level="10.6.2" data-path="hpc.html"><a href="hpc.html#memory"><i class="fa fa-check"></i><b>10.6.2</b> Memory</a></li>
+<li class="chapter" data-level="10.6.3" data-path="hpc.html"><a href="hpc.html#storage"><i class="fa fa-check"></i><b>10.6.3</b> Storage</a></li>
+<li class="chapter" data-level="10.6.4" data-path="hpc.html"><a href="hpc.html#the-template-argument-for-persistent-workers"><i class="fa fa-check"></i><b>10.6.4</b> The <code>template</code> argument for persistent workers</a></li>
+<li class="chapter" data-level="10.6.5" data-path="hpc.html"><a href="hpc.html#the-resources-column-for-transient-workers"><i class="fa fa-check"></i><b>10.6.5</b> The <code>resources</code> column for transient workers</a></li>
+<li class="chapter" data-level="10.6.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>10.6.6</b> Parallel computing <em>within</em> targets</a></li>
+<li class="chapter" data-level="10.6.7" data-path="hpc.html"><a href="hpc.html#custom-job-schedulers"><i class="fa fa-check"></i><b>10.6.7</b> Custom job schedulers</a></li>
+<li class="chapter" data-level="10.6.8" data-path="hpc.html"><a href="hpc.html#hasty-mode"><i class="fa fa-check"></i><b>10.6.8</b> Hasty mode</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>11</b> Triggers: decision rules for building targets</a><ul>
@@ -368,14 +369,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="kw">make</span>(my_plan, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 <div id="batch-mode-for-long-workflows" class="section level2">
 <h2><span class="header-section-number">10.1</span> Batch mode for long workflows</h2>
-<p>If you expect <code>make()</code> to take a long time, create a master script for your project (say, <code>drake-work.R</code>) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.</p>
-<pre><code>nohup nice -19 R CMD BATCH drake_work.R &
+<p>If you expect <code>make()</code> to take a long time, create a master script for your project (say, <code>make.R</code>, as in the <a href="projects.html#projects">guidance on projects</a>) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.</p>
+<pre><code>nohup nice -19 R CMD BATCH --no-save make.R &
 </code></pre>
 <p>where:</p>
 <ul>
 <li><code>nohup</code>: Keep the job running even if you log out of the machine.</li>
 <li><code>nice -19</code>: This is a low-priority job that should not consume many resources. Other processes should take priority.</li>
-<li><code>R CMD BATCH drake_work.R</code>: Run the <code>drake_work.R</code> script in a new R session.</li>
+<li><code>R CMD BATCH</code>: Run the R script in a fresh new R session.</li>
+<li><code>--no-save</code>: do not save the workspace in a <code>.RData</code> file.</li>
 <li><code>&amp;</code>: Run this job in the background so you can do other stuff in the terminal window.</li>
 </ul>
 </div>
@@ -478,8 +480,40 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 </div>
 <div id="advanced-options" class="section level2">
 <h2><span class="header-section-number">10.6</span> Advanced options</h2>
+<div id="selectivity" class="section level3">
+<h3><span class="header-section-number">10.6.1</span> Selectivity</h3>
+<p>Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the master process, define a special <code>hpc</code> column of your <code>drake</code> plan. Below, <code>NA</code> and <code>TRUE</code> are treated the same, and <code>make(plan, parallelism = &quot;clustermq&quot;)</code> only sends <code>model_1</code> and <code>model_2</code> to parallel workers.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_plan</span>(
+  <span class="dt">model =</span> <span class="kw">target</span>(
+    <span class="kw">crazy_long_computation</span>(index),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">index =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))
+  ),
+  <span class="dt">accuracy =</span> <span class="kw">target</span>(
+    <span class="kw">summarize_accuracy</span>(model),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(model),
+    <span class="dt">hpc =</span> <span class="ot">FALSE</span>
+  ),
+  <span class="dt">specificity =</span> <span class="kw">target</span>(
+    <span class="kw">summarize_specificity</span>(model),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(model),
+    <span class="dt">hpc =</span> <span class="ot">FALSE</span>
+  ),
+  <span class="dt">report =</span> <span class="kw">target</span>(
+    <span class="kw">render</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;results.Rmd&quot;</span>), <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;results.html&quot;</span>)),
+    <span class="dt">hpc =</span> <span class="ot">FALSE</span>
+  )
+)
+<span class="co">#&gt; # A tibble: 5 x 3</span>
+<span class="co">#&gt;   target     command                                                  hpc  </span>
+<span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;                                                   &lt;lgl&gt;</span>
+<span class="co">#&gt; 1 model_1    crazy_long_computation(1)                              … NA   </span>
+<span class="co">#&gt; 2 model_2    crazy_long_computation(2)                              … NA   </span>
+<span class="co">#&gt; 3 accuracy   summarize_accuracy(model_1, model_2)                   … FALSE</span>
+<span class="co">#&gt; 4 specifici… summarize_specificity(model_1, model_2)                … FALSE</span>
+<span class="co">#&gt; 5 report     render(knitr_in(&quot;results.Rmd&quot;), output_file = file_out(… FALSE</span></code></pre>
+</div>
 <div id="memory" class="section level3">
-<h3><span class="header-section-number">10.6.1</span> Memory</h3>
+<h3><span class="header-section-number">10.6.2</span> Memory</h3>
 <p>By default, <code>make()</code> keeps targets in memory during runtime. Some targets are dependencies of other targets downstream, while others may be no longer actually need to be in memory. The <code>memory_strategy</code> argument to <code>make()</code> allows you to choose the tradeoff that best suits your project. Options:</p>
 <ul>
 <li><code>&quot;speed&quot;</code>: Once a target is loaded in memory, just keep it there. This choice maximizes speed and hogs memory.</li>
@@ -488,7 +522,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 </ul>
 </div>
 <div id="storage" class="section level3">
-<h3><span class="header-section-number">10.6.2</span> Storage</h3>
+<h3><span class="header-section-number">10.6.3</span> Storage</h3>
 <p>In <code>make(caching = &quot;master&quot;)</code>, the workers send the targets to the master process, and the master process stores them one by one in the cache. <code>caching = &quot;master&quot;</code> is compatible with all <a href="https://github.com/richfitz/storr"><code>storr</code></a> cache formats, including the more esoteric ones like <code>storr_dbi()</code> and <code>storr_environment()</code>.</p>
 <p>In <code>make(caching = &quot;worker&quot;)</code>, the parallel workers are responsible for writing the targets to the cache. Some output-heavy projects can benefit from this form of parallelism. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:</p>
 <ul>
@@ -498,7 +532,7 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <
 <p>See the <a href="store.html#store">storage chapter</a> for details.</p>
 </div>
 <div id="the-template-argument-for-persistent-workers" class="section level3">
-<h3><span class="header-section-number">10.6.3</span> The <code>template</code> argument for persistent workers</h3>
+<h3><span class="header-section-number">10.6.4</span> The <code>template</code> argument for persistent workers</h3>
 <p>For more control and flexibility in the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> backend, you can parameterize your template file and use the <code>template</code> argument of <code>make()</code>. For example, suppose you want to programatically set the number of “slots” (basically cores) per job on an <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE system</a> (<code>clustermq</code> guide to SGE setup <a href="https://github.com/mschubert/clustermq/wiki/SGE">here</a>). Begin with a parameterized template file <code>sge_clustermq.tmpl</code> with a custom <code>n_slots</code> placeholder.</p>
 <pre><code># File: sge_clustermq.tmpl
 # Modified from https://github.com/mschubert/clustermq/wiki/SGE
@@ -525,7 +559,7 @@ CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(&quot;{{
 <p>Custom placeholders like <code>n_slots</code> are processed with the <a href="https://github.com/Bart6114/infuser"><code>infuser</code></a> package.</p>
 </div>
 <div id="the-resources-column-for-transient-workers" class="section level3">
-<h3><span class="header-section-number">10.6.4</span> The <code>resources</code> column for transient workers</h3>
+<h3><span class="header-section-number">10.6.5</span> The <code>resources</code> column for transient workers</h3>
 <p>Different targets may need different resources. For example,</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">download_data</span>(),
@@ -554,10 +588,10 @@ future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <sp
 <span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</code></pre>
 </div>
 <div id="parallel-computing-within-targets" class="section level3">
-<h3><span class="header-section-number">10.6.5</span> Parallel computing <em>within</em> targets</h3>
+<h3><span class="header-section-number">10.6.6</span> Parallel computing <em>within</em> targets</h3>
 <p>To recruit parallel processes within individual targets, we recommend the <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a> and <a href="https://github.com/DavisVaughan/furrr"><code>furrr</code></a> packages. Usage details depend on the parallel backend you choose for <code>make()</code>. If you must write custom code with <code>mclapply()</code>, please read the subsection below on locked bindings/environments.</p>
 <div id="locally" class="section level4">
-<h4><span class="header-section-number">10.6.5.1</span> Locally</h4>
+<h4><span class="header-section-number">10.6.6.1</span> Locally</h4>
 <p>Use <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a> and <a href="https://github.com/DavisVaughan/furrr"><code>furrr</code></a> normally.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
 
@@ -577,7 +611,7 @@ future<span class="op">::</span><span class="kw">plan</span>(future.callr<span c
 <span class="kw">readd</span>(x)</code></pre>
 </div>
 <div id="persistent-workers-1" class="section level4">
-<h4><span class="header-section-number">10.6.5.2</span> Persistent workers</h4>
+<h4><span class="header-section-number">10.6.6.2</span> Persistent workers</h4>
 <p>Each persistent worker needs its own <a href="https://github.com/HenrikBengtsson/future"><code>future::plan()</code></a>, which we set with the <code>prework</code> argument of <code>make()</code>. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> documentation.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
 
@@ -624,7 +658,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <span class="kw">readd</span>(x) </code></pre>
 </div>
 <div id="transient-workers-1" class="section level4">
-<h4><span class="header-section-number">10.6.5.3</span> Transient workers</h4>
+<h4><span class="header-section-number">10.6.6.3</span> Transient workers</h4>
 <p>As explained in the <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html"><code>future</code> vignette</a>, we can nest our <code>future::plans()</code>. Each target gets its own remote job, and each job can spawn up to 4 local <code>callr</code> processes. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> documentation.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(drake)
 
@@ -670,7 +704,7 @@ future<span class="op">::</span><span class="kw">plan</span>(
 <span class="kw">readd</span>(x)</code></pre>
 </div>
 <div id="number-of-local-workers-per-target" class="section level4">
-<h4><span class="header-section-number">10.6.5.4</span> Number of local workers per target</h4>
+<h4><span class="header-section-number">10.6.6.4</span> Number of local workers per target</h4>
 <p>By default, <code>future::availableCores()</code> determines the number of local <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers. To better manage resources, you may wish to further restrict the number of <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers for all targets in the plan, e.g. <code>future::plan(future::callr, workers = 4L)</code> or:</p>
 <pre class="sourceCode r"><code class="sourceCode r">future<span class="op">::</span><span class="kw">plan</span>(
   <span class="kw">list</span>(
@@ -684,7 +718,7 @@ future<span class="op">::</span><span class="kw">plan</span>(
 <p>Alternatively, you can use chunking to prevent individual targets from using too many workers, e.g. <code>furrr::future_map(.options = furrr::future_options(scheduling = 4))</code>. Here, the <code>scheduling</code> argument sets the average number of futures per worker.</p>
 </div>
 <div id="locked-bindingenvironment-errors" class="section level4">
-<h4><span class="header-section-number">10.6.5.5</span> Locked binding/environment errors</h4>
+<h4><span class="header-section-number">10.6.6.5</span> Locked binding/environment errors</h4>
 <p>Some workflows unavoidably use <code>mclapply()</code>, which is known to modify the global environment against <code>drake</code>’s will. If you are stuck, there are two workarounds.</p>
 <ol style="list-style-type: decimal">
 <li>Use <code>make(lock_envir = FALSE)</code>.</li>
@@ -710,7 +744,7 @@ envir &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class=
 </div>
 </div>
 <div id="custom-job-schedulers" class="section level3">
-<h3><span class="header-section-number">10.6.6</span> Custom job schedulers</h3>
+<h3><span class="header-section-number">10.6.7</span> Custom job schedulers</h3>
 <p>It is possible to supply a custom job scheduler function to the <code>parallelism</code> argument of <code>make()</code>. The <code>backend_future_lapply_staged()</code> function from the <a href="https://github.com/wlandau/drake.future.lapply.staged"><code>drake.future.lapply.staged</code></a> package is an example. You might consider writing your own such function if you wish to</p>
 <ol style="list-style-type: decimal">
 <li>Experiment with a more efficient job scheduler before proposing a patch to core <code>drake</code>, or</li>
@@ -719,7 +753,7 @@ envir &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class=
 <p>This feature is very advanced, and you should only attempt it in production if you really know what you are doing. Use at your own risk.</p>
 </div>
 <div id="hasty-mode" class="section level3">
-<h3><span class="header-section-number">10.6.7</span> Hasty mode</h3>
+<h3><span class="header-section-number">10.6.8</span> Hasty mode</h3>
 <p>The <a href="https://github.com/wlandau/drake.hasty"><code>drake.hasty</code></a> package is a bare-bones experimental spin-off of <code>drake</code>. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.</p>
 
 </div>
