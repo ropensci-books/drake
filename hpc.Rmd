@@ -19,16 +19,17 @@ make(my_plan, jobs = 2)
 
 ## Batch mode for long workflows
 
-If you expect `make()` to take a long time, create a master script for your project (say, `drake-work.R`) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.
+If you expect `make()` to take a long time, create a master script for your project (say, `make.R`, as in the [guidance on projects](#projects)) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.
 
-<pre><code>nohup nice -19 R CMD BATCH drake_work.R &
+<pre><code>nohup nice -19 R CMD BATCH --no-save make.R &
 </code></pre>
 
 where:
 
 - `nohup`: Keep the job running even if you log out of the machine.
 - `nice -19`: This is a low-priority job that should not consume many resources. Other processes should take priority.
-- `R CMD BATCH drake_work.R`: Run the `drake_work.R` script in a new R session.
+- `R CMD BATCH`: Run the R script in a fresh new R session.
+- `--no-save`: do not save the workspace in a `.RData` file.
 - `&`: Run this job in the background so you can do other stuff in the terminal window.
 
 ## Let `make()` schedule your targets.
@@ -149,6 +150,33 @@ make(plan, parallelism = "future", jobs = 2)
 ```
 
 ## Advanced options
+
+### Selectivity
+
+Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the master process, define a special `hpc` column of your `drake` plan. Below, `NA` and `TRUE` are treated the same, and `make(plan, parallelism = "clustermq")` only sends `model_1` and `model_2` to parallel workers.
+
+```{r hybrid1}
+drake_plan(
+  model = target(
+    crazy_long_computation(index),
+    transform = map(index = c(1, 2))
+  ),
+  accuracy = target(
+    summarize_accuracy(model),
+    transform = combine(model),
+    hpc = FALSE
+  ),
+  specificity = target(
+    summarize_specificity(model),
+    transform = combine(model),
+    hpc = FALSE
+  ),
+  report = target(
+    render(knitr_in("results.Rmd"), output_file = file_out("results.html")),
+    hpc = FALSE
+  )
+)
+```
 
 ### Memory
 
