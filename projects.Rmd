@@ -1,15 +1,14 @@
 # `drake` projects {#projects}
 
-```{r bestpracticesstart, echo = FALSE}
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c("_drake.R", "R", "main", "Thumbs.db", "raw_data.xlsx", "report.Rmd"),
-  recursive = TRUE
-)
+```{r projects_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r projects_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(dplyr)
+library(ggplot2)
 drake_example("main")
 tmp <- file.copy("main/R", ".", recursive = TRUE)
 tmp <- file.copy("main/_drake.R", ".")
@@ -241,12 +240,3 @@ For a minimal example, see [Tiernan Martin](https://github.com/tiernanmartin)'s 
 - [PLOS article](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510) by Wilson et al.
 - [RStudio Conference 2019 presentation ](https://github.com/karthik/rstudio2019) by [Karthik Ram](https://github.com/karthik).
 - [`rrtools`](https://github.com/benmarwick/rrtools) by [Ben Marwick](https://github.com/benmarwick).
-
-
-```{r endofline_bestpractices, echo = F}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c("_drake.R", "R", "main", "Thumbs.db", "raw_data.xlsx", "report.Rmd"),
-  recursive = TRUE
-)
-```

@@ -1,19 +1,12 @@
 # Storage {#store}
 
-```{r suppression10, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "Makefile", "report.Rmd", "shell.sh",
-    "STDIN.o*", "Thumbs.db",
-    "faster_cache", "my_storr",
-    "database-file.sqlite", ".drake",
-    "report.md", "log.txt"
-  ),
-  recursive = TRUE
-)
+```{r store_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r store_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
 ```
 
 When you run `make()`, `drake` stores your targets in a cache.
@@ -178,16 +171,4 @@ For `drake`, the default hash algorithm is `xxhash64`. You can choose different 
 ```{r cachehashoptions, eval = FALSE}
 cache3 <- new_cache("cache_3_path", hash_algorithm = "murmur32")
 cache4 <- storr_rds("cache_4_path", hash_algorithm = "crc32")
-```
-
-```{r cleanup_storage, echo = FALSE}
-unlink(
-  c(
-    "main", "Makefile", "report.Rmd",
-    "shell.sh", "STDIN.o*", "Thumbs.db",
-    "database-file.sqlite", ".drake",
-    "report.md", "log.txt"
-  ),
-  recursive = TRUE
-)
 ```

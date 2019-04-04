@@ -1,10 +1,13 @@
 # Visualization with drake {#visuals}
 
-```{r vissetup, echo = FALSE}
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(visNetwork)))
-clean(destroy = TRUE)
+```{r vis_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r vis_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(visNetwork)
 ```
 
 Data analysis projects have complicated networks of dependencies, and `drake` can help you visualize them with `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` (note the two g's).
@@ -239,22 +242,4 @@ If your graph is too busy, you can hide the output files with `show_output_files
 
 ```{r visfileplan2}
 vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
-```
-
-```{r endofline_vis, echo = F}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "*.lock",
-    "report.Rmd",
-    "in1.txt",
-    "in2.txt",
-    "STDIN.o*",
-    "Thumbs.db",
-    "main",
-    "graph.png",
-    "graph.html"
-  ),
-  recursive = TRUE
-)
 ```

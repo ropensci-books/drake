@@ -1,15 +1,7 @@
 # Time: logging, prediction, and strategy {#time}
 
-```{r suppression_timing, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "main", "Makefile", "report.Rmd",
-    "shell.sh", "STDIN.o*", "Thumbs.db"
-  ),
-  recursive = TRUE
-)
+```{r time_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -17,6 +9,10 @@ knitr::opts_chunk$set(
   fig.height = 6,
   fig.align = "center"
 )
+```
+
+```{r time_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
 ```
 
 Thanks to [Jasper Clarkberg](https://github.com/dapperjapper), `drake` records how long it takes to build each target. For large projects that take hours or days to run, this feature becomes important for planning and execution.
@@ -93,14 +89,3 @@ ggplot(data.frame(time = time / 3600, jobs = ordered(1:12), group = 1)) +
 We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of `jobs` for `make()` ultimately depends on the runtime you can tolerate and the computing resources at your disposal.
 
 A final note on predicting runtime: the output of `predict_runtime()` and `predict_workers()` also depends the optional `workers` column of your `drake_plan()`. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the [high-performance computing guide](#hpc) for more.
-
-```{r endofline_timing, echo = F}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "main", "*.lock", "Makefile",
-    "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"
-  ),
-  recursive = TRUE
-)
-```

@@ -1,17 +1,16 @@
 # `drake` plans {#plans}
 
-```{r loaddrake14, echo = FALSE}
-unlink(
-  c("main", "report.Rmd", "raw_data.xlsx"),
-  recursive = TRUE
-)
+```{r plans_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-suppressPackageStartupMessages(library(drake))
-suppressPackageStartupMessages(library(glue))
-suppressPackageStartupMessages(library(purrr))
-suppressPackageStartupMessages(library(rlang))
-suppressPackageStartupMessages(library(tidyverse))
-clean(destroy = TRUE)
+```
+
+```{r plans_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(glue)
+library(purrr)
+library(rlang)
+library(tidyverse)
 invisible(drake_example("main", overwrite = TRUE))
 invisible(file.copy("main/raw_data.xlsx", ".", overwrite = TRUE))
 invisible(file.copy("main/report.Rmd", ".", overwrite = TRUE))
@@ -20,7 +19,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 
 ## What is a `drake` plan?
 
-A`drake` plan is a data frame with columns named `target` and `command`. Each target is an R object, and each command is an [expression](http://adv-r.had.co.nz/Expressions.html) to produce it.[^1] The `drake_plan()` function is the best way to set up plans.[^2] Recall the plan from our [previous example](#main):
+A `drake` plan is a data frame with columns named `target` and `command`. Each target is an R object, and each command is an [expression](http://adv-r.had.co.nz/Expressions.html) to produce it.[^1] The `drake_plan()` function is the best way to set up plans.[^2] Recall the plan from our [previous example](#main):
 
 [^1]: You can turn the `command` column of your plan into a character vector (e.g. `plan$command <- purrr::map_chr(plan$command, rlang::expr_text)`) and `drake` will still understand you. However, the recommended format is a list of [expressions](http://adv-r.had.co.nz/Expressions.html). `drake_plan()` and friends always supply [expression](http://adv-r.had.co.nz/Expressions.html) lists.
 [^2]: `drake_plan()` is the best way to create plans, but you can create plans any way you like. `drake` will understand plans you create directly using `data.frame()` or `tibble()`.
@@ -1078,14 +1077,3 @@ plan <- tibble(
 Metaprogramming gets much simpler if you do not need to construct literal calls to `file_in()`, `file_out()`, etc. in your commands. The construction of `model_plan` in the [gross state product exmaple](#gsp) is an example.
 
 Thanks to [Chris Hammill](https://github.com/cfhammill) for [presenting this scenario and contributing to the solution](https://github.com/ropensci/drake/issues/451).
-
-```{r endofline_plans, echo = FALSE}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c("main", "code_to_plan", "start.rds", "report.Rmd", "raw_data.xlsx",
-    "STDIN.o*", "Thumbs.db", "in1.txt", "in2.txt", "new_script.R",
-    "new_notebook.Rmd", "plot.png"),
-  recursive = TRUE
-)
-```
-

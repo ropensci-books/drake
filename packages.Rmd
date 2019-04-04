@@ -1,25 +1,21 @@
 # An analysis of R package download trends {#packages}
 
-```{r setup, include = FALSE}
+```{r pkgs_setup, message = FALSE, warning = FALSE, include = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-suppressMessages(suppressWarnings(library(cranlogs)))
-suppressMessages(suppressWarnings(library(curl)))
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-suppressMessages(suppressWarnings(library(httr)))
-suppressMessages(suppressWarnings(library(knitr)))
-suppressMessages(suppressWarnings(library(magrittr)))
-suppressMessages(suppressWarnings(library(R.utils)))
-suppressMessages(suppressWarnings(library(rvest)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "packages", "Makefile", "report.Rmd",
-    "shell.sh", "STDIN.o*", "Thumbs.db"
-  ),
-  recursive = TRUE
-)
+```
+
+```{r pkgs_setup2, message = FALSE, warning = FALSE, include = FALSE}
+library(cranlogs)
+library(curl)
+library(drake)
+library(dplyr)
+library(ggplot2)
+library(httr)
+library(knitr)
+library(magrittr)
+library(R.utils)
+library(rvest)
 invisible(drake_example("packages", overwrite = TRUE))
 invisible(file.copy("packages/report.Rmd", ".", overwrite = TRUE))
 ```
@@ -200,15 +196,3 @@ readd(logs)
 ```
 
 If the log file at the `url` ever changes, the timestamp will update remotely, and `make()` will download the file again.
-
-```{r rmfiles_main02, echo = FALSE}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "packages", "Makefile", "report.Rmd",
-    "shell.sh", "STDIN.o*", "Thumbs.db"
-  ),
-  recursive = TRUE
-)
-```
-

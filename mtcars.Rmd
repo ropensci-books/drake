@@ -1,13 +1,12 @@
 # The mtcars example and `drake` plan generation {#mtcars}
 
-```{r suppression04, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c("mtcars", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
-  recursive = TRUE
-)
+```{r mtcars_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r mtcars_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
 ```
 
 This chapter is a walkthrough of `drake`'s main functionality based on the mtcars example. It sets up the project and runs it repeatedly to demonstrate `drake`'s most important functionality.
@@ -439,12 +438,4 @@ clean(small, reg1, verbose = FALSE)
 clean(verbose = FALSE) # Cleans all targets out of the cache.
 drake_gc(verbose = FALSE) # Just garbage collection.
 clean(destroy = TRUE, verbose = FALSE) # removes the cache entirely
-```
-
-```{r endofline_quickstart04, echo = F}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c("mtcars", "Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"),
-  recursive = TRUE
-)
 ```
