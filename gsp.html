@@ -1197,7 +1197,7 @@ rmspe_%: model_%
     Rscript -e 'saveRDS(get_rmspe(...), ...)'
 
 rmspe.rds: rmspe_%
-    Rscript -e 'saveRDS(rbind(...), ...)'
+    Rscript -e 'saveRDS(dplyr::bind_rows(...), ...)'
 
 rmspe.pdf: rmspe.rds
     Rscript -e 'ggplot2::ggsave(plot_rmspe(readRDS("rmspe.rds")), "rmspe.pdf")'
