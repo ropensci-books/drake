@@ -530,7 +530,7 @@ my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x17527d20&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x13f51718&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -615,11 +615,11 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 <span class="co">#&gt; Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:</span>
 <span class="co">#&gt;   `x` cannot be negative.</span>
 
-<span class="kw">failed</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) <span class="co"># from the last make() only</span>
+<span class="kw">failed</span>(<span class="dt">verbose =</span> 0L) <span class="co"># from the last make() only</span>
 <span class="co">#&gt; [1] &quot;my_target&quot;</span>
 
 <span class="co"># See also warnings and messages.</span>
-error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(my_target, <span class="dt">verbose =</span> <span class="ot">FALSE</span>)<span class="op">$</span>error
+error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(my_target, <span class="dt">verbose =</span> 0L)<span class="op">$</span>error
 
 error<span class="op">$</span>message
 <span class="co">#&gt; [1] &quot;`x` cannot be negative.&quot;</span>
@@ -638,7 +638,7 @@ error<span class="op">$</span>call
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x15790a88&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x16b54798&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -680,7 +680,7 @@ f
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt;   x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x17afe3c8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x184f08a8&gt;</span>
 
 <span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
 f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
@@ -703,7 +703,7 @@ f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
 <div id="timeouts-and-retries" class="section level2">
 <h2><span class="header-section-number">9.3</span> Timeouts and retries</h2>
 <p>See the <code>elapsed</code>, <code>cpu</code>, and <code>retries</code> argument to <code>make()</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)
 f &lt;-<span class="st"> </span><span class="cf">function</span>(...){
   <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
 }
@@ -723,7 +723,7 @@ withr<span class="op">::</span><span class="kw">with_message_sink</span>(
 <span class="co">#&gt; target y</span>
 <span class="co">#&gt; retry y 1 of 2</span></code></pre>
 <p>To tailor these settings to each individual target, create new <code>elapsed</code>, <code>cpu</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>)
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)
 debug_plan<span class="op">$</span>elapsed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
 debug_plan<span class="op">$</span>retries &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>
 
