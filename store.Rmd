@@ -14,7 +14,7 @@ When you run `make()`, `drake` stores your targets in a cache.
 ```{r mtcars_storage}
 library(drake)
 load_mtcars_example() # Get the code with drake_example("mtcars").
-make(my_plan, verbose = FALSE)
+make(my_plan, verbose = 0L)
 ```
 
 The default cache is a hidden `.drake` folder. 
@@ -92,7 +92,7 @@ cache2$destroy()
 By default, `drake` uses `storr_rds()` caches because they allow `make(jobs = 4)` to safely store multiple targets in parallel. To achieve this thread safety, however, [`storr`](https://github.com/richfitz/storr) splits up the data into a pool of tiny cryptically-named files.
 
 ```{r rdsinternals}
-make(my_plan, verbose = FALSE)
+make(my_plan, verbose = 0L)
 head(list.files(".drake/data"))
 head(list.files(".drake/keys/objects"))
 ```
@@ -115,7 +115,7 @@ It is possible use a single SQLite database file as the cache.
 ```{r databaseinit}
 mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
 cache <- storr::storr_dbi("datatable", "keystable", mydb)
-make(my_plan, cache = cache, verbose = FALSE)
+make(my_plan, cache = cache, verbose = 0L)
 loadd(small, cache = cache)
 head(small)
 ```

@@ -168,10 +168,10 @@ withr::with_message_sink(
   make(bad_plan)
 )
 
-failed(verbose = FALSE) # from the last make() only
+failed(verbose = 0L) # from the last make() only
 
 # See also warnings and messages.
-error <- diagnose(my_target, verbose = FALSE)$error
+error <- diagnose(my_target, verbose = 0L)$error
 
 error$message
 
@@ -231,7 +231,7 @@ readd(my_target)
 See the `elapsed`, `cpu`, and `retries` argument to `make()`.
 
 ```{r timeoutretry}
-clean(verbose = FALSE)
+clean(verbose = 0L)
 f <- function(...){
   Sys.sleep(1)
 }
@@ -247,7 +247,7 @@ withr::with_message_sink(
 To tailor these settings to each individual target, create new `elapsed`, `cpu`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
 
 ```{r message = FALSE, warning = FALSE, timeoutretry2}
-clean(verbose = FALSE)
+clean(verbose = 0L)
 debug_plan$elapsed <- c(1e-3, 2e-3)
 debug_plan$retries <- 1:2
 
