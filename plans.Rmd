@@ -138,7 +138,7 @@ The following columns have special meanings for `make()`.
 
 ## Large plans
 
-`drake` version 7.0.0 will introduce new experimental syntax to make it easier to create plans. To try it out before the next [CRAN](http://cran.r-project.org) release, install the [current development version](https://github.com/ropensci/drake) from GitHub.
+`drake` version 7.0.0 introduced new syntax to make it easier to create plans. To try it out before the next [CRAN](http://cran.r-project.org) release, install the [current development version](https://github.com/ropensci/drake) from GitHub.
 
 ```{r installdevdrakedsl, eval = FALSE}
 install.packages("remotes")
@@ -625,455 +625,104 @@ vis_drake_graph(config)
 
 <br>
 
+### Target names
+
+All transformations have an optional `.id` argument to control the names of targets. Use it to select the grouping variables that go into the names, as well as the order they appear in the suffixes. 
+
+```{r dslidnames}
+drake_plan(
+  data = target(
+    get_data(param1, param2),
+    transform = map(
+      param1 = c(123, 456),
+      param2 = c(7, 9),
+      param2 = c("abc", "xyz"),
+      .id = param2
+    )
+  )
+)
+```
+
+```{r dslidnames2}
+drake_plan(
+  data = target(
+    get_data(param1, param2),
+    transform = map(
+      param1 = c(123, 456),
+      param2 = c(7, 9),
+      param2 = c("abc", "xyz"),
+      .id = c(param2, param1)
+    )
+  )
+)
+```
+
+```{r dslidnames3}
+drake_plan(
+  data = target(
+    get_data(param1, param2),
+    transform = map(
+      param1 = c(123, 456),
+      param2 = c(7, 9),
+      param2 = c("abc", "xyz"),
+      .id = c(param1, param2)
+    )
+  )
+)
+```
+
+Set `.id` to `FALSE` to ignore the grouping variables altogether.
+
+```{r dslidnames4}
+drake_plan(
+  data = target(
+    get_data(param1, param2),
+    transform = map(
+      param1 = c(123, 456),
+      param2 = c(7, 9),
+      param2 = c("abc", "xyz"),
+      .id = FALSE
+    )
+  )
+)
+```
+
+Finally, `drake` supports a special `.id_chr` symbol in commands to let you refer to the name of the current target as a character string.
+
+```{r dslidnames5}
+as_chr <- function(x) {
+  deparse(substitute(x))
+}
+plan <- drake_plan(
+  data = target(
+    get_data(param),
+    transform = map(param = c(123, 456))
+  ),
+  keras_model = target(
+    save_model_hdf5(fit_model(data), file_out(!!sprintf("%s.h5", .id_chr))),
+    transform = map(data, .id = param)
+  ),
+  result = target(
+    predict(load_model_hdf5(file_in(!!sprintf("%s.h5", as_chr(keras_model))))),
+    transform = map(keras_model, .id = param)
+  )
+)
+
+plan
+```
+
+```{r dslnames6}
+drake_plan_source(plan)
+```
 
 ## Create large plans the *old* way
 
-`drake` provides several older utility that increase the flexibility of plan creation.
-
-- `drake_plan()`
-- `map_plan()`
-- `evaluate_plan()`
-- `expand_plan()`
-- `gather_by()`
-- `reduce_by()`
-- `gather_plan()`
-- `reduce_plan()`
-
-### `map_plan()`
-
-[`purrr`](https://github.com/tidyverse/purrr)-like functional programming is like looping, but cleaner. The idea is to iterate the same computation over multiple different data points. You write a function to do something once, and a [`map()`](https://purrr.tidyverse.org/reference/map.html)-like helper invokes it on each point in your dataset. `drake`'s version of [`map()`](https://purrr.tidyverse.org/reference/map.html) &mdash; or more precisely, [`pmap_df()`](https://purrr.tidyverse.org/reference/map2.html) &mdash; is [`map_plan()`](https://ropensci.github.io/drake/reference/map_plan.html).
-
-In the following example, we want to know how well each pair covariates in the [`mtcars` dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html) can predict fuel efficiency (in miles per gallon). We will try multiple pairs of covariates using the same statistical analysis, so it is a great time for `drake`-flavored functional programming with `map_plan()`.
-
-As with its cousin, [`pmap_df()`](https://purrr.tidyverse.org/reference/map2.html), [`map_plan()`](https://ropensci.github.io/drake/reference/map_plan.html) needs
-
-1. A function.
-2. A grid of function arguments.
-
-Our function fits a fuel efficiency model given a *single* pair of covariate names `x1` and `x2`.
-
-```{r map_plan_fn}
-my_model_fit <- function(x1, x2, data){
-  lm(as.formula(paste("mpg ~", x1, "+", x2)), data = data)
-}
-```
-
-Our grid of function arguments is a data frame of possible values for `x1`, `x2`, and `data`.
-
-```{r map_plan_covariates}
-covariates <- setdiff(colnames(mtcars), "mpg") # Exclude the response variable.
-args <- t(combn(covariates, 2)) # Take all possible pairs.
-colnames(args) <- c("x1", "x2") # The column names must be the argument names of my_model_fit()
-args <- tibble::as_tibble(args) # Tibbles are so nice.
-args$data <- "mtcars"
-
-args
-```
-
-Each row of `args` corresponds to a call to `my_model_fit()`. To actually write out all those function calls, we use `map_plan()`. 
-
-```{r argsplan}
-map_plan(args, my_model_fit)
-```
-
-We now have a plan, but it has a couple issues.
-
-1. The `data` argument should be a symbol. In other words, we want `my_model_fit(data = mtcars)`, not `my_model_fit(data = "mtcars")`. So we use the [`syms()`](https://rlang.r-lib.org/reference/sym.html) function from the [`rlang`](https://github.com/r-lib/rlang) package turn `args$data` into a list of symbols.
-2. The default argument names are ugly, so we can add a new `"id"` column to `args` (or select one with the `id` argument of `map_plan()`).
-
-```{r mapplanid}
-# Fixes (1)
-args$data <- rlang::syms(args$data)
-
-# Alternative if each element of `args$data` is code with multiple symbols:
-# args$data <- purrr::map(args$data, rlang::parse_expr)
-
-# Fixes (2)
-args$id <- paste0("fit_", args$x1, "_", args$x2)
-
-args
-```
-
-Much better.
-
-```{r mapplanmakesymbols}
-plan <- map_plan(args, my_model_fit)
-plan
-```
-
-We may also want to retain information about the constituent function arguments of each target. With `map_plan(trace = TRUE)`, we can append the columns of `args` alongside the usual `"target"` and `"command"` columns of our plan.
-
-```{r mapplantrace}
-map_plan(args, my_model_fit, trace = TRUE)
-```
-
-In any case, we can now fit our models.
-
-```{r map_plan_make}
-make(plan, verbose = 0L)
-```
-
-And inspect the output.
-
-```{r map_plan_readd}
-readd(fit_cyl_disp)
-```
-
-### Wildcard templating
-
-In `drake`, you can write plans with wildcards. These wildcards are placeholders for text in commands. By iterating over the possible values of a wildcard, you can easily generate plans with thousands of targets. Let's say you are running a simulation study, and you need to generate sets of random numbers from different distributions.
-
-
-```{r evaluteplan1}
-plan <- drake_plan(
-  t  = rt(1000, df = 5),
-  normal = runif(1000, mean = 0, sd = 1)
-)
-```
-
-If you need to generate many datasets with different means, you may wish to write out each target individually.
-
-```{r evaluteplan2, eval = FALSE}
-drake_plan(
-  t  = rt(1000, df = 5),
-  normal_0 = runif(1000, mean = 0, sd = 1),
-  normal_1 = runif(1000, mean = 1, sd = 1),
-  normal_2 = runif(1000, mean = 2, sd = 1),
-  normal_3 = runif(1000, mean = 3, sd = 1),
-  normal_4 = runif(1000, mean = 4, sd = 1),
-  normal_5 = runif(1000, mean = 5, sd = 1),
-  normal_6 = runif(1000, mean = 6, sd = 1),
-  normal_7 = runif(1000, mean = 7, sd = 1),
-  normal_8 = runif(1000, mean = 8, sd = 1),
-  normal_9 = runif(1000, mean = 9, sd = 1)
-)
-```
-
-But writing all that code manually is a pain and prone to human error. Instead, use `evaluate_plan()`
-
-```{r evaluateplan3}
-plan <- drake_plan(
-  t  = rt(1000, df = 5),
-  normal = runif(1000, mean = mean__, sd = 1)
-)
-evaluate_plan(plan, wildcard = "mean__", values = 0:9)
-```
-
-You can specify multiple wildcards at once. If multiple wildcards appear in the same command, you will get a new target for each unique combination of values.
-
-```{r evaluateplan4}
-plan <- drake_plan(
-  t  = rt(1000, df = df__),
-  normal = runif(1000, mean = mean__, sd = sd__)
-)
-evaluate_plan(
-  plan,
-  rules = list(
-    mean__ = c(0, 1),
-    sd__ = c(3, 4),
-    df__ = 5:7
-  )
-)
-```
-
-Wildcards for `evaluate_plan()` do not need to have the double-underscore suffix. Any valid symbol will do.
-
-```{r evaluateplan5}
-plan <- drake_plan(
-  t  = rt(1000, df = .DF.),
-  normal = runif(1000, mean = `{MEAN}`, sd = ..sd)
-)
-evaluate_plan(
-  plan,
-  rules = list(
-    "`{MEAN}`" = c(0, 1),
-    ..sd = c(3, 4),
-    .DF. = 5:7
-  )
-)
-```
-
-Set `expand` to `FALSE` to disable expansion.
-
-```{r noexpand}
-plan <- drake_plan(
-  t  = rpois(samples__, lambda = mean__),
-  normal = runif(samples__, mean = mean__)
-)
-evaluate_plan(
-  plan,
-  rules = list(
-    samples__ = c(50, 100),
-    mean__ = c(1, 5)
-  ),
-  expand = FALSE
-)
-```
-
-Wildcard templating can sometimes be tricky. For example, suppose your project is to analyze school data, and your workflow checks several metrics of several schools. The idea is to write a `drake` plan with your metrics and let the wildcard templating expand over the available schools.
-
-```{r schoolswildcards1}
-hard_plan <- drake_plan(
-  credits = check_credit_hours(school__),
-  students = check_students(school__),
-  grads = check_graduations(school__),
-  public_funds = check_public_funding(school__)
-)
-
-evaluate_plan(
-  hard_plan,
-  rules = list(school__ = c("schoolA", "schoolB", "schoolC"))
-)
-```
-
-But what if some metrics do not make sense? For example, what if `schoolC` is a completely privately-funded school? With no public funds, `check_public_funds(schoolC)` may quit in error if we are not careful. This is where setting up `drake` plans requires a little creativity. In this case, we recommend that you use two wildcards: one for all the schools and another for just the public schools. The new plan has no twelfth row.
-
-```{r schoolsplanfinal}
-plan_template <- drake_plan(
-  school = get_school_data("school__"),
-  credits = check_credit_hours(all_schools__),
-  students = check_students(all_schools__),
-  grads = check_graduations(all_schools__),
-  public_funds = check_public_funding(public_schools__)
-)
-evaluate_plan(
-  plan = plan_template,
-  rules = list(
-    school__ = c("A", "B", "C"),
-    all_schools__ =  c("school_A", "school_B", "school_C"),
-    public_schools__ = c("school_A", "school_B")
-  )
-)
-```
-
-Thanks to [Alex Axthelm](https://github.com/AlexAxthelm) for this use case in [issue 235](https://github.com/ropensci/drake/issues/235).
-
-
-### Wildcard clusters
-
-With `evaluate_plan(trace = TRUE)`, you can generate columns that show how the targets were generated from the wildcards.
-
-```{r trace1}
-plan_template <- drake_plan(
-  school = get_school_data("school__"),
-  credits = check_credit_hours(all_schools__),
-  students = check_students(all_schools__),
-  grads = check_graduations(all_schools__),
-  public_funds = check_public_funding(public_schools__)
-)
-plan <- evaluate_plan(
-  plan = plan_template,
-  rules = list(
-    school__ = c("A", "B", "C"),
-    all_schools__ =  c("school_A", "school_B", "school_C"),
-    public_schools__ = c("school_A", "school_B")
-  ),
-  trace = TRUE
-)
-plan
-```
-
-And then when you visualize the dependency graph, you can cluster nodes based on the wildcard info.
-
-```{r tracevis1hide, echo = FALSE}
-check_credit_hours <- check_students <- check_graduations <-
-  check_public_funding <- get_school_data <- function(){}
-```
-
-```{r tracevisplans1}
-config <- drake_config(plan)
-vis_drake_graph(
-  config,
-  group = "all_schools__",
-  clusters = c("school_A", "school_B", "school_C")
-)
-```
-
-See the [visualization guide](#visuals) for more details.
-
-### Non-wildcard functions
-
-#### `expand_plan()`
-
-Sometimes, you just want multiple replicates of the same targets.
-
-```{r expandplan}
-plan <- drake_plan(
-  fake_data = simulate_from_model(),
-  bootstrapped_data = bootstrap_from_real_data(real_data)
-)
-expand_plan(plan, values = 1:3)
-```
-
-
-#### `gather_plan()` and `gather_by()`
-
-Other times, you want to combine multiple targets into one. 
-
-```{r gather1}
-plan <- drake_plan(
-  small = data.frame(type = "small", x = rnorm(25), y = rnorm(25)),
-  large = data.frame(type = "large", x = rnorm(1000), y = rnorm(1000))
-)
-gather_plan(plan, target = "combined")
-```
-
-In this case, `small` and `large` are data frames, so it may be more convenient to combine the rows together.
-
-```{r gather2}
-gather_plan(plan, target = "combined", gather = "rbind")
-```
-
-See also `gather_by()` to gather multiple groups of targets based on other columns in the plan (e.g. from `evaluate_plan(trace = TRUE)`).
-
-#### `reduce_plan()` and `reduce_by()`
-
-`reduce_plan()` is similar to `gather_plan()`, but it allows you to combine multiple targets together in pairs. This is useful if combining everything at once requires too much time or computer memory, or if you want to parallelize the aggregation.
-
-```{r reduceplan}
-plan <- drake_plan(
-  a = 1,
-  b = 2,
-  c = 3,
-  d = 4
-)
-reduce_plan(plan)
-```
-
-You can control how each pair of targets gets combined.
-
-```{r reduceplan2}
-reduce_plan(plan, begin = "c(", op = ", ", end = ")")
-```
-
-See also `reduce_by()` to do reductions on multiple groups of targets based on other columns in the plan (e.g. from `evaluate_plan(trace = TRUE)`).
-
-### Custom metaprogramming
-
-The `drake` plan is just a data frame. There is nothing magic about it, and you can create it any way you want. With your own custom metaprogramming, you don't even need the `drake_plan()` function.
-
-The following example could more easily be implemented with `map_plan()`, but we use other techniques to demonstrate the versatility of custom metaprogramming. Let's consider a file-based example workflow. Here, our targets execute Linux commands to process input files and create output files.
-
-<pre><code>cat in1.txt > out1.txt
-cat in2.txt > out2.txt
-</code></pre>
-
-The [`glue`](https://github.com/tidyverse/glue) package can automatically generate these Linux commands.
-
-```{r systemcmdglue}
-library(glue)
-glue_data(
-  list(
-    inputs = c("in1.txt", "in2.txt"), 
-    outputs = c("out1.txt", "out2.txt")
-  ),
-  "cat {inputs} > {outputs}"
-)
-```
-
-Our `drake` commands will use `system()` to execute the Linux commands that [`glue`](https://github.com/tidyverse/glue) generates. Technically, we could use `drake_plan()` if we wanted.
-
-```{r hypotheticaldrakeplan}
-library(tidyverse)
-drake_plan(
-  glue_data(
-    list(
-      inputs = file_in(c("in1.txt", "in2.txt")), 
-      outputs = file_out(c("out1.txt", "out2.txt"))
-    ),
-    "cat {inputs} > {outputs}"
-  ) %>%
-    lapply(FUN = system)
-)
-```
-
-But what if we want to *generate* these [`glue`](https://github.com/tidyverse/glue) commands instead of writing them literally in our plan? This is a job for custom metaprogramming with [tidy evaluation](https://www.youtube.com/watch?v=nERXS3ssntw). First, we create a function to generate the `drake` command of an arbitrary target.
-
-```{r tidyevalplan1}
-library(rlang) # for tidy evaluation
-write_command <- function(cmd, inputs = NULL , outputs = NULL){
-  inputs <- enexpr(inputs)
-  outputs <- enexpr(outputs)
-  expr({
-    glue_data(
-      list(
-        inputs = file_in(!!inputs),
-        outputs = file_out(!!outputs)
-      ),
-      !!cmd
-    ) %>%
-      lapply(FUN = system)
-  }) %>%
-    expr_text
-}
-
-write_command(
-  cmd = "cat {inputs} > {outputs}",
-  inputs = c("in1.txt", "in2.txt"),
-  outputs = c("out1.txt", "out2.txt")
-) %>%
-  cat
-```
-
-Then, we lay out all the arguments we will pass to `write_command()`. Here, each row corresponds to a separate target.
-
-```{r tidyevalplan2}
-meta_plan <- tribble(
-  ~cmd, ~inputs, ~outputs,
-  "cat {inputs} > {outputs}", c("in1.txt", "in2.txt"), c("out1.txt", "out2.txt"),
-  "cat {inputs} {inputs} > {outputs}", c("out1.txt", "out2.txt"), c("out3.txt", "out4.txt")
-) %>%
-  print
-```
-
-Finally, we create our `drake` plan without any built-in `drake` functions.
-
-```{r tidyevalplan3}
-plan <- tibble(
-  target = paste0("target_", seq_len(nrow(meta_plan))),
-  command = pmap_chr(meta_plan, write_command)
-) %>%
-  print
-writeLines("in1", "in1.txt")
-writeLines("in2", "in2.txt")
-vis_drake_graph(drake_config(plan))
-```
-
-Alternatively, you could use `as.call()` instead of tidy evaluation to generate your plan. Use `as.call()` to construct calls to `file_in()`, `file_out()`, and custom functions in your commands.
-
-```{r alternativenontidyplan4}
-library(purrr) # pmap_chr() is particularly useful here.
-
-# A function that will be called in your commands.
-command_function <- function(cmd, inputs, outputs){
-  glue_data(
-    list(
-      inputs = inputs,
-      outputs = outputs
-    ),
-    cmd
-  ) %>%
-    purrr::walk(system)
-}
-
-# A function to generate quoted calls to command_function(),
-# which in turn contain quoted calls to file_in() and file_out().
-write_command <- function(...){
-  args <- list(...)
-  args$inputs <- as.call(list(quote(file_in), args$inputs))
-  args$outputs <- as.call(list(quote(file_out), args$outputs))
-  c(quote(command_function), args) %>%
-    as.call() %>%
-    rlang::expr_text()
-}
-
-plan <- tibble(
-  target = paste0("target_", seq_len(nrow(meta_plan))),
-  command = pmap_chr(meta_plan, write_command)
-) %>%
-  print
-```
-
-Metaprogramming gets much simpler if you do not need to construct literal calls to `file_in()`, `file_out()`, etc. in your commands. The construction of `model_plan` in the [gross state product exmaple](#gsp) is an example.
-
-Thanks to [Chris Hammill](https://github.com/cfhammill) for [presenting this scenario and contributing to the solution](https://github.com/ropensci/drake/issues/451).
+`drake` provides several older utility that increase the flexibility of plan creation. They may go away at some point in the future, they are still officially supported at this point.
+
+- [`map_plan()`](https://ropensci.github.io/drake/reference/map_plan.html)
+- [`evaluate_plan()`](https://ropensci.github.io/drake/reference/evaluate_plan.html)
+- [`expand_plan()`](https://ropensci.github.io/drake/reference/expand_plan.html)
+- [`gather_by()`](https://ropensci.github.io/drake/reference/gather_by.html)
+- [`reduce_by()`](https://ropensci.github.io/drake/reference/reduce_by.html)
+- [`gather_plan()`](https://ropensci.github.io/drake/reference/gather_plan.html)
+- [`reduce_plan()`](https://ropensci.github.io/drake/reference/reduce_plan.html)
