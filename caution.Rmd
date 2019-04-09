@@ -1,16 +1,18 @@
 # Cautionary notes {#caution}
 
-```{r cautionstart11, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(magrittr)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+```{r caution_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   error = TRUE,
   warning = TRUE
 )
+```
+
+```{r caution_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(magrittr)
 ```
 
 This chapter addresses `drake`'s known edge cases, pitfalls, and weaknesses that might not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the [issue tracker](https://github.com/ropensci/drake/issues), where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version of `drake`. For a guide to debugging and testing `drake` projects, please refer to the separate [guide to debugging and testing drake projects](#debug).
@@ -378,8 +380,3 @@ The [storage guide](#store) describes how storage works in `drake`. As explained
 ### Runtime predictions
 
 In `predict_runtime()` and `rate_limiting_times()`, `drake` only accounts for the targets with logged build times. If some targets have not been timed, `drake` throws a warning and prints the untimed targets.
-
-```{r rmfiles_caution11, echo = FALSE}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
-```

@@ -1,19 +1,12 @@
 # Storage {#store}
 
-```{r suppression10, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "Makefile", "report.Rmd", "shell.sh",
-    "STDIN.o*", "Thumbs.db",
-    "faster_cache", "my_storr",
-    "database-file.sqlite", ".drake",
-    "report.md", "log.txt"
-  ),
-  recursive = TRUE
-)
+```{r store_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r store_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
 ```
 
 When you run `make()`, `drake` stores your targets in a cache.
@@ -21,7 +14,7 @@ When you run `make()`, `drake` stores your targets in a cache.
 ```{r mtcars_storage}
 library(drake)
 load_mtcars_example() # Get the code with drake_example("mtcars").
-make(my_plan, verbose = FALSE)
+make(my_plan, verbose = 0L)
 ```
 
 The default cache is a hidden `.drake` folder. 
@@ -99,7 +92,7 @@ cache2$destroy()
 By default, `drake` uses `storr_rds()` caches because they allow `make(jobs = 4)` to safely store multiple targets in parallel. To achieve this thread safety, however, [`storr`](https://github.com/richfitz/storr) splits up the data into a pool of tiny cryptically-named files.
 
 ```{r rdsinternals}
-make(my_plan, verbose = FALSE)
+make(my_plan, verbose = 0L)
 head(list.files(".drake/data"))
 head(list.files(".drake/keys/objects"))
 ```
@@ -122,7 +115,7 @@ It is possible use a single SQLite database file as the cache.
 ```{r databaseinit}
 mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
 cache <- storr::storr_dbi("datatable", "keystable", mydb)
-make(my_plan, cache = cache, verbose = FALSE)
+make(my_plan, cache = cache, verbose = 0L)
 loadd(small, cache = cache)
 head(small)
 ```
@@ -178,16 +171,4 @@ For `drake`, the default hash algorithm is `xxhash64`. You can choose different 
 ```{r cachehashoptions, eval = FALSE}
 cache3 <- new_cache("cache_3_path", hash_algorithm = "murmur32")
 cache4 <- storr_rds("cache_4_path", hash_algorithm = "crc32")
-```
-
-```{r cleanup_storage, echo = FALSE}
-unlink(
-  c(
-    "main", "Makefile", "report.Rmd",
-    "shell.sh", "STDIN.o*", "Thumbs.db",
-    "database-file.sqlite", ".drake",
-    "report.md", "log.txt"
-  ),
-  recursive = TRUE
-)
 ```

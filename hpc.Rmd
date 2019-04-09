@@ -1,12 +1,14 @@
 # High-performance computing {#hpc}
 
-```{r suppression08, echo = FALSE}
-suppressMessages(suppressWarnings(library(future)))
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(dplyr)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+```{r hpc_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r hpc_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(future)
+library(drake)
+library(dplyr)
 ```
 
 This chapter provides guidance on time-consuming `drake` workflows and high-level parallel computation.
@@ -460,13 +462,3 @@ This feature is very advanced, and you should only attempt it in production if y
 ### Hasty mode
 
 The [`drake.hasty`](https://github.com/wlandau/drake.hasty) package is a bare-bones experimental spin-off of `drake`. It sacrifices reproducibility to aggressively boost speed when scheduling and executing your targets. It is not recommended for most serious production use cases, but it can useful for experimentation.
-
-```{r endoflinehpc, echo = FALSE}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "Makefile", "report.Rmd", "shell.sh",
-    "STDIN.o*", "Thumbs.db", "raw_data.xlsx"
-  )
-)
-```

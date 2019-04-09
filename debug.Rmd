@@ -1,16 +1,18 @@
 # Debugging and testing drake projects {#debug}
 
-```{r debugstart, echo = F}
-suppressMessages(suppressWarnings(library(drake)))
-suppressMessages(suppressWarnings(library(tidyverse)))
-clean(destroy = TRUE, verbose = FALSE)
-unlink(c("Makefile", "report.Rmd", "shell.sh", "STDIN.o*", "Thumbs.db"))
+```{r debug_setup, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   error = TRUE,
   warning = TRUE
 )
+```
+
+```{r debug_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(tidyverse)
 ```
 
 This chapter is a guide to debugging and testing `drake` projects.
@@ -166,10 +168,10 @@ withr::with_message_sink(
   make(bad_plan)
 )
 
-failed(verbose = FALSE) # from the last make() only
+failed(verbose = 0L) # from the last make() only
 
 # See also warnings and messages.
-error <- diagnose(my_target, verbose = FALSE)$error
+error <- diagnose(my_target, verbose = 0L)$error
 
 error$message
 
@@ -229,7 +231,7 @@ readd(my_target)
 See the `elapsed`, `cpu`, and `retries` argument to `make()`.
 
 ```{r timeoutretry}
-clean(verbose = FALSE)
+clean(verbose = 0L)
 f <- function(...){
   Sys.sleep(1)
 }
@@ -244,8 +246,8 @@ withr::with_message_sink(
 
 To tailor these settings to each individual target, create new `elapsed`, `cpu`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
 
-```{r timeoutretry2}
-clean(verbose = FALSE)
+```{r message = FALSE, warning = FALSE, timeoutretry2}
+clean(verbose = 0L)
 debug_plan$elapsed <- c(1e-3, 2e-3)
 debug_plan$retries <- 1:2
 
@@ -260,14 +262,3 @@ withr::with_message_sink(
 ## More help
 
 Please also see the [compendium of cautionary notes](#caution), which addresses `drake`'s known edge cases, pitfalls, and weaknesses that may or may not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the [issue tracker](https://github.com/ropensci/drake/issues), where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version.
-
-```{r endofline_debug, echo = FALSE}
-clean(destroy = TRUE, verbose = FALSE)
-unlink(
-  c(
-    "main", "Makefile", "report.Rmd", "raw_data.xlsx",
-    "shell.sh", "STDIN.o*", "Thumbs.db", "*.txt"
-  ),
-  recursive = TRUE
-)
-```
