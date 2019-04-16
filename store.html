@@ -416,13 +416,13 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 <p>Functions <code>get_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>(<span class="dt">path =</span> <span class="kw">getwd</span>()) <span class="co"># root or subdirectory of a drake project</span>
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpj6QBDl/file387e62f63dda/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpWGAxLZ/file35c641114b6b/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># actual cache folder</span>
 
 cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)
 cache2<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpj6QBDl/file387e62f63dda/my_new_cache&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpWGAxLZ/file35c641114b6b/my_new_cache&quot;</span></code></pre>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2<span class="op">$</span><span class="kw">list</span>()
 <span class="co">#&gt; character(0)</span>
@@ -451,8 +451,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-<span class="co">#&gt; [1] &quot;03ca90a625660402.rds&quot; &quot;065f93613f1cb914.rds&quot; &quot;132205c13f9d0fb6.rds&quot;</span>
-<span class="co">#&gt; [4] &quot;19662e773d3dc843.rds&quot; &quot;1baabd0ead4f37c9.rds&quot; &quot;21935c86f12692e2.rds&quot;</span>
+<span class="co">#&gt; [1] &quot;01c1ecc2cf720aa3.rds&quot; &quot;065f93613f1cb914.rds&quot; &quot;0b847dea1aefcbc1.rds&quot;</span>
+<span class="co">#&gt; [4] &quot;112f6417f37915f4.rds&quot; &quot;136fe22eb9b87c29.rds&quot; &quot;1e3be61162eef60b.rds&quot;</span>
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span>
 <span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span>
