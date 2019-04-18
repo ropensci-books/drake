@@ -7,6 +7,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 ```{r store_setup2, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
+library(tidyverse)
 ```
 
 When you run `make()`, `drake` stores your targets in a cache.
@@ -99,11 +100,12 @@ head(list.files(".drake/keys/objects"))
 
 This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to work with database cashes as the next section describes.
 
-Alternatively, you can track changes in a cache log file with fingerprints of all your targets.
+Alternatively, you can track changes in a cache log with fingerprints of all your targets.
 
 ```{r cachelogfile}
-drake_cache_log_file("log.txt")
-cat(head(readLines("log.txt")), sep = "\n")
+drake_cache_log()
+make(my_plan, verbose = 0L, cache_log_file = TRUE)
+read_csv("drake_cache.csv", col_types = cols())
 ```
 
 Use the `cache_log_file` argument of `make()` to refresh the cache log file every time you run `make()`. Then, if you put this file under version control (e.g. with git/GitHub) then the commit history will tell you how your data objects change over time.
