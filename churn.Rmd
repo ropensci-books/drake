@@ -1,0 +1,419 @@
+# Customer churn and deep learning {#churn}
+
+```{r plans_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(glue)
+library(purrr)
+library(rlang)
+library(tidyverse)
+tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
+```
+
+
+```{r setup, include = FALSE}
+library(drake)
+library(keras)
+library(tidyverse)
+library(rsample)
+library(recipes)
+library(yardstick)
+options(
+  drake_make_menu = FALSE,
+  drake_clean_menu = FALSE,
+  warnPartialMatchArgs = FALSE,
+  crayon.enabled = FALSE,
+  readr.show_progress = FALSE
+)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+```
+
+```{r get_churn_data, include = FALSE}
+invisible(drake_example("customer-churn-fast", overwrite = TRUE))
+invisible(file.copy("customer-churn-fast/data/customer_churn.csv", ".", overwrite = TRUE))
+```
+
+[`drake`](https://github.com/ropensci/drake) is intended for projects with long runtimes, and a major use case is deep learning. This chapter demonstrates how to leverage [`drake`](https://github.com/ropensci/drake) to manage a deep learning workflow. The original example comes from a [blog post by Matt Dancho](https://blogs.rstudio.com/tensorflow/posts/2018-01-11-keras-customer-churn/), and the chapter's content itself comes directly from [this R notebook](https://github.com/sol-eng/tensorflow-w-r/blob/master/workflow/tensorflow-drake.Rmd), part of an [RStudio Solutions Engineering example demonstrating TensorFlow in R](https://github.com/sol-eng/tensorflow-w-r). The notebook is modified and redistributed under the terms of the [Apache 2.0 license](https://github.com/sol-eng/tensorflow-w-r/blob/master/LICENSE), copyright RStudio ([details here](https://github.com/ropenscilabs/drake-manual/blob/master/COPYRIGHT)).
+
+## Packages
+
+First, we load our packages into a fresh R session.
+
+```{r}
+library(drake)
+library(keras)
+library(tidyverse)
+library(rsample)
+library(recipes)
+library(yardstick)
+```
+
+## Functions
+
+[`drake`](https://github.com/ropensci/drake) is R-focused and function-oriented. We create functions to [preprocess the data](https://github.com/tidymodels/recipes),
+
+```{r}
+prepare_recipe <- function(data) {
+  data %>%
+    training() %>%
+    recipe(Churn ~ .) %>%
+    step_rm(customerID) %>%
+    step_naomit(all_outcomes(), all_predictors()) %>%
+    step_discretize(tenure, options = list(cuts = 6)) %>%
+    step_log(TotalCharges) %>%
+    step_mutate(Churn = ifelse(Churn == "Yes", 1, 0)) %>%
+    step_dummy(all_nominal(), -all_outcomes()) %>%
+    step_center(all_predictors(), -all_outcomes()) %>%
+    step_scale(all_predictors(), -all_outcomes()) %>%
+    prep()
+}
+```
+
+define a [`keras`](https://github.com/rstudio/keras) model,
+
+```{r}
+define_model <- function(rec) {
+  input_shape <- ncol(
+    juice(rec, all_predictors(), composition = "matrix")
+  )
+  keras_model_sequential() %>%
+    layer_dense(
+      units = 16,
+      kernel_initializer = "uniform",
+      activation = "relu",
+      input_shape = input_shape
+    ) %>%
+    layer_dropout(rate = 0.1) %>%
+    layer_dense(
+      units = 16,
+      kernel_initializer = "uniform",
+      activation = "relu"
+    ) %>%
+    layer_dropout(rate = 0.1) %>%
+    layer_dense(
+      units = 1,
+      kernel_initializer = "uniform",
+      activation = "sigmoid"
+    )
+}
+```
+
+train and [serialize](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) a model,
+
+
+```{r}
+train_model <- function(data, rec, batch_size) {
+  model <- define_model(rec)
+  compile(
+    model,
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+  x_train_tbl <- juice(
+    rec,
+    all_predictors(),
+    composition = "matrix"
+  )
+  y_train_vec <- juice(rec, all_outcomes()) %>%
+    pull()
+  fit(
+    object = model,
+    x = x_train_tbl,
+    y = y_train_vec,
+    batch_size = batch_size,
+    epochs = 35,
+    validation_split = 0.30,
+    verbose = 0
+  )
+  serialize_model(model)
+}
+```
+
+compare the predictions of a [serialized](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) model against reality,
+
+```{r}
+confusion_matrix <- function(data, rec, serialized_model) {
+  model <- unserialize_model(serialized_model)
+  testing_data <- bake(rec, testing(data))
+  x_test_tbl <- testing_data %>%
+    select(-Churn) %>%
+    as.matrix()
+  y_test_vec <- testing_data %>%
+    select(Churn) %>%
+    pull()
+  yhat_keras_class_vec <- model %>%
+    predict_classes(x_test_tbl) %>%
+    as.factor() %>%
+    fct_recode(yes = "1", no = "0")
+  yhat_keras_prob_vec <-
+    model %>%
+    predict_proba(x_test_tbl) %>%
+    as.vector()
+  test_truth <- y_test_vec %>%
+    as.factor() %>%
+    fct_recode(yes = "1", no = "0")
+  estimates_keras_tbl <- tibble(
+    truth = test_truth,
+    estimate = yhat_keras_class_vec,
+    class_prob = yhat_keras_prob_vec
+  )
+  estimates_keras_tbl %>%
+    conf_mat(truth, estimate)
+}
+```
+
+and compare the performance of multiple models. 
+
+```{r}
+compare_models <- function(...) {
+  batch_sizes <- match.call()[-1] %>%
+    as.character() %>%
+    gsub(pattern = "conf_", replacement = "")
+  df <- map_df(list(...), summary) %>%
+    filter(.metric %in% c("accuracy", "sens", "spec")) %>%
+    mutate(
+      batch_size = rep(batch_sizes, each = n() / length(batch_sizes))
+    ) %>%
+    rename(metric = .metric, estimate = .estimate)
+  ggplot(df) +
+    geom_line(
+      aes(x = metric, y = estimate, color = batch_size, group = batch_size)
+    ) +
+    theme_gray(16)
+}
+```
+
+## Plan
+
+Next, we define our workflow in a [`drake` plan](https://ropenscilabs.github.io/drake-manual/plans.html). We will prepare the data, train different models with different batch sizes, and compare the models in terms of performance. 
+
+```{r}
+batch_sizes <- c(16, 32)
+
+plan <- drake_plan(
+  data = read_csv(file_in("customer_churn.csv"), col_types = cols()) %>%
+    initial_split(prop = 0.3),
+  rec = prepare_recipe(data),
+  model = target(
+    train_model(data, rec, batch_size),
+    transform = map(batch_size = !!batch_sizes)
+  ),
+  conf = target(
+    confusion_matrix(data, rec, model),
+    transform = map(model, .id = batch_size)
+  ),
+  comparison = target(
+    compare_models(conf),
+    transform = combine(conf)
+  )
+)
+```
+
+The plan is a data frame with the steps we are going to do.
+
+```{r, paged.print = FALSE, warning = FALSE}
+plan
+```
+
+## Dependency graph
+
+The graph visualizes the dependency relationships among the steps of the workflow.
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+## Run the models
+
+Call [`make()`](https://ropensci.github.io/drake/reference/make.html) to actually run the workflow.
+
+```{r}
+make(plan)
+```
+
+## Inspect the results
+
+The two models performed about the same.
+
+```{r}
+readd(comparison) # see also loadd()
+```
+
+## Add models
+
+Let's try another batch size.
+
+```{r}
+batch_sizes <- c(16, 32, 64)
+
+plan <- drake_plan(
+  data = read_csv(file_in("customer_churn.csv"), col_types = cols()) %>%
+    initial_split(prop = 0.3),
+  rec = prepare_recipe(data),
+  model = target(
+    train_model(data, rec, batch_size),
+    transform = map(batch_size = !!batch_sizes)
+  ),
+  conf = target(
+    confusion_matrix(data, rec, model),
+    transform = map(model, .id = batch_size)
+  ),
+  comparison = target(
+    compare_models(conf),
+    transform = combine(conf)
+  )
+)
+```
+
+We already trained models with batch sizes 16 and 32, and their dependencies have not changed, so some of our work is already up to date.
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config) # see also outdated() and predict_runtime()
+```
+
+[`make()`](https://ropensci.github.io/drake/reference/make.html) only trains the outdated or missing models and refreshes the post-processing. It skips the targets that are already up to date.
+
+
+```{r}
+make(plan)
+```
+
+## Inspect the results again
+
+```{r}
+readd(comparison) # see also loadd()
+```
+
+Going forward, we can turn our attention to different tuning parameters and try to improve specificity.
+
+## Increasing efficiency
+
+Due to [the technical details of `drake`'s storage system](https://github.com/richfitz/storr/issues/77#issuecomment-476275570), the above workflow serializes each Keras model twice, which could prove inefficient for large models. If it takes a long time to save your models, you may wish to store them in their own special [HDF5](https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file) files. This approach adds some cumbersome bookkeeping, but `make()` should run faster. We need to rewrite our functions in terms of [`save_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html) and [`load_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html).
+
+```{r}
+# We add a new model_file argument.
+train_model <- function(data, rec, batch_size, model_file) {
+  model <- define_model(rec)
+  compile(
+    model,
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+  x_train_tbl <- juice(
+    rec,
+    all_predictors(),
+    composition = "matrix"
+  )
+  y_train_vec <- juice(rec, all_outcomes()) %>%
+    pull()
+  history <- fit(
+    object = model,
+    x = x_train_tbl,
+    y = y_train_vec,
+    batch_size = batch_size,
+    epochs = 35,
+    validation_split = 0.30,
+    verbose = 0
+  )
+  
+  # Instead of calling serialize_model(), we save the model to a file.
+  save_model_hdf5(model, model_file)
+  
+  # As an added bonus, we can now return the history from the function.
+  history
+}
+
+# Again, we need a model_file argument.
+confusion_matrix <- function(data, rec, model_file) {
+  # Instead of calling unserialize_model(),
+  # we load the model from the HDF5 file.
+  model <- load_model_hdf5(model_file)
+
+  testing_data <- bake(rec, testing(data))
+  x_test_tbl <- testing_data %>%
+    select(-Churn) %>%
+    as.matrix()
+  y_test_vec <- testing_data %>%
+    select(Churn) %>%
+    pull()
+  yhat_keras_class_vec <- model %>%
+    predict_classes(x_test_tbl) %>%
+    as.factor() %>%
+    fct_recode(yes = "1", no = "0")
+  yhat_keras_prob_vec <-
+    model %>%
+    predict_proba(x_test_tbl) %>%
+    as.vector()
+  test_truth <- y_test_vec %>%
+    as.factor() %>%
+    fct_recode(yes = "1", no = "0")
+  estimates_keras_tbl <- tibble(
+    truth = test_truth,
+    estimate = yhat_keras_class_vec,
+    class_prob = yhat_keras_prob_vec
+  )
+  estimates_keras_tbl %>%
+    conf_mat(truth, estimate)
+}
+```
+
+And we need a new plan that tracks the model files using [`file_in()`](https://ropensci.github.io/drake/reference/file_in.html) and [`file_out()`](https://ropensci.github.io/drake/reference/file_out.html).
+
+```{r}
+batch_sizes <- c(16, 32, 64)
+model_files <- paste0("model_", batch_sizes, ".h5")
+
+plan <- drake_plan(
+  data = read_csv(file_in("customer_churn.csv"), col_types = cols()) %>%
+    initial_split(prop = 0.3),
+  rec = prepare_recipe(data),
+  history = target(
+    train_model(data, rec, batch_size, file_out(model_file)),
+    transform = map(
+      batch_size = !!batch_sizes,
+      model_file = !!model_files,
+      .id = batch_size
+    )
+  ),
+  conf = target(
+    confusion_matrix(data, rec, file_in(model_file)),
+    transform = map(model_file, .id = batch_size)
+  ),
+  comparison = target(
+    compare_models(conf),
+    transform = combine(conf)
+  )
+)
+```
+
+`drake` still resolves the correct dependency relationships, but because of the changes to our functions and plan, our models and downstream results are no longer up to date.
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+Another advantage of this more complicated approach is that we can now view model histories.
+
+```{r}
+make(plan)
+
+plot(readd(history_16))
+```
+
+## Tips
+
+- To see this workflow [organized as a collection of modular  scripts](https://ropenscilabs.github.io/drake-manual/projects.html), see the customer churn examples in [this repository](https://github.com/wlandau/drake-examples). You can download the code with `drake_example("customer-churn-simple")` and `drake_example("customer-churn-fast")`.
+- [`drake`](https://github.com/ropensci/drake) has [built-in distributed computing support](https://ropenscilabs.github.io/drake-manual/hpc.html) that lets you fit multiple models in parallel.
+
+```{r, echo = FALSE}
+clean(destroy = TRUE)
+unlink(model_files)
+```
