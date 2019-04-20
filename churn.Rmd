@@ -1,6 +1,6 @@
 # Customer churn and deep learning {#churn}
 
-```{r plans_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r plans_setup_keras, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(glue)
 library(purrr)
@@ -10,7 +10,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 ```
 
 
-```{r setup, include = FALSE}
+```{r setup_keras, include = FALSE}
 library(drake)
 library(keras)
 library(tidyverse)
@@ -42,7 +42,7 @@ invisible(file.copy("customer-churn-fast/data/customer_churn.csv", ".", overwrit
 
 First, we load our packages into a fresh R session.
 
-```{r}
+```{r, keraspkgs}
 library(drake)
 library(keras)
 library(tidyverse)
@@ -74,7 +74,7 @@ prepare_recipe <- function(data) {
 
 define a [`keras`](https://github.com/rstudio/keras) model,
 
-```{r}
+```{r, kerasmodel}
 define_model <- function(rec) {
   input_shape <- ncol(
     juice(rec, all_predictors(), composition = "matrix")
@@ -104,7 +104,7 @@ define_model <- function(rec) {
 train and [serialize](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) a model,
 
 
-```{r}
+```{r, kerastrain}
 train_model <- function(data, rec, batch_size) {
   model <- define_model(rec)
   compile(
@@ -135,7 +135,7 @@ train_model <- function(data, rec, batch_size) {
 
 compare the predictions of a [serialized](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) model against reality,
 
-```{r}
+```{r, kerasconf}
 confusion_matrix <- function(data, rec, serialized_model) {
   model <- unserialize_model(serialized_model)
   testing_data <- bake(rec, testing(data))
@@ -168,7 +168,7 @@ confusion_matrix <- function(data, rec, serialized_model) {
 
 and compare the performance of multiple models. 
 
-```{r}
+```{r, kerascompare}
 compare_models <- function(...) {
   batch_sizes <- match.call()[-1] %>%
     as.character() %>%
@@ -191,7 +191,7 @@ compare_models <- function(...) {
 
 Next, we define our workflow in a [`drake` plan](https://ropenscilabs.github.io/drake-manual/plans.html). We will prepare the data, train different models with different batch sizes, and compare the models in terms of performance. 
 
-```{r}
+```{r, kerasplan1}
 batch_sizes <- c(16, 32)
 
 plan <- drake_plan(
@@ -215,7 +215,7 @@ plan <- drake_plan(
 
 The plan is a data frame with the steps we are going to do.
 
-```{r, paged.print = FALSE, warning = FALSE}
+```{r planpg, paged.print = FALSE, warning = FALSE}
 plan
 ```
 
@@ -223,7 +223,7 @@ plan
 
 The graph visualizes the dependency relationships among the steps of the workflow.
 
-```{r}
+```{r kerasgraph}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
@@ -232,7 +232,7 @@ vis_drake_graph(config)
 
 Call [`make()`](https://ropensci.github.io/drake/reference/make.html) to actually run the workflow.
 
-```{r}
+```{r kerasmake1}
 make(plan)
 ```
 
@@ -240,7 +240,7 @@ make(plan)
 
 The two models performed about the same.
 
-```{r}
+```{r kerasreadcomp}
 readd(comparison) # see also loadd()
 ```
 
@@ -248,7 +248,7 @@ readd(comparison) # see also loadd()
 
 Let's try another batch size.
 
-```{r}
+```{r kerasaddbatchsz}
 batch_sizes <- c(16, 32, 64)
 
 plan <- drake_plan(
@@ -272,7 +272,7 @@ plan <- drake_plan(
 
 We already trained models with batch sizes 16 and 32, and their dependencies have not changed, so some of our work is already up to date.
 
-```{r}
+```{r kerasgraph2}
 config <- drake_config(plan)
 vis_drake_graph(config) # see also outdated() and predict_runtime()
 ```
@@ -280,13 +280,13 @@ vis_drake_graph(config) # see also outdated() and predict_runtime()
 [`make()`](https://ropensci.github.io/drake/reference/make.html) only trains the outdated or missing models and refreshes the post-processing. It skips the targets that are already up to date.
 
 
-```{r}
+```{r kerasmake2}
 make(plan)
 ```
 
 ## Inspect the results again
 
-```{r}
+```{r kerasread2}
 readd(comparison) # see also loadd()
 ```
 
@@ -296,7 +296,7 @@ Going forward, we can turn our attention to different tuning parameters and try 
 
 Due to [the technical details of `drake`'s storage system](https://github.com/richfitz/storr/issues/77#issuecomment-476275570), the above workflow serializes each Keras model twice, which could prove inefficient for large models. If it takes a long time to save your models, you may wish to store them in their own special [HDF5](https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file) files. This approach adds some cumbersome bookkeeping, but `make()` should run faster. We need to rewrite our functions in terms of [`save_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html) and [`load_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html).
 
-```{r}
+```{r kerastrainfile}
 # We add a new model_file argument.
 train_model <- function(data, rec, batch_size, model_file) {
   model <- define_model(rec)
@@ -366,7 +366,7 @@ confusion_matrix <- function(data, rec, model_file) {
 
 And we need a new plan that tracks the model files using [`file_in()`](https://ropensci.github.io/drake/reference/file_in.html) and [`file_out()`](https://ropensci.github.io/drake/reference/file_out.html).
 
-```{r}
+```{r kerasplanfile}
 batch_sizes <- c(16, 32, 64)
 model_files <- paste0("model_", batch_sizes, ".h5")
 
@@ -395,14 +395,14 @@ plan <- drake_plan(
 
 `drake` still resolves the correct dependency relationships, but because of the changes to our functions and plan, our models and downstream results are no longer up to date.
 
-```{r}
+```{r kerasgraphfile}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
 Another advantage of this more complicated approach is that we can now view model histories.
 
-```{r}
+```{r kerasmakefile}
 make(plan)
 
 plot(readd(history_16))
