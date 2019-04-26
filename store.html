@@ -236,6 +236,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.0.1" data-path="visuals.html"><a href="visuals.html#vis_drake_graph"><i class="fa fa-check"></i><b>8.0.1</b> <code>vis_drake_graph()</code></a></li>
 <li class="chapter" data-level="8.0.2" data-path="visuals.html"><a href="visuals.html#sankey_drake_graph"><i class="fa fa-check"></i><b>8.0.2</b> <code>sankey_drake_graph()</code></a></li>
 <li class="chapter" data-level="8.0.3" data-path="visuals.html"><a href="visuals.html#drake_ggraph"><i class="fa fa-check"></i><b>8.0.3</b> <code>drake_ggraph()</code></a></li>
+<li class="chapter" data-level="8.0.4" data-path="visuals.html"><a href="visuals.html#text_drake_graph"><i class="fa fa-check"></i><b>8.0.4</b> <code>text_drake_graph()</code></a></li>
 <li class="chapter" data-level="8.1" data-path="visuals.html"><a href="visuals.html#underlying-graph-data-node-and-edge-data-frames"><i class="fa fa-check"></i><b>8.1</b> Underlying graph data: node and edge data frames</a></li>
 <li class="chapter" data-level="8.2" data-path="visuals.html"><a href="visuals.html#visualizing-target-status"><i class="fa fa-check"></i><b>8.2</b> Visualizing target status</a></li>
 <li class="chapter" data-level="8.3" data-path="visuals.html"><a href="visuals.html#subgraphs"><i class="fa fa-check"></i><b>8.3</b> Subgraphs</a></li>
@@ -419,13 +420,13 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 <p>Functions <code>get_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>(<span class="dt">path =</span> <span class="kw">getwd</span>()) <span class="co"># root or subdirectory of a drake project</span>
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpdfW1KM/file363313839c39/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpppEq9G/file364624c81346/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># actual cache folder</span>
 
 cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)
 cache2<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpdfW1KM/file363313839c39/my_new_cache&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpppEq9G/file364624c81346/my_new_cache&quot;</span></code></pre>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2<span class="op">$</span><span class="kw">list</span>()
 <span class="co">#&gt; character(0)</span>
@@ -454,8 +455,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-<span class="co">#&gt; [1] &quot;065f93613f1cb914.rds&quot; &quot;0ef06daf1ea3a4ff.rds&quot; &quot;14c809bc91562c84.rds&quot;</span>
-<span class="co">#&gt; [4] &quot;18b6e0c84b024e10.rds&quot; &quot;21935c86f12692e2.rds&quot; &quot;2362318068e2692d.rds&quot;</span>
+<span class="co">#&gt; [1] &quot;003b3ecb7059f7d4.rds&quot; &quot;065f93613f1cb914.rds&quot; &quot;0a65061d64fa68f6.rds&quot;</span>
+<span class="co">#&gt; [4] &quot;0ef06daf1ea3a4ff.rds&quot; &quot;1554129b02a4648a.rds&quot; &quot;1db2e4613261d71b.rds&quot;</span>
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span>
 <span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span>
