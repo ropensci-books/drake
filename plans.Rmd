@@ -266,6 +266,90 @@ config2 <- drake_config(plan2)
 vis_drake_graph(config2)
 ```
 
+
+### Start small.
+
+To speed up initial testing and experimentation, you may want to limit the number of extra targets created by the `map()` and `cross()` transformations. Simply set `max_expand` in `drake_plan()`.
+
+```{r max_expand_dsl}
+plan <- drake_plan(
+  data = target(
+    get_data(source),
+    transform = map(source = !!seq_len(25))
+  ),
+  analysis = target(
+    fn(data, param),
+    transform = cross(
+      data,
+      fn = !!letters,
+      param = !!seq_len(25)
+    ),
+  ),
+  result = target(
+    bind_rows(analysis),
+    transform = combine(analysis, .by = fn)
+  ),
+  max_expand = 3
+)
+
+plan
+```
+
+We can more easily inspect the graph to get an idea of the shape of our workflow.
+
+```{r max_expand_dsl2}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+We can even run `make(plan)` and verify that the subset of targets in the plan turn out okay.
+
+```{r max_expand_dsl3, eval = FALSE}
+make(plan)                       # Run the small subset of targets we kept.
+loadd()                          # Load all those targets into memory.
+summary(analysis_z_25L_data_13L) # Look at the values of those targets
+                                 # and decide if we are ready to scale up.
+```
+
+Afterwards, we can scale up to the full collection of targets.
+
+```{r max_expand_dsl4}
+plan <- drake_plan(
+  data = target(
+    get_data(source),
+    transform = map(source = !!seq_len(25))
+  ),
+  analysis = target(
+    fn(data, param),
+    transform = cross(
+      data,
+      fn = !!letters,
+      param = !!seq_len(25)
+    ),
+  ),
+  result = target(
+    bind_rows(analysis),
+    transform = combine(analysis, .by = fn)
+  )
+)
+
+nrow(plan)
+```
+
+The full plan is enormous! Here, `vis_drake_graph()` would be prohibitively slow and eat up too much memory to show anything useful. Good thing we checked the scaled-down version first.
+
+```{r map_expand_dsl5}
+# config <- drake_config(plan) # Takes a long time.
+# vis_drake_graph()            # Takes too much time and too much memory.
+```
+
+
+The next `make()` will skip the targets we ran before in test mode if they are still up to date. In other words, experimenting on a downsized plan gave us a head start.
+
+```{r max_expand_dsl6, eval = FALSE}
+make(plan) # Full scaled-up workflow. Takes much longer.
+```
+
 ### The types of transformations
 
 `drake` supports three types of transformations: `map()`, `cross()`, and `combine()`. These are not actual functions, but you can treat them as functions when you use them in `drake_plan()`. Each transformation takes after a function from the [Tidyverse](https://www.tidyverse.org/).
