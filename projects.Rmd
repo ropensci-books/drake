@@ -3,6 +3,7 @@
 ```{r projects_setup, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(crayon.enabled = FALSE)
 ```
 
 ```{r projects_setup2, message = FALSE, warning = FALSE, echo = FALSE}
@@ -42,7 +43,7 @@ Let's consider the [main example](https://github.com/wlandau/drake-examples/tree
 source("R/packages.R")  # loads packages
 source("R/functions.R") # defines the create_plot() function
 source("R/plan.R")      # creates the drake plan
-# options(clustermq.scheduler = "multicore") # optional parallel computing
+# options(clustermq.scheduler = "multicore") # optional parallel computing. Also needs parallelism = "clustermq"
 make(
   plan, # defined in R/plan.R
   verbose = 2
@@ -97,13 +98,13 @@ Note: this part of `drake` does not inherently focus on your script files. There
 
 ```{r visproj, eval = FALSE}
 # Restart R.
-> interactive()
+interactive()
 #> [1] TRUE
 source("R/packages.R")
 source("R/functions.R")
 source("R/plan.R")
 config <- drake_config(plan)
-vis_drake_graph()
+vis_drake_graph(config)
 ```
 
 ## Safer interactivity
@@ -151,7 +152,7 @@ Here is what happens when you call `r_make()`.
 The purpose of `drake_config()` is to collect and sanitize all the parameters and settings that `make()` needs to do its job. In fact, if you do not set the `config` argument explicitly, then `make()` invokes `drake_config()` behind the scenes. `make(plan, parallelism = "clustermq", jobs = 2, verbose = 6)` is equivalent to
 
 ```{r exconfig, eval = FALSE}
-config <- drake_config(plan, parallelism = "clustermq", jobs = 2, verbose = 6)
+config <- drake_config(plan, verbose = 2)
 make(config = config)
 ```
 
