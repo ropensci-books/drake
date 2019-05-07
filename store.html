@@ -384,12 +384,12 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 
 <span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))
 <span class="co">#&gt;       x    y</span>
-<span class="co">#&gt; 1 5.424 10.4</span>
+<span class="co">#&gt; 1 3.780 15.2</span>
 <span class="co">#&gt; 2 3.440 17.8</span>
-<span class="co">#&gt; 3 3.440 19.2</span>
-<span class="co">#&gt; 4 3.170 15.8</span>
-<span class="co">#&gt; 5 3.730 17.3</span>
-<span class="co">#&gt; 6 3.845 19.2</span></code></pre>
+<span class="co">#&gt; 3 3.215 21.4</span>
+<span class="co">#&gt; 4 3.440 19.2</span>
+<span class="co">#&gt; 5 2.770 19.7</span>
+<span class="co">#&gt; 6 2.465 21.5</span></code></pre>
 <p><code>drake</code> has its own interface on top of <a href="https://github.com/richfitz/storr">storr</a> to make it easier to work with the default <code>.drake/</code> cache. The <code>loadd()</code>, <code>readd()</code>, and <code>cached()</code> functions explore saved targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">cached</span>())
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
@@ -398,35 +398,35 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 
 <span class="kw">head</span>(<span class="kw">readd</span>(small))
 <span class="co">#&gt;       x    y</span>
-<span class="co">#&gt; 1 5.424 10.4</span>
+<span class="co">#&gt; 1 3.780 15.2</span>
 <span class="co">#&gt; 2 3.440 17.8</span>
-<span class="co">#&gt; 3 3.440 19.2</span>
-<span class="co">#&gt; 4 3.170 15.8</span>
-<span class="co">#&gt; 5 3.730 17.3</span>
-<span class="co">#&gt; 6 3.845 19.2</span>
+<span class="co">#&gt; 3 3.215 21.4</span>
+<span class="co">#&gt; 4 3.440 19.2</span>
+<span class="co">#&gt; 5 2.770 19.7</span>
+<span class="co">#&gt; 6 2.465 21.5</span>
 
 <span class="kw">loadd</span>(large)
 
 <span class="kw">head</span>(large)
 <span class="co">#&gt;       x    y</span>
-<span class="co">#&gt; 1 3.170 15.8</span>
-<span class="co">#&gt; 2 5.345 14.7</span>
-<span class="co">#&gt; 3 4.070 16.4</span>
-<span class="co">#&gt; 4 1.615 30.4</span>
-<span class="co">#&gt; 5 3.170 15.8</span>
-<span class="co">#&gt; 6 1.513 30.4</span>
+<span class="co">#&gt; 1 2.140 26.0</span>
+<span class="co">#&gt; 2 3.730 17.3</span>
+<span class="co">#&gt; 3 1.935 27.3</span>
+<span class="co">#&gt; 4 2.780 21.4</span>
+<span class="co">#&gt; 5 2.320 22.8</span>
+<span class="co">#&gt; 6 2.780 21.4</span>
 
 <span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></code></pre>
 <p>Functions <code>get_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">get_cache</span>(<span class="dt">path =</span> <span class="kw">getwd</span>()) <span class="co"># root or subdirectory of a drake project</span>
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpppEq9G/file364624c81346/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpVn0V8f/file4928e6274ff/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># actual cache folder</span>
 
 cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)
 cache2<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpppEq9G/file364624c81346/my_new_cache&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpVn0V8f/file4928e6274ff/my_new_cache&quot;</span></code></pre>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2<span class="op">$</span><span class="kw">list</span>()
 <span class="co">#&gt; character(0)</span>
@@ -443,8 +443,8 @@ cache2<span class="op">$</span><span class="kw">list</span>()
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> plan2, <span class="dt">cache =</span> cache2)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
-<div id="htmlwidget-8d27908a7c387e5c88b8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8d27908a7c387e5c88b8">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.003s","y\n0.003s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-85332d8ffcd4723e094c" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-85332d8ffcd4723e094c">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.002s","y\n0.002s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Destroy caches to remove them from your file system.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache<span class="op">$</span><span class="kw">destroy</span>()
 cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
@@ -455,8 +455,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-<span class="co">#&gt; [1] &quot;003b3ecb7059f7d4.rds&quot; &quot;065f93613f1cb914.rds&quot; &quot;0a65061d64fa68f6.rds&quot;</span>
-<span class="co">#&gt; [4] &quot;0ef06daf1ea3a4ff.rds&quot; &quot;1554129b02a4648a.rds&quot; &quot;1db2e4613261d71b.rds&quot;</span>
+<span class="co">#&gt; [1] &quot;0ef06daf1ea3a4ff.rds&quot; &quot;106a19570cda1c17.rds&quot; &quot;1f3305a3d1c3d5ea.rds&quot;</span>
+<span class="co">#&gt; [4] &quot;216027252a7b462f.rds&quot; &quot;21935c86f12692e2.rds&quot; &quot;24f1b86566e3eed1.rds&quot;</span>
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span>
 <span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span>
@@ -467,14 +467,14 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <span class="co">#&gt; # A tibble: 22 x 3</span>
 <span class="co">#&gt;    hash             type   name                  </span>
 <span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span>
-<span class="co">#&gt;  1 4e6e4d4c0bcda263 target coef_regression1_large</span>
-<span class="co">#&gt;  2 5ad25785a84e0cac target coef_regression1_small</span>
-<span class="co">#&gt;  3 b2662785d55b28c1 target coef_regression2_large</span>
-<span class="co">#&gt;  4 23c66b36be56905b target coef_regression2_small</span>
-<span class="co">#&gt;  5 7b6504d4c0dcceab target large                 </span>
+<span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span>
+<span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span>
+<span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span>
+<span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span>
+<span class="co">#&gt;  5 d87293dd4d012762 target large                 </span>
 <span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span>
 <span class="co">#&gt;  7 7a456ee58df699be import file report.Rmd       </span>
-<span class="co">#&gt;  8 4b64ebf47673af37 target file report.md        </span>
+<span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span>
 <span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span>
 <span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span>
 <span class="co">#&gt; # … with 12 more rows</span>
@@ -483,14 +483,14 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <span class="co">#&gt; # A tibble: 22 x 3</span>
 <span class="co">#&gt;    hash             type   name                  </span>
 <span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span>
-<span class="co">#&gt;  1 4e6e4d4c0bcda263 target coef_regression1_large</span>
-<span class="co">#&gt;  2 5ad25785a84e0cac target coef_regression1_small</span>
-<span class="co">#&gt;  3 b2662785d55b28c1 target coef_regression2_large</span>
-<span class="co">#&gt;  4 23c66b36be56905b target coef_regression2_small</span>
-<span class="co">#&gt;  5 7b6504d4c0dcceab target large                 </span>
+<span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span>
+<span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span>
+<span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span>
+<span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span>
+<span class="co">#&gt;  5 d87293dd4d012762 target large                 </span>
 <span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span>
 <span class="co">#&gt;  7 7a456ee58df699be import file report.Rmd       </span>
-<span class="co">#&gt;  8 4b64ebf47673af37 target file report.md        </span>
+<span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span>
 <span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span>
 <span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span>
 <span class="co">#&gt; # … with 12 more rows</span></code></pre>
@@ -505,12 +505,12 @@ cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="
 <span class="kw">loadd</span>(small, <span class="dt">cache =</span> cache)
 <span class="kw">head</span>(small)
 <span class="co">#&gt;       x    y</span>
-<span class="co">#&gt; 1 5.424 10.4</span>
+<span class="co">#&gt; 1 3.780 15.2</span>
 <span class="co">#&gt; 2 3.440 17.8</span>
-<span class="co">#&gt; 3 3.440 19.2</span>
-<span class="co">#&gt; 4 3.170 15.8</span>
-<span class="co">#&gt; 5 3.730 17.3</span>
-<span class="co">#&gt; 6 3.845 19.2</span></code></pre>
+<span class="co">#&gt; 3 3.215 21.4</span>
+<span class="co">#&gt; 4 3.440 19.2</span>
+<span class="co">#&gt; 5 2.770 19.7</span>
+<span class="co">#&gt; 6 2.465 21.5</span></code></pre>
 <p>But be careful: for safe parallel computing (<code>jobs</code> &gt; 1) there are additional requirements for <code>make()</code>:</p>
 <ol style="list-style-type: decimal">
 <li>Select either <code>parallelism = &quot;clustermq&quot;</code> or <code>parallelism = &quot;future&quot;</code>.</li>
