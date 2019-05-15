@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Debugging and testing drake projects | The drake R Package User Manual</title>
-  <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale.">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
+  <meta name="generator" content="bookdown 0.10 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Debugging and testing drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -22,16 +21,16 @@
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="twitter:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
 
-<meta name="author" content="Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert">
-<meta name="author" content="Copyright Eli Lilly and Company">
+<meta name="author" content="Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert" />
+<meta name="author" content="Copyright Eli Lilly and Company" />
 
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png">
-  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="visuals.html">
 <link rel="next" href="hpc.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
@@ -213,8 +212,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.6" data-path="churn.html"><a href="churn.html#inspect-the-results"><i class="fa fa-check"></i><b>5.6</b> Inspect the results</a></li>
 <li class="chapter" data-level="5.7" data-path="churn.html"><a href="churn.html#add-models"><i class="fa fa-check"></i><b>5.7</b> Add models</a></li>
 <li class="chapter" data-level="5.8" data-path="churn.html"><a href="churn.html#inspect-the-results-again"><i class="fa fa-check"></i><b>5.8</b> Inspect the results again</a></li>
-<li class="chapter" data-level="5.9" data-path="churn.html"><a href="churn.html#increasing-efficiency"><i class="fa fa-check"></i><b>5.9</b> Increasing efficiency</a></li>
-<li class="chapter" data-level="5.10" data-path="churn.html"><a href="churn.html#tips"><i class="fa fa-check"></i><b>5.10</b> Tips</a></li>
+<li class="chapter" data-level="5.9" data-path="churn.html"><a href="churn.html#possible-slowness"><i class="fa fa-check"></i><b>5.9</b> Possible slowness</a></li>
+<li class="chapter" data-level="5.10" data-path="churn.html"><a href="churn.html#models-in-hdf5-files"><i class="fa fa-check"></i><b>5.10</b> Models in HDF5 files</a></li>
+<li class="chapter" data-level="5.11" data-path="churn.html"><a href="churn.html#tips"><i class="fa fa-check"></i><b>5.11</b> Tips</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>6</b> An analysis of R package download trends</a><ul>
 <li class="chapter" data-level="6.1" data-path="packages.html"><a href="packages.html"><i class="fa fa-check"></i><b>6.1</b> Get the code.</a></li>
@@ -540,7 +540,7 @@ my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x160819d0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x16022af0&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -630,16 +630,16 @@ error<span class="op">$</span>call
 
 <span class="kw">str</span>(error<span class="op">$</span>calls) <span class="co"># View the traceback.</span>
 <span class="co">#&gt; List of 8</span>
-<span class="co">#&gt;  $ : language local({     f(b) ...</span>
+<span class="co">#&gt;  $ : language local(f(b))</span>
 <span class="co">#&gt;  $ : language eval.parent(substitute(eval(quote(expr), envir)))</span>
 <span class="co">#&gt;  $ : language eval(expr, p)</span>
 <span class="co">#&gt;  $ : language eval(expr, p)</span>
-<span class="co">#&gt;  $ : language eval(quote({     f(b) ...</span>
-<span class="co">#&gt;  $ : language eval(quote({     f(b) ...</span>
+<span class="co">#&gt;  $ : language eval(quote(f(b)), new.env())</span>
+<span class="co">#&gt;  $ : language eval(quote(f(b)), new.env())</span>
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x85a2970&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x1d9958b8&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -681,7 +681,7 @@ f
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt;   x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x2399c888&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x13dd1060&gt;</span>
 
 <span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
 f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
