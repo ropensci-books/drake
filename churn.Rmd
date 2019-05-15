@@ -292,9 +292,35 @@ readd(comparison) # see also loadd()
 
 Going forward, we can turn our attention to different tuning parameters and try to improve specificity.
 
-## Increasing efficiency
+## Possible slowness
 
-Due to [the technical details of `drake`'s storage system](https://github.com/richfitz/storr/issues/77#issuecomment-476275570), the above workflow serializes each Keras model twice, which could prove inefficient for large models. If it takes a long time to save your models, you may wish to store them in their own special [HDF5](https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file) files. This approach adds some cumbersome bookkeeping, but `make()` should run faster. We need to rewrite our functions in terms of [`save_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html) and [`load_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html).
+Due to [the technical details of `drake`'s storage system](https://github.com/richfitz/storr/issues/77#issuecomment-476275570), the above workflow serializes each Keras model twice, which could potentially prove inefficient for large models. Using `build_times()`, you can examine the runtime overhead incurred by `drake`.
+
+Here is the time it took `drake` to fully process `model_16`.
+
+```{r}
+build <- build_times(model_16, type = "build")$elapsed
+build
+```
+
+And here is the time it took just to run the command.
+
+```{r}
+command <- build_times(model_16, type = "command")$elapsed
+command
+```
+
+The relative difference is the overhead incurred by `drake`.
+
+```{r}
+sprintf("%.3f%%", 100 * (build - command) / build)
+```
+
+In this particular case study, overhead is not so bad. But if it ever becomes a problem, consider shifting the burden away from [`drake`'s storage system](https://github.com/richfitz/storr) as described below.
+
+## Models in HDF5 files
+
+If it takes a long time to save your models, you may wish to store them in custom [HDF5](https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file) files. This approach adds some cumbersome bookkeeping, but `make()` should run faster. We need to rewrite our functions in terms of [`save_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html) and [`load_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html).
 
 ```{r kerastrainfile}
 # We add a new model_file argument.
@@ -400,7 +426,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Another advantage of this more complicated approach is that we can now view model histories.
+But one advantage of this more complicated approach is that we can now view model histories.
 
 ```{r kerasmakefile}
 make(plan)
