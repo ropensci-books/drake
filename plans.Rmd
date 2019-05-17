@@ -25,6 +25,27 @@ A `drake` plan is a data frame with columns named `target` and `command`. Each t
 [^2]: `drake_plan()` is the best way to create plans, but you can create plans any way you like. `drake` will understand plans you create directly using `data.frame()` or `tibble()`.
 
 ```{r firstexampleplan}
+drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Species = forcats::fct_inorder(Species)),
+  hist = create_plot(data),
+  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  report = rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  )
+)
+```
+
+`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
+
+## Plans are similar to R scripts.
+
+Your `drake` plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions [`plan_to_code()`](https://ropensci.github.io/drake/reference/plan_to_code.html) and [`code_to_plan()`](https://ropensci.github.io/drake/reference/code_to_plan.html) (with some [caveats](https://ropensci.github.io/drake/reference/code_to_plan.html#details)).
+
+```{r plan_to_code_planschapter}
 plan <- drake_plan(
   raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
   data = raw_data %>%
@@ -37,16 +58,7 @@ plan <- drake_plan(
     quiet = TRUE
   )
 )
-plan
-```
 
-`drake_plan()` does not run the workflow, it only creates the plan. To build the actual targets, we need to run `make()`. Creating the plan is like writing an R script, and running `make(your_plan)` is like calling [`source("your_script.R")`](https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/source).
-
-## Plans are similar to R scripts.
-
-Your `drake` plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions [`plan_to_code()`](https://ropensci.github.io/drake/reference/plan_to_code.html) and [`code_to_plan()`](https://ropensci.github.io/drake/reference/code_to_plan.html) (with some [caveats](https://ropensci.github.io/drake/reference/code_to_plan.html#details)).
-
-```{r plan_to_code_planschapter}
 plan_to_code(plan, "new_script.R")
 cat(readLines("new_script.R"), sep = "\n")
 
