@@ -363,7 +363,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="churn" class="section level1">
 <h1><span class="header-section-number">Chapter 5</span> Customer churn and deep learning</h1>
-<p><a href="https://github.com/ropensci/drake"><code>drake</code></a> is intended for projects with long runtimes, and a major use case is deep learning. This chapter demonstrates how to leverage <a href="https://github.com/ropensci/drake"><code>drake</code></a> to manage a deep learning workflow. The original example comes from a <a href="https://blogs.rstudio.com/tensorflow/posts/2018-01-11-keras-customer-churn/">blog post by Matt Dancho</a>, and the chapter’s content itself comes directly from <a href="https://github.com/sol-eng/tensorflow-w-r/blob/master/workflow/tensorflow-drake.Rmd">this R notebook</a>, part of an <a href="https://github.com/sol-eng/tensorflow-w-r">RStudio Solutions Engineering example demonstrating TensorFlow in R</a>. The notebook is modified and redistributed under the terms of the <a href="https://github.com/sol-eng/tensorflow-w-r/blob/master/LICENSE">Apache 2.0 license</a>, copyright RStudio (<a href="https://github.com/ropenscilabs/drake-manual/blob/master/COPYRIGHT">details here</a>).</p>
+<p><a href="https://github.com/ropensci/drake"><code>drake</code></a> is designed for workflows with long runtimes, and a major use case is deep learning. This chapter demonstrates how to leverage <a href="https://github.com/ropensci/drake"><code>drake</code></a> to manage a deep learning workflow. The original example comes from a <a href="https://blogs.rstudio.com/tensorflow/posts/2018-01-11-keras-customer-churn/">blog post by Matt Dancho</a>, and the chapter’s content itself comes directly from <a href="https://github.com/sol-eng/tensorflow-w-r/blob/master/workflow/tensorflow-drake.Rmd">this R notebook</a>, part of an <a href="https://github.com/sol-eng/tensorflow-w-r">RStudio Solutions Engineering example demonstrating TensorFlow in R</a>. The notebook is modified and redistributed under the terms of the <a href="https://github.com/sol-eng/tensorflow-w-r/blob/master/LICENSE">Apache 2.0 license</a>, copyright RStudio (<a href="https://github.com/ropenscilabs/drake-manual/blob/master/COPYRIGHT">details here</a>).</p>
 <div id="packages" class="section level2">
 <h2><span class="header-section-number">5.1</span> Packages</h2>
 <p>First, we load our packages into a fresh R session.</p>
@@ -391,34 +391,49 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span class="st">    </span><span class="kw">step_scale</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">prep</span>()
 }</code></pre>
-<p>define a <a href="https://github.com/rstudio/keras"><code>keras</code></a> model,</p>
-<pre class="sourceCode r"><code class="sourceCode r">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec) {
+<p>define a <a href="https://github.com/rstudio/keras"><code>keras</code></a> model, with arguments to set the dimensionality and activation functions of the layers,</p>
+<pre class="sourceCode r"><code class="sourceCode r">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {
   input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(
     <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)
   )
   <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">layer_dense</span>(
-      <span class="dt">units =</span> <span class="dv">16</span>,
+      <span class="dt">units =</span> units1,
       <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,
-      <span class="dt">activation =</span> <span class="st">&quot;relu&quot;</span>,
+      <span class="dt">activation =</span> act1,
       <span class="dt">input_shape =</span> input_shape
     ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">layer_dense</span>(
-      <span class="dt">units =</span> <span class="dv">16</span>,
+      <span class="dt">units =</span> units2,
       <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,
-      <span class="dt">activation =</span> <span class="st">&quot;relu&quot;</span>
+      <span class="dt">activation =</span> act2
     ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">layer_dense</span>(
       <span class="dt">units =</span> <span class="dv">1</span>,
       <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,
-      <span class="dt">activation =</span> <span class="st">&quot;sigmoid&quot;</span>
+      <span class="dt">activation =</span> act3
     )
 }</code></pre>
 <p>train and <a href="https://tensorflow.rstudio.com/keras/reference/serialize_model.html">serialize</a> a model,</p>
-<pre class="sourceCode r"><code class="sourceCode r">train_model &lt;-<span class="st"> </span><span class="cf">function</span>(data, rec, batch_size) {
-  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(rec)
+<pre class="sourceCode r"><code class="sourceCode r">train_model &lt;-<span class="st"> </span><span class="cf">function</span>(
+  data,
+  rec,
+  <span class="dt">units1 =</span> <span class="dv">16</span>,
+  <span class="dt">units2 =</span> <span class="dv">16</span>,
+  <span class="dt">act1 =</span> <span class="st">&quot;relu&quot;</span>,
+  <span class="dt">act2 =</span> <span class="st">&quot;relu&quot;</span>,
+  <span class="dt">act3 =</span> <span class="st">&quot;sigmoid&quot;</span>
+) {
+  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(
+    <span class="dt">rec =</span> rec,
+    <span class="dt">units1 =</span> units1,
+    <span class="dt">units2 =</span> units2,
+    <span class="dt">act1 =</span> act1,
+    <span class="dt">act2 =</span> act2,
+    <span class="dt">act3 =</span> act3
+  )
   <span class="kw">compile</span>(
     model,
     <span class="dt">optimizer =</span> <span class="st">&quot;adam&quot;</span>,
@@ -436,9 +451,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <span class="dt">object =</span> model,
     <span class="dt">x =</span> x_train_tbl,
     <span class="dt">y =</span> y_train_vec,
-    <span class="dt">batch_size =</span> batch_size,
-    <span class="dt">epochs =</span> <span class="dv">35</span>,
-    <span class="dt">validation_split =</span> <span class="fl">0.30</span>,
+    <span class="dt">batch_size =</span> <span class="dv">32</span>,
+    <span class="dt">epochs =</span> <span class="dv">32</span>,
+    <span class="dt">validation_split =</span> <span class="fl">0.3</span>,
     <span class="dt">verbose =</span> <span class="dv">0</span>
   )
   <span class="kw">serialize_model</span>(model)
@@ -474,40 +489,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }</code></pre>
 <p>and compare the performance of multiple models.</p>
 <pre class="sourceCode r"><code class="sourceCode r">compare_models &lt;-<span class="st"> </span><span class="cf">function</span>(...) {
-  batch_sizes &lt;-<span class="st"> </span><span class="kw">match.call</span>()[<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">as.character</span>() <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">gsub</span>(<span class="dt">pattern =</span> <span class="st">&quot;conf_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)
+  name &lt;-<span class="st"> </span><span class="kw">match.call</span>()[<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.character</span>()
   df &lt;-<span class="st"> </span><span class="kw">map_df</span>(<span class="kw">list</span>(...), summary) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">filter</span>(.metric <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>, <span class="st">&quot;sens&quot;</span>, <span class="st">&quot;spec&quot;</span>)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">mutate</span>(
-      <span class="dt">batch_size =</span> <span class="kw">rep</span>(batch_sizes, <span class="dt">each =</span> <span class="kw">n</span>() <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(batch_sizes))
-    ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">name =</span> <span class="kw">rep</span>(name, <span class="dt">each =</span> <span class="kw">n</span>() <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(name))) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">rename</span>(<span class="dt">metric =</span> .metric, <span class="dt">estimate =</span> .estimate)
   <span class="kw">ggplot</span>(df) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_line</span>(
-      <span class="kw">aes</span>(<span class="dt">x =</span> metric, <span class="dt">y =</span> estimate, <span class="dt">color =</span> batch_size, <span class="dt">group =</span> batch_size)
-    ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">16</span>)
+<span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> metric, <span class="dt">y =</span> estimate, <span class="dt">color =</span> name, <span class="dt">group =</span> name)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)
 }</code></pre>
 </div>
 <div id="plan" class="section level2">
 <h2><span class="header-section-number">5.3</span> Plan</h2>
-<p>Next, we define our workflow in a <a href="https://ropenscilabs.github.io/drake-manual/plans.html"><code>drake</code> plan</a>. We will prepare the data, train different models with different batch sizes, and compare the models in terms of performance.</p>
-<pre class="sourceCode r"><code class="sourceCode r">batch_sizes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">32</span>)
+<p>Next, we define our workflow in a <a href="https://ropenscilabs.github.io/drake-manual/plans.html"><code>drake</code> plan</a>. We will prepare the data, train different models with different activation functions, and compare the models in terms of performance.</p>
+<pre class="sourceCode r"><code class="sourceCode r">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>)
 
 plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),
   <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),
   <span class="dt">model =</span> <span class="kw">target</span>(
-    <span class="kw">train_model</span>(data, rec, batch_size),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">batch_size =</span> <span class="op">!!</span>batch_sizes)
+    <span class="kw">train_model</span>(data, rec, <span class="dt">act1 =</span> act),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)
   ),
   <span class="dt">conf =</span> <span class="kw">target</span>(
     <span class="kw">confusion_matrix</span>(data, rec, model),
-    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> batch_size)
+    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)
   ),
-  <span class="dt">comparison =</span> <span class="kw">target</span>(
+  <span class="dt">metrics =</span> <span class="kw">target</span>(
     <span class="kw">compare_models</span>(conf),
     <span class="dt">transform =</span> <span class="kw">combine</span>(conf)
   )
@@ -515,15 +525,15 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <p>The plan is a data frame with the steps we are going to do.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan
 <span class="co">#&gt; # A tibble: 7 x 2</span>
-<span class="co">#&gt;   target     command                                                       </span>
-<span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;                                                        </span>
-<span class="co">#&gt; 1 data       read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols()) %…</span>
-<span class="co">#&gt; 2 rec        prepare_recipe(data)                                         …</span>
-<span class="co">#&gt; 3 model_16   train_model(data, rec, 16)                                   …</span>
-<span class="co">#&gt; 4 model_32   train_model(data, rec, 32)                                   …</span>
-<span class="co">#&gt; 5 conf_16    confusion_matrix(data, rec, model_16)                        …</span>
-<span class="co">#&gt; 6 conf_32    confusion_matrix(data, rec, model_32)                        …</span>
-<span class="co">#&gt; 7 comparison compare_models(conf_16, conf_32)                             …</span></code></pre>
+<span class="co">#&gt;   target       command                                                     </span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;expr&gt;                                                      </span>
+<span class="co">#&gt; 1 data         read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols())…</span>
+<span class="co">#&gt; 2 rec          prepare_recipe(data)                                       …</span>
+<span class="co">#&gt; 3 model_relu   train_model(data, rec, act1 = &quot;relu&quot;)                      …</span>
+<span class="co">#&gt; 4 model_sigmo… train_model(data, rec, act1 = &quot;sigmoid&quot;)                   …</span>
+<span class="co">#&gt; 5 conf_relu    confusion_matrix(data, rec, model_relu)                    …</span>
+<span class="co">#&gt; 6 conf_sigmoid confusion_matrix(data, rec, model_sigmoid)                 …</span>
+<span class="co">#&gt; 7 metrics      compare_models(conf_relu, conf_sigmoid)                    …</span></code></pre>
 </div>
 <div id="dependency-graph" class="section level2">
 <h2><span class="header-section-number">5.4</span> Dependency graph</h2>
@@ -531,7 +541,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-6814fa2876b88076bf66" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6814fa2876b88076bf66">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","model_16","model_32","conf_16","conf_32","comparison"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data","rec","model_16","model_32","conf_16","conf_32","comparison"],"status":["imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","train_model","train_model","rec","rec","rec","rec","model_16","model_32","conf_32","conf_16"],"to":["train_model","conf_32","conf_16","comparison","rec","data","rec","model_16","model_32","conf_32","conf_16","model_16","model_32","model_16","model_32","conf_32","conf_16","conf_16","conf_32","comparison","comparison"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-6814fa2876b88076bf66">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"status":["imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","train_model","train_model","rec","rec","rec","rec","model_relu","model_sigmoid","conf_sigmoid","conf_relu"],"to":["train_model","conf_sigmoid","conf_relu","metrics","rec","data","rec","model_relu","model_sigmoid","conf_sigmoid","conf_relu","model_relu","model_sigmoid","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_relu","conf_sigmoid","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="run-the-models" class="section level2">
 <h2><span class="header-section-number">5.5</span> Run the models</h2>
@@ -539,79 +549,94 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
 <span class="co">#&gt; target data</span>
 <span class="co">#&gt; target rec</span>
-<span class="co">#&gt; target model_16</span>
-<span class="co">#&gt; target model_32</span>
-<span class="co">#&gt; target conf_16</span>
-<span class="co">#&gt; target conf_32</span>
-<span class="co">#&gt; target comparison</span></code></pre>
+<span class="co">#&gt; target model_relu</span>
+<span class="co">#&gt; target model_sigmoid</span>
+<span class="co">#&gt; target conf_relu</span>
+<span class="co">#&gt; target conf_sigmoid</span>
+<span class="co">#&gt; target metrics</span></code></pre>
 </div>
 <div id="inspect-the-results" class="section level2">
 <h2><span class="header-section-number">5.6</span> Inspect the results</h2>
 <p>The two models performed about the same.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(comparison) <span class="co"># see also loadd()</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></code></pre>
 <p><img src="drake-manual_files/figure-html/kerasreadcomp-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="add-models" class="section level2">
 <h2><span class="header-section-number">5.7</span> Add models</h2>
-<p>Let’s try another batch size.</p>
-<pre class="sourceCode r"><code class="sourceCode r">batch_sizes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>)
+<p>Let’s try another activation function.</p>
+<pre class="sourceCode r"><code class="sourceCode r">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)
 
 plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),
   <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),
   <span class="dt">model =</span> <span class="kw">target</span>(
-    <span class="kw">train_model</span>(data, rec, batch_size),
-    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">batch_size =</span> <span class="op">!!</span>batch_sizes)
+    <span class="kw">train_model</span>(data, rec, <span class="dt">act1 =</span> act),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)
   ),
   <span class="dt">conf =</span> <span class="kw">target</span>(
     <span class="kw">confusion_matrix</span>(data, rec, model),
-    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> batch_size)
+    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)
   ),
-  <span class="dt">comparison =</span> <span class="kw">target</span>(
+  <span class="dt">metrics =</span> <span class="kw">target</span>(
     <span class="kw">compare_models</span>(conf),
     <span class="dt">transform =</span> <span class="kw">combine</span>(conf)
   )
 )</code></pre>
-<p>We already trained models with batch sizes 16 and 32, and their dependencies have not changed, so some of our work is already up to date.</p>
+<p>We already trained models with the relu and sigmoid activation functions, and their dependencies have not changed, so some of our work is already up to date.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config) <span class="co"># see also outdated() and predict_runtime()</span></code></pre>
 <div id="htmlwidget-3ccc807f45d95c26cf1a" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3ccc807f45d95c26cf1a">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","model_16","model_32","model_64","conf_16","conf_32","conf_64","comparison"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data\n0.174s","rec\n0.432s","model_16\n10.32s","model_32\n4.858s","model_64","conf_16\n1.497s","conf_32\n1.834s","conf_64","comparison\n0.056s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","up to date","up to date","outdated","up to date","up to date","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","data","data","train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","model_16","model_32","model_64","conf_64","conf_32","conf_16"],"to":["train_model","conf_64","conf_32","conf_16","comparison","rec","data","rec","model_16","model_32","model_64","conf_64","conf_32","conf_16","model_16","model_32","model_64","model_16","model_32","model_64","conf_64","conf_32","conf_16","conf_16","conf_32","conf_64","comparison","comparison","comparison"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-3ccc807f45d95c26cf1a">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","model_relu","model_sigmoid","model_softmax","conf_relu","conf_sigmoid","conf_softmax","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data\n0.151s","rec\n0.476s","model_relu\n6.334s","model_sigmoid\n4.636s","model_softmax","conf_relu\n1.567s","conf_sigmoid\n1.979s","conf_softmax","metrics\n0.046s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","up to date","up to date","outdated","up to date","up to date","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","data","data","train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","model_relu","model_sigmoid","model_softmax","conf_sigmoid","conf_relu","conf_softmax"],"to":["train_model","conf_sigmoid","conf_relu","conf_softmax","metrics","rec","data","rec","model_relu","model_sigmoid","model_softmax","conf_sigmoid","conf_relu","conf_softmax","model_relu","model_sigmoid","model_softmax","model_relu","model_sigmoid","model_softmax","conf_sigmoid","conf_relu","conf_softmax","conf_relu","conf_sigmoid","conf_softmax","metrics","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p><a href="https://ropensci.github.io/drake/reference/make.html"><code>make()</code></a> only trains the outdated or missing models and refreshes the post-processing. It skips the targets that are already up to date.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-<span class="co">#&gt; target model_64</span>
-<span class="co">#&gt; target conf_64</span>
-<span class="co">#&gt; target comparison</span></code></pre>
+<span class="co">#&gt; target model_softmax</span>
+<span class="co">#&gt; target conf_softmax</span>
+<span class="co">#&gt; target metrics</span></code></pre>
 </div>
 <div id="inspect-the-results-again" class="section level2">
 <h2><span class="header-section-number">5.8</span> Inspect the results again</h2>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(comparison) <span class="co"># see also loadd()</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></code></pre>
 <p><img src="drake-manual_files/figure-html/kerasread2-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>Going forward, we can turn our attention to different tuning parameters and try to improve specificity.</p>
 </div>
 <div id="possible-slowness" class="section level2">
 <h2><span class="header-section-number">5.9</span> Possible slowness</h2>
 <p>Due to <a href="https://github.com/richfitz/storr/issues/77#issuecomment-476275570">the technical details of <code>drake</code>’s storage system</a>, the above workflow serializes each Keras model twice, which could potentially prove inefficient for large models. Using <code>build_times()</code>, you can examine the runtime overhead incurred by <code>drake</code>.</p>
-<p>Here is the time it took <code>drake</code> to fully process <code>model_16</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r">build &lt;-<span class="st"> </span><span class="kw">build_times</span>(model_<span class="dv">16</span>, <span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)<span class="op">$</span>elapsed
+<p>Here is the time it took <code>drake</code> to fully process <code>model_relu</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">build &lt;-<span class="st"> </span><span class="kw">build_times</span>(model_relu, <span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)<span class="op">$</span>elapsed
 build
-<span class="co">#&gt; [1] &quot;10.32s&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;6.334s&quot;</span></code></pre>
 <p>And here is the time it took just to run the command.</p>
-<pre class="sourceCode r"><code class="sourceCode r">command &lt;-<span class="st"> </span><span class="kw">build_times</span>(model_<span class="dv">16</span>, <span class="dt">type =</span> <span class="st">&quot;command&quot;</span>)<span class="op">$</span>elapsed
+<pre class="sourceCode r"><code class="sourceCode r">command &lt;-<span class="st"> </span><span class="kw">build_times</span>(model_relu, <span class="dt">type =</span> <span class="st">&quot;command&quot;</span>)<span class="op">$</span>elapsed
 command
-<span class="co">#&gt; [1] &quot;10.315s&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;6.329s&quot;</span></code></pre>
 <p>The relative difference is the overhead incurred by <code>drake</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sprintf</span>(<span class="st">&quot;%.3f%%&quot;</span>, <span class="dv">100</span> <span class="op">*</span><span class="st"> </span>(build <span class="op">-</span><span class="st"> </span>command) <span class="op">/</span><span class="st"> </span>build)
-<span class="co">#&gt; [1] &quot;0.048%&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;0.079%&quot;</span></code></pre>
 <p>In this particular case study, overhead is not so bad. But if it ever becomes a problem, consider shifting the burden away from <a href="https://github.com/richfitz/storr"><code>drake</code>’s storage system</a> as described below.</p>
 </div>
 <div id="models-in-hdf5-files" class="section level2">
 <h2><span class="header-section-number">5.10</span> Models in HDF5 files</h2>
 <p>If it takes a long time to save your models, you may wish to store them in custom <a href="https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file">HDF5</a> files. This approach adds some cumbersome bookkeeping, but <code>make()</code> should run faster. We need to rewrite our functions in terms of <a href="https://keras.rstudio.com/reference/save_model_hdf5.html"><code>save_model_hdf5()</code></a> and <a href="https://keras.rstudio.com/reference/save_model_hdf5.html"><code>load_model_hdf5()</code></a>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># We add a new model_file argument.</span>
-train_model &lt;-<span class="st"> </span><span class="cf">function</span>(data, rec, batch_size, model_file) {
-  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(rec)
+train_model &lt;-<span class="st"> </span><span class="cf">function</span>(
+  data,
+  rec,
+  model_file,
+  <span class="dt">units1 =</span> <span class="dv">16</span>,
+  <span class="dt">units2 =</span> <span class="dv">16</span>,
+  <span class="dt">act1 =</span> <span class="st">&quot;relu&quot;</span>,
+  <span class="dt">act2 =</span> <span class="st">&quot;relu&quot;</span>,
+  <span class="dt">act3 =</span> <span class="st">&quot;sigmoid&quot;</span>
+) {
+  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(
+    <span class="dt">rec =</span> rec,
+    <span class="dt">units1 =</span> units1,
+    <span class="dt">units2 =</span> units2,
+    <span class="dt">act1 =</span> act1,
+    <span class="dt">act2 =</span> act2,
+    <span class="dt">act3 =</span> act3
+  )
   <span class="kw">compile</span>(
     model,
     <span class="dt">optimizer =</span> <span class="st">&quot;adam&quot;</span>,
@@ -625,20 +650,21 @@ train_model &lt;-<span class="st"> </span><span class="cf">function</span>(data,
   )
   y_train_vec &lt;-<span class="st"> </span><span class="kw">juice</span>(rec, <span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">pull</span>()
+  
+  <span class="co"># As an added bonus, we get to hold onto the history</span>
+  <span class="co"># of each model fit.</span>
   history &lt;-<span class="st"> </span><span class="kw">fit</span>(
     <span class="dt">object =</span> model,
     <span class="dt">x =</span> x_train_tbl,
     <span class="dt">y =</span> y_train_vec,
-    <span class="dt">batch_size =</span> batch_size,
-    <span class="dt">epochs =</span> <span class="dv">35</span>,
-    <span class="dt">validation_split =</span> <span class="fl">0.30</span>,
+    <span class="dt">batch_size =</span> <span class="dv">32</span>,
+    <span class="dt">epochs =</span> <span class="dv">32</span>,
+    <span class="dt">validation_split =</span> <span class="fl">0.3</span>,
     <span class="dt">verbose =</span> <span class="dv">0</span>
   )
   
   <span class="co"># Instead of calling serialize_model(), we save the model to a file.</span>
   <span class="kw">save_model_hdf5</span>(model, model_file)
-  
-  <span class="co"># As an added bonus, we can now return the history from the function.</span>
   history
 }
 
@@ -647,7 +673,6 @@ confusion_matrix &lt;-<span class="st"> </span><span class="cf">function</span>(
   <span class="co"># Instead of calling unserialize_model(),</span>
   <span class="co"># we load the model from the HDF5 file.</span>
   model &lt;-<span class="st"> </span><span class="kw">load_model_hdf5</span>(model_file)
-
   testing_data &lt;-<span class="st"> </span><span class="kw">bake</span>(rec, <span class="kw">testing</span>(data))
   x_test_tbl &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>Churn) <span class="op">%&gt;%</span>
@@ -675,26 +700,21 @@ confusion_matrix &lt;-<span class="st"> </span><span class="cf">function</span>(
 <span class="st">    </span><span class="kw">conf_mat</span>(truth, estimate)
 }</code></pre>
 <p>And we need a new plan that tracks the model files using <a href="https://ropensci.github.io/drake/reference/file_in.html"><code>file_in()</code></a> and <a href="https://ropensci.github.io/drake/reference/file_out.html"><code>file_out()</code></a>.</p>
-<pre class="sourceCode r"><code class="sourceCode r">batch_sizes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>)
-model_files &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;model_&quot;</span>, batch_sizes, <span class="st">&quot;.h5&quot;</span>)
+<pre class="sourceCode r"><code class="sourceCode r">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)
 
 plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),
   <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),
   <span class="dt">history =</span> <span class="kw">target</span>(
-    <span class="kw">train_model</span>(data, rec, batch_size, <span class="kw">file_out</span>(model_file)),
-    <span class="dt">transform =</span> <span class="kw">map</span>(
-      <span class="dt">batch_size =</span> <span class="op">!!</span>batch_sizes,
-      <span class="dt">model_file =</span> <span class="op">!!</span>model_files,
-      <span class="dt">.id =</span> batch_size
-    )
+    <span class="kw">train_model</span>(data, rec, <span class="kw">file_out</span>(<span class="op">!!</span><span class="kw">paste0</span>(act, <span class="st">&quot;.h5&quot;</span>)), <span class="dt">act1 =</span> act),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)
   ),
   <span class="dt">conf =</span> <span class="kw">target</span>(
-    <span class="kw">confusion_matrix</span>(data, rec, <span class="kw">file_in</span>(model_file)),
-    <span class="dt">transform =</span> <span class="kw">map</span>(model_file, <span class="dt">.id =</span> batch_size)
+    <span class="kw">confusion_matrix</span>(data, rec, <span class="kw">file_in</span>(<span class="op">!!</span><span class="kw">paste0</span>(act, <span class="st">&quot;.h5&quot;</span>))),
+    <span class="dt">transform =</span> <span class="kw">map</span>(act)
   ),
-  <span class="dt">comparison =</span> <span class="kw">target</span>(
+  <span class="dt">metrics =</span> <span class="kw">target</span>(
     <span class="kw">compare_models</span>(conf),
     <span class="dt">transform =</span> <span class="kw">combine</span>(conf)
   )
@@ -703,18 +723,18 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-05518fdb4a90a0243a52" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-05518fdb4a90a0243a52">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","history_16","history_32","history_64","p-NVXWIZLML4YTMLTIGU","p-NVXWIZLML4ZTELTIGU","p-NVXWIZLML43DILTIGU","conf_16","conf_32","conf_64","comparison"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data\n0.174s","rec\n0.432s","history_16","history_32","history_64","file model_16.h5","file model_32.h5","file model_64.h5","conf_16\n1.497s","conf_32\n1.834s","conf_64\n2.719s","comparison\n0.046s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","file","file","file","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","square","square","square","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6,6,6,7],"x":[-1,-1,-1,-1,-1,-0.666666666666667,-0.666666666666667,-0.333333333333333,0,0,0,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,0.666666666666667,0.666666666666667,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","data","data","train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","history_16","history_16","history_32","history_32","history_64","history_64","p-NVXWIZLML4YTMLTIGU","p-NVXWIZLML4ZTELTIGU","p-NVXWIZLML43DILTIGU","conf_64","conf_32","conf_16"],"to":["train_model","conf_64","conf_32","conf_16","comparison","rec","data","rec","history_16","history_32","history_64","conf_64","conf_32","conf_16","history_16","history_32","history_64","history_16","history_32","history_64","conf_64","conf_32","conf_16","p-NVXWIZLML4YTMLTIGU","conf_16","p-NVXWIZLML4ZTELTIGU","conf_32","p-NVXWIZLML43DILTIGU","conf_64","conf_16","conf_32","conf_64","comparison","comparison","comparison"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-05518fdb4a90a0243a52">{"x":{"nodes":{"id":["define_model","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","history_relu","history_sigmoid","history_softmax","p-OJSWY5JONA2Q","p-ONUWO3LPNFSC42BV","p-ONXWM5DNMF4C42BV","conf_relu","conf_sigmoid","conf_softmax","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false],"label":["define_model","confusion_matrix","compare_models","prepare_recipe","file customer_churn.csv","train_model","data\n0.151s","rec\n0.476s","history_relu","history_sigmoid","history_softmax","file relu.h5","file sigmoid.h5","file softmax.h5","conf_relu\n1.567s","conf_sigmoid\n1.979s","conf_softmax\n2.918s","metrics\n0.058s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","file","file","file","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","square","square","square","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6,6,6,7],"x":[-1,-1,-1,-1,-1,-0.666666666666667,-0.666666666666667,-0.333333333333333,0,0,0,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,0.666666666666667,0.666666666666667,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["define_model","confusion_matrix","confusion_matrix","confusion_matrix","compare_models","prepare_recipe","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","data","data","data","data","data","data","data","train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","history_relu","history_relu","history_sigmoid","history_sigmoid","history_softmax","history_softmax","p-OJSWY5JONA2Q","p-ONUWO3LPNFSC42BV","p-ONXWM5DNMF4C42BV","conf_sigmoid","conf_relu","conf_softmax"],"to":["train_model","conf_sigmoid","conf_relu","conf_softmax","metrics","rec","data","rec","history_relu","history_sigmoid","history_softmax","conf_sigmoid","conf_relu","conf_softmax","history_relu","history_sigmoid","history_softmax","history_relu","history_sigmoid","history_softmax","conf_sigmoid","conf_relu","conf_softmax","p-OJSWY5JONA2Q","conf_relu","p-ONUWO3LPNFSC42BV","conf_sigmoid","p-ONXWM5DNMF4C42BV","conf_softmax","conf_relu","conf_sigmoid","conf_softmax","metrics","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>But one advantage of this more complicated approach is that we can now view model histories.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
-<span class="co">#&gt; target history_16</span>
-<span class="co">#&gt; target history_32</span>
-<span class="co">#&gt; target history_64</span>
-<span class="co">#&gt; target conf_16</span>
-<span class="co">#&gt; target conf_32</span>
-<span class="co">#&gt; target conf_64</span>
-<span class="co">#&gt; target comparison</span>
+<span class="co">#&gt; target history_relu</span>
+<span class="co">#&gt; target history_sigmoid</span>
+<span class="co">#&gt; target history_softmax</span>
+<span class="co">#&gt; target conf_relu</span>
+<span class="co">#&gt; target conf_sigmoid</span>
+<span class="co">#&gt; target conf_softmax</span>
+<span class="co">#&gt; target metrics</span>
 
-<span class="kw">plot</span>(<span class="kw">readd</span>(history_<span class="dv">16</span>))</code></pre>
+<span class="kw">plot</span>(<span class="kw">readd</span>(history_relu))</code></pre>
 <p><img src="drake-manual_files/figure-html/kerasmakefile-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="tips" class="section level2">
