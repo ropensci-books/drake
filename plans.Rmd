@@ -353,12 +353,13 @@ make(plan) # Full scaled-up workflow. Takes much longer.
 
 ### The types of transformations
 
-`drake` supports three types of transformations: `map()`, `cross()`, and `combine()`. These are not actual functions, but you can treat them as functions when you use them in `drake_plan()`. Each transformation takes after a function from the [Tidyverse](https://www.tidyverse.org/).
+`drake` supports three types of transformations: `map()`, `cross()`, `split()` (unsupported in `drake` <= 7.3.0), and `combine()`. These are not actual functions, but you can treat them as functions when you use them in `drake_plan()`. Each transformation takes after a function from the [Tidyverse](https://www.tidyverse.org/).
 
 | `drake`     | Tidyverse analogue          |
 |-------------|-----------------------------|
 | `map()`     | `pmap()` from `purrr`       |
 | `cross()`   | `crossing()` from `tidyr`   |
+| `split()`   | `group_map()`  from `dplyr` |
 | `combine()` | `summarize()` from `dplyr`  |
 
 #### `map()`
@@ -492,6 +493,48 @@ drake_plan(
     transform = cross(nrow = c(1, 2, 3), ncol = c(4, 5))
   )
 )
+```
+
+
+#### `split()`
+
+`split()` is not supported in `drake` 7.3.0 and below. It should reach the next CRAN release in June 2019.
+
+The `split()` transformation distributes a dataset as uniformly as possible across multiple targets.
+
+```{r, split1}
+plan <- drake_plan(
+  large_data = get_data(),
+  slice_analysis = target(
+    large_data %>%
+      analyze(),
+    transform = split(large_data, slices = 4)
+  ),
+  results = target(
+    dplyr::bind_rows(slice_analysis),
+    transform = combine(slice_analysis)
+  )
+)
+
+plan
+```
+
+```{r split3}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+Here, `drake_slice()` takes a single subset of the data at runtime. It supports lists, vectors, data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc).
+
+```{r darke_slice}
+dataset <- tibble::as_tibble(iris)
+dim(dataset)
+
+drake_slice(dataset, slices = 50, index = 1)
+
+drake_slice(dataset, slices = 50, index = 2)
+
+drake_slice(dataset, slices = 3, index = 1, margin = 2)
 ```
 
 #### `combine()`
