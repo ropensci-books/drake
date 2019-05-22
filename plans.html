@@ -757,7 +757,7 @@ plan
 </div>
 <div id="the-types-of-transformations" class="section level3">
 <h3><span class="header-section-number">3.5.3</span> The types of transformations</h3>
-<p><code>drake</code> supports three types of transformations: <code>map()</code>, <code>cross()</code>, and <code>combine()</code>. These are not actual functions, but you can treat them as functions when you use them in <code>drake_plan()</code>. Each transformation takes after a function from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
+<p><code>drake</code> supports three types of transformations: <code>map()</code>, <code>cross()</code>, <code>split()</code> (unsupported in <code>drake</code> &lt;= 7.3.0), and <code>combine()</code>. These are not actual functions, but you can treat them as functions when you use them in <code>drake_plan()</code>. Each transformation takes after a function from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
 <table>
 <thead>
 <tr class="header">
@@ -775,6 +775,10 @@ plan
 <td><code>crossing()</code> from <code>tidyr</code></td>
 </tr>
 <tr class="odd">
+<td><code>split()</code></td>
+<td><code>group_map()</code> from <code>dplyr</code></td>
+</tr>
+<tr class="even">
 <td><code>combine()</code></td>
 <td><code>summarize()</code> from <code>dplyr</code></td>
 </tr>
@@ -940,8 +944,76 @@ my_grid<span class="op">$</span>sim_function &lt;-<span class="st"> </span>rlang
 <span class="co">#&gt; 5 x_2_5  simulate_data(2, 5)</span>
 <span class="co">#&gt; 6 x_3_5  simulate_data(3, 5)</span></code></pre>
 </div>
+<div id="split" class="section level4">
+<h4><span class="header-section-number">3.5.3.4</span> <code>split()</code></h4>
+<p><code>split()</code> is not supported in <code>drake</code> 7.3.0 and below. It should reach the next CRAN release in June 2019.</p>
+<p>The <code>split()</code> transformation distributes a dataset as uniformly as possible across multiple targets.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">large_data =</span> <span class="kw">get_data</span>(),
+  <span class="dt">slice_analysis =</span> <span class="kw">target</span>(
+    large_data <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">analyze</span>(),
+    <span class="dt">transform =</span> <span class="kw">split</span>(large_data, <span class="dt">slices =</span> <span class="dv">4</span>)
+  ),
+  <span class="dt">results =</span> <span class="kw">target</span>(
+    dplyr<span class="op">::</span><span class="kw">bind_rows</span>(slice_analysis),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(slice_analysis)
+  )
+)
+
+plan
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   target         command                                                   </span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                                    </span>
+<span class="co">#&gt; 1 large_data     get_data()                                               …</span>
+<span class="co">#&gt; 2 slice_analysi… drake_slice(data = large_data, slices = 4, index = 1) %&gt;%…</span>
+<span class="co">#&gt; 3 slice_analysi… drake_slice(data = large_data, slices = 4, index = 2) %&gt;%…</span>
+<span class="co">#&gt; 4 slice_analysi… drake_slice(data = large_data, slices = 4, index = 3) %&gt;%…</span>
+<span class="co">#&gt; 5 slice_analysi… drake_slice(data = large_data, slices = 4, index = 4) %&gt;%…</span>
+<span class="co">#&gt; 6 results        dplyr::bind_rows(slice_analysis_1, slice_analysis_2, slic…</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
+<span class="kw">vis_drake_graph</span>(config)</code></pre>
+<div id="htmlwidget-c8c2efd752b3f9f48dc8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c8c2efd752b3f9f48dc8">{"x":{"nodes":{"id":["large_data","n-MRYGY6LSHI5GE2LOMRPXE33XOM","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results"],"imported":[false,true,false,false,false,false,false],"label":["large_data","dplyr::bind_rows","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results"],"status":["outdated","imported","outdated","outdated","outdated","outdated","outdated"],"type":["object","function","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20],"color":["#000000","#1874CD","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","triangle","dot","dot","dot","dot","dot"],"level":[1,1,2,2,2,2,3],"x":[-1,-1,0,0,0,0,1],"y":[-0.555555555555556,0.555555555555555,-1,-0.333333333333333,0.333333333333333,1,-2.22044604925031e-16]},"edges":{"from":["large_data","large_data","large_data","large_data","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","n-MRYGY6LSHI5GE2LOMRPXE33XOM"],"to":["slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results","results","results","results","results"],"arrows":["to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","triangle"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>Here, <code>drake_slice()</code> takes a single subset of the data at runtime. It supports lists, vectors, data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc).</p>
+<pre class="sourceCode r"><code class="sourceCode r">dataset &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(iris)
+<span class="kw">dim</span>(dataset)
+<span class="co">#&gt; [1] 150   5</span>
+
+<span class="kw">drake_slice</span>(dataset, <span class="dt">slices =</span> <span class="dv">50</span>, <span class="dt">index =</span> <span class="dv">1</span>)
+<span class="co">#&gt; # A tibble: 3 x 5</span>
+<span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span>
+<span class="co">#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  </span>
+<span class="co">#&gt; 1          5.1         3.5          1.4         0.2 setosa </span>
+<span class="co">#&gt; 2          4.9         3            1.4         0.2 setosa </span>
+<span class="co">#&gt; 3          4.7         3.2          1.3         0.2 setosa</span>
+
+<span class="kw">drake_slice</span>(dataset, <span class="dt">slices =</span> <span class="dv">50</span>, <span class="dt">index =</span> <span class="dv">2</span>)
+<span class="co">#&gt; # A tibble: 3 x 5</span>
+<span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span>
+<span class="co">#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  </span>
+<span class="co">#&gt; 1          4.6         3.1          1.5         0.2 setosa </span>
+<span class="co">#&gt; 2          5           3.6          1.4         0.2 setosa </span>
+<span class="co">#&gt; 3          5.4         3.9          1.7         0.4 setosa</span>
+
+<span class="kw">drake_slice</span>(dataset, <span class="dt">slices =</span> <span class="dv">3</span>, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">margin =</span> <span class="dv">2</span>)
+<span class="co">#&gt; # A tibble: 150 x 2</span>
+<span class="co">#&gt;    Sepal.Length Sepal.Width</span>
+<span class="co">#&gt;           &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1          5.1         3.5</span>
+<span class="co">#&gt;  2          4.9         3  </span>
+<span class="co">#&gt;  3          4.7         3.2</span>
+<span class="co">#&gt;  4          4.6         3.1</span>
+<span class="co">#&gt;  5          5           3.6</span>
+<span class="co">#&gt;  6          5.4         3.9</span>
+<span class="co">#&gt;  7          4.6         3.4</span>
+<span class="co">#&gt;  8          5           3.4</span>
+<span class="co">#&gt;  9          4.4         2.9</span>
+<span class="co">#&gt; 10          4.9         3.1</span>
+<span class="co">#&gt; # … with 140 more rows</span></code></pre>
+</div>
 <div id="combine" class="section level4">
-<h4><span class="header-section-number">3.5.3.4</span> <code>combine()</code></h4>
+<h4><span class="header-section-number">3.5.3.5</span> <code>combine()</code></h4>
 <p>In <code>combine()</code>, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator <code>!!!</code> from the Tidyverse.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
@@ -975,8 +1047,8 @@ plan
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
-<div id="htmlwidget-c8c2efd752b3f9f48dc8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c8c2efd752b3f9f48dc8">{"x":{"nodes":{"id":["data_1_3","data_2_4","larger"],"imported":[false,false,false],"label":["data_1_3","data_2_4","larger"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"x":[-1,-1,1],"y":[-1,1,2.22044604925031e-16]},"edges":{"from":["data_1_3","data_2_4"],"to":["larger","larger"],"arrows":["to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-094a7ca09aea0953f3fb" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-094a7ca09aea0953f3fb">{"x":{"nodes":{"id":["data_1_3","data_2_4","larger"],"imported":[false,false,false],"label":["data_1_3","data_2_4","larger"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,2],"x":[-1,-1,1],"y":[-1,1,2.22044604925031e-16]},"edges":{"from":["data_1_3","data_2_4"],"to":["larger","larger"],"arrows":["to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>You can different groups of targets in the same command.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data_group1 =</span> <span class="kw">target</span>(
@@ -1254,8 +1326,8 @@ plan
 
 config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
-<div id="htmlwidget-094a7ca09aea0953f3fb" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-094a7ca09aea0953f3fb">{"x":{"nodes":{"id":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","summary_online","munged_2"],"imported":[false,false,false,false,false,false,false,false,false],"label":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","summary_online","munged_2"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,2,2,2,2,3,3,3,3],"x":[-1,0,0,0,0,1,1,1,1],"y":[-2.22044604925031e-16,-1,-0.333333333333333,0.333333333333333,1,-1,-0.333333333333333,0.333333333333333,1]},"edges":{"from":["prep_work","prep_work","prep_work","prep_work","local_1","local_1","local_2","local_2","online_1","online_1","online_2","online_2"],"to":["local_1","local_2","online_1","online_2","summary_local","munged_1","summary_local","munged_2","summary_online","munged_1","summary_online","munged_2"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d6a708145d7725acdca8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d6a708145d7725acdca8">{"x":{"nodes":{"id":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","summary_online","munged_2"],"imported":[false,false,false,false,false,false,false,false,false],"label":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","summary_online","munged_2"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,2,2,2,2,3,3,3,3],"x":[-1,0,0,0,0,1,1,1,1],"y":[-2.22044604925031e-16,-1,-0.333333333333333,0.333333333333333,1,-1,-0.333333333333333,0.333333333333333,1]},"edges":{"from":["prep_work","prep_work","prep_work","prep_work","local_1","local_1","local_2","local_2","online_1","online_1","online_2","online_2"],"to":["local_1","local_2","online_1","online_2","summary_local","munged_1","summary_local","munged_2","summary_online","munged_1","summary_online","munged_2"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p><br></p>
 </div>
 <div id="target-names" class="section level3">
