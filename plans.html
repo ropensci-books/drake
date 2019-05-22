@@ -681,7 +681,7 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
 </div>
 <div id="start-small" class="section level3">
 <h3><span class="header-section-number">3.5.2</span> Start small</h3>
-<p>To speed up initial testing and experimentation, you may want to limit the number of extra targets created by the <code>map()</code> and <code>cross()</code> transformations. Simply set <code>max_expand</code> in <code>drake_plan()</code>.</p>
+<p>Some plans are too large to deploy right away.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">get_data</span>(source),
@@ -698,36 +698,60 @@ config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2
   <span class="dt">result =</span> <span class="kw">target</span>(
     <span class="kw">bind_rows</span>(analysis),
     <span class="dt">transform =</span> <span class="kw">combine</span>(analysis, <span class="dt">.by =</span> fn)
+  )
+)
+
+<span class="kw">dim</span>(plan)
+<span class="co">#&gt; [1] 16301     2</span></code></pre>
+<p>It is extremely difficult to understand, visualize, test, and debug a workflow with so many targets. <code>make()</code>, <code>drake_config()</code>, and <code>vis_drake_graph()</code> simply take too long if you are not ready for production.</p>
+<p>To speed up initial testing and experimentation, you may want to limit the number of extra targets created by the <code>map()</code> and <code>cross()</code> transformations. Simply set <code>max_expand</code> in <code>drake_plan()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">max_expand =</span> <span class="dv">2</span>,
+  <span class="dt">data =</span> <span class="kw">target</span>(
+    <span class="kw">get_data</span>(source),
+    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">source =</span> <span class="op">!!</span><span class="kw">seq_len</span>(<span class="dv">25</span>))
   ),
-  <span class="dt">max_expand =</span> <span class="dv">3</span>
+  <span class="dt">analysis =</span> <span class="kw">target</span>(
+    <span class="kw">fn</span>(data, param),
+    <span class="dt">transform =</span> <span class="kw">cross</span>(
+      data,
+      <span class="dt">fn =</span> <span class="op">!!</span>letters,
+      <span class="dt">param =</span> <span class="op">!!</span><span class="kw">seq_len</span>(<span class="dv">25</span>)
+    ),
+  ),
+  <span class="dt">result =</span> <span class="kw">target</span>(
+    <span class="kw">bind_rows</span>(analysis),
+    <span class="dt">transform =</span> <span class="kw">combine</span>(analysis, <span class="dt">.by =</span> fn)
+  )
 )
 
 plan
-<span class="co">#&gt; # A tibble: 33 x 2</span>
-<span class="co">#&gt;    target                 command        </span>
-<span class="co">#&gt;    &lt;chr&gt;                  &lt;expr&gt;         </span>
-<span class="co">#&gt;  1 data_1L                get_data(1L)   </span>
-<span class="co">#&gt;  2 data_13L               get_data(13L)  </span>
-<span class="co">#&gt;  3 data_25L               get_data(25L)  </span>
-<span class="co">#&gt;  4 analysis_a_1L_data_1L  a(data_1L, 1L) </span>
-<span class="co">#&gt;  5 analysis_m_1L_data_1L  m(data_1L, 1L) </span>
-<span class="co">#&gt;  6 analysis_z_1L_data_1L  z(data_1L, 1L) </span>
-<span class="co">#&gt;  7 analysis_a_13L_data_1L a(data_1L, 13L)</span>
-<span class="co">#&gt;  8 analysis_m_13L_data_1L m(data_1L, 13L)</span>
-<span class="co">#&gt;  9 analysis_z_13L_data_1L z(data_1L, 13L)</span>
-<span class="co">#&gt; 10 analysis_a_25L_data_1L a(data_1L, 25L)</span>
-<span class="co">#&gt; # … with 23 more rows</span></code></pre>
-<p>We can more easily inspect the graph to get an idea of the shape of our workflow.</p>
+<span class="co">#&gt; # A tibble: 12 x 2</span>
+<span class="co">#&gt;    target              command                                             </span>
+<span class="co">#&gt;    &lt;chr&gt;               &lt;expr&gt;                                              </span>
+<span class="co">#&gt;  1 data_1L             get_data(1L)                                       …</span>
+<span class="co">#&gt;  2 data_25L            get_data(25L)                                      …</span>
+<span class="co">#&gt;  3 analysis_a_1L_data… a(data_1L, 1L)                                     …</span>
+<span class="co">#&gt;  4 analysis_z_1L_data… z(data_1L, 1L)                                     …</span>
+<span class="co">#&gt;  5 analysis_a_25L_dat… a(data_1L, 25L)                                    …</span>
+<span class="co">#&gt;  6 analysis_z_25L_dat… z(data_1L, 25L)                                    …</span>
+<span class="co">#&gt;  7 analysis_a_1L_data… a(data_25L, 1L)                                    …</span>
+<span class="co">#&gt;  8 analysis_z_1L_data… z(data_25L, 1L)                                    …</span>
+<span class="co">#&gt;  9 analysis_a_25L_dat… a(data_25L, 25L)                                   …</span>
+<span class="co">#&gt; 10 analysis_z_25L_dat… z(data_25L, 25L)                                   …</span>
+<span class="co">#&gt; 11 result_a            bind_rows(analysis_a_1L_data_1L, analysis_a_25L_dat…</span>
+<span class="co">#&gt; 12 result_z            bind_rows(analysis_z_1L_data_1L, analysis_z_25L_dat…</span></code></pre>
+<p>With a downsized plan, we can inspect the graph to make sure the dependencies line up correctly.</p>
 <pre class="sourceCode r"><code class="sourceCode r">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-4bd26251e3510f85efcc" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4bd26251e3510f85efcc">{"x":{"nodes":{"id":["data_1L","data_13L","data_25L","analysis_a_25L_data_1L","analysis_a_13L_data_1L","analysis_a_1L_data_1L","analysis_m_25L_data_1L","analysis_m_13L_data_1L","analysis_m_1L_data_1L","analysis_z_13L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_13L_data_13L","analysis_a_25L_data_13L","analysis_a_1L_data_13L","analysis_m_1L_data_13L","analysis_m_13L_data_13L","analysis_m_25L_data_13L","analysis_z_13L_data_13L","analysis_z_1L_data_13L","analysis_z_25L_data_13L","analysis_a_13L_data_25L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_m_13L_data_25L","analysis_m_25L_data_25L","analysis_m_1L_data_25L","analysis_z_1L_data_25L","analysis_z_13L_data_25L","analysis_z_25L_data_25L","result_a","result_m","result_z"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"label":["data_1L","data_13L","data_25L","analysis_a_25L_data_1L","analysis_a_13L_data_1L","analysis_a_1L_data_1L","analysis_m_25L_data_1L","analysis_m_13L_data_1L","analysis_m_1L_data_1L","analysis_z_13L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_13L_data_13L","analysis_a_25L_data_13L","analysis_a_1L_data_13L","analysis_m_1L_data_13L","analysis_m_13L_data_13L","analysis_m_25L_data_13L","analysis_z_13L_data_13L","analysis_z_1L_data_13L","analysis_z_25L_data_13L","analysis_a_13L_data_25L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_m_13L_data_25L","analysis_m_25L_data_25L","analysis_m_1L_data_25L","analysis_z_1L_data_25L","analysis_z_13L_data_25L","analysis_z_25L_data_25L","result_a","result_m","result_z"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3],"x":[-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],"y":[-0.538461538461538,2.22044604925031e-16,0.538461538461539,-1,-0.923076923076923,-0.846153846153846,-0.769230769230769,-0.692307692307692,-0.615384615384615,-0.538461538461538,-0.461538461538461,-0.384615384615385,-0.307692307692308,-0.230769230769231,-0.153846153846154,-0.0769230769230769,2.22044604925031e-16,0.0769230769230771,0.153846153846154,0.230769230769231,0.307692307692308,0.384615384615385,0.461538461538461,0.538461538461539,0.615384615384615,0.692307692307693,0.769230769230769,0.846153846153846,0.923076923076923,1,-0.538461538461538,2.22044604925031e-16,0.538461538461539]},"edges":{"from":["data_1L","data_1L","data_1L","data_1L","data_1L","data_1L","data_1L","data_1L","data_1L","data_13L","data_13L","data_13L","data_13L","data_13L","data_13L","data_13L","data_13L","data_13L","data_25L","data_25L","data_25L","data_25L","data_25L","data_25L","data_25L","data_25L","data_25L","analysis_a_25L_data_1L","analysis_a_13L_data_13L","analysis_a_13L_data_25L","analysis_a_1L_data_25L","analysis_a_25L_data_13L","analysis_a_13L_data_1L","analysis_a_25L_data_25L","analysis_a_1L_data_1L","analysis_a_1L_data_13L","analysis_m_1L_data_13L","analysis_m_13L_data_25L","analysis_m_25L_data_1L","analysis_m_13L_data_13L","analysis_m_25L_data_25L","analysis_m_1L_data_25L","analysis_m_25L_data_13L","analysis_m_13L_data_1L","analysis_m_1L_data_1L","analysis_z_1L_data_25L","analysis_z_13L_data_1L","analysis_z_1L_data_1L","analysis_z_13L_data_25L","analysis_z_13L_data_13L","analysis_z_25L_data_1L","analysis_z_25L_data_25L","analysis_z_1L_data_13L","analysis_z_25L_data_13L"],"to":["analysis_a_25L_data_1L","analysis_a_13L_data_1L","analysis_a_1L_data_1L","analysis_m_25L_data_1L","analysis_m_13L_data_1L","analysis_m_1L_data_1L","analysis_z_13L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_13L_data_13L","analysis_a_25L_data_13L","analysis_a_1L_data_13L","analysis_m_1L_data_13L","analysis_m_13L_data_13L","analysis_m_25L_data_13L","analysis_z_13L_data_13L","analysis_z_1L_data_13L","analysis_z_25L_data_13L","analysis_a_13L_data_25L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_m_13L_data_25L","analysis_m_25L_data_25L","analysis_m_1L_data_25L","analysis_z_1L_data_25L","analysis_z_13L_data_25L","analysis_z_25L_data_25L","result_a","result_a","result_a","result_a","result_a","result_a","result_a","result_a","result_a","result_m","result_m","result_m","result_m","result_m","result_m","result_m","result_m","result_m","result_z","result_z","result_z","result_z","result_z","result_z","result_z","result_z","result_z"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>We can even run <code>make(plan)</code> and verify that the subset of targets in the plan turn out okay.</p>
+<script type="application/json" data-for="htmlwidget-4bd26251e3510f85efcc">{"x":{"nodes":{"id":["data_1L","data_25L","analysis_a_25L_data_1L","analysis_a_1L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_z_1L_data_25L","analysis_z_25L_data_25L","result_a","result_z"],"imported":[false,false,false,false,false,false,false,false,false,false,false,false],"label":["data_1L","data_25L","analysis_a_25L_data_1L","analysis_a_1L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_z_1L_data_25L","analysis_z_25L_data_25L","result_a","result_z"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,2,2,2,2,2,2,2,2,3,3],"x":[-1,-1,0,0,0,0,0,0,0,0,1,1],"y":[-0.428571428571428,0.428571428571429,-1,-0.714285714285714,-0.428571428571428,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1,-0.428571428571428,0.428571428571429]},"edges":{"from":["data_1L","data_1L","data_1L","data_1L","data_25L","data_25L","data_25L","data_25L","analysis_a_25L_data_1L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_a_1L_data_1L","analysis_z_1L_data_25L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_z_25L_data_25L"],"to":["analysis_a_25L_data_1L","analysis_a_1L_data_1L","analysis_z_1L_data_1L","analysis_z_25L_data_1L","analysis_a_1L_data_25L","analysis_a_25L_data_25L","analysis_z_1L_data_25L","analysis_z_25L_data_25L","result_a","result_a","result_a","result_a","result_z","result_z","result_z","result_z"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>We can even run <code>make(plan)</code> and check a strategic subset of targets.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)                       <span class="co"># Run the small subset of targets we kept.</span>
 <span class="kw">loadd</span>()                          <span class="co"># Load all those targets into memory.</span>
 <span class="kw">summary</span>(analysis_z_25L_data_13L) <span class="co"># Look at the values of those targets</span>
                                  <span class="co"># and decide if we are ready to scale up.</span></code></pre>
-<p>Afterwards, we can scale up to the full collection of targets.</p>
+<p>When we are ready to scale back up, we simply remove <code>max_expand</code> from the call to <code>drake_plan()</code>. Nothing else needs to change.</p>
 <pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
   <span class="dt">data =</span> <span class="kw">target</span>(
     <span class="kw">get_data</span>(source),
@@ -749,11 +773,6 @@ plan
 
 <span class="kw">nrow</span>(plan)
 <span class="co">#&gt; [1] 16301</span></code></pre>
-<p>The full plan is enormous! Here, <code>vis_drake_graph()</code> would be prohibitively slow and eat up too much memory to show anything useful. Good thing we checked the scaled-down version first.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># config &lt;- drake_config(plan) # Takes a long time.</span>
-<span class="co"># vis_drake_graph()            # Takes too much time and too much memory.</span></code></pre>
-<p>The next <code>make()</code> will skip the targets we ran before in test mode if they are still up to date. In other words, experimenting on a downsized plan gave us a head start.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan) <span class="co"># Full scaled-up workflow. Takes much longer.</span></code></pre>
 </div>
 <div id="the-types-of-transformations" class="section level3">
 <h3><span class="header-section-number">3.5.3</span> The types of transformations</h3>
