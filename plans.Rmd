@@ -537,7 +537,7 @@ config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
-Here, `drake_slice()` takes a single subset of the data at runtime. It supports lists, vectors, data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc).
+Here, `drake_slice()` takes a single subset of the data at runtime. 
 
 ```{r darke_slice}
 dataset <- tibble::as_tibble(iris)
@@ -549,6 +549,31 @@ drake_slice(dataset, slices = 50, index = 2)
 
 drake_slice(dataset, slices = 3, index = 1, margin = 2)
 ```
+
+`drake_slice()` supports data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc). Even better, you can split up ordinary vectors and lists. Instead of taking slices of the actual dataset, you can split up a set of indices. Combined with [high-performance computing](#hpc), this should help you avoid loading an entire big data file into memory onto single compute node.
+
+```{r splitfilenomem}
+plan <- drake_plan(
+  all_rows = file_in("huge.csv") %>%
+    number_of_rows() %>%
+    seq_len(),
+  rows = target(
+    all_rows,
+    transform = split(all_rows, slices = 3)
+  ),
+  analysis = target(
+    read_rows( # custom function
+      file = file_in("huge.csv"),
+      rows = rows
+    ) %>%
+      analyze_data(),
+    transform = map(rows, .id = rows_index) # an internal trick
+  )
+)
+
+drake_plan_source(plan)
+```
+
 
 #### `combine()`
 
