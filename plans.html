@@ -994,7 +994,7 @@ plan
 <span class="kw">vis_drake_graph</span>(config)</code></pre>
 <div id="htmlwidget-c8c2efd752b3f9f48dc8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-c8c2efd752b3f9f48dc8">{"x":{"nodes":{"id":["large_data","n-MRYGY6LSHI5GE2LOMRPXE33XOM","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results"],"imported":[false,true,false,false,false,false,false],"label":["large_data","dplyr::bind_rows","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results"],"status":["outdated","imported","outdated","outdated","outdated","outdated","outdated"],"type":["object","function","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20],"color":["#000000","#1874CD","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","triangle","dot","dot","dot","dot","dot"],"level":[1,1,2,2,2,2,3],"x":[-1,-1,0,0,0,0,1],"y":[-0.555555555555556,0.555555555555555,-1,-0.333333333333333,0.333333333333333,1,-2.22044604925031e-16]},"edges":{"from":["large_data","large_data","large_data","large_data","slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","n-MRYGY6LSHI5GE2LOMRPXE33XOM"],"to":["slice_analysis_1","slice_analysis_2","slice_analysis_3","slice_analysis_4","results","results","results","results","results"],"arrows":["to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function"],"color":["#000000","#1874CD","#888888","#888888"],"shape":["dot","dot","dot","triangle"],"font.color":["black","black","black","black"],"font.size":[20,20,20,20],"id":[2,5,7,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p>Here, <code>drake_slice()</code> takes a single subset of the data at runtime. It supports lists, vectors, data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc).</p>
+<p>Here, <code>drake_slice()</code> takes a single subset of the data at runtime.</p>
 <pre class="sourceCode r"><code class="sourceCode r">dataset &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>(iris)
 <span class="kw">dim</span>(dataset)
 <span class="co">#&gt; [1] 150   5</span>
@@ -1030,6 +1030,37 @@ plan
 <span class="co">#&gt;  9          4.4         2.9</span>
 <span class="co">#&gt; 10          4.9         3.1</span>
 <span class="co">#&gt; # … with 140 more rows</span></code></pre>
+<p><code>drake_slice()</code> supports data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc). Even better, you can split up ordinary vectors and lists. Instead of taking slices of the actual dataset, you can split up a set of indices. Combined with <a href="hpc.html#hpc">high-performance computing</a>, this should help you avoid loading an entire big data file into memory onto single compute node.</p>
+<pre class="sourceCode r"><code class="sourceCode r">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">all_rows =</span> <span class="kw">file_in</span>(<span class="st">&quot;huge.csv&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">number_of_rows</span>() <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">seq_len</span>(),
+  <span class="dt">rows =</span> <span class="kw">target</span>(
+    all_rows,
+    <span class="dt">transform =</span> <span class="kw">split</span>(all_rows, <span class="dt">slices =</span> <span class="dv">3</span>)
+  ),
+  <span class="dt">analysis =</span> <span class="kw">target</span>(
+    <span class="kw">read_rows</span>( <span class="co"># custom function</span>
+      <span class="dt">file =</span> <span class="kw">file_in</span>(<span class="st">&quot;huge.csv&quot;</span>),
+      <span class="dt">rows =</span> rows
+    ) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">analyze_data</span>(),
+    <span class="dt">transform =</span> <span class="kw">map</span>(rows, <span class="dt">.id =</span> rows_index) <span class="co"># an internal trick</span>
+  )
+)
+
+<span class="kw">drake_plan_source</span>(plan)
+<span class="co">#&gt; drake_plan(</span>
+<span class="co">#&gt;   all_rows = file_in(&quot;huge.csv&quot;) %&gt;%</span>
+<span class="co">#&gt;     number_of_rows() %&gt;%</span>
+<span class="co">#&gt;     seq_len(),</span>
+<span class="co">#&gt;   rows_1 = drake_slice(data = all_rows, slices = 3, index = 1),</span>
+<span class="co">#&gt;   rows_2 = drake_slice(data = all_rows, slices = 3, index = 2),</span>
+<span class="co">#&gt;   rows_3 = drake_slice(data = all_rows, slices = 3, index = 3),</span>
+<span class="co">#&gt;   analysis_1 = read_rows(file = file_in(&quot;huge.csv&quot;), rows = rows_1) %&gt;% analyze_data(),</span>
+<span class="co">#&gt;   analysis_2 = read_rows(file = file_in(&quot;huge.csv&quot;), rows = rows_2) %&gt;% analyze_data(),</span>
+<span class="co">#&gt;   analysis_3 = read_rows(file = file_in(&quot;huge.csv&quot;), rows = rows_3) %&gt;% analyze_data()</span>
+<span class="co">#&gt; )</span></code></pre>
 </div>
 <div id="combine" class="section level4">
 <h4><span class="header-section-number">3.5.3.5</span> <code>combine()</code></h4>
