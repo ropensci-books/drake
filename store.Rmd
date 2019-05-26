@@ -23,9 +23,6 @@ The default cache is a hidden `.drake` folder.
 ```{r getdefaultcache, eval = FALSE}
 find_cache()
 ### [1] "/home/you/project/.drake"
-
-find_project()
-### [1] "/home/you/project"
 ```
 
 `drake` uses the [storr](https://github.com/richfitz/storr) package to create and modify caches.
@@ -53,13 +50,17 @@ head(large)
 rm(large) # Does not remove `large` from the cache.
 ```
 
-Functions `get_cache()`, `storr::storr_rds()`, and `new_cache()` recover and create caches.
+Functions `drake_cache()`, `storr::storr_rds()`, and `new_cache()` recover and create caches. (`drake_cache()` is only supported in `drake` version 7.4.0 and above.)
 
 ```{r recovercache}
-cache <- get_cache(path = getwd()) # root or subdirectory of a drake project
+cache <- drake_cache()
 cache$driver$path
 
-cache <- storr::storr_rds(path = ".drake") # actual cache folder
+cache <- drake_cache(path = ".drake") # File path to drake's cache.
+cache$driver$path
+
+cache <- storr::storr_rds(path = ".drake")
+cache$driver$path
 
 cache2 <- new_cache("my_new_cache")
 cache2$driver$path
