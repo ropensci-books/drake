@@ -50,7 +50,7 @@
 <script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
-<script src="libs/visNetwork-binding-2.0.6/visNetwork.js"></script>
+<script src="libs/visNetwork-binding-2.0.7/visNetwork.js"></script>
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
@@ -417,19 +417,19 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 <p>Functions <code>drake_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpFd7S5w/file3a3e7ac1896b/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpvvClhc/file37b620618683/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span>
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpFd7S5w/file3a3e7ac1896b/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpvvClhc/file37b620618683/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpFd7S5w/file3a3e7ac1896b/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpvvClhc/file37b620618683/.drake&quot;</span>
 
 cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)
 cache2<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/RtmpFd7S5w/file3a3e7ac1896b/my_new_cache&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpvvClhc/file37b620618683/my_new_cache&quot;</span></code></pre>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2<span class="op">$</span><span class="kw">list</span>()
 <span class="co">#&gt; character(0)</span>
@@ -458,8 +458,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-<span class="co">#&gt; [1] &quot;01490dfddbc632f3.rds&quot; &quot;1a66b3418404dcbf.rds&quot; &quot;21935c86f12692e2.rds&quot;</span>
-<span class="co">#&gt; [4] &quot;2c3d8028117512b7.rds&quot; &quot;2c74bb499b8a0901.rds&quot; &quot;2e81d62763322ce5.rds&quot;</span>
+<span class="co">#&gt; [1] &quot;01490dfddbc632f3.rds&quot; &quot;01714a4ec767303f.rds&quot; &quot;062713c358e6a268.rds&quot;</span>
+<span class="co">#&gt; [4] &quot;083de007153ef14c.rds&quot; &quot;1167e78c9c2cfbda.rds&quot; &quot;1ae2788aa53d9686.rds&quot;</span>
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span>
 <span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span>
