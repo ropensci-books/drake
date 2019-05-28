@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>The drake R Package User Manual</title>
+  <title>Chapter 2 Similar work | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="generator" content="bookdown 0.10 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:title" content="Chapter 2 Similar work | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="https://ropenscilabs.github.io/drake-manual" />
   <meta property="og:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ropenscilabs/drake-manual" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The drake R Package User Manual" />
+  <meta name="twitter:title" content="Chapter 2 Similar work | The drake R Package User Manual" />
   
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="twitter:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-
-<link rel="next" href="similar-work.html">
+<link rel="prev" href="index.html">
+<link rel="next" href="walkthrough.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -366,241 +366,80 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">The drake R Package User Manual</h1>
-<p class="author"><em>Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert</em></p>
-<p class="author"><em>Copyright Eli Lilly and Company</em></p>
+<div id="similar-work" class="section level1">
+<h1><span class="header-section-number">Chapter 2</span> Similar work</h1>
+<p><code>drake</code> enhances reproducibility and high-performance computing, but not in all respects. <a href="https://rmarkdown.rstudio.com/">Literate programming</a>, <a href="https://rstudio.github.io/packrat">local library managers</a>, <a href="https://www.docker.com/">containerization</a>, and <a href="https://github.com/tidyverse/reprex">strict session managers</a> offer more robust solutions in their respective domains. And for the problems <code>drake</code> <em>does</em> solve, it stands on the shoulders of the giants that came before.</p>
+<div id="pipeline-tools" class="section level2">
+<h2><span class="header-section-number">2.1</span> Pipeline tools</h2>
+<div id="gnu-make" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> GNU Make</h3>
+<p>The original idea of a time-saving reproducible build system extends back at least as far as <a href="https://www.gnu.org/software/make/">GNU Make</a>, which still aids the work of <a href="http://blog.kaggle.com/2012/10/15/make-for-data-scientists/">data scientists</a> as well as the original user base of complied language programmers. In fact, the name “drake” stands for “Data Frames in R for Make”. <a href="https://kbroman.org/minimal_make/">Make</a> is used widely in reproducible research. Below are some examples from <a href="https://kbroman.org/minimal_make/">Karl Broman’s website</a>.</p>
+<ul>
+<li>Bostock, Mike (2013). “A map of flowlines from NHDPlus.” <a href="https://github.com/mbostock/us-rivers" class="uri">https://github.com/mbostock/us-rivers</a>. Powered by the Makefile at <a href="https://github.com/mbostock/us-rivers/blob/master/Makefile" class="uri">https://github.com/mbostock/us-rivers/blob/master/Makefile</a>.</li>
+<li>Broman, Karl W (2012). “Halotype Probabilities in Advanced Intercross Populations.” <em>G3</em> 2(2), 199-202.Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/ailProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/ailProbPaper/blob/master/Makefile</a>.</li>
+<li>Broman, Karl W (2012). “Genotype Probabilities at Intermediate Generations in the Construction of Recombinant Inbred Lines.” *Genetics 190(2), 403-412. Powered by the Makefile at <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile" class="uri">https://github.com/kbroman/preCCProbPaper/blob/master/Makefile</a>.</li>
+<li>Broman, Karl W and Kim, Sungjin and Sen, Saunak and Ane, Cecile and Payseur, Bret A (2012). “Mapping Quantitative Trait Loci onto a Phylogenetic Tree.” <em>Genetics</em> 192(2), 267-279. Powered by the <code>Makefile</code> at <a href="https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile" class="uri">https://github.com/kbroman/phyloQTLpaper/blob/master/Makefile</a>.</li>
+</ul>
+<p>Whereas <a href="https://www.gnu.org/software/make/">GNU Make</a> is language-agnostic, <code>drake</code> is fundamentally designed for R.</p>
+<ul>
+<li>Instead of a <a href="https://github.com/kbroman/preCCProbPaper/blob/master/Makefile">Makefile</a>, <code>drake</code> supports an R-friendly <a href="https://ropenscilabs.github.io/drake-manual/plans.html#large-plans">domain-specific language</a> for declaring targets.</li>
+<li>Targets in <a href="https://www.gnu.org/software/make/">GNU Make</a> are files, whereas targets in <code>drake</code> are arbitrary variables in memory. (<code>drake</code> does have opt-in support for files via <code>file_out()</code>, <code>file_in()</code>, and <code>knitr_in()</code>.) <code>drake</code> caches these objects in its own <a href="https://github.com/richfitz/storr">storage system</a> so R users rarely have to think about output files.</li>
+</ul>
 </div>
-<div id="intro" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
-<iframe src="https://player.vimeo.com/video/288956463" width="640" height="358" frameborder="0" allowfullscreen>
-</iframe>
-<div id="the-drake-r-package" class="section level2">
-<h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p>Data analysis can be slow. A round of scientific computation can take several minutes, hours, or even days to complete. After it finishes, if you update your code or data, your hard-earned results may no longer be valid. How much of that valuable output can you keep, and how much do you need to update? How much runtime must you endure all over again?</p>
-<p>For projects in R, the <code>drake</code> package can help. It <a href="https://ropenscilabs.github.io/drake-manual/plans.html">analyzes your workflow</a>, skips steps with up-to-date results, and orchestrates the rest with <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">optional distributed computing</a>. At the end, <code>drake</code> provides evidence that your results match the underlying code and data, which increases your ability to trust your research.</p>
+<div id="remake" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> Remake</h3>
+<p><a href="https://github.com/richfitz/remake">remake</a> itself is no longer maintained, but its founding design goals and principles live on through <a href="https://github.com/ropensci/drake">drake</a>. In fact, <a href="https://github.com/ropensci/drake">drake</a> is a direct reimagining of <a href="https://github.com/richfitz/remake">remake</a> with enhanced scalability, reproducibility, high-performance computing, visualization, and documentation.</p>
 </div>
-<div id="installation" class="section level2">
-<h2><span class="header-section-number">1.2</span> Installation</h2>
-<p>You can choose among different versions of <code>drake</code>. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install the latest stable release from CRAN.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)
+<div id="factuals-drake" class="section level3">
+<h3><span class="header-section-number">2.1.3</span> Factual’s Drake</h3>
+<p><a href="https://github.com/Factual/drake">Factual’s Drake</a> is similar in concept, but the development effort is completely unrelated to the <a href="https://github.com/ropensci/drake">drake R package</a>.</p>
+</div>
+<div id="other-pipeline-tools" class="section level3">
+<h3><span class="header-section-number">2.1.4</span> Other pipeline tools</h3>
+<p>There are <a href="https://github.com/pditommaso/awesome-pipeline">countless other successful pipeline toolkits</a>. The <code>drake</code> package distinguishes itself with its R-focused approach, Tidyverse-friendly interface, and a <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">thorough selection of parallel computing technologies and scheduling algorithms</a>.</p>
+</div>
+</div>
+<div id="memoization" class="section level2">
+<h2><span class="header-section-number">2.2</span> Memoization</h2>
+<p>Memoization is the strategic caching of the return values of functions. It is a lightweight approach to the core problem that <code>drake</code> and other pipeline tools are trying to solve. Every time a memoized function is called with a new set of arguments, the return value is saved for future use. Later, whenever the same function is called with the same arguments, the previous return value is salvaged, and the function call is skipped to save time. The <a href="https://github.com/r-lib/memoise"><code>memoise</code></a> package is the primary implementation of memoization in R.</p>
+<p>Memoization saves time for small projects, but it arguably does not go far enough for large reproducible pipelines. In reality, the return value of a function depends not only on the function body and the arguments, but also on any nested functions and global variables, the dependencies of those dependencies, and so on upstream. <code>drake</code> tracks this deeper context, while <a href="https://github.com/r-lib/memoise">memoise</a> does not.</p>
+</div>
+<div id="literate-programming" class="section level2">
+<h2><span class="header-section-number">2.3</span> Literate programming</h2>
+<p><a href="https://rmarkdown.rstudio.com/">Literate programming</a> is the practice of narrating code in plain vernacular. The goal is to communicate the research process clearly, transparently, and reproducibly. Whereas commented code is still mostly code, literate <a href="https://yihui.name/knitr/">knitr</a> / <a href="https://rmarkdown.rstudio.com/">R Markdown</a> reports can become websites, presentation slides, lecture notes, serious scientific manuscripts, and even books.</p>
+<div id="knitr-and-r-markdown" class="section level3">
+<h3><span class="header-section-number">2.3.1</span> knitr and R Markdown</h3>
+<p><code>drake</code> and <a href="https://yihui.name/knitr/">knitr</a> are symbiotic. <code>drake</code>’s job is to manage large computation and orchestrate the demanding tasks of a complex data analysis pipeline. <a href="https://yihui.name/knitr/">knitr</a>’s job is to communicate those expensive results after <code>drake</code> computes them. <a href="https://yihui.name/knitr/">knitr</a> / <a href="https://rmarkdown.rstudio.com/">R Markdown</a> reports are small pieces of an overarching <code>drake</code> pipeline. They should focus on communication, and they should do as little computation as possible.</p>
+<p>To insert a <a href="https://yihui.name/knitr/">knitr</a> report in a <code>drake</code> pipeline, use the <code>knitr_in()</code> function inside your <a href="https://ropenscilabs.github.io/drake-manual/plans.html"><code>drake</code> plan</a>, and use <code>loadd()</code> and <code>readd()</code> to refer to targets in the report itself. See an <a href="https://github.com/wlandau/drake-examples/tree/master/main">example here</a>.</p>
+</div>
+<div id="workflowr" class="section level3">
+<h3><span class="header-section-number">2.3.2</span> workflowr</h3>
+<p>The <a href="https://github.com/jdblischak/workflowr"><code>workflowr</code></a> package is a project manager that focuses on literate programming, sharing over the web, file organization, and version control. Its brand of reproducibility is all about transparency, communication, and discoverability. For an example of <a href="https://github.com/jdblischak/workflowr"><code>workflowr</code></a> and <code>drake</code> working together, see <a href="https://2019-feature-selection.pjs-web.de/report-defoliation.html">this machine learning project</a> by <a href="https://github.com/pat-s">Patrick Schratz</a> (<a href="https://github.com/pat-s/2019-feature-selection">source</a>).</p>
+</div>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2><span class="header-section-number">2.4</span> Acknowledgements</h2>
+<p>Special thanks to <a href="http://www.jarad.me/">Jarad Niemi</a>, my advisor from <a href="http://stat.iastate.edu/">graduate school</a>, for first introducing me to the idea of <a href="https://www.gnu.org/software/make/">Makefiles</a> for research. He originally set me down the path that led to <code>drake</code>.</p>
+<p>Many thanks to <a href="https://github.com/jules32">Julia Lowndes</a>, <a href="https://github.com/benmarwick">Ben Marwick</a>, and <a href="https://github.com/gothub">Peter Slaughter</a> for <a href="https://github.com/ropensci/onboarding/issues/156">reviewing drake for rOpenSci</a>, and to <a href="https://github.com/maelle">Maëlle Salmon</a> for such active involvement as the editor. Thanks also to the following people for contributing early in development.</p>
+<ul>
+<li><a href="https://github.com/AlexAxthelm">Alex Axthelm</a></li>
+<li><a href="https://github.com/mrchypark">Chan-Yub Park</a></li>
+<li><a href="https://github.com/dfalster">Daniel Falster</a></li>
+<li><a href="https://github.com/thercast">Eric Nantz</a></li>
+<li><a href="https://github.com/HenrikBengtsson">Henrik Bengtsson</a></li>
+<li><a href="https://github.com/IanAWatson">Ian Watson</a></li>
+<li><a href="https://github.com/dapperjapper">Jasper Clarkberg</a></li>
+<li><a href="https://github.com/kendonB">Kendon Bell</a></li>
+<li><a href="https://github.com/krlmlr">Kirill Müller</a></li>
+</ul>
+<p>Credit for images is <a href="ropensci.github.io/drake/figures/image-credit.md">attributed here</a>.</p>
+<p><a href="https://ropensci.org"><img src="http://ropensci.org/public_images/github_footer.png" alt="ropensci_footer" /></a></p>
 
-<span class="co"># Alternatively, install the development version from GitHub.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
-<span class="kw">library</span>(devtools)
-<span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre>
 </div>
-<div id="why-drake" class="section level2">
-<h2><span class="header-section-number">1.3</span> Why drake?</h2>
-<div id="what-gets-done-stays-done." class="section level3">
-<h3><span class="header-section-number">1.3.1</span> What gets done stays done.</h3>
-<p>Too many data science projects follow a <a href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphean loop</a>:</p>
-<ol style="list-style-type: decimal">
-<li>Launch the code.</li>
-<li>Wait while it runs.</li>
-<li>Discover an issue.</li>
-<li>Restart from scratch.</li>
-</ol>
-<p>Ordinarily, it is hard to avoid restarting from scratch.
-<br></p>
-<center>
-<img src="https://ropensci.github.io/drake/images/tweet.png" alt="tweet" align="center" style = "border: none; float: center;">
-</center>
-<p><br></p>
-<p>But with <code>drake</code>, you can automatically</p>
-<ol style="list-style-type: decimal">
-<li>Launch the parts that changed since last time.</li>
-<li>Skip the rest.</li>
-</ol>
 </div>
-<div id="reproducibility-with-confidence" class="section level3">
-<h3><span class="header-section-number">1.3.2</span> Reproducibility with confidence</h3>
-<p>The R community emphasizes reproducibility. Traditional themes include <a href="https://en.wikipedia.org/wiki/Replication_crisis">scientific replicability</a>, literate programming with <a href="https://yihui.name/knitr/">knitr</a>, and version control with <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">git</a>. But internal consistency is important too. Reproducibility carries the promise that your output matches the code and data you say you used. With the exception of <a href="triggers.html#triggers">non-default triggers</a> and <a href="https://ropenscilabs.github.io/drake-manual/hpc.html#hasty-mode">hasty mode</a>, <code>drake</code> strives to keep this promise.</p>
-<div id="evidence" class="section level4">
-<h4><span class="header-section-number">1.3.2.1</span> Evidence</h4>
-<p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
 
-config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
-<span class="kw">outdated</span>(config)</code></pre>
-<p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
-</div>
-<div id="ease" class="section level4">
-<h4><span class="header-section-number">1.3.2.2</span> Ease</h4>
-<p>When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()       <span class="co"># Remove the original author&#39;s results.</span>
-<span class="kw">make</span>(plan) <span class="co"># Independently re-create the results from the code and input data.</span></code></pre>
-</div>
-<div id="independent-replication" class="section level4">
-<h4><span class="header-section-number">1.3.2.3</span> Independent replication</h4>
-<p>With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic <code>drake</code> functions such as <code>make()</code>, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author’s methodology. In other words, <code>drake</code> could potentially improve the integrity of independent replication.</p>
-</div>
-<div id="readability-and-transparency" class="section level4">
-<h4><span class="header-section-number">1.3.2.4</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>drake</code> helps in several ways.</p>
-<ul>
-<li>The <a href="https://ropensci.github.io/drake/reference/drake_plan.html"><code>drake</code> plan</a> explicitly outlines the steps of the analysis, and <a href="https://ropensci.github.io/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
-<li>You can <a href="https://ropenscilabs.github.io/drake-manual/plans#large-plans">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
-</ul>
-</div>
-</div>
-<div id="aggressively-scale-up." class="section level3">
-<h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the spare cores on your local machine.</span>
-<span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)
 
-<span class="co"># Or scale up to a supercomputer.</span>
-<span class="kw">drake_batchtools_tmpl_file</span>(<span class="st">&quot;slurm&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span>
-<span class="kw">library</span>(future.batchtools)
-future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;batchtools.slurm.tmpl&quot;</span>, <span class="dt">workers =</span> <span class="dv">100</span>)
-<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</code></pre>
-</div>
-</div>
-<div id="documentation" class="section level2">
-<h2><span class="header-section-number">1.4</span> Documentation</h2>
-<p>The main resources to learn <code>drake</code> are</p>
-<ol style="list-style-type: decimal">
-<li>The <a href="https://ropenscilabs.github.io/drake-manual/">user manual</a>, which contains a friendly introduction and several long-form tutorials.</li>
-<li>The <a href="https://ropensci.github.io/drake/">documentation website</a>, which serves as a quicker reference.</li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a>’s <a href="https://github.com/krlmlr/drake-sib-zurich"><code>drake</code> workshop from March 5, 2018</a>.</li>
-</ol>
-<div id="shiny-app" class="section level3">
-<h3><span class="header-section-number">1.4.1</span> Shiny app</h3>
-<p>The Shiny app at <a href="https://wlandau.shinyapps.io/drakeplanner">wlandau.shinyapps.io/drakeplanner</a> makes it easier to learn <code>drake</code> and create new <code>drake</code>-powered projects. If you have trouble accessing it, you can install and run it locally.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;wlandau/drakeplanner&quot;</span>)
-drakeplanner<span class="op">::</span><span class="kw">drakeplanner</span>()</code></pre>
-</div>
-<div id="cheat-sheet" class="section level3">
-<h3><span class="header-section-number">1.4.2</span> Cheat sheet</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for preparing a <a href="https://github.com/krlmlr/drake-sib-zurich/blob/master/cheat-sheet.pdf"><code>drake</code> cheat sheet</a> for the <a href="https://github.com/krlmlr/drake-sib-zurich">workshop</a>.</p>
-</div>
-<div id="frequently-asked-questions" class="section level3">
-<h3><span class="header-section-number">1.4.3</span> Frequently asked questions</h3>
-<p>The <a href="https://ropenscilabs.github.io/drake-manual/faq.html">FAQ page</a> is an index of links to <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">appropriately-labeled issues on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled as a frequently asked question.</p>
-</div>
-<div id="function-reference" class="section level3">
-<h3><span class="header-section-number">1.4.4</span> Function reference</h3>
-<p>The <a href="https://ropensci.github.io/drake/reference/index.html">reference section</a> lists all the available functions. Here are the most important ones.</p>
-<ul>
-<li><code>drake_plan()</code>: create a workflow data frame (like <code>my_plan</code>).</li>
-<li><code>make()</code>: build your project.</li>
-<li><code>loadd()</code>: load one or more built targets into your R session.</li>
-<li><code>readd()</code>: read and return a built target.</li>
-<li><code>drake_config()</code>: create a master configuration list for other user-side functions.</li>
-<li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
-<li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
-<li><code>deps()</code>: check the dependencies of a command or function.</li>
-<li><code>failed()</code>: list the targets that failed to build in the last <code>make()</code>.</li>
-<li><code>diagnose()</code>: return the full context of a build, including errors, warnings, and messages.</li>
-</ul>
-</div>
-<div id="tutorials" class="section level3">
-<h3><span class="header-section-number">1.4.5</span> Tutorials</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for constructing two interactive <a href="https://rstudio.github.io/learnr/"><code>learnr</code></a> tutorials: <a href="https://krlmlr.shinyapps.io/cooking-drake-tutorial/">one supporting <code>drake</code> itself</a>, and a <a href="https://krlmlr.shinyapps.io/cooking-tutorial/">prerequisite walkthrough</a> of the <a href="https://github.com/krlmlr/cooking"><code>cooking</code> package</a>.</p>
-</div>
-<div id="examples" class="section level3">
-<h3><span class="header-section-number">1.4.6</span> Examples</h3>
-<p>The official <a href="https://ropensci.org/usecases/">rOpenSci use cases</a> and <a href="https://discuss.ropensci.org/c/usecases">associated discussion threads</a> describe applications of <code>drake</code> in action. Here are some more real-world sightings of <code>drake</code> in the wild.</p>
-<ul>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/pat-s/pathogen-modeling">pat-s/pathogen-modeling</a></li>
-<li><a href="https://github.com/sol-eng/tensorflow-w-r">sol-eng/tensorflow-w-r</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-<p>There are also multiple <code>drake</code>-powered example projects <a href="https://github.com/wlandau/drake-examples">available here</a>, ranging from beginner-friendly stubs to demonstrations of high-performance computing. You can generate the files for a project with <code>drake_example()</code> (e.g. <code>drake_example(&quot;gsp&quot;)</code>), and you can list the available projects with <code>drake_examples()</code>. You can contribute your own example project with a <a href="https://github.com/wlandau/drake-examples/pulls">fork and pull request</a>.</p>
-</div>
-<div id="presentations" class="section level3">
-<h3><span class="header-section-number">1.4.7</span> Presentations</h3>
-<table>
-<colgroup>
-<col width="22%" />
-<col width="22%" />
-<col width="22%" />
-<col width="31%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author</th>
-<th>Venue</th>
-<th>Date</th>
-<th>Materials</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="https://github.com/DominikRafacz">Dominik Rafacz</a></td>
-<td><a href="https://gdansk2019.satrdays.org">satRday Gdansk</a></td>
-<td>2019-05-18</td>
-<td><a href="https://github.com/DominikRafacz/drake-presentation/blob/master/presentation.pdf">slides</a>, <a href="https://github.com/DominikRafacz/drake-presentation">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/aedobbyn">Amanda Dobbyn</a></td>
-<td><a href="http://www.rladiesnyc.org/">R-Ladies NYC</a></td>
-<td>2019-02-12</td>
-<td><a href="https://aedobbyn.github.io/nyc-fires/index.html#1">slides</a>, <a href="https://github.com/aedobbyn/nyc-fires">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="https://projects.iq.harvard.edu/datafest2019/home">Harvard DataFest</a></td>
-<td>2019-01-22</td>
-<td><a href="https://wlandau.github.io/drake-datafest-2019">slides</a>, <a href="https://github.com/wlandau/drake-datafest-2019">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="http://github.com/karthik">Karthik Ram</a></td>
-<td><a href="https://www.rstudio.com/conference">RStudio Conference</a></td>
-<td>2019-01-18</td>
-<td><a href="https://resources.rstudio.com/rstudio-conf-2019/a-guide-to-modern-reproducible-data-science-with-r">video</a>, <a href="http://inundata.org/talks/rstd19/#/">slides</a>, <a href="https://github.com/karthik/rstudio2019">resources</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/sinarueeger">Sina Rüeger</a></td>
-<td><a href="https://www.meetup.com/Geneve-R-User-Group">Geneva R User Group</a></td>
-<td>2018-10-04</td>
-<td><a href="https://sinarueeger.github.io/20181004-geneve-rug">slides</a>, <a href="https://github.com/sinarueeger/workflow-example">example code</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="http://rinpharma.com/">R in Pharma</a></td>
-<td>2018-08-16</td>
-<td><a href="https://ropenscilabs.github.io/drake-manual/">video</a>, <a href="https://wlandau.github.io/drake-talk">slides</a>, <a href="https://github.com/wlandau/drake-talk">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/cstawitz">Christine Stawitz</a></td>
-<td><a href="https://www.meetup.com/rladies-seattle">R-Ladies Seattle</a></td>
-<td>2018-06-25</td>
-<td><a href="https://github.com/cstawitz/RLadies_Sea_drake">materials</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/krlmlr">Kirill Müller</a></td>
-<td><a href="https://www.sib.swiss">Swiss Institute of Bioinformatics</a></td>
-<td>2018-03-05</td>
-<td><a href="https://www.sib.swiss/training/course/2018-03-remake">workshop</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich">slides</a>, <a href="https://github.com/krlmlr/drake-sib-zurich">source</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich/cooking.html">exercises</a></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="context-and-history" class="section level3">
-<h3><span class="header-section-number">1.4.8</span> Context and history</h3>
-<p>For context and history, check out <a href="https://ropensci.org/blog/2018/02/06/drake/">this post on the rOpenSci blog</a> and <a href="https://www.r-podcast.org/episode/022-diving-in-to-drake-with-will-landau/">episode 22 of the R Podcast</a>.</p>
-</div>
-</div>
-<div id="help-and-troubleshooting" class="section level2">
-<h2><span class="header-section-number">1.5</span> Help and troubleshooting</h2>
-<p>The following resources document many known issues and challenges.</p>
-<ul>
-<li><a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22Frequently+Asked+Question%22">Frequently-asked questions</a>.</li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/caution.html">Cautionary notes and edge cases</a></li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/debug.html">Debugging and testing drake projects</a></li>
-<li><a href="https://github.com/ropensci/drake/issues">Other known issues</a> (please search both open and closed ones).</li>
-</ul>
-<p>If you are still having trouble, please submit a <a href="https://github.com/ropensci/drake/issues/new">new issue</a> with a bug report or feature request, along with a minimal reproducible example where appropriate.</p>
-<p>The GitHub issue tracker is mainly intended for bug reports and feature requests. While questions about usage etc. are also highly encouraged, you may alternatively wish to post to <a href="https://stackoverflow.com">Stack Overflow</a> and use the <a href="https://stackoverflow.com/tags/drake-r-package"><code>drake-r-package</code> tag</a>.</p>
-</div>
+
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">
   Copyright Eli Lilly and Company
@@ -610,8 +449,8 @@ drakeplanner<span class="op">::</span><span class="kw">drakeplanner</span>()</co
           </div>
         </div>
       </div>
-
-<a href="similar-work.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="walkthrough.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
