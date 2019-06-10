@@ -1,0 +1,239 @@
+# Memory management {#memory}
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+library(biglm)
+library(drake)
+library(tidyverse)
+```
+
+The default settings of `drake` prioritize speed over memory efficiency. For projects with large data, this default behavior can cause problems. Consider the following hypothetical workflow, where we simulate several large datasets and summarize them.
+
+```{r, paged.print = FALSE}
+reps <- 10 # Serious workflows may have several times more.
+
+# Reduce `n` to lighten the load if you want to try this workflow yourself.
+# It is super high in this chapter to motivate the memory issues.
+generate_large_data <- function(rep, n = 1e8) {
+  tibble(x = rnorm(n), y = rnorm(n), rep = rep)
+}
+
+get_means <- function(...) {
+  out <- NULL
+  for (dataset in list(...)) {
+    out <- bind_rows(out, colMeans(dataset))
+  }
+  out
+}
+
+plan <- drake_plan(
+  large_data = target(
+    generate_large_data(rep),
+    transform = map(rep = !!seq_len(reps), .id = FALSE)
+  ),
+  means = target(
+    get_means(large_data),
+    transform = combine(large_data)
+  ),
+  summ = summary(means)
+)
+
+print(plan)
+```
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+If you call `make(plan)` with no additional arguments, `drake` will try to load all the datasets into the same R session. Each dataset from `generate_large_data(n = 1e8)` occupies about 2.4 GB of memory, and most machines cannot handle all the data at once. We should use memory more wisely.
+
+## Garbage collection and custom files
+
+`make()` and `drake_config()` have a `garbage_collection` argument, which tells `drake` to periodically unload data objects that no longer belong to variables. You can also run garbage collection manually with the `gc()` function. For more on garbage collection, please refer to the [memory usage chapter of Advanced R](http://adv-r.had.co.nz/memory.html#gc).
+
+Let's reduce the memory consumption of our example workflow:
+
+1. Call `gc()` after every loop iteration of `get_means()`.
+2. Avoid `drake`'s caching system with custom `file_out()` files in the plan.
+3. Call `make(plan, garbage_collection = TRUE)`.
+
+```{r, paged.print = FALSE}
+reps <- 10 # Serious workflows may have several times more.
+files <- paste0(seq_len(reps), ".rds")
+
+generate_large_data <- function(file, n = 1e8) {
+  out <- tibble(x = rnorm(n), y = rnorm(n)) # a billion rows
+  saveRDS(out, file)
+}
+
+get_means <- function(files) {
+  out <- NULL
+  for (file in files) {
+    x <- colMeans(readRDS(file))
+    out <- bind_rows(out, x)
+    gc() # Use the gc() function here to make sure each x gets unloaded.
+  }
+  out
+}
+
+plan <- drake_plan(
+  large_data = target(
+    generate_large_data(file = file_out(file)),
+    transform = map(file = !!files, .id = FALSE)
+  ),
+  means = get_means(file_in(!!files)),
+  summ = summary(means)
+)
+
+print(plan)
+```
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+```{r, eval = FALSE}
+make(plan, garbage_collection = TRUE)
+```
+
+## Memory strategies
+
+`make()` and `drake_config()` have a `memory_strategy` argument to customize how `drake` loads and unloads targets. With the right memory strategy, you can rely on `drake`'s built-in caching system without having to bother with messy `file_out()` files.
+
+Each memory strategy follows three stages for each target:
+
+1. Initial discard: before building the target, optionally discard some other targets from the R session. The choice of discards depends on the memory strategy. (Note: we do not actually get the memory back until we call `gc()`.)
+2. Initial load: before building the target, optionally load any dependencies that are not already in memory.
+3. Final discard: optionally discard or keep the return value after the target finishes building. Either way, the return value is still stored in the cache, so you can load it with `loadd()` and `readd()`.
+
+The implementation of these steps varies from strategy to strategy.
+
+`memory_strategy` | Initial discard | Initial load | Final discard
+---|---|---|---
+"speed" | Discard nothing | Load any missing dependencies. | Keep the return value loaded.
+"memory" | Discard all targets which are not dependencies of the current target. | Load any missing dependencies. | Keep the return value loaded.
+"lookahead" | Discard all targets which are not dependencies of either (1) the current target or (2) other targets waiting to be checked or built. | Load any missing dependencies. | Keep the return value loaded.
+"unload"[^1] | Unload all targets. | Load nothing. | Discard the return value.
+"none"[^1] | Unload nothing. | Load nothing. | Discard the return value.
+
+[^1]: Only supported in `drake` version 7.4.0 and above.
+
+With the `"speed"`, `"memory"`, and `"lookahead"` strategies, you can simply call `make(plan, memory_strategy = YOUR_CHOICE, garbage_collection = TRUE)` and trust that your targets will build normally. For the `"unload"` and `"none"` strategies, there is extra work to do: you will need to manually load each target's dependencies with `loadd()` or `readd()`. This manual bookkeeping lets you aggressively optimize your workflow, and it is less cumbersome than swarms of `file_out()` files. It is particularly useful when you have a large `combine()` step.
+
+Let's redesign the workflow to reap the benefits of `make(plan, memory_strategy = "none", garbage_collection = TRUE)`. The trick is to use [`match.call()`](https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/match.call) inside `get_means()` so we can load and unload dependencies one at a time instead of all at once.
+
+```{r, paged.print = FALSE}
+reps <- 10 # Serious workflows may have several times more.
+
+generate_large_data <- function(rep, n = 1e8) {
+  tibble(x = rnorm(n), y = rnorm(n), rep = rep)
+}
+
+# Load targets one at a time
+get_means <- function(...) {
+  arg_symbols <- match.call(expand.dots = FALSE)$...
+  arg_names <- as.character(arg_symbols)
+  out <- NULL
+  for (arg_name in arg_names) {
+    dataset <- readd(arg_name, character_only = TRUE)
+    out <- bind_rows(out, colMeans(dataset))
+    gc() # Run garbage collection.
+  }
+  out
+}
+
+plan <- drake_plan(
+  large_data = target(
+    generate_large_data(rep),
+    transform = map(rep = !!seq_len(reps), .id = FALSE)
+  ),
+  means = target(
+    get_means(large_data),
+    transform = combine(large_data)
+  ),
+  summ = {
+    loadd(means) # Annoying, but necessary with the "none" strategy.
+    summary(means)
+  }
+)
+```
+
+Now, we can build our targets.
+
+```{r, eval = FALSE}
+make(plan, memory_strategy = "none", garbage_collection = TRUE)
+```
+
+But there is a snag: we needed to manually load `means` in the command for `summ` (notice the call to `loadd()`). This is annoying, especially because `means` is quite small. Fortunately, `drake` lets you define different memory strategies for different targets in the plan. The target-specific memory strategies override the global one (i.e. the `memory_strategy` argument of `make()` and `drake_config()`).
+
+```{r}
+plan <- drake_plan(
+  large_data = target(
+    generate_large_data(rep),
+    transform = map(rep = !!seq_len(reps), .id = FALSE),
+    memory_strategy = "none"
+  ),
+  means = target(
+    get_means(large_data),
+    transform = combine(large_data),
+    memory_strategy = "unload" # Be careful with this one.
+  ),
+  summ = summary(means)
+)
+
+print(plan)
+```
+
+In fact, now you can run `make()` without setting a global memory strategy at all.
+
+```{r, eval = FALSE}
+make(plan, garbage_collection = TRUE)
+```
+
+## Data splitting
+
+The [`split()` transformation](https://ropenscilabs.github.io/drake-manual/plans.html#split) breaks up a dataset into smaller targets. The ordinary use of `split()` is to partition an in-memory dataset into slices.
+
+```{r, paged.print = FALSE}
+drake_plan(
+  data = get_large_data(),
+  x = target(
+    data %>%
+      analyze_data(),
+    transform = split(data, slices = 4)
+  )
+)
+```
+
+However, you can also use it to load individual pieces of a large file, thus conserving memory. The trick is to break up an index set instead of the data itself. In the following sketch, `get_number_of_rows()` and `read_selected_rows()` are user-defined functions, and `%>%` is the [`magrittr`](https://magrittr.tidyverse.org) pipe.
+
+```{r, paged.print = FALSE}
+get_number_of_rows <- function(file) {
+  # ...
+}
+
+read_selected_rows <- function(which_rows, file) {
+  # ...
+}
+
+plan <- drake_plan(
+  row_indices = file_in("large_file.csv") %>%
+    get_number_of_rows() %>%
+    seq_len(),
+  subset = target(
+    row_indices %>%
+      read_selected_rows(file = file_in("large_file.csv")),
+    transform = split(row_indices, slices = 4)
+  )
+)
+
+plan
+
+drake_plan_source(plan)
+```
