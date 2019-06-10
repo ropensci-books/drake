@@ -16,7 +16,8 @@ The default settings of `drake` prioritize speed over memory efficiency. For wor
 ```{r, paged.print = FALSE}
 reps <- 10 # Serious workflows may have several times more.
 
-# Reduce `n` to lighten the load.
+# Reduce `n` to lighten the load if you want to try this workflow yourself.
+# It is super high in this chapter to motivate the memory issues.
 generate_large_data <- function(rep, n = 1e8) {
   tibble(x = rnorm(n), y = rnorm(n), rep = rep)
 }
@@ -101,10 +102,10 @@ vis_drake_graph(config)
 
 `make()` and `drake_config()` have a `memory_strategy` argument to customize how `drake` loads and unloads targets. With the right memory strategy, you can rely on `drake`'s built-in caching system without having to bother with messy `file_out()` files.
 
-Each memory strategy follows rules for shuffling data before and after each target is built.
+Each memory strategy follows three stages for each target:
 
-1. Initial discard: before building each target, discard some targets from the R session. (Note: the actual data does not relinquish its memory until `gc()` is called.)
-2. Initial load: check which dependencies the target needs in memory and load any that are missing.
+1. Initial discard: before building the target, discard some other targets from the R session. (Note: the actual data does not relinquish its memory until `gc()` is called.)
+2. Initial load: before building the target, check the target's dependencies and load any that are missing.
 3. Final discard: after the target finishes building, either keep the target's return value in the session or discard it. Either way, the return value is still stored in the cache, so you can load it with `loadd()` and `readd()`.
 
 These three steps vary among the different memory strategies.
@@ -185,11 +186,48 @@ print(plan)
 
 Now, you can run `make()` without setting a global memory strategy.
 
-```{r}
+```{r, eval = FALSE}
 make(plan, garbage_collection = TRUE)
 ```
 
 ## Data splitting
 
-You can combine these ideas with data splitting. 
+The [`split()` transformation](https://ropenscilabs.github.io/drake-manual/plans.html#split) breaks up a dataset into smaller targets. The ordinary use of `split()` is to partition an in-memory dataset into slices.
 
+```{r, paged.print = FALSE}
+drake_plan(
+  data = get_large_data(),
+  x = target(
+    data %>%
+      analyze_data(),
+    transform = split(data, slices = 4)
+  )
+)
+```
+
+However, you can also use it to load individual pieces of a large file. The trick is to use `split()` to break up an index set instead of the data itself. In the sketch below, `get_number_of_rows()` and `read_selected_rows()` are user-defined functions, and `%>%` is the `magrittr` pipe.
+
+```{r, paged.print = FALSE}
+get_number_of_rows <- function(file) {
+  # ...
+}
+
+read_selected_rows <- function(which_rows, file) {
+  # ...
+}
+
+plan <- drake_plan(
+  row_indices = file_in("large_file.csv") %>%
+    get_number_of_rows() %>%
+    seq_len(),
+  subset = target(
+    row_indices %>%
+      read_selected_rows(file = file_in("large_file.csv")),
+    transform = split(row_indices, slices = 4)
+  )
+)
+
+plan
+
+drake_plan_source(plan)
+```
