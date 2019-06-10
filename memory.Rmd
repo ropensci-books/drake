@@ -119,8 +119,10 @@ The implementation of these steps varies from strategy to strategy.
 "speed" | Discard nothing | Load any missing dependencies. | Keep the return value loaded.
 "memory" | Discard all targets which are not dependencies of the current target. | Load any missing dependencies. | Keep the return value loaded.
 "lookahead" | Discard all targets which are not dependencies of either (1) the current target or (2) other targets waiting to be checked or built. | Load any missing dependencies. | Keep the return value loaded.
-"unload" | Unload all targets. | Load nothing. | Discard the return value.
-"none" | Unload nothing. | Load nothing. | Discard the return value.
+"unload"[^1] | Unload all targets. | Load nothing. | Discard the return value.
+"none"[^1] | Unload nothing. | Load nothing. | Discard the return value.
+
+[^1]: Only supported in `drake` version 7.4.0 and above.
 
 With the `"speed"`, `"memory"`, and `"lookahead"` strategies, you can simply call `make(plan, memory_strategy = YOUR_CHOICE, garbage_collection = TRUE)` and trust that your targets will build normally. For the `"unload"` and `"none"` strategies, there is extra work to do: you will need to manually load each target's dependencies with `loadd()` or `readd()`. This manual bookkeeping lets you aggressively optimize your workflow, and it is less cumbersome than swarms of `file_out()` files. It is particularly useful when you have a large `combine()` step.
 
