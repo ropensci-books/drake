@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>The drake R Package User Manual</title>
+  <title>Chapter 14 Debugging and testing drake projects | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:title" content="Chapter 14 Debugging and testing drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="https://ropenscilabs.github.io/drake-manual" />
   <meta property="og:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ropenscilabs/drake-manual" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The drake R Package User Manual" />
+  <meta name="twitter:title" content="Chapter 14 Debugging and testing drake projects | The drake R Package User Manual" />
   
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="twitter:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-
-<link rel="next" href="similar-work.html">
+<link rel="prev" href="visuals.html">
+<link rel="next" href="triggers.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -372,240 +372,396 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">The drake R Package User Manual</h1>
-<p class="author"><em>Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert</em></p>
-<p class="author"><em>Copyright Eli Lilly and Company</em></p>
+<div id="debugging" class="section level1">
+<h1><span class="header-section-number">Chapter 14</span> Debugging and testing drake projects</h1>
+<p>This chapter is a guide to debugging and testing <code>drake</code> projects.</p>
+<div id="start-small-2" class="section level3">
+<h3><span class="header-section-number">14.0.1</span> Start small</h3>
+<p>If your workflow is large, consider running a downsized version to debug and test things first. That way, you can find the bugs early on without wasting as much time. Create a test plan with <code>drake_plan(max_expand = SMALL_NUMBER)</code> before scaling up to the full set of targets. See <a href="https://ropenscilabs.github.io/drake-manual/plans.html#start-small">this section on plans</a> for details.</p>
 </div>
-<div id="intro" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
-<iframe src="https://player.vimeo.com/video/288956463" width="640" height="358" frameborder="0" allowfullscreen>
-</iframe>
-<div id="the-drake-r-package" class="section level2">
-<h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p>Data analysis can be slow. A round of scientific computation can take several minutes, hours, or even days to complete. After it finishes, if you update your code or data, your hard-earned results may no longer be valid. How much of that valuable output can you keep, and how much do you need to update? How much runtime must you endure all over again?</p>
-<p>For projects in R, the <code>drake</code> package can help. It <a href="https://ropenscilabs.github.io/drake-manual/plans.html">analyzes your workflow</a>, skips steps with up-to-date results, and orchestrates the rest with <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">optional distributed computing</a>. At the end, <code>drake</code> provides evidence that your results match the underlying code and data, which increases your ability to trust your research.</p>
+<div id="dependencies" class="section level2">
+<h2><span class="header-section-number">14.1</span> Dependencies</h2>
+<p><code>drake</code> automatically detects dependency relationships among your targets and imports. While this is convenient most of the time, it can lead to some pitfalls. This section describes techniques to understand you project’s dependency structure and diagnose and debug issues.</p>
+<div id="visualize-your-dependency-graph." class="section level3">
+<h3><span class="header-section-number">14.1.1</span> Visualize your dependency graph.</h3>
+<p>To avoid frustration early on, please use <a href="visuals.html#visuals"><code>drake</code>’s dependency graph visualizations</a> to see how the steps of your workflow fit together. <code>drake</code> resolves the dependency relationships in the graph by analyzing the code in your commands and the functions in your environment.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span>
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(my_plan)
+<span class="co"># Hover, click, drag, zoom, and pan. See args &#39;from&#39; and &#39;to&#39;.</span>
+<span class="kw">vis_drake_graph</span>(config, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;500px&quot;</span>)</code></pre>
+<div id="htmlwidget-3a1720f9a5da47692e40" style="width:100%;height:500px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3a1720f9a5da47692e40">{"x":{"nodes":{"id":["random_rows","reg1","reg2","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","p-OJSXA33SOQXFE3LE","simulate","large","small","regression1_large","regression2_large","regression1_small","regression2_small","summ_regression1_large","coef_regression1_large","summ_regression2_large","coef_regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression2_small","report","p-OJSXA33SOQXG2ZA"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"label":["random_rows","reg1","reg2","datasets::mtcars","file report.Rmd","simulate","large","small","regression1_large","regression2_large","regression1_small","regression2_small","summ_regression1_large","coef_regression1_large","summ_regression2_large","coef_regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression2_small","report","file report.md"],"status":["imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","object","file","function","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","dot","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","square"],"level":[1,1,1,1,1,2,3,3,4,4,4,4,5,5,5,5,5,5,5,5,6,7],"x":[-1,-1,-1,-1,-1,-0.666666666666667,-0.333333333333333,-0.333333333333333,0,0,0,0,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,1],"y":[-0.857142857142857,-0.428571428571428,2.22044604925031e-16,0.428571428571429,0.857142857142857,2.22044604925031e-16,-0.428571428571428,0.428571428571429,-0.771428571428571,-0.257142857142857,0.257142857142858,0.771428571428572,-1,-0.714285714285714,-0.428571428571428,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["random_rows","reg1","reg1","reg2","reg2","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","large","large","large","small","small","small","coef_regression2_small","p-OJSXA33SOQXFE3LE","report","simulate","simulate","regression1_small","regression1_small","regression1_large","regression1_large","regression2_small","regression2_small","regression2_large","regression2_large"],"to":["simulate","regression1_small","regression1_large","regression2_small","regression2_large","simulate","report","regression1_large","regression2_large","report","regression1_small","regression2_small","report","report","p-OJSXA33SOQXG2ZA","large","small","summ_regression1_small","coef_regression1_small","summ_regression1_large","coef_regression1_large","coef_regression2_small","summ_regression2_small","summ_regression2_large","coef_regression2_large"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":false},"physics":{"stabilization":false},"interaction":{"navigationButtons":true}},"groups":null,"width":"100%","height":"500px","idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,5,7,8,9]},"nodesToDataframe":true},"igraphlayout":{"type":"square"},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="installation" class="section level2">
-<h2><span class="header-section-number">1.2</span> Installation</h2>
-<p>You can choose among different versions of <code>drake</code>. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install the latest stable release from CRAN.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)
+<div id="check-specific-dependency-information." class="section level3">
+<h3><span class="header-section-number">14.1.2</span> Check specific dependency information.</h3>
+<p>With the <code>deps_code()</code> function, you can see for yourself how <code>drake</code> detects first-order dependencies from code.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(simulate)
+<span class="co">#&gt; function (n) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     data &lt;- random_rows(data = datasets::mtcars, n = n)</span>
+<span class="co">#&gt;     data.frame(x = data$wt, y = data$mpg)</span>
+<span class="co">#&gt; }</span>
 
-<span class="co"># Alternatively, install the development version from GitHub.</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
-<span class="kw">library</span>(devtools)
-<span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</code></pre>
-</div>
-<div id="why-drake" class="section level2">
-<h2><span class="header-section-number">1.3</span> Why drake?</h2>
-<div id="what-gets-done-stays-done." class="section level3">
-<h3><span class="header-section-number">1.3.1</span> What gets done stays done.</h3>
-<p>Too many data science projects follow a <a href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphean loop</a>:</p>
-<ol style="list-style-type: decimal">
-<li>Launch the code.</li>
-<li>Wait while it runs.</li>
-<li>Discover an issue.</li>
-<li>Restart from scratch.</li>
-</ol>
-<p>Ordinarily, it is hard to avoid restarting from scratch.
-<br></p>
-<center>
-<img src="https://ropensci.github.io/drake/images/tweet.png" alt="tweet" align="center" style = "border: none; float: center;">
-</center>
-<p><br></p>
-<p>But with <code>drake</code>, you can automatically</p>
-<ol style="list-style-type: decimal">
-<li>Launch the parts that changed since last time.</li>
-<li>Skip the rest.</li>
-</ol>
-</div>
-<div id="reproducibility-with-confidence" class="section level3">
-<h3><span class="header-section-number">1.3.2</span> Reproducibility with confidence</h3>
-<p>The R community emphasizes reproducibility. Traditional themes include <a href="https://en.wikipedia.org/wiki/Replication_crisis">scientific replicability</a>, literate programming with <a href="https://yihui.name/knitr/">knitr</a>, and version control with <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">git</a>. But internal consistency is important too. Reproducibility carries the promise that your output matches the code and data you say you used. With the exception of <a href="triggers.html#triggers">non-default triggers</a> and <a href="https://ropenscilabs.github.io/drake-manual/hpc.html#hasty-mode">hasty mode</a>, <code>drake</code> strives to keep this promise.</p>
-<div id="evidence" class="section level4">
-<h4><span class="header-section-number">1.3.2.1</span> Evidence</h4>
-<p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(plan)
+<span class="kw">deps_code</span>(simulate)
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   name             type      </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 data.frame       globals   </span>
+<span class="co">#&gt; 2 mpg              globals   </span>
+<span class="co">#&gt; 3 wt               globals   </span>
+<span class="co">#&gt; 4 random_rows      globals   </span>
+<span class="co">#&gt; 5 datasets::mtcars namespaced</span>
 
-config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)
-<span class="kw">outdated</span>(config)</code></pre>
-<p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
-</div>
-<div id="ease" class="section level4">
-<h4><span class="header-section-number">1.3.2.2</span> Ease</h4>
-<p>When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>()       <span class="co"># Remove the original author&#39;s results.</span>
-<span class="kw">make</span>(plan) <span class="co"># Independently re-create the results from the code and input data.</span></code></pre>
-</div>
-<div id="independent-replication" class="section level4">
-<h4><span class="header-section-number">1.3.2.3</span> Independent replication</h4>
-<p>With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic <code>drake</code> functions such as <code>make()</code>, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author’s methodology. In other words, <code>drake</code> could potentially improve the integrity of independent replication.</p>
-</div>
-<div id="readability-and-transparency" class="section level4">
-<h4><span class="header-section-number">1.3.2.4</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>drake</code> helps in several ways.</p>
-<ul>
-<li>The <a href="https://ropensci.github.io/drake/reference/drake_plan.html"><code>drake</code> plan</a> explicitly outlines the steps of the analysis, and <a href="https://ropensci.github.io/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
-<li>You can <a href="https://ropenscilabs.github.io/drake-manual/plans#large-plans">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
-</ul>
-</div>
-</div>
-<div id="aggressively-scale-up." class="section level3">
-<h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the spare cores on your local machine.</span>
-<span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)
+<span class="co"># knitr_in() makes sure your target depends on `report.Rmd`</span>
+<span class="co"># and any dependencies loaded with loadd() and readd()</span>
+<span class="co"># in the report&#39;s active code chunks.</span>
+my_plan<span class="op">$</span>command[[<span class="dv">1</span>]]
+<span class="co">#&gt; knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), quiet = TRUE)</span>
 
-<span class="co"># Or scale up to a supercomputer.</span>
-<span class="kw">drake_batchtools_tmpl_file</span>(<span class="st">&quot;slurm&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span>
-<span class="kw">library</span>(future.batchtools)
-future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;batchtools.slurm.tmpl&quot;</span>, <span class="dt">workers =</span> <span class="dv">100</span>)
-<span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</code></pre>
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="dv">1</span>]])
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   name                   type    </span>
+<span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 knit                   globals </span>
+<span class="co">#&gt; 2 large                  loadd   </span>
+<span class="co">#&gt; 3 small                  readd   </span>
+<span class="co">#&gt; 4 coef_regression2_small readd   </span>
+<span class="co">#&gt; 5 report.md              file_out</span>
+<span class="co">#&gt; 6 report.Rmd             knitr_in</span>
+
+my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
+<span class="co">#&gt; suppressWarnings(summary(regression2_large))$coefficients</span>
+
+<span class="kw">deps_code</span>(my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]])
+<span class="co">#&gt; # A tibble: 4 x 2</span>
+<span class="co">#&gt;   name              type   </span>
+<span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 summary           globals</span>
+<span class="co">#&gt; 2 suppressWarnings  globals</span>
+<span class="co">#&gt; 3 regression2_large globals</span>
+<span class="co">#&gt; 4 coefficients      globals</span></code></pre>
+<p>With <code>deps_target()</code>, you can see the dependencies that <code>drake</code> has already detected for your targets and imports.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">deps_target</span>(<span class="st">&quot;simulate&quot;</span>, config)
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   name             type      </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 random_rows      globals   </span>
+<span class="co">#&gt; 2 datasets::mtcars namespaced</span>
+
+<span class="kw">deps_target</span>(<span class="st">&quot;small&quot;</span>, config)
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   name     type   </span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  </span>
+<span class="co">#&gt; 1 simulate globals</span>
+
+<span class="kw">deps_target</span>(<span class="st">&quot;report&quot;</span>, config)
+<span class="co">#&gt; # A tibble: 5 x 2</span>
+<span class="co">#&gt;   name                   type    </span>
+<span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 large                  loadd   </span>
+<span class="co">#&gt; 2 small                  readd   </span>
+<span class="co">#&gt; 3 coef_regression2_small readd   </span>
+<span class="co">#&gt; 4 report.md              file_out</span>
+<span class="co">#&gt; 5 report.Rmd             knitr_in</span></code></pre>
+<p>And with <code>tracked()</code>, you can list all the reproducibly tracked objects and files.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tracked</span>(config)
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;datasets::mtcars&quot;      </span>
+<span class="co">#&gt;  [7] &quot;file report.Rmd&quot;        &quot;file report.md&quot;        </span>
+<span class="co">#&gt;  [9] &quot;random_rows&quot;            &quot;reg1&quot;                  </span>
+<span class="co">#&gt; [11] &quot;reg2&quot;                   &quot;regression1_large&quot;     </span>
+<span class="co">#&gt; [13] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt; [15] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [17] &quot;simulate&quot;               &quot;small&quot;                 </span>
+<span class="co">#&gt; [19] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;</span>
+<span class="co">#&gt; [21] &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;</span></code></pre>
+</div>
+<div id="outdated-targets-and-missing-dependencies" class="section level3">
+<h3><span class="header-section-number">14.1.3</span> Outdated targets and missing dependencies</h3>
+<p><code>missed()</code> shows any imports missing from your environment</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">missed</span>(config) <span class="co"># Nothing is missing right now.</span>
+<span class="co">#&gt; character(0)</span></code></pre>
+<p><code>outdated()</code> reports any targets that are outdated.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config)
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span>
+<span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span>
+<span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span>
+<span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span>
+
+<span class="kw">make</span>(my_plan)
+<span class="co">#&gt; target large</span>
+<span class="co">#&gt; target small</span>
+<span class="co">#&gt; target regression1_large</span>
+<span class="co">#&gt; target regression2_large</span>
+<span class="co">#&gt; target regression1_small</span>
+<span class="co">#&gt; target regression2_small</span>
+<span class="co">#&gt; target summ_regression1_large</span>
+<span class="co">#&gt; target coef_regression1_large</span>
+<span class="co">#&gt; target summ_regression2_large</span>
+<span class="co">#&gt; target coef_regression2_large</span>
+<span class="co">#&gt; target summ_regression1_small</span>
+<span class="co">#&gt; target coef_regression1_small</span>
+<span class="co">#&gt; target coef_regression2_small</span>
+<span class="co">#&gt; target summ_regression2_small</span>
+<span class="co">#&gt; target report</span>
+
+<span class="kw">outdated</span>(config)
+<span class="co">#&gt; character(0)</span></code></pre>
+</div>
+<div id="but-why-are-my-targets-out-of-date" class="section level3">
+<h3><span class="header-section-number">14.1.4</span> But <em>why</em> are my targets out of date?</h3>
+<p><code>drake</code> has the option to produce a cache log with the fingerprint of every target and import.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">drake_cache_log</span>()
+<span class="co">#&gt; # A tibble: 22 x 3</span>
+<span class="co">#&gt;    hash             type   name                  </span>
+<span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span>
+<span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span>
+<span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span>
+<span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span>
+<span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span>
+<span class="co">#&gt;  5 d87293dd4d012762 target large                 </span>
+<span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span>
+<span class="co">#&gt;  7 7a456ee58df699be import file report.Rmd       </span>
+<span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span>
+<span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span>
+<span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span>
+<span class="co">#&gt; # … with 12 more rows</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">filter</span>(<span class="kw">drake_cache_log</span>(), type <span class="op">==</span><span class="st"> &quot;import&quot;</span>)
+<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt;   hash             type   name            </span>
+<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;           </span>
+<span class="co">#&gt; 1 f4b89e63bc92af79 import datasets::mtcars</span>
+<span class="co">#&gt; 2 7a456ee58df699be import file report.Rmd </span>
+<span class="co">#&gt; 3 db84c9f752635a13 import random_rows     </span>
+<span class="co">#&gt; 4 21935c86f12692e2 import reg1            </span>
+<span class="co">#&gt; 5 69ade4b78f15a3f9 import reg2            </span>
+<span class="co">#&gt; 6 f4d57e5ba38b744b import simulate</span></code></pre>
+<p>We highly recommend that you automatically produce a cache log file on every <code>make()</code> and put it under <a href="https://github.com">version control</a> with the rest of your project.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">cache_log_file =</span> <span class="st">&quot;cache_log.csv&quot;</span>)
+<span class="co">#&gt; All targets are already up to date.</span></code></pre>
+<p>Suppose we go back and add input checking to one of our functions.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(random_rows)
+<span class="co">#&gt; function (data, n) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
+<span class="co">#&gt;         ]</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x2400c898&gt;</span>
+
+random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
+  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
+  data[<span class="kw">sample.int</span>(<span class="dt">n =</span> <span class="kw">nrow</span>(data), <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>), ]
+}</code></pre>
+<p>Then, we forget to run <code>make()</code> again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outdated</span>(config)
+<span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span>
+<span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span>
+<span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span>
+<span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span>
+<span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span>
+<span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span>
+<span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span>
+<span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span></code></pre>
+<p>At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to <code>outdated()</code> already re-cached the imports, so any changed imports will show up in the new cache log.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">read_csv</span>(<span class="st">&quot;cache_log.csv&quot;</span>, <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(<span class="kw">drake_cache_log</span>(), <span class="dt">by =</span> <span class="st">&quot;name&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(hash.x <span class="op">!=</span><span class="st"> </span>hash.y) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(name, hash.x, hash.y, <span class="op">-</span>type.x, <span class="op">-</span>type.y)
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   name        hash.x           hash.y          </span>
+<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;           </span>
+<span class="co">#&gt; 1 random_rows db84c9f752635a13 089a5c1023c1c51a</span>
+<span class="co">#&gt; 2 simulate    f4d57e5ba38b744b 739a28336ceb4da2</span></code></pre>
+<p>Now, we see that <code>random_rows()</code> has changed since last time, and we have a new dependency <code>stopifnot()</code>. <code>simulate()</code> shows up in the changes too because <code>random_rows()</code> is nested in the body of <code>simulate()</code>. If we revert <code>random_rows()</code> to its original state, all our targets are up to date again.</p>
+<pre class="sourceCode r"><code class="sourceCode r">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
+  data[<span class="kw">sample.int</span>(<span class="dt">n =</span> <span class="kw">nrow</span>(data), <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>), ]
+}
+
+<span class="kw">print</span>(<span class="kw">outdated</span>(config))
+<span class="co">#&gt; character(0)</span>
+
+<span class="kw">read_csv</span>(<span class="st">&quot;cache_log.csv&quot;</span>, <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(<span class="kw">drake_cache_log</span>(), <span class="dt">by =</span> <span class="st">&quot;name&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(hash.x <span class="op">!=</span><span class="st"> </span>hash.y) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(name, hash.x, hash.y, <span class="op">-</span>type.x, <span class="op">-</span>type.y)
+<span class="co">#&gt; # A tibble: 0 x 3</span>
+<span class="co">#&gt; # … with 3 variables: name &lt;chr&gt;, hash.x &lt;chr&gt;, hash.y &lt;chr&gt;</span></code></pre>
 </div>
 </div>
-<div id="documentation" class="section level2">
-<h2><span class="header-section-number">1.4</span> Documentation</h2>
-<p>The main resources to learn <code>drake</code> are</p>
-<ol style="list-style-type: decimal">
-<li>The <a href="https://ropenscilabs.github.io/drake-manual/">user manual</a>, which contains a friendly introduction and several long-form tutorials.</li>
-<li>The <a href="https://ropensci.github.io/drake/">documentation website</a>, which serves as a quicker reference.</li>
-<li><a href="https://github.com/krlmlr">Kirill Müller</a>’s <a href="https://github.com/krlmlr/drake-sib-zurich"><code>drake</code> workshop from March 5, 2018</a>.</li>
-</ol>
-<div id="shiny-app" class="section level3">
-<h3><span class="header-section-number">1.4.1</span> Shiny app</h3>
-<p>The Shiny app at <a href="https://wlandau.shinyapps.io/drakeplanner">wlandau.shinyapps.io/drakeplanner</a> makes it easier to learn <code>drake</code> and create new <code>drake</code>-powered projects. If you have trouble accessing it, you can install and run it locally.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;wlandau/drakeplanner&quot;</span>)
-drakeplanner<span class="op">::</span><span class="kw">drakeplanner</span>()</code></pre>
+<div id="diagnose-failures." class="section level2">
+<h2><span class="header-section-number">14.2</span> Diagnose failures.</h2>
+<p><code>drake</code> records diagnostic metadata on all your targets, including the latest errors, warnings, messages, and other bits of context.</p>
+<pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="cf">if</span> (x <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){
+    <span class="kw">stop</span>(<span class="st">&quot;`x` cannot be negative.&quot;</span>)
+  }
+  x
+}
+bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
+  <span class="dt">a =</span> <span class="dv">12</span>,
+  <span class="dt">b =</span> <span class="op">-</span>a,
+  <span class="dt">my_target =</span> <span class="kw">f</span>(b)
+)
+
+bad_plan
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   target    command</span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;expr&gt; </span>
+<span class="co">#&gt; 1 a         12     </span>
+<span class="co">#&gt; 2 b         -a     </span>
+<span class="co">#&gt; 3 my_target f(b)</span>
+
+withr<span class="op">::</span><span class="kw">with_message_sink</span>(
+  <span class="dt">new =</span> <span class="kw">stdout</span>(),
+  <span class="kw">make</span>(bad_plan)
+)
+<span class="co">#&gt; target a</span>
+<span class="co">#&gt; target b</span>
+<span class="co">#&gt; target my_target</span>
+<span class="co">#&gt; fail my_target</span>
+<span class="co">#&gt; Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:</span>
+<span class="co">#&gt;   `x` cannot be negative.</span>
+
+<span class="kw">failed</span>(<span class="dt">verbose =</span> 0L) <span class="co"># from the last make() only</span>
+<span class="co">#&gt; [1] &quot;my_target&quot;</span>
+
+<span class="co"># See also warnings and messages.</span>
+error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(my_target, <span class="dt">verbose =</span> 0L)<span class="op">$</span>error
+
+error<span class="op">$</span>message
+<span class="co">#&gt; [1] &quot;`x` cannot be negative.&quot;</span>
+
+error<span class="op">$</span>call
+<span class="co">#&gt; f(b)</span>
+
+<span class="kw">str</span>(error<span class="op">$</span>calls) <span class="co"># View the traceback.</span>
+<span class="co">#&gt; List of 8</span>
+<span class="co">#&gt;  $ : language local(f(b))</span>
+<span class="co">#&gt;  $ : language eval.parent(substitute(eval(quote(expr), envir)))</span>
+<span class="co">#&gt;  $ : language eval(expr, p)</span>
+<span class="co">#&gt;  $ : language eval(expr, p)</span>
+<span class="co">#&gt;  $ : language eval(quote(f(b)), new.env())</span>
+<span class="co">#&gt;  $ : language eval(quote(f(b)), new.env())</span>
+<span class="co">#&gt;  $ : language f(b)</span>
+<span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
+<span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x11c4ebb8&gt;</span></code></pre>
+<p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
+<span class="kw">library</span>(drake)
+
+<span class="co"># Unloads target `b`.</span>
+config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> bad_plan)
+
+<span class="co"># my_target depends on b.</span>
+<span class="st">&quot;b&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>()
+<span class="co">#&gt; [1] FALSE</span>
+
+<span class="co"># Try to build my_target until the error is fixed.</span>
+<span class="co"># Skip all that pesky work checking dependencies.</span>
+<span class="kw">drake_build</span>(my_target, <span class="dt">config =</span> config) <span class="co"># See also drake_debug().</span>
+<span class="co">#&gt; target my_target</span>
+<span class="co">#&gt; fail my_target</span>
+<span class="co">#&gt; Error: Target `my_target` failed. Call `diagnose(my_target)` for details. Error message:</span>
+<span class="co">#&gt;   `x` cannot be negative.</span>
+
+<span class="co"># The target failed, but the dependency was loaded.</span>
+<span class="st">&quot;b&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>()
+<span class="co">#&gt; [1] FALSE</span>
+
+<span class="co"># What was `b` again?</span>
+b
+<span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;b&#39; not found</span>
+
+<span class="co"># How was `b` used?</span>
+<span class="kw">diagnose</span>(my_target)<span class="op">$</span>message
+<span class="co">#&gt; NULL</span>
+
+<span class="kw">diagnose</span>(my_target)<span class="op">$</span>call
+<span class="co">#&gt; NULL</span>
+
+f
+<span class="co">#&gt; function(x){</span>
+<span class="co">#&gt;   if (x &lt; 0){</span>
+<span class="co">#&gt;     stop(&quot;`x` cannot be negative.&quot;)</span>
+<span class="co">#&gt;   }</span>
+<span class="co">#&gt;   x</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x1b66d650&gt;</span>
+
+<span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
+f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  x &lt;-<span class="st"> </span><span class="kw">abs</span>(x)
+  <span class="cf">if</span> (x <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){
+    <span class="kw">stop</span>(<span class="st">&quot;`x` cannot be negative.&quot;</span>)
+  }
+  x
+}
+
+<span class="co"># Now it works!</span>
+<span class="co"># Since you called make() previously, `config` is read from the cache</span>
+<span class="co"># if you do not supply it.</span>
+<span class="kw">drake_build</span>(my_target, config) <span class="co"># See also drake_debug().</span>
+<span class="co">#&gt; target my_target</span>
+
+<span class="kw">readd</span>(my_target)
+<span class="co">#&gt; [1] 12</span></code></pre>
 </div>
-<div id="cheat-sheet" class="section level3">
-<h3><span class="header-section-number">1.4.2</span> Cheat sheet</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for preparing a <a href="https://github.com/krlmlr/drake-sib-zurich/blob/master/cheat-sheet.pdf"><code>drake</code> cheat sheet</a> for the <a href="https://github.com/krlmlr/drake-sib-zurich">workshop</a>.</p>
+<div id="timeouts-and-retries" class="section level2">
+<h2><span class="header-section-number">14.3</span> Timeouts and retries</h2>
+<p>See the <code>elapsed</code>, <code>cpu</code>, and <code>retries</code> argument to <code>make()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)
+f &lt;-<span class="st"> </span><span class="cf">function</span>(...){
+  <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
+}
+debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))
+debug_plan
+<span class="co">#&gt; # A tibble: 2 x 2</span>
+<span class="co">#&gt;   target command</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span>
+<span class="co">#&gt; 1 x      1      </span>
+<span class="co">#&gt; 2 y      f(x)</span>
+
+withr<span class="op">::</span><span class="kw">with_message_sink</span>(
+  <span class="kw">stdout</span>(),
+  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)
+)
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt; target y</span>
+<span class="co">#&gt; retry y 1 of 2</span></code></pre>
+<p>To tailor these settings to each individual target, create new <code>elapsed</code>, <code>cpu</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)
+debug_plan<span class="op">$</span>elapsed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)
+debug_plan<span class="op">$</span>retries &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>
+
+debug_plan
+<span class="co">#&gt; # A tibble: 2 x 4</span>
+<span class="co">#&gt;   target command elapsed retries</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;    &lt;dbl&gt;   &lt;int&gt;</span>
+<span class="co">#&gt; 1 x      1         0.001       1</span>
+<span class="co">#&gt; 2 y      f(x)      0.002       2</span>
+
+withr<span class="op">::</span><span class="kw">with_message_sink</span>(
+  <span class="dt">new =</span> <span class="kw">stdout</span>(),
+  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="ot">Inf</span>, <span class="dt">retries =</span> <span class="dv">0</span>)
+)
+<span class="co">#&gt; target x</span>
+<span class="co">#&gt; target y</span>
+<span class="co">#&gt; retry y 1 of 2</span>
+<span class="co">#&gt; retry y 2 of 2</span>
+<span class="co">#&gt; fail y</span>
+<span class="co">#&gt; Error: Target `y` failed. Call `diagnose(y)` for details. Error message:</span>
+<span class="co">#&gt;   reached elapsed time limit</span></code></pre>
 </div>
-<div id="frequently-asked-questions" class="section level3">
-<h3><span class="header-section-number">1.4.3</span> Frequently asked questions</h3>
-<p>The <a href="https://ropenscilabs.github.io/drake-manual/faq.html">FAQ page</a> is an index of links to <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">appropriately-labeled issues on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled as a frequently asked question.</p>
-</div>
-<div id="function-reference" class="section level3">
-<h3><span class="header-section-number">1.4.4</span> Function reference</h3>
-<p>The <a href="https://ropensci.github.io/drake/reference/index.html">reference section</a> lists all the available functions. Here are the most important ones.</p>
-<ul>
-<li><code>drake_plan()</code>: create a workflow data frame (like <code>my_plan</code>).</li>
-<li><code>make()</code>: build your project.</li>
-<li><code>loadd()</code>: load one or more built targets into your R session.</li>
-<li><code>readd()</code>: read and return a built target.</li>
-<li><code>drake_config()</code>: create a master configuration list for other user-side functions.</li>
-<li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
-<li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
-<li><code>deps()</code>: check the dependencies of a command or function.</li>
-<li><code>failed()</code>: list the targets that failed to build in the last <code>make()</code>.</li>
-<li><code>diagnose()</code>: return the full context of a build, including errors, warnings, and messages.</li>
-</ul>
-</div>
-<div id="tutorials" class="section level3">
-<h3><span class="header-section-number">1.4.5</span> Tutorials</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for constructing two interactive <a href="https://rstudio.github.io/learnr/"><code>learnr</code></a> tutorials: <a href="https://krlmlr.shinyapps.io/cooking-drake-tutorial/">one supporting <code>drake</code> itself</a>, and a <a href="https://krlmlr.shinyapps.io/cooking-tutorial/">prerequisite walkthrough</a> of the <a href="https://github.com/krlmlr/cooking"><code>cooking</code> package</a>.</p>
-</div>
-<div id="examples" class="section level3">
-<h3><span class="header-section-number">1.4.6</span> Examples</h3>
-<p>The official <a href="https://ropensci.org/usecases/">rOpenSci use cases</a> and <a href="https://discuss.ropensci.org/c/usecases">associated discussion threads</a> describe applications of <code>drake</code> in action. Here are some more real-world sightings of <code>drake</code> in the wild.</p>
-<ul>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/pat-s/pathogen-modeling">pat-s/pathogen-modeling</a></li>
-<li><a href="https://github.com/sol-eng/tensorflow-w-r">sol-eng/tensorflow-w-r</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-<p>There are also multiple <code>drake</code>-powered example projects <a href="https://github.com/wlandau/drake-examples">available here</a>, ranging from beginner-friendly stubs to demonstrations of high-performance computing. You can generate the files for a project with <code>drake_example()</code> (e.g. <code>drake_example(&quot;gsp&quot;)</code>), and you can list the available projects with <code>drake_examples()</code>. You can contribute your own example project with a <a href="https://github.com/wlandau/drake-examples/pulls">fork and pull request</a>.</p>
-</div>
-<div id="presentations" class="section level3">
-<h3><span class="header-section-number">1.4.7</span> Presentations</h3>
-<table>
-<colgroup>
-<col width="22%" />
-<col width="22%" />
-<col width="22%" />
-<col width="31%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author</th>
-<th>Venue</th>
-<th>Date</th>
-<th>Materials</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="https://github.com/DominikRafacz">Dominik Rafacz</a></td>
-<td><a href="https://gdansk2019.satrdays.org">satRday Gdansk</a></td>
-<td>2019-05-18</td>
-<td><a href="https://github.com/DominikRafacz/drake-presentation/blob/master/presentation.pdf">slides</a>, <a href="https://github.com/DominikRafacz/drake-presentation">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/aedobbyn">Amanda Dobbyn</a></td>
-<td><a href="http://www.rladiesnyc.org/">R-Ladies NYC</a></td>
-<td>2019-02-12</td>
-<td><a href="https://aedobbyn.github.io/nyc-fires/index.html#1">slides</a>, <a href="https://github.com/aedobbyn/nyc-fires">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="https://projects.iq.harvard.edu/datafest2019/home">Harvard DataFest</a></td>
-<td>2019-01-22</td>
-<td><a href="https://wlandau.github.io/drake-datafest-2019">slides</a>, <a href="https://github.com/wlandau/drake-datafest-2019">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="http://github.com/karthik">Karthik Ram</a></td>
-<td><a href="https://www.rstudio.com/conference">RStudio Conference</a></td>
-<td>2019-01-18</td>
-<td><a href="https://resources.rstudio.com/rstudio-conf-2019/a-guide-to-modern-reproducible-data-science-with-r">video</a>, <a href="http://inundata.org/talks/rstd19/#/">slides</a>, <a href="https://github.com/karthik/rstudio2019">resources</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/sinarueeger">Sina Rüeger</a></td>
-<td><a href="https://www.meetup.com/Geneve-R-User-Group">Geneva R User Group</a></td>
-<td>2018-10-04</td>
-<td><a href="https://sinarueeger.github.io/20181004-geneve-rug">slides</a>, <a href="https://github.com/sinarueeger/workflow-example">example code</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="http://rinpharma.com/">R in Pharma</a></td>
-<td>2018-08-16</td>
-<td><a href="https://ropenscilabs.github.io/drake-manual/">video</a>, <a href="https://wlandau.github.io/drake-talk">slides</a>, <a href="https://github.com/wlandau/drake-talk">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/cstawitz">Christine Stawitz</a></td>
-<td><a href="https://www.meetup.com/rladies-seattle">R-Ladies Seattle</a></td>
-<td>2018-06-25</td>
-<td><a href="https://github.com/cstawitz/RLadies_Sea_drake">materials</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/krlmlr">Kirill Müller</a></td>
-<td><a href="https://www.sib.swiss">Swiss Institute of Bioinformatics</a></td>
-<td>2018-03-05</td>
-<td><a href="https://www.sib.swiss/training/course/2018-03-remake">workshop</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich">slides</a>, <a href="https://github.com/krlmlr/drake-sib-zurich">source</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich/cooking.html">exercises</a></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="context-and-history" class="section level3">
-<h3><span class="header-section-number">1.4.8</span> Context and history</h3>
-<p>For context and history, check out <a href="https://ropensci.org/blog/2018/02/06/drake/">this post on the rOpenSci blog</a> and <a href="https://www.r-podcast.org/episode/022-diving-in-to-drake-with-will-landau/">episode 22 of the R Podcast</a>.</p>
-</div>
-</div>
-<div id="help-and-troubleshooting" class="section level2">
-<h2><span class="header-section-number">1.5</span> Help and troubleshooting</h2>
-<p>The following resources document many known issues and challenges.</p>
-<ul>
-<li><a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22Frequently+Asked+Question%22">Frequently-asked questions</a>.</li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/caution.html">Cautionary notes and edge cases</a></li>
-<li><a href="https://ropenscilabs.github.io/drake-manual/debug.html">Debugging and testing drake projects</a></li>
-<li><a href="https://github.com/ropensci/drake/issues">Other known issues</a> (please search both open and closed ones).</li>
-</ul>
-<p>If you are still having trouble, please submit a <a href="https://github.com/ropensci/drake/issues/new">new issue</a> with a bug report or feature request, along with a minimal reproducible example where appropriate.</p>
-<p>The GitHub issue tracker is mainly intended for bug reports and feature requests. While questions about usage etc. are also highly encouraged, you may alternatively wish to post to <a href="https://stackoverflow.com">Stack Overflow</a> and use the <a href="https://stackoverflow.com/tags/drake-r-package"><code>drake-r-package</code> tag</a>.</p>
+<div id="more-help" class="section level2">
+<h2><span class="header-section-number">14.4</span> More help</h2>
+<p>Please also see the <a href="caution.html#caution">compendium of cautionary notes</a>, which addresses <code>drake</code>’s known edge cases, pitfalls, and weaknesses that may or may not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the <a href="https://github.com/ropensci/drake/issues">issue tracker</a>, where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version.</p>
+
 </div>
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">
@@ -616,8 +772,8 @@ drakeplanner<span class="op">::</span><span class="kw">drakeplanner</span>()</co
           </div>
         </div>
       </div>
-
-<a href="similar-work.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="visuals.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="triggers.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -637,11 +793,11 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ropenscilabs/drake-manual/edit/master/index.Rmd",
+"link": "https://github.com/ropenscilabs/drake-manual/edit/master/debugging.Rmd",
 "text": "Edit this chapter"
 },
 "history": {
-"link": "https://github.com/ropenscilabs/drake-manual/commits/master/index.Rmd",
+"link": "https://github.com/ropenscilabs/drake-manual/commits/master/debugging.Rmd",
 "text": "Chapter edit history"
 },
 "download": null,
