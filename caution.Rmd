@@ -15,7 +15,7 @@ library(drake)
 library(magrittr)
 ```
 
-This chapter addresses `drake`'s known edge cases, pitfalls, and weaknesses that might not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the [issue tracker](https://github.com/ropensci/drake/issues), where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version of `drake`. For a guide to debugging and testing `drake` projects, please refer to the separate [guide to debugging and testing drake projects](#debug).
+This chapter addresses `drake`'s known edge cases, pitfalls, and weaknesses that might not be fixed in future releases. For the most up-to-date information on unhandled edge cases, please visit the [issue tracker](https://github.com/ropensci/drake/issues), where you can submit your own bug reports as well. Be sure to search the closed issues too, especially if you are not using the most up-to-date development version of `drake`. For a guide to debugging and testing `drake` projects, please refer to the separate [guide to debugging and testing drake projects](#debugging).
 
 ## Workflow plans
 
@@ -371,7 +371,7 @@ drake_gc(cache)
 
 ### Cache customization is limited
 
-The [storage guide](#store) describes how storage works in `drake`. As explained near the end of that chapter, you can plug custom [storr](https://github.com/richfitz/storr) caches into `make()`. However, non-RDS caches such as `storr_dbi()` may not work with most forms of parallel computing. The `storr::storr_dbi()` cache and many others are not thread-safe. Either
+The [storage guide](#storage) describes how storage works in `drake`. As explained near the end of that chapter, you can plug custom [storr](https://github.com/richfitz/storr) caches into `make()`. However, non-RDS caches such as `storr_dbi()` may not work with most forms of parallel computing. The `storr::storr_dbi()` cache and many others are not thread-safe. Either
 
 1. Set `parallelism = "clustermq_staged"` in `make()`, or
 2. Set `parallelism = "future"` with `caching = "master"` in `make()`, or
