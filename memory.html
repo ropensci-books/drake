@@ -499,7 +499,7 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 </colgroup>
 <thead>
 <tr class="header">
-<th><code>memory_strategy</code></th>
+<th>Memory strategy</th>
 <th>Initial discard</th>
 <th>Initial load</th>
 <th>Final discard</th>
@@ -513,32 +513,38 @@ plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(
 <td>Keep the return value loaded.</td>
 </tr>
 <tr class="even">
-<td>“memory”</td>
+<td>“autoclean”<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></td>
+<td>Discard all targets which are not dependencies of the current target.</td>
+<td>Load any missing dependencies.</td>
+<td>Discard the return value.</td>
+</tr>
+<tr class="odd">
+<td>“preclean”</td>
 <td>Discard all targets which are not dependencies of the current target.</td>
 <td>Load any missing dependencies.</td>
 <td>Keep the return value loaded.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>“lookahead”</td>
 <td>Discard all targets which are not dependencies of either (1) the current target or (2) other targets waiting to be checked or built.</td>
 <td>Load any missing dependencies.</td>
 <td>Keep the return value loaded.</td>
 </tr>
-<tr class="even">
-<td>“unload”<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></td>
+<tr class="odd">
+<td>“unload”<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></td>
 <td>Unload all targets.</td>
 <td>Load nothing.</td>
 <td>Discard the return value.</td>
 </tr>
-<tr class="odd">
-<td>“none”<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></td>
+<tr class="even">
+<td>“none”<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></td>
 <td>Unload nothing.</td>
 <td>Load nothing.</td>
 <td>Discard the return value.</td>
 </tr>
 </tbody>
 </table>
-<p>With the <code>&quot;speed&quot;</code>, <code>&quot;memory&quot;</code>, and <code>&quot;lookahead&quot;</code> strategies, you can simply call <code>make(plan, memory_strategy = YOUR_CHOICE, garbage_collection = TRUE)</code> and trust that your targets will build normally. For the <code>&quot;unload&quot;</code> and <code>&quot;none&quot;</code> strategies, there is extra work to do: you will need to manually load each target’s dependencies with <code>loadd()</code> or <code>readd()</code>. This manual bookkeeping lets you aggressively optimize your workflow, and it is less cumbersome than swarms of <code>file_out()</code> files. It is particularly useful when you have a large <code>combine()</code> step.</p>
+<p>With the <code>&quot;speed&quot;</code>, <code>&quot;autoclean&quot;</code>, <code>&quot;preclean&quot;</code>, and <code>&quot;lookahead&quot;</code> strategies, you can simply call <code>make(plan, memory_strategy = YOUR_CHOICE, garbage_collection = TRUE)</code> and trust that your targets will build normally. For the <code>&quot;unload&quot;</code> and <code>&quot;none&quot;</code> strategies, there is extra work to do: you will need to manually load each target’s dependencies with <code>loadd()</code> or <code>readd()</code>. This manual bookkeeping lets you aggressively optimize your workflow, and it is less cumbersome than swarms of <code>file_out()</code> files. It is particularly useful when you have a large <code>combine()</code> step.</p>
 <p>Let’s redesign the workflow to reap the benefits of <code>make(plan, memory_strategy = &quot;none&quot;, garbage_collection = TRUE)</code>. The trick is to use <a href="https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/match.call"><code>match.call()</code></a> inside <code>get_means()</code> so we can load and unload dependencies one at a time instead of all at once.</p>
 <pre class="sourceCode r"><code class="sourceCode r">reps &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span>
 
@@ -674,8 +680,9 @@ plan
 <div class="footnotes">
 <hr />
 <ol start="3">
-<li id="fn3"><p>Only supported in <code>drake</code> version 7.4.0 and above.<a href="memory.html#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Only supported in <code>drake</code> version 7.5.0 and above.<a href="memory.html#fnref3" class="footnote-back">↩</a></p></li>
 <li id="fn4"><p>Only supported in <code>drake</code> version 7.4.0 and above.<a href="memory.html#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p>Only supported in <code>drake</code> version 7.4.0 and above.<a href="memory.html#fnref5" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">
