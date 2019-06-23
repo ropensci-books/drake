@@ -175,8 +175,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.1" data-path="walkthrough.html"><a href="walkthrough.html#set-the-stage."><i class="fa fa-check"></i><b>3.1</b> Set the stage.</a></li>
 <li class="chapter" data-level="3.2" data-path="walkthrough.html"><a href="walkthrough.html#make-your-results."><i class="fa fa-check"></i><b>3.2</b> Make your results.</a></li>
 <li class="chapter" data-level="3.3" data-path="walkthrough.html"><a href="walkthrough.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>3.3</b> Go back and fix things.</a></li>
-<li class="chapter" data-level="3.4" data-path="walkthrough.html"><a href="walkthrough.html#try-it-yourself"><i class="fa fa-check"></i><b>3.4</b> Try it yourself!</a></li>
-<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#thanks"><i class="fa fa-check"></i><b>3.5</b> Thanks</a></li>
+<li class="chapter" data-level="3.4" data-path="walkthrough.html"><a href="walkthrough.html#history-and-provenance"><i class="fa fa-check"></i><b>3.4</b> History and provenance</a></li>
+<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#try-it-yourself"><i class="fa fa-check"></i><b>3.5</b> Try it yourself!</a></li>
+<li class="chapter" data-level="3.6" data-path="walkthrough.html"><a href="walkthrough.html#thanks"><i class="fa fa-check"></i><b>3.6</b> Thanks</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a><ul>
 <li class="chapter" data-level="4.1" data-path="plans.html"><a href="plans.html#what-is-a-drake-plan"><i class="fa fa-check"></i><b>4.1</b> What is a <code>drake</code> plan?</a></li>
@@ -426,19 +427,19 @@ cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span clas
 <p>Functions <code>drake_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpfprxx7/file3a6d6c6765e7/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpbDRyuX/file367e6788d575/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span>
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpfprxx7/file3a6d6c6765e7/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpbDRyuX/file367e6788d575/.drake&quot;</span>
 
 cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)
 cache<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpfprxx7/file3a6d6c6765e7/.drake&quot;</span>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpbDRyuX/file367e6788d575/.drake&quot;</span>
 
 cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)
 cache2<span class="op">$</span>driver<span class="op">$</span>path
-<span class="co">#&gt; [1] &quot;/tmp/Rtmpfprxx7/file3a6d6c6765e7/my_new_cache&quot;</span></code></pre>
+<span class="co">#&gt; [1] &quot;/tmp/RtmpbDRyuX/file367e6788d575/my_new_cache&quot;</span></code></pre>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <pre class="sourceCode r"><code class="sourceCode r">cache2<span class="op">$</span><span class="kw">list</span>()
 <span class="co">#&gt; character(0)</span>
@@ -465,8 +466,8 @@ cache2<span class="op">$</span><span class="kw">destroy</span>()</code></pre>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))
-<span class="co">#&gt; [1] &quot;0ffb369815c8ccdf.rds&quot; &quot;14b6fb971b8e3f77.rds&quot; &quot;150c06fa6f8e5857.rds&quot;</span>
-<span class="co">#&gt; [4] &quot;19785344c2930f7f.rds&quot; &quot;1e119274c5e5df00.rds&quot; &quot;1e4f54a749aa30e2.rds&quot;</span>
+<span class="co">#&gt; [1] &quot;01f17285bda582d7.rds&quot; &quot;055676f1835a1028.rds&quot; &quot;11187a1035ed0358.rds&quot;</span>
+<span class="co">#&gt; [4] &quot;19785344c2930f7f.rds&quot; &quot;1a2145a9fd044e3a.rds&quot; &quot;1aae245045f70d6c.rds&quot;</span>
 <span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))
 <span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span>
 <span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span>
