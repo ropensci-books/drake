@@ -104,6 +104,29 @@ make(plan) # Independently re-create the results from the code and input data.
 
 With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic `drake` functions such as `make()`, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author's methodology. In other words, `drake` could potentially improve the integrity of independent replication.
 
+#### History
+
+
+As of version 7.5.0, `drake` can track the history of your analysis: what you built, when you built it, how you built it, the arguments you used in your function calls, and how to get the data back.
+
+```{r history, eval = FALSE}
+make(history = TRUE)
+
+drake_history(analyze = TRUE)
+#> # A tibble: 7 x 8
+#>   target  time        hash   exists command            runtime latest quiet
+#>   <chr>   <chr>       <chr>  <lgl>  <chr>                <dbl> <lgl>  <lgl>
+#> 1 data    2019-06-23… e580e… TRUE   raw_data %>% muta… 0.001   TRUE   NA   
+#> 2 fit     2019-06-23… 62a16… TRUE   lm(Sepal.Width ~ … 0.00300 TRUE   NA   
+#> 3 hist    2019-06-23… 10bcd… TRUE   create_plot(data)  0.00500 FALSE  NA   
+#> 4 hist    2019-06-23… 00fad… TRUE   create_plot(data)  0.00300 TRUE   NA   
+#> 5 raw_da… 2019-06-23… 63172… TRUE   "readxl::read_exc… 0.00900 TRUE   NA   
+#> 6 report  2019-06-23… dd965… TRUE   "rmarkdown::rende… 0.476   FALSE  TRUE 
+#> 7 report  2019-06-23… dd965… TRUE   "rmarkdown::rende… 0.369   TRUE   TRUE
+```
+
+The history has arguments like `quiet` (because of the call to `knit(quiet = TRUE)`) and hashes to help you recover old data. To learn more, see the end of the [walkthrough chapter](#walkthrough) and the [`drake_history()`](https://ropensci.github.io/drake/reference/drake_history.html) help file.
+
 #### Readability and transparency
 
 Ideally, independent observers should be able to read your code and understand it. `drake` helps in several ways.
