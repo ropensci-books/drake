@@ -166,7 +166,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.2" data-path="similar-work.html"><a href="similar-work.html#memoization"><i class="fa fa-check"></i><b>2.2</b> Memoization</a></li>
 <li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a><ul>
 <li class="chapter" data-level="2.3.1" data-path="similar-work.html"><a href="similar-work.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>2.3.1</b> knitr and R Markdown</a></li>
-<li class="chapter" data-level="2.3.2" data-path="similar-work.html"><a href="similar-work.html#workflowr"><i class="fa fa-check"></i><b>2.3.2</b> workflowr</a></li>
+<li class="chapter" data-level="2.3.2" data-path="similar-work.html"><a href="similar-work.html#version-control"><i class="fa fa-check"></i><b>2.3.2</b> Version control</a></li>
+<li class="chapter" data-level="2.3.3" data-path="similar-work.html"><a href="similar-work.html#containerization-and-r-package-environments"><i class="fa fa-check"></i><b>2.3.3</b> Containerization and R package environments</a></li>
+<li class="chapter" data-level="2.3.4" data-path="similar-work.html"><a href="similar-work.html#workflowr"><i class="fa fa-check"></i><b>2.3.4</b> workflowr</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="similar-work.html"><a href="similar-work.html#acknowledgements"><i class="fa fa-check"></i><b>2.4</b> Acknowledgements</a></li>
 </ul></li>
@@ -417,8 +419,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code>drake</code> and <a href="https://yihui.name/knitr/">knitr</a> are symbiotic. <code>drake</code>’s job is to manage large computation and orchestrate the demanding tasks of a complex data analysis pipeline. <a href="https://yihui.name/knitr/">knitr</a>’s job is to communicate those expensive results after <code>drake</code> computes them. <a href="https://yihui.name/knitr/">knitr</a> / <a href="https://rmarkdown.rstudio.com/">R Markdown</a> reports are small pieces of an overarching <code>drake</code> pipeline. They should focus on communication, and they should do as little computation as possible.</p>
 <p>To insert a <a href="https://yihui.name/knitr/">knitr</a> report in a <code>drake</code> pipeline, use the <code>knitr_in()</code> function inside your <a href="https://ropenscilabs.github.io/drake-manual/plans.html"><code>drake</code> plan</a>, and use <code>loadd()</code> and <code>readd()</code> to refer to targets in the report itself. See an <a href="https://github.com/wlandau/drake-examples/tree/master/main">example here</a>.</p>
 </div>
+<div id="version-control" class="section level3">
+<h3><span class="header-section-number">2.3.2</span> Version control</h3>
+<p><code>drake</code> is not a version control tool. However, it is fully compatible with <a href="https://git-scm.com/"><code>git</code></a>, <a href="https://en.wikipedia.org/wiki/Apache_Subversion"><code>svn</code></a>, and similar software. In fact, it is good practice to use <a href="https://git-scm.com/"><code>git</code></a> alongside <code>drake</code> for reproducible workflows.</p>
+<p>However, data poses a challenge. The datasets created by <code>make()</code> can get large and numerous, and it is not recommended to put the <code>.drake/</code> cache or the <code>.drake_history/</code> logs under version control. Instead, it is recommended to use a data storage solution such as <a href="https://www.dropbox.com/">DropBox</a> or <a href="https://osf.io/ka7jv/wiki/home/">OSF</a>.</p>
+</div>
+<div id="containerization-and-r-package-environments" class="section level3">
+<h3><span class="header-section-number">2.3.3</span> Containerization and R package environments</h3>
+<p><code>drake</code> does not track R packages or system dependencies for changes. Instead, it defers to tools like <a href="https://www.docker.com">Docker</a>, <a href="https://sylabs.io/singularity/">Singularity</a>, <a href="https://github.com/rstudio/renv"><code>renv</code></a>, and <a href="https://github.com/rstudio/packrat"><code>packrat</code></a>, which create self-contained portable environments to reproducibly isolate and ship data analysis projects. <code>drake</code> is fully compatible with these tools.</p>
+</div>
 <div id="workflowr" class="section level3">
-<h3><span class="header-section-number">2.3.2</span> workflowr</h3>
+<h3><span class="header-section-number">2.3.4</span> workflowr</h3>
 <p>The <a href="https://github.com/jdblischak/workflowr"><code>workflowr</code></a> package is a project manager that focuses on literate programming, sharing over the web, file organization, and version control. Its brand of reproducibility is all about transparency, communication, and discoverability. For an example of <a href="https://github.com/jdblischak/workflowr"><code>workflowr</code></a> and <code>drake</code> working together, see <a href="https://2019-feature-selection.pjs-web.de/report-defoliation.html">this machine learning project</a> by <a href="https://github.com/pat-s">Patrick Schratz</a> (<a href="https://github.com/pat-s/2019-feature-selection">source</a>).</p>
 </div>
 </div>
