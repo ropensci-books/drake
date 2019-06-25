@@ -104,6 +104,29 @@ make(plan) # Independently re-create the results from the code and input data.
 
 With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic `drake` functions such as `make()`, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author's methodology. In other words, `drake` could potentially improve the integrity of independent replication.
 
+#### History
+
+
+As of version 7.5.0, `drake` can track the history of your analysis: what you built, when you built it, how you built it, the arguments you used in your function calls, and how to get the data back.
+
+```{r history, eval = FALSE}
+make(history = TRUE)
+
+drake_history(analyze = TRUE)
+#> # A tibble: 7 x 8
+#>   target  time        hash   exists command            runtime latest quiet
+#>   <chr>   <chr>       <chr>  <lgl>  <chr>                <dbl> <lgl>  <lgl>
+#> 1 data    2019-06-23… e580e… TRUE   raw_data %>% muta… 0.001   TRUE   NA   
+#> 2 fit     2019-06-23… 62a16… TRUE   lm(Sepal.Width ~ … 0.00300 TRUE   NA   
+#> 3 hist    2019-06-23… 10bcd… TRUE   create_plot(data)  0.00500 FALSE  NA   
+#> 4 hist    2019-06-23… 00fad… TRUE   create_plot(data)  0.00300 TRUE   NA   
+#> 5 raw_da… 2019-06-23… 63172… TRUE   "readxl::read_exc… 0.00900 TRUE   NA   
+#> 6 report  2019-06-23… dd965… TRUE   "rmarkdown::rende… 0.476   FALSE  TRUE 
+#> 7 report  2019-06-23… dd965… TRUE   "rmarkdown::rende… 0.369   TRUE   TRUE
+```
+
+The history has arguments like `quiet` (because of the call to `knit(quiet = TRUE)`) and hashes to help you recover old data. To learn more, see the end of the [walkthrough chapter](#walkthrough) and the [`drake_history()`](https://ropensci.github.io/drake/reference/drake_history.html) help file.
+
 #### Readability and transparency
 
 Ideally, independent observers should be able to read your code and understand it. `drake` helps in several ways.
@@ -133,21 +156,8 @@ The main resources to learn `drake` are
 
 1. The [user manual](https://ropenscilabs.github.io/drake-manual/), which contains a friendly introduction and several long-form tutorials.
 2. The [documentation website](https://ropensci.github.io/drake/), which serves as a quicker reference.
-3. [Kirill Müller](https://github.com/krlmlr)'s [`drake` workshop from March 5, 2018](https://github.com/krlmlr/drake-sib-zurich).
-
-### Shiny app
-
-The Shiny app at [wlandau.shinyapps.io/drakeplanner](https://wlandau.shinyapps.io/drakeplanner) makes it easier to learn `drake` and create new `drake`-powered projects. If you have trouble accessing it, you can install and run it locally.
-
-```{r, eval = FALSE}
-install.packages("remotes")
-remotes::install_github("wlandau/drakeplanner")
-drakeplanner::drakeplanner()
-```
-
-### Cheat sheet
-
-Thanks to [Kirill](https://github.com/krlmlr) for preparing a [`drake` cheat sheet](https://github.com/krlmlr/drake-sib-zurich/blob/master/cheat-sheet.pdf) for the [workshop](https://github.com/krlmlr/drake-sib-zurich).
+3. [`learndrake`](https://github.com/wlandau/learndrake), an R package for teaching an extended `drake` workshop. It contains notebooks, slides, Shiny apps, the latter two of which are publicly deployed. See the [README](https://github.com/wlandau/learndrake/blob/master/README.md) for instructions and links.
+4. [`drakeplanner`](https://github.com/wlandau/drakeplanner), an R/Shiny app deployed to [wlandau.shinyapps.io/drakeplanner](https://wlandau.shinyapps.io/drakeplanner). This app is an interactive tool for creating new `drake`-powered projects. If you have trouble accessing it, you can install it as a package and run it locally.
 
 ### Frequently asked questions
 
@@ -159,6 +169,7 @@ The [reference section](https://ropensci.github.io/drake/reference/index.html) l
 
 - `drake_plan()`: create a workflow data frame (like `my_plan`).
 - `make()`: build your project.
+- `drake_history()`: show what you built, when you built it, and the function arguments you used.
 - `loadd()`: load one or more built targets into your R session.
 - `readd()`: read and return a built target.
 - `drake_config()`: create a master configuration list for other user-side functions.
@@ -179,6 +190,7 @@ The official [rOpenSci use cases](https://ropensci.org/usecases/) and [associate
 - [efcaguab/demografia-del-voto](https://github.com/efcaguab/demografia-del-voto)
 - [efcaguab/great-white-shark-nsw](https://github.com/efcaguab/great-white-shark-nsw)
 - [IndianaCHE/Detailed-SSP-Reports](https://github.com/IndianaCHE/Detailed-SSP-Reports)
+- [joelnitta/pleurosoriopsis](https://github.com/joelnitta/pleurosoriopsis)
 - [pat-s/pathogen-modeling](https://github.com/pat-s/pathogen-modeling)
 - [sol-eng/tensorflow-w-r](https://github.com/sol-eng/tensorflow-w-r)
 - [tiernanmartin/home-and-hope](https://github.com/tiernanmartin/home-and-hope)
