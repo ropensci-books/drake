@@ -242,8 +242,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="part"><span><b>III Resource management</b></span></li>
 <li class="chapter" data-level="9" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>9</b> High-performance computing</a><ul>
 <li class="chapter" data-level="9.1" data-path="hpc.html"><a href="hpc.html#start-small-1"><i class="fa fa-check"></i><b>9.1</b> Start small</a></li>
-<li class="chapter" data-level="9.2" data-path="hpc.html"><a href="hpc.html#batch-mode-for-long-workflows"><i class="fa fa-check"></i><b>9.2</b> Batch mode for long workflows</a></li>
-<li class="chapter" data-level="9.3" data-path="hpc.html"><a href="hpc.html#let-make-schedule-your-targets."><i class="fa fa-check"></i><b>9.3</b> Let <code>make()</code> schedule your targets.</a></li>
+<li class="chapter" data-level="9.2" data-path="hpc.html"><a href="hpc.html#let-make-schedule-your-targets."><i class="fa fa-check"></i><b>9.2</b> Let <code>make()</code> schedule your targets.</a></li>
+<li class="chapter" data-level="9.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>9.3</b> The master process</a><ul>
+<li class="chapter" data-level="9.3.1" data-path="hpc.html"><a href="hpc.html#master-on-a-cluster"><i class="fa fa-check"></i><b>9.3.1</b> Master on a cluster</a></li>
+<li class="chapter" data-level="9.3.2" data-path="hpc.html"><a href="hpc.html#local-master"><i class="fa fa-check"></i><b>9.3.2</b> Local master</a></li>
+</ul></li>
 <li class="chapter" data-level="9.4" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>9.4</b> Parallel backends</a></li>
 <li class="chapter" data-level="9.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>9.5</b> The <code>clustermq</code> backend</a><ul>
 <li class="chapter" data-level="9.5.1" data-path="hpc.html"><a href="hpc.html#persistent-workers"><i class="fa fa-check"></i><b>9.5.1</b> Persistent workers</a></li>
@@ -554,7 +557,7 @@ my_plan<span class="op">$</span>command[[<span class="kw">nrow</span>(my_plan)]]
 <span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span>
 <span class="co">#&gt;         ]</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x18acf2e0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x215f4800&gt;</span>
 
 random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){
   <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
@@ -653,7 +656,7 @@ error<span class="op">$</span>call
 <span class="co">#&gt;  $ : language f(b)</span>
 <span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span>
 <span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span>
-<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x28cc0f98&gt;</span></code></pre>
+<span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x2193e290&gt;</span></code></pre>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Pretend we just opened a new R session.</span>
 <span class="kw">library</span>(drake)
@@ -695,7 +698,7 @@ f
 <span class="co">#&gt;   }</span>
 <span class="co">#&gt;   x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x1a615228&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0xf47edf8&gt;</span>
 
 <span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span>
 f &lt;-<span class="st"> </span><span class="cf">function</span>(x){
