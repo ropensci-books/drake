@@ -12,6 +12,8 @@ then
   git config --global user.name "wlandau"
   git clone -b gh-pages https://${GITHUB_PAT}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
   cd gh-pages
+  shopt -s extglob
+  rm -r ./!(.git)
   cp -r ../_book/* ./
   git add --all *
   git commit -m "Update the manual" || true
