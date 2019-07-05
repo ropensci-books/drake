@@ -14,7 +14,7 @@ then
   cd gh-pages
   ls -a | grep -Ev "^\.$|^..$|^\.git$" | xargs rm -rf
   cp -r ../_book/* ./
-  git add --all *
-  git commit -m "Update the manual" || true
+  git add *
+  git commit -am "Update the manual" || true
   git push -q origin gh-pages
 fi
