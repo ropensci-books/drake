@@ -13,19 +13,79 @@ library(dplyr)
 
 This chapter provides guidance on time-consuming `drake` workflows and high-level parallel computation.
 
-```{r a, eval = FALSE}
-library(drake)
-load_mtcars_example()
-make(my_plan, jobs = 2)
-```
-
 ## Start small
 
-If your workflow is large, consider running a downsized version to debug and test things first. That way, you can avoid consuming lots of computing resources until you are reasonably sure everything works. Create a test plan with `drake_plan(max_expand = SMALL_NUMBER)` before scaling up to the full set of targets. See [this section on plans](https://ropenscilabs.github.io/drake-manual/plans.html#start-small) for details.
+Before you jump into high-performance computing with a large workflow, consider running a downsized version to debug and test things first. That way, you can avoid consuming lots of computing resources until you are reasonably sure everything works. Create a test plan with `drake_plan(max_expand = SMALL_NUMBER)` before scaling up to the full set of targets, and take temporary shortcuts in your commands so your targets build more quickly for test mode. See [this section on plans](https://ropenscilabs.github.io/drake-manual/plans.html#start-small) for details.
 
-## Batch mode for long workflows
+## Let `make()` schedule your targets.
 
-If you expect `make()` to take a long time, create a master script for your project (say, `make.R`, as in the [guidance on projects](#projects)) and run it in a persistent background process. The following should work in the Mac/Linux terminal/shell.
+When it comes time to activate high-performance computing, `drake` launches its own parallel workers and sends targets to those workers. The workers can be local processes or jobs on a cluster. `drake` uses your project's implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.
+
+```{r hpcgraph}
+load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
+config <- drake_config(my_plan)
+vis_drake_graph(config)
+```
+
+You do not need to not micromanage how targets are scheduled, and you do not need to run simultaneous instances of `make()`.
+
+## The master process
+
+`make()` takes care of the jobs it launches, but `make()` *itself* is a job too, and it is your responsibility to manage it.
+
+### Master on a cluster
+
+Most clusters will let you submit `make()` as a job on a compute node. Let's consider the Sun Grid Engine (SGE) as an example. First, we create a script that calls `make()` (or [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html)).
+
+```{r hpcremotemaster1, eval = FALSE}
+# make.R
+source("R/packages.R")
+source("R/packages.R")
+source("R/packages.R")
+options(
+  clustermq.scheduler = "sge",
+  # Created by drake_hpc_template_file("sge_clustermq.tmpl"):
+  clustermq.template = "sge_clustermq.tmpl"
+)
+make(
+  plan,
+  parallelism = "clustermq",
+  jobs = 8,
+  console_log_file = "drake.log"
+)
+```
+
+Then, we create a shell script (say, `run.sh`) to call `make.R`. This script may look different if you use a different scheduler such as [SLURM](https://slurm.schedmd.com).
+
+```{bash, hpcremotemaster2, eval = FALSE}
+# run.sh
+#!/bin/bash
+#$ -j y       # combine stdout/error in one file
+#$ -o log.out # output file
+#$ -cwd       # use pwd as work dir
+#$ -V         # use environment variable
+module load R # Uncomment if R is an environment module.
+R CMD BATCH make.R
+```
+
+Finally, to run the whole workflow, we call `qsub`.
+
+```{bash, hpcremotemaster3, eval = FALSE}
+qsub run.sh
+```
+
+And here is what happens:
+
+1. A new job starts on the cluster with the configuration flags next to `#$` in `run.sh`.
+2. `run.sh` opens R and runs `make.R`.
+3. `make.R` invokes `drake` using the `make()` function.
+4. `make()` launches 8 new jobs on the cluster 
+
+So 9 simultaneous jobs run on the cluster and we avoid bothering the headnode / login node.
+
+### Local master
+
+Alternatively, you can run `make()` in a persistent background process. The following should work in the Mac/Linux terminal/shell.
 
 <pre><code>nohup nice -19 R CMD BATCH --no-save make.R &
 </code></pre>
@@ -38,17 +98,7 @@ where:
 - `--no-save`: do not save the workspace in a `.RData` file.
 - `&`: Run this job in the background so you can do other stuff in the terminal window.
 
-## Let `make()` schedule your targets.
-
-`drake` uses your project's implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.
-
-```{r hpcgraph}
-load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
-config <- drake_config(my_plan)
-vis_drake_graph(config)
-```
-
-You do not need to not micromanage the timing among targets, and you do not need to run parallel instances of `make()`. As the next sections describe, `drake` has built-in parallel and distributed computing support.
+Alternatives to `nohup` include [`screen`](https://linuxize.com/post/how-to-use-linux-screen/) and [Byobu](http://byobu.co/).
 
 ## Parallel backends
 

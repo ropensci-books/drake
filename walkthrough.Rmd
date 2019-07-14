@@ -79,7 +79,7 @@ vis_drake_graph(config)
 So far, we have just been setting the stage. Use `make()` to do the real work. Targets are built in the correct order regardless of the row order of `plan`.
 
 ```{r make1}
-make(plan, history = TRUE) # History is new in version 7.5.0.
+make(plan)
 ```
 
 Except for output files like `report.html`, your output is stored in a hidden `.drake/` folder. Reading it back is easy.
@@ -122,7 +122,7 @@ vis_drake_graph(config)
 The next `make()` just builds `hist` and `report`. No point in wasting time on the data or model.
 
 ```{r justhistetc}
-make(plan, history = TRUE)
+make(plan)
 ```
 
 ```{r hist2}
@@ -132,12 +132,12 @@ hist
 
 ## History and provenance
 
-As of version 7.5.0, `drake` can track the history and provenance of your targets:
+As of version 7.5.0, `drake` tracks the history and provenance of your targets:
 what you built, when you built it, how you built it, the arguments you
 used in your function calls, and how to get the data back.
 
 ```{r history_walkthrough}
-history <- drake_history(analyze = TRUE) # Requires make(history = TRUE)
+history <- drake_history(analyze = TRUE)
 history
 ```
 
@@ -145,13 +145,15 @@ Remarks:
 
 - The `quiet` column appears above because one of the `drake_plan()` commands has `knit(quiet = TRUE)`.
 - The `hash` column identifies all the previous the versions of your targets. As long as `exists` is `TRUE`, you can recover old data.
+- Advanced: if you use `make(cache_log_file = TRUE)` and put the cache log file under version control, you can match the hashes from `drake_history()` with the `git` commit history of your code.
 
-Let's use the history to recover the old histogram.
+Let's use the history to recover the oldest histogram.
 
 ```{r}
 hash <- history %>%
-  filter(target == "hist" & !latest) %>% # Get the old histogram.
-  pull(hash)
+  filter(target == "hist") %>%
+  pull(hash) %>%
+  head(n = 1)
 cache <- drake_cache()
 cache$get_value(hash)
 ```
