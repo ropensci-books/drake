@@ -249,16 +249,26 @@ plan <- drake_plan(
 )
 ```
 
-The `model` needs a GPU and multiple CPU cores, and the `data` only needs the bare minimum resources. Declare these requirements in a new list column of the `plan`. Here, each element is a named list for the `resources` argument of `future::future()`.
+The `model` needs a GPU and multiple CPU cores, and the `data` only needs the bare minimum resources. Declare these requirements with `target()`, as below. This is equivalent to adding a new list column to the `plan`, where each element is a named list for the `resources` argument of `future::future()`.
 
 ```{r planresources}
-plan$resources <- list(
-  list(cores = 1, gpus = 0),
-  list(cores = 4, gpus = 1)
+plan <- drake_plan(
+  data = target(
+    download_data(),
+    resources = list(cores = 1, gpus = 0)
+  ),
+  model = target(
+    big_machine_learning_model(data),
+    resources = list(cores = 4, gpus = 1)
+  )
 )
+
+plan
+
+str(plan$resources)
 ```
 
-Next, plug your resources into the [`brew`](https://CRAN.R-project.org/package=brew) patterns of your [`batchtools`](https://github.com/mllg/batchtools) template file. The following `sge_batchtools.tmpl` file shows how to do it, but the file itself probably requires modification before it will work with your own machine.
+Next, plug the names of your resources into the [`brew`](https://CRAN.R-project.org/package=brew) patterns of your [`batchtools`](https://github.com/mllg/batchtools) template file. The following `sge_batchtools.tmpl` file shows how to do it, but the file itself probably requires modification before it will work with your own machine.
 
 ```
 #!/bin/bash
