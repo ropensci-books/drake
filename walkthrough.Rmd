@@ -160,6 +160,18 @@ cache$get_value(hash)
 
 ## Reproducible data recovery and renaming
 
+Remember how we made that change to our histogram? What if we want to change it back? If we revert `create_plot()`, `make(plan, recover = TRUE)` restores the original plot.
+
+```{r recoverhist}
+create_plot <- function(data) {
+  ggplot(data, aes(x = Petal.Width, fill = Species)) +
+    geom_histogram()
+}
+
+# The report still needs to run in order to restore report.html.
+make(plan, recover = TRUE)
+```
+
 `drake`'s data recovery feature is another way to avoid rerunning commands. It is useful if:
 
 - You want to revert to your old code, maybe with `git reset`.
@@ -173,7 +185,7 @@ Caveats:
 1. This feature is still experimental.
 2. Recovery may not be a good idea if your external dependencies have changed a lot over time (R version, package environment, etc.).
 
-### Basic recovery
+### Undoing `clean()`
 
 ```{r}
 # Is the data really gone?
