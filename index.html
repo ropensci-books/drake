@@ -491,13 +491,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">1.3.3</span> Aggressively scale up.</h3>
 <p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://ropenscilabs.github.io/drake-manual/hpc.html">high-performance computing guide</a> for all the details.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Use the spare cores on your local machine.</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">make</span>(plan, <span class="dt">jobs =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co"># Or scale up to a supercomputer.</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="kw">drake_batchtools_tmpl_file</span>(<span class="st">&quot;slurm&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw">library</span>(future.batchtools)</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;batchtools.slurm.tmpl&quot;</span>, <span class="dt">workers =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future_lapply&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;multicore&quot;</span>)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># Or scale up to a supercomputer.</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw">drake_hpc_tmpl_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="kw">options</span>(</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>,</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">  <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">)</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">100</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="documentation" class="section level2">
@@ -566,6 +569,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td><a href="https://github/com/wlandau">Will Landau</a></td>
+<td>R/Pharma 2019</td>
+<td>2019-08-21</td>
+<td><a href="https://wlandau.github.io/learndrake/#1">slides</a>, <a href="https://mybinder.org/v2/gh/wlandau/learndrake/binder?urlpath=rstudio">workspace</a>, <a href="https://github.com/wlandau/learndrake">source</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/gadenbuie">Garrick Aden-Buie</a></td>
+<td></td>
+<td></td>
+<td><a href="https://pkg.garrickadenbuie.com/drake-intro/">slides</a>, <a href="Run%20project%20in%20RStudio%20Cloud">workspace</a>, <a href="https://github.com/gadenbuie/drake-intro">source</a></td>
+</tr>
 <tr class="odd">
 <td><a href="https://github.com/DominikRafacz">Dominik Rafacz</a></td>
 <td><a href="https://gdansk2019.satrdays.org">satRday Gdansk</a></td>
