@@ -149,13 +149,16 @@ Not every project can complete in a single R session on your laptop. Some projec
 
 ```{r scaleup, eval = FALSE}
 # Use the spare cores on your local machine.
-make(plan, jobs = 4)
+options(clustermq.scheduler = "multicore")
+make(plan, parallelism = "clustermq", jobs = 4)
 
 # Or scale up to a supercomputer.
-drake_batchtools_tmpl_file("slurm") # https://slurm.schedmd.com/
-library(future.batchtools)
-future::plan(batchtools_slurm, template = "batchtools.slurm.tmpl", workers = 100)
-make(plan, parallelism = "future_lapply")
+drake_hpc_tmpl_file("slurm_clustermq.tmpl") # https://slurm.schedmd.com/
+options(
+  clustermq.scheduler = "slurm",
+  clustermq.template = "slurm_clustermq.tmpl"
+)
+make(plan, parallelism = "clustermq", jobs = 100)
 ```
 
 ## Documentation
