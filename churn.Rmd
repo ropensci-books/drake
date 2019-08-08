@@ -101,7 +101,7 @@ define_model <- function(rec, units1, units2, act1, act2, act3) {
 }
 ```
 
-train and [serialize](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) a model,
+train a model,
 
 ```{r, kerastrain}
 train_model <- function(
@@ -143,15 +143,14 @@ train_model <- function(
     validation_split = 0.3,
     verbose = 0
   )
-  serialize_model(model)
+  model
 }
 ```
 
-compare the predictions of a [serialized](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) model against reality,
+compare predictions against reality,
 
 ```{r, kerasconf}
-confusion_matrix <- function(data, rec, serialized_model) {
-  model <- unserialize_model(serialized_model)
+confusion_matrix <- function(data, rec, model) {
   testing_data <- bake(rec, testing(data))
   x_test_tbl <- testing_data %>%
     select(-Churn) %>%
@@ -209,6 +208,7 @@ plan <- drake_plan(
   rec = prepare_recipe(data),
   model = target(
     train_model(data, rec, act1 = act),
+    format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
   conf = target(
@@ -266,6 +266,7 @@ plan <- drake_plan(
   rec = prepare_recipe(data),
   model = target(
     train_model(data, rec, act1 = act),
+    format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
   conf = target(
@@ -347,167 +348,12 @@ hash <- history %>%
   filter(act1 == "relu") %>%
   pull(hash) %>%
   head(n = 1)
-cache <- drake_cache()
-cache$get_value(hash) %>%
-  unserialize_model()
-```
-
-## Possible slowness
-
-Due to [the technical details of `drake`'s storage system](https://github.com/richfitz/storr/issues/77#issuecomment-476275570), the above workflow serializes each Keras model twice, which could potentially prove inefficient for large models. Using `build_times()`, you can examine the runtime overhead incurred by `drake`.
-
-Here is the time it took `drake` to fully process `model_relu`.
-
-```{r}
-build <- build_times(model_relu, type = "build")$elapsed
-build
-```
-
-And here is the time it took just to run the command.
-
-```{r}
-command <- build_times(model_relu, type = "command")$elapsed
-command
-```
-
-The relative difference is the overhead incurred by `drake`.
-
-```{r}
-sprintf("%.3f%%", 100 * (build - command) / build)
-```
-
-In this particular case study, overhead is not so bad. But if it ever becomes a problem, consider shifting the burden away from [`drake`'s storage system](https://github.com/richfitz/storr) as described below.
-
-## Models in HDF5 files
-
-If it takes a long time to save your models, you may wish to store them in custom [HDF5](https://www.tensorflow.org/tutorials/keras/save_and_restore_models#as_an_hdf5_file) files. This approach adds some cumbersome bookkeeping, but `make()` should run faster. We need to rewrite our functions in terms of [`save_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html) and [`load_model_hdf5()`](https://keras.rstudio.com/reference/save_model_hdf5.html).
-
-```{r kerastrainfile}
-# We add a new model_file argument.
-train_model <- function(
-  data,
-  rec,
-  model_file,
-  units1 = 16,
-  units2 = 16,
-  act1 = "relu",
-  act2 = "relu",
-  act3 = "sigmoid"
-) {
-  model <- define_model(
-    rec = rec,
-    units1 = units1,
-    units2 = units2,
-    act1 = act1,
-    act2 = act2,
-    act3 = act3
-  )
-  compile(
-    model,
-    optimizer = "adam",
-    loss = "binary_crossentropy",
-    metrics = c("accuracy")
-  )
-  x_train_tbl <- juice(
-    rec,
-    all_predictors(),
-    composition = "matrix"
-  )
-  y_train_vec <- juice(rec, all_outcomes()) %>%
-    pull()
-  
-  # As an added bonus, we get to hold onto the history
-  # of each model fit.
-  history <- fit(
-    object = model,
-    x = x_train_tbl,
-    y = y_train_vec,
-    batch_size = 32,
-    epochs = 32,
-    validation_split = 0.3,
-    verbose = 0
-  )
-  
-  # Instead of calling serialize_model(), we save the model to a file.
-  save_model_hdf5(model, model_file)
-  history
-}
-
-# Again, we need a model_file argument.
-confusion_matrix <- function(data, rec, model_file) {
-  # Instead of calling unserialize_model(),
-  # we load the model from the HDF5 file.
-  model <- load_model_hdf5(model_file)
-  testing_data <- bake(rec, testing(data))
-  x_test_tbl <- testing_data %>%
-    select(-Churn) %>%
-    as.matrix()
-  y_test_vec <- testing_data %>%
-    select(Churn) %>%
-    pull()
-  yhat_keras_class_vec <- model %>%
-    predict_classes(x_test_tbl) %>%
-    as.factor() %>%
-    fct_recode(yes = "1", no = "0")
-  yhat_keras_prob_vec <-
-    model %>%
-    predict_proba(x_test_tbl) %>%
-    as.vector()
-  test_truth <- y_test_vec %>%
-    as.factor() %>%
-    fct_recode(yes = "1", no = "0")
-  estimates_keras_tbl <- tibble(
-    truth = test_truth,
-    estimate = yhat_keras_class_vec,
-    class_prob = yhat_keras_prob_vec
-  )
-  estimates_keras_tbl %>%
-    conf_mat(truth, estimate)
-}
-```
-
-And we need a new plan that tracks the model files using [`file_in()`](https://ropensci.github.io/drake/reference/file_in.html) and [`file_out()`](https://ropensci.github.io/drake/reference/file_out.html).
-
-```{r kerasplanfile}
-activations <- c("relu", "sigmoid", "softmax")
-
-plan <- drake_plan(
-  data = read_csv(file_in("customer_churn.csv"), col_types = cols()) %>%
-    initial_split(prop = 0.3),
-  rec = prepare_recipe(data),
-  progression = target(
-    train_model(data, rec, file_out(!!paste0(act, ".h5")), act1 = act),
-    transform = map(act = !!activations)
-  ),
-  conf = target(
-    confusion_matrix(data, rec, file_in(!!paste0(act, ".h5"))),
-    transform = map(act)
-  ),
-  metrics = target(
-    compare_models(conf),
-    transform = combine(conf)
-  )
-)
-```
-
-`drake` still resolves the correct dependency relationships, but because of the changes to our functions and plan, our models and downstream results are no longer up to date.
-
-```{r kerasgraphfile, message = FALSE}
-config <- drake_config(plan)
-vis_drake_graph(config)
-```
-
-But one advantage of this more complicated approach is that we can now view the progression of each model fit.
-
-```{r kerasmakefile}
-make(plan)
-
-plot(readd(progression_relu))
+drake_cache()$get_value(hash)
 ```
 
 ## Tips
 
-- To see this workflow [organized as a collection of modular  scripts](https://ropenscilabs.github.io/drake-manual/projects.html), see the customer churn examples in [this repository](https://github.com/wlandau/drake-examples). You can download the code with `drake_example("customer-churn-simple")` and `drake_example("customer-churn-fast")`.
+- To see this workflow [organized as a collection of modular  scripts](https://ropenscilabs.github.io/drake-manual/projects.html), see the customer churn examples in [this repository](https://github.com/wlandau/drake-examples). You can download the code with `drake_example("customer-churn")`.
 - [`drake`](https://github.com/ropensci/drake) has [built-in distributed computing support](https://ropenscilabs.github.io/drake-manual/hpc.html) that lets you fit multiple models in parallel.
 
 ```{r, echo = FALSE}
