@@ -131,12 +131,21 @@ drake_plan(
 
 The following columns have special meanings for `make()`.
 
+- `format`: set a storage format to save big targets more efficiently. Most formats are faster than ordinary storage, and they consume far less memory. Available formats:
+    - `"fst"`: save big data frames fast. The target must be a data frame, and you must have the `fst` package installed.
+    - `"keras"`: save Keras models as HDF5 files. Requires the `keras` package. Warning: `format = "keras"` is incompatible with certain kinds of high-performance computing. This is because a Keras model must be serialized before being sent to another R process, and `format = "keras"` does not serialize models. If you use HPC and master caching (e.g. `make(parallelism = "clustermq", caching = "master")`) consider one of the workarounds listed in the "High-performance computing caveats" section of <https://ropenscilabs.github.io/drake-manual/churn.html>.
+    - `"rds"`: save any object. This is similar to the default storage except we avoid creating a serialized copy of the entire target in memory. Requires R >= 3.5.0 so drake can use ALTREP.
+- `trigger`: rule to decide whether a target needs to run. See the [trigger chapter](#triggers) to learn more.
 - `elapsed` and `cpu`: number of seconds to wait for the target to build before timing out (`elapsed` for elapsed time and `cpu` for CPU time).
 - `hpc`: logical values (`TRUE`/`FALSE`/`NA`) whether to send each target to parallel workers. [Click here](https://ropenscilabs.github.io/drake-manual/hpc.html#selectivity) to learn more.
 - `resources`: target-specific lists of resources for a computing cluster. See the advanced options in the [parallel computing](#hpc) chapter for details.
+- `caching`: overrides the `caching` argument of [make()] for each target individually. Only supported in `drake` version 7.6.1.9000 and above. Possible values:
+    - "master": tell the master process to store the target in the cache.
+    - "worker": tell the HPC worker to store the target in the cache.
+    - NA: default to the `caching` argument of [make()].
 - `retries`: number of times to retry building a target in the event of an error.
 - `seed`: pseudo-random number generator (RNG) seed for each target. `drake` usually computes its own unique reproducible target-specific seeds using the target name and the global seed (the `seed` argument of `make()` and `drake_config()`). Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
-- `trigger`: rule to decide whether a target needs to run. See the [trigger chapter](#triggers) to learn more.
+
 
 ## Large plans
 
