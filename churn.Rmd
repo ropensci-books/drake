@@ -351,18 +351,6 @@ hash <- history %>%
 drake_cache()$get_value(hash)
 ```
 
-## High-performance computing caveats
-
-Currently, there is some friction with the above workflow and [`drake`'s high-performance computing](#hpc).
-
-First, Keras models are not valid if you send them from one R session to another. Workarounds:
-
-1. Set `caching = "worker"` in `make()`. That way, `drake` saves the model with the same R session that fit it, so the model remains valid. In `drake` >= 7.6.1.9000, you can set worker caching for an individual target with the custom "caching" column of the plan, e.g. `target(train_model(...), format = "keras", caching = "worker")`.
-2. Alternatively, use `target(train_model(...), format = "keras", hpc = FALSE)` to fit models locally and run everything else as before.
-3. Alternatively, avoid `target(train_model(...), format = "keras")` and instead return a [serialized model](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) from the `train_model()` function. If you do that, `confusion_matrix()` needs to accept a serialize model and call `unserialize_model()` on it before further processing.
-
-In addition, `clustermq` multicore workers currently hangs when they try to fit Keras models: <https://github.com/mschubert/clustermq/issues/169>. Hopefully this will be fixed in later versions of `clustermq`.
-
 ```{r, echo = FALSE}
 clean(destroy = TRUE)
 ```
