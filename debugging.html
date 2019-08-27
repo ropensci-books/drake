@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 14 Debugging and testing drake projects | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.12 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 14 Debugging and testing drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="visuals.html">
-<link rel="next" href="triggers.html">
+<link rel="prev" href="visuals.html"/>
+<link rel="next" href="triggers.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -554,7 +554,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb226-4" data-line-number="4"><span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span></a>
 <a class="sourceLine" id="cb226-5" data-line-number="5"><span class="co">#&gt;         ]</span></a>
 <a class="sourceLine" id="cb226-6" data-line-number="6"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb226-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x7c732e0&gt;</span></a>
+<a class="sourceLine" id="cb226-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x1a76c5b8&gt;</span></a>
 <a class="sourceLine" id="cb226-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb226-9" data-line-number="9">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){</a>
 <a class="sourceLine" id="cb226-10" data-line-number="10">  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
@@ -653,7 +653,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb230-52" data-line-number="52"><span class="co">#&gt;  $ : language f(b)</span></a>
 <a class="sourceLine" id="cb230-53" data-line-number="53"><span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span></a>
 <a class="sourceLine" id="cb230-54" data-line-number="54"><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span></a>
-<a class="sourceLine" id="cb230-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xe5d64f0&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb230-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xdf45630&gt;</span></a></code></pre></div>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="co"># Pretend we just opened a new R session.</span></a>
 <a class="sourceLine" id="cb231-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
@@ -695,7 +695,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb231-38" data-line-number="38"><span class="co">#&gt;   }</span></a>
 <a class="sourceLine" id="cb231-39" data-line-number="39"><span class="co">#&gt;   x</span></a>
 <a class="sourceLine" id="cb231-40" data-line-number="40"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb231-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x1b5d6fd0&gt;</span></a>
+<a class="sourceLine" id="cb231-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x1baaa258&gt;</span></a>
 <a class="sourceLine" id="cb231-42" data-line-number="42"></a>
 <a class="sourceLine" id="cb231-43" data-line-number="43"><span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span></a>
 <a class="sourceLine" id="cb231-44" data-line-number="44">f &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
@@ -818,8 +818,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
