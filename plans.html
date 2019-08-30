@@ -50,7 +50,7 @@
 <script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
-<script src="libs/visNetwork-binding-2.0.7/visNetwork.js"></script>
+<script src="libs/visNetwork-binding-2.0.8/visNetwork.js"></script>
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
@@ -409,7 +409,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="plans-are-similar-to-r-scripts." class="section level2">
 <h2><span class="header-section-number">4.2</span> Plans are similar to R scripts.</h2>
-<p>Your <code>drake</code> plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions <a href="https://ropensci.github.io/drake/reference/plan_to_code.html"><code>plan_to_code()</code></a> and <a href="https://ropensci.github.io/drake/reference/code_to_plan.html"><code>code_to_plan()</code></a> (with some <a href="https://ropensci.github.io/drake/reference/code_to_plan.html#details">caveats</a>).</p>
+<!-- Your `drake` plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions [`plan_to_code()`](https://docs.ropensci.org/drake/reference/plan_to_code.html) and [`code_to_plan()`](https://docs.ropensci.org/drake/reference/code_to_plan.html) (with some [caveats](https://docs.ropensci.org/drake/reference/code_to_plan.html#details)). -->
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">plan_to_code</span>(plan, <span class="st">&quot;new_script.R&quot;</span>)</a>
 <a class="sourceLine" id="cb26-2" data-line-number="2"><span class="co">#&gt; Loading required namespace: styler</span></a>
 <a class="sourceLine" id="cb26-3" data-line-number="3"><span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_script.R&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
@@ -431,7 +431,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb26-19" data-line-number="19"><span class="co">#&gt; 3 fit      lm(Sepal.Width ~ Petal.Width + Species, data)                  …</span></a>
 <a class="sourceLine" id="cb26-20" data-line-number="20"><span class="co">#&gt; 4 hist     create_plot(data)                                              …</span></a>
 <a class="sourceLine" id="cb26-21" data-line-number="21"><span class="co">#&gt; 5 report   rmarkdown::render(knitr_in(&quot;report.Rmd&quot;), output_file = file_ou…</span></a></code></pre></div>
-<p>And <a href="https://ropensci.github.io/drake/reference/plan_to_notebook.html"><code>plan_to_notebook()</code></a> turns plans into <a href="https://bookdown.org/yihui/rmarkdown/notebook.html">R notebooks</a>.</p>
+<p>And <a href="https://docs.ropensci.org/drake/reference/plan_to_notebook.html"><code>plan_to_notebook()</code></a> turns plans into <a href="https://bookdown.org/yihui/rmarkdown/notebook.html">R notebooks</a>.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">plan_to_notebook</span>(plan, <span class="st">&quot;new_notebook.Rmd&quot;</span>)</a>
 <a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">cat</span>(<span class="kw">readLines</span>(<span class="st">&quot;new_notebook.Rmd&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
 <a class="sourceLine" id="cb27-3" data-line-number="3"><span class="co">#&gt; ---</span></a>
@@ -531,9 +531,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><code>format</code>: set a storage format to save big targets more efficiently. Most formats are faster than ordinary storage, and they consume far less memory. Available formats:
 <ul>
-<li><code>&quot;fst&quot;</code>: save big data frames fast. The target must be a data frame, and you must have the <code>fst</code> package installed.</li>
-<li><code>&quot;keras&quot;</code>: save Keras models as HDF5 files. Requires the <code>keras</code> package. Warning: <code>format = &quot;keras&quot;</code> is incompatible with certain kinds of high-performance computing. This is because a Keras model must be serialized before being sent to another R process, and <code>format = &quot;keras&quot;</code> does not serialize models. If you use HPC and master caching (e.g. <code>make(parallelism = &quot;clustermq&quot;, caching = &quot;master&quot;)</code>) consider one of the workarounds listed in the “High-performance computing caveats” section of <a href="https://ropenscilabs.github.io/drake-manual/churn.html" class="uri">https://ropenscilabs.github.io/drake-manual/churn.html</a>.</li>
+<li><code>&quot;fst&quot;</code>: save big data frames fast. Requirements:
+<ol style="list-style-type: decimal">
+<li>The <code>fst</code> package must be installed.</li>
+<li>The target’s value must be a plain data frame. If it is not a
+plain data frame (for example, a tibble or data.table)
+then drake will coerce it to a plain data frame with
+<code>as.data.frame()</code>.
+All non-data-frame-specific attributes are lost
+when <code>drake</code> saves the target.</li>
+</ol></li>
+<li><code>&quot;fst_dt&quot;</code>: Like <code>&quot;fst&quot;</code> format, but for <code>data.table</code> objects.
+Requirements:
+<ol style="list-style-type: decimal">
+<li>The <code>data.table</code> and <code>fst</code> packages must be installed.</li>
+<li>The target’s value must be a data.table object. If it is not a
+data.table object (for example, a data frame or tibble)
+then drake will coerce it to a data.table object using
+<code>data.table::as.data.table()</code>.
+All non-data-table-specific attributes are lost
+when <code>drake</code> saves the target.</li>
+</ol>
+<ul>
+<li><code>&quot;keras&quot;</code>: save Keras models as HDF5 files. Requires the <code>keras</code> package.</li>
 <li><code>&quot;rds&quot;</code>: save any object. This is similar to the default storage except we avoid creating a serialized copy of the entire target in memory. Requires R &gt;= 3.5.0 so drake can use ALTREP.</li>
+</ul></li>
 </ul></li>
 <li><code>trigger</code>: rule to decide whether a target needs to run. See the <a href="triggers.html#triggers">trigger chapter</a> to learn more.</li>
 <li><code>elapsed</code> and <code>cpu</code>: number of seconds to wait for the target to build before timing out (<code>elapsed</code> for elapsed time and <code>cpu</code> for CPU time).</li>
