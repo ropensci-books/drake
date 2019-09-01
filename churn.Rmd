@@ -105,7 +105,6 @@ train a model,
 
 ```{r, kerastrain}
 train_model <- function(
-  data,
   rec,
   units1 = 16,
   units2 = 16,
@@ -207,7 +206,7 @@ plan <- drake_plan(
     initial_split(prop = 0.3),
   rec = prepare_recipe(data),
   model = target(
-    train_model(data, rec, act1 = act),
+    train_model(rec, act1 = act),
     format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
@@ -265,7 +264,7 @@ plan <- drake_plan(
     initial_split(prop = 0.3),
   rec = prepare_recipe(data),
   model = target(
-    train_model(data, rec, act1 = act),
+    train_model(rec, act1 = act),
     format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
@@ -327,6 +326,8 @@ define_model <- function(rec, units1, units2, act1, act2, act3) {
     )
 }
 ```
+
+All the models and downstream results are affected.
 
 ```{r kerasmake3}
 make(plan)
