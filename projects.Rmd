@@ -109,19 +109,17 @@ vis_drake_graph(config)
 
 ## Safer interactivity
 
-**Caution: functions [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) etc. described below are still experiemntal.**
-
 ### Motivation
 
 A serious [`drake`](https://github.com/ropensci/drake) workflow should be consistent and reliable, ideally with the help of a [master R script](https://github.com/wlandau/drake-examples/blob/master/gsp/make.R). Before it builds your targets, this script should begin in a fresh R session and load your packages and functions in a [dependable manner](https://github.com/wlandau/drake-examples/blob/d9417547a05aec416afbbda913eaf2d44a552d5b/gsp/make.R#L4-L6). [Batch mode](https://www.statmethods.net/interface/batch.html) makes sure all this goes according to plan.
 
 If you use a single persistent [interactive R session](https://stat.ethz.ch/R-manual/R-devel/library/base/html/interactive.html) to repeatedly invoke `make()` while you develop the workflow, then over time, your session could grow stale and accidentally invalidate targets. For example, if you interactively tinker with a new version of `create_plot()`, targets `hist` and `report` will fall out of date without warning, and the next `make()` will build them again. Even worse, the outputs from `hist` and `report` will be wrong if they depend on a half-finished `create_plot()`.
 
-The quickest workaround is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) and friends. [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html) runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
+The quickest workaround is to restart R and `source()` your setup scripts all over again. However, a better solution is to use [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html) and friends. [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html) runs `make()` in a new transient R session so that accidental changes to your interactive environment do not break your workflow.
 
 ### Usage
 
-To use [`r_make()`](https://ropensci.github.io/drake/reference/r_make.html), you need a configuration R script. Unless you supply a custom file path (e.g. `r_make(source = "your_file.R")` or `options(drake_source = "your_file.R")`) `drake` assumes this configuration script is called `_drake.R`. (So the file name really *is* magical in this case). The suggested file structure becomes:
+To use [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html), you need a configuration R script. Unless you supply a custom file path (e.g. `r_make(source = "your_file.R")` or `options(drake_source = "your_file.R")`) `drake` assumes this configuration script is called `_drake.R`. (So the file name really *is* magical in this case). The suggested file structure becomes:
 
 ```
 _drake.R

@@ -105,7 +105,6 @@ train a model,
 
 ```{r, kerastrain}
 train_model <- function(
-  data,
   rec,
   units1 = 16,
   units2 = 16,
@@ -207,7 +206,7 @@ plan <- drake_plan(
     initial_split(prop = 0.3),
   rec = prepare_recipe(data),
   model = target(
-    train_model(data, rec, act1 = act),
+    train_model(rec, act1 = act),
     format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
@@ -239,7 +238,7 @@ vis_drake_graph(config)
 
 ## Run the models
 
-Call [`make()`](https://ropensci.github.io/drake/reference/make.html) to actually run the workflow.
+Call [`make()`](https://docs.ropensci.org/drake/reference/make.html) to actually run the workflow.
 
 ```{r kerasmake1}
 make(plan)
@@ -265,7 +264,7 @@ plan <- drake_plan(
     initial_split(prop = 0.3),
   rec = prepare_recipe(data),
   model = target(
-    train_model(data, rec, act1 = act),
+    train_model(rec, act1 = act),
     format = "keras", # Supported in drake > 7.5.2 to store models properly.
     transform = map(act = !!activations)
   ),
@@ -285,7 +284,7 @@ config <- drake_config(plan)
 vis_drake_graph(config) # see also outdated() and predict_runtime()
 ```
 
-[`make()`](https://ropensci.github.io/drake/reference/make.html) skips the relu and sigmoid models because they are already up to date. (Their dependencies did not change.) Only the softmax model needs to run.
+[`make()`](https://docs.ropensci.org/drake/reference/make.html) skips the relu and sigmoid models because they are already up to date. (Their dependencies did not change.) Only the softmax model needs to run.
 
 ```{r kerasmake2}
 make(plan)
@@ -328,6 +327,8 @@ define_model <- function(rec, units1, units2, act1, act2, act3) {
 }
 ```
 
+All the models and downstream results are affected.
+
 ```{r kerasmake3}
 make(plan)
 ```
@@ -350,18 +351,6 @@ hash <- history %>%
   head(n = 1)
 drake_cache()$get_value(hash)
 ```
-
-## High-performance computing caveats
-
-Currently, there is some friction with the above workflow and [`drake`'s high-performance computing](#hpc).
-
-First, Keras models are not valid if you send them from one R session to another. Workarounds:
-
-1. Set `caching = "worker"` in `make()`. That way, `drake` saves the model with the same R session that fit it, so the model remains valid.
-2. Alternatively, use `target(train_model(...), format = "keras", hpc = FALSE)` to fit models locally and run everything else as before.
-3. Alternatively, avoid `target(train_model(...), format = "keras")` and instead return a [serialized model](https://tensorflow.rstudio.com/keras/reference/serialize_model.html) from the `train_model()` function. If you do that, `confusion_matrix()` needs to accept a serialize model and call `unserialize_model()` on it before further processing.
-
-In addition, `clustermq` multicore workers currently hangs when they try to fit Keras models: <https://github.com/mschubert/clustermq/issues/169>. Hopefully this will be fixed in later versions of `clustermq`.
 
 ```{r, echo = FALSE}
 clean(destroy = TRUE)
