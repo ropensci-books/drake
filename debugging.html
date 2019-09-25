@@ -554,7 +554,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb226-4" data-line-number="4"><span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span></a>
 <a class="sourceLine" id="cb226-5" data-line-number="5"><span class="co">#&gt;         ]</span></a>
 <a class="sourceLine" id="cb226-6" data-line-number="6"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb226-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0xe8c4220&gt;</span></a>
+<a class="sourceLine" id="cb226-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x16b49670&gt;</span></a>
 <a class="sourceLine" id="cb226-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb226-9" data-line-number="9">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){</a>
 <a class="sourceLine" id="cb226-10" data-line-number="10">  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
@@ -653,7 +653,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb230-52" data-line-number="52"><span class="co">#&gt;  $ : language f(b)</span></a>
 <a class="sourceLine" id="cb230-53" data-line-number="53"><span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span></a>
 <a class="sourceLine" id="cb230-54" data-line-number="54"><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span></a>
-<a class="sourceLine" id="cb230-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xccb6b90&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb230-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xf9cd7e8&gt;</span></a></code></pre></div>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="co"># Pretend we just opened a new R session.</span></a>
 <a class="sourceLine" id="cb231-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
@@ -695,7 +695,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb231-38" data-line-number="38"><span class="co">#&gt;   }</span></a>
 <a class="sourceLine" id="cb231-39" data-line-number="39"><span class="co">#&gt;   x</span></a>
 <a class="sourceLine" id="cb231-40" data-line-number="40"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb231-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x16986128&gt;</span></a>
+<a class="sourceLine" id="cb231-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x15f09710&gt;</span></a>
 <a class="sourceLine" id="cb231-42" data-line-number="42"></a>
 <a class="sourceLine" id="cb231-43" data-line-number="43"><span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span></a>
 <a class="sourceLine" id="cb231-44" data-line-number="44">f &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
@@ -719,24 +719,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">14.3</span> Timeouts and retries</h2>
 <p>See the <code>elapsed</code>, <code>cpu</code>, and <code>retries</code> argument to <code>make()</code>.</p>
 <div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)</a>
-<a class="sourceLine" id="cb232-2" data-line-number="2">f &lt;-<span class="st"> </span><span class="cf">function</span>(...){</a>
-<a class="sourceLine" id="cb232-3" data-line-number="3">  <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb232-4" data-line-number="4">}</a>
-<a class="sourceLine" id="cb232-5" data-line-number="5">debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))</a>
-<a class="sourceLine" id="cb232-6" data-line-number="6">debug_plan</a>
-<a class="sourceLine" id="cb232-7" data-line-number="7"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb232-8" data-line-number="8"><span class="co">#&gt;   target command</span></a>
-<a class="sourceLine" id="cb232-9" data-line-number="9"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
-<a class="sourceLine" id="cb232-10" data-line-number="10"><span class="co">#&gt; 1 x      1      </span></a>
-<a class="sourceLine" id="cb232-11" data-line-number="11"><span class="co">#&gt; 2 y      f(x)</span></a>
-<a class="sourceLine" id="cb232-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb232-13" data-line-number="13">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
-<a class="sourceLine" id="cb232-14" data-line-number="14">  <span class="kw">stdout</span>(),</a>
-<a class="sourceLine" id="cb232-15" data-line-number="15">  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb232-16" data-line-number="16">)</a>
-<a class="sourceLine" id="cb232-17" data-line-number="17"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb232-18" data-line-number="18"><span class="co">#&gt; target y</span></a>
-<a class="sourceLine" id="cb232-19" data-line-number="19"><span class="co">#&gt; retry y 1 of 2</span></a></code></pre></div>
+<a class="sourceLine" id="cb232-2" data-line-number="2"><span class="co">#&gt; Warning: Argument `verbose` is deprecated some minor drake utility</span></a>
+<a class="sourceLine" id="cb232-3" data-line-number="3"><span class="co">#&gt; functions.</span></a>
+<a class="sourceLine" id="cb232-4" data-line-number="4">f &lt;-<span class="st"> </span><span class="cf">function</span>(...){</a>
+<a class="sourceLine" id="cb232-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb232-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb232-7" data-line-number="7">debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))</a>
+<a class="sourceLine" id="cb232-8" data-line-number="8">debug_plan</a>
+<a class="sourceLine" id="cb232-9" data-line-number="9"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb232-10" data-line-number="10"><span class="co">#&gt;   target command</span></a>
+<a class="sourceLine" id="cb232-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
+<a class="sourceLine" id="cb232-12" data-line-number="12"><span class="co">#&gt; 1 x      1      </span></a>
+<a class="sourceLine" id="cb232-13" data-line-number="13"><span class="co">#&gt; 2 y      f(x)</span></a>
+<a class="sourceLine" id="cb232-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb232-15" data-line-number="15">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
+<a class="sourceLine" id="cb232-16" data-line-number="16">  <span class="kw">stdout</span>(),</a>
+<a class="sourceLine" id="cb232-17" data-line-number="17">  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb232-18" data-line-number="18">)</a>
+<a class="sourceLine" id="cb232-19" data-line-number="19"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb232-20" data-line-number="20"><span class="co">#&gt; target y</span></a>
+<a class="sourceLine" id="cb232-21" data-line-number="21"><span class="co">#&gt; retry y 1 of 2</span></a></code></pre></div>
 <p>To tailor these settings to each individual target, create new <code>elapsed</code>, <code>cpu</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb233-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)</a>
 <a class="sourceLine" id="cb233-2" data-line-number="2">debug_plan<span class="op">$</span>elapsed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)</a>
