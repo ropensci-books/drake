@@ -167,7 +167,7 @@ Ideally, independent observers should be able to read your code and understand i
 - `drake` takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.
 - You can [generate large collections of targets](https://ropenscilabs.github.io/drake-manual/plans#large-plans) without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow
 
-### Aggressively scale up.
+### Scale up and out.
 
 Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. `drake` knows what to do. Parallelism is implicit and automatic. See the [high-performance computing guide](https://ropenscilabs.github.io/drake-manual/hpc.html) for all the details.
 
@@ -184,6 +184,15 @@ options(
 )
 make(plan, parallelism = "clustermq", jobs = 100)
 ```
+
+# With Docker
+
+`drake` and Docker are compatible and complementary. Here are some examples that run `drake` inside a Docker image.
+
+- [`drake-gitlab-docker-example`](https://gitlab.com/ecohealthalliance/drake-gitlab-docker-example): A small pedagogical example workflow that leverages `drake`, Docker, GitLab, and continuous integration in a reproducible analysis pipeline. Created by [Noam Ross](https://www.noamross.net/).
+- [`pleurosoriopsis`](https://github.com/joelnitta/pleurosoriopsis): The workflow that supports [Ebihara *et al.* 2019. "Growth Dynamics of the Independent Gametophytes of *Pleurorosiopsis makinoi* (Polypodiaceae)" *Bulletin of the National Science Museum Series B (Botany)* 45:77-86.](https://www.kahaku.go.jp/research/publication/botany.html). Created by [Joel Nitta](https://github.com/joelnitta).
+
+Alternatively, it is possible to run `drake` outside Docker and use the [`future`](https://github.com/HenrikBengtsson/future) package to send targets to a Docker image. `drake`'s [`Docker-psock`](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) example demonstrates how. Download the code with `drake_example("Docker-psock")`.
 
 ## Documentation
 
@@ -222,6 +231,7 @@ Thanks to [Kirill](https://github.com/krlmlr) for constructing two interactive [
 
 The official [rOpenSci use cases](https://ropensci.org/usecases/) and [associated discussion threads](https://discuss.ropensci.org/c/usecases) describe applications of `drake` in action. Here are some more real-world sightings of `drake` in the wild.
 
+- [ecohealthalliance/drake-gitlab-docker-example](https://gitlab.com/ecohealthalliance/drake-gitlab-docker-example)
 - [efcaguab/demografia-del-voto](https://github.com/efcaguab/demografia-del-voto)
 - [efcaguab/great-white-shark-nsw](https://github.com/efcaguab/great-white-shark-nsw)
 - [IndianaCHE/Detailed-SSP-Reports](https://github.com/IndianaCHE/Detailed-SSP-Reports)
