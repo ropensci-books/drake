@@ -1,6 +1,6 @@
 # Customer churn and deep learning {#churn}
 
-```{r plans_setup_keras, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(glue)
 library(purrr)
@@ -10,7 +10,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 ```
 
 
-```{r setup_keras, include = FALSE}
+```{r, include = FALSE}
 library(drake)
 library(keras)
 library(tidyverse)
@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 ```
 
-```{r get_churn_data, include = FALSE}
+```{r, include = FALSE}
 invisible(drake_example("customer-churn", overwrite = TRUE))
 invisible(file.copy("customer-churn/data/customer_churn.csv", ".", overwrite = TRUE))
 ```
@@ -223,7 +223,7 @@ plan <- drake_plan(
 
 The plan is a data frame with the steps we are going to do.
 
-```{r planpg, paged.print = FALSE, warning = FALSE}
+```{r, paged.print = FALSE, warning = FALSE}
 plan
 ```
 
@@ -231,7 +231,7 @@ plan
 
 The graph visualizes the dependency relationships among the steps of the workflow.
 
-```{r kerasgraph, message = FALSE}
+```{r, message = FALSE}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
@@ -240,7 +240,7 @@ vis_drake_graph(config)
 
 Call [`make()`](https://docs.ropensci.org/drake/reference/make.html) to actually run the workflow.
 
-```{r kerasmake1}
+```{r}
 make(plan)
 ```
 
@@ -248,7 +248,7 @@ make(plan)
 
 The two models performed about the same.
 
-```{r kerasreadcomp}
+```{r}
 readd(metrics) # see also loadd()
 ```
 
@@ -256,7 +256,7 @@ readd(metrics) # see also loadd()
 
 Let's try the softmax activation function.
 
-```{r kerasaddbatchsz}
+```{r}
 activations <- c("relu", "sigmoid", "softmax")
 
 plan <- drake_plan(
@@ -279,20 +279,20 @@ plan <- drake_plan(
 )
 ```
 
-```{r kerasgraph2, message = FALSE}
+```{r, message = FALSE}
 config <- drake_config(plan)
 vis_drake_graph(config) # see also outdated() and predict_runtime()
 ```
 
 [`make()`](https://docs.ropensci.org/drake/reference/make.html) skips the relu and sigmoid models because they are already up to date. (Their dependencies did not change.) Only the softmax model needs to run.
 
-```{r kerasmake2}
+```{r}
 make(plan)
 ```
 
 ## Inspect the results again
 
-```{r kerasread2}
+```{r}
 readd(metrics) # see also loadd()
 ```
 
@@ -300,7 +300,7 @@ readd(metrics) # see also loadd()
 
 If you change upstream functions, even nested ones, `drake` automatically refits the affected models. Let's increase dropout in both layers.
 
-```{r, kerasmodelfn2}
+```{r}
 define_model <- function(rec, units1, units2, act1, act2, act3) {
   input_shape <- ncol(
     juice(rec, all_predictors(), composition = "matrix")
@@ -329,7 +329,7 @@ define_model <- function(rec, units1, units2, act1, act2, act3) {
 
 All the models and downstream results are affected.
 
-```{r kerasmake3}
+```{r}
 make(plan)
 ```
 
@@ -337,14 +337,14 @@ make(plan)
 
 `drake` version 7.5.0 and above tracks history and provenance. You can see which models you ran, when you ran them, how long they took, and which settings you tried (i.e. named arguments to function calls in your commands).
 
-```{r churnhistory}
+```{r}
 history <- drake_history()
 history
 ```
 
 And as long as you did not run `clean(garbage_collection = TRUE)`, you can get the old data back. Let's find the oldest run of the relu model.
 
-```{r churnhistory2}
+```{r}
 hash <- history %>%
   filter(act1 == "relu") %>%
   pull(hash) %>%
