@@ -1,11 +1,11 @@
 # Finding the best model of gross state product {#gsp}
 
-```{r gsp_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r gsp_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(biglm)
 library(drake)
 library(Ecdat)
@@ -21,7 +21,7 @@ The following data analysis workflow shows off `drake`'s ability to generate lot
 
 Write the code files to your workspace.
 
-```{r getthequickstartcode03, eval = FALSE}
+```{r, eval = FALSE}
 drake_example("gsp")
 ```
 
@@ -53,7 +53,7 @@ The `Produc` dataset from the [Ecdat package](https://cran.r-project.org/package
 - `emp`: labor input measured by the employment in non-agricultural payrolls.
 - `unemp`: state unemployment rate.
 
-```{r masterdata2}
+```{r}
 library(Ecdat)
 data(Produc)
 head(Produc)
@@ -63,7 +63,7 @@ head(Produc)
 
 First, we load the required packages. `drake` is aware of all the packages you load with `library()` or `require()`.
 
-```{r masterpkgs}
+```{r}
 library(biglm) # lightweight models, easier to store than with lm()
 library(drake)
 library(Ecdat) # econometrics datasets
@@ -75,7 +75,7 @@ library(tidyverse)
 
 Next, we construct our plan. The following code uses `drake`'s special new language for generating plans (learn more [here](#plans)).
 
-```{r gspdsl}
+```{r}
 predictors <- setdiff(colnames(Produc), "gsp")
 
 # We will try all combinations of three covariates.
@@ -121,7 +121,7 @@ plan
 
 We also need to define functions for summaries and plots.
 
-```{r masterget_rmspe}
+```{r}
 get_rmspe <- function(model_fit, data){
   y <- data$gsp
   yhat <- as.numeric(predict(model_fit, newdata = data))
@@ -142,21 +142,21 @@ plot_rmspe <- function(rmspe){
 
 We have a [`report.Rmd` file ](https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd) to summarize our results at the end.
 
-```{r copyreport}
+```{r}
 drake_example("gsp")
 file.copy(from = "gsp/report.Rmd", to = ".", overwrite = TRUE)
 ```
 
 We can inspect the project before we run it.
 
-```{r gspvisgraph}
+```{r}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
 Now, we can run the project.
 
-```{r appmake}
+```{r}
 make(plan, verbose = 0L)
 ```
 
@@ -164,7 +164,7 @@ make(plan, verbose = 0L)
 
 Here are the root mean squared prediction errors of all the models.
 
-```{r masterrmspeplot}
+```{r}
 results <- readd(rmspe)
 library(ggplot2)
 plot_rmspe(rmspe = results)
@@ -172,7 +172,7 @@ plot_rmspe(rmspe = results)
 
 And here are the best models. The best variables are in the top row under `X1`, `X2`, and `X3`.
 
-```{r masterbestmodels}
+```{r}
 head(results[order(results$rmspe, decreasing = FALSE), ])
 ```
 

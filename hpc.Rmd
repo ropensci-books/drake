@@ -1,11 +1,11 @@
 # High-performance computing {#hpc}
 
-```{r hpc_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r hpc_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(future)
 library(drake)
 library(dplyr)
@@ -21,7 +21,7 @@ Before you jump into high-performance computing with a large workflow, consider 
 
 When it comes time to activate high-performance computing, `drake` launches its own parallel workers and sends targets to those workers. The workers can be local processes or jobs on a cluster. `drake` uses your project's implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.
 
-```{r hpcgraph}
+```{r}
 load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
 config <- drake_config(my_plan)
 vis_drake_graph(config)
@@ -37,7 +37,7 @@ You do not need to not micromanage how targets are scheduled, and you do not nee
 
 Most clusters will let you submit `make()` as a job on a compute node. Let's consider the Sun Grid Engine (SGE) as an example. First, we create a script that calls `make()` (or [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html)).
 
-```{r hpcremotemaster1, eval = FALSE}
+```{r, eval = FALSE}
 # make.R
 source("R/packages.R")
 source("R/packages.R")
@@ -104,7 +104,7 @@ Alternatives to `nohup` include [`screen`](https://linuxize.com/post/how-to-use-
 
 Choose the parallel backend with the `parallelism` argument and set the `jobs` argument to scale the work appropriately.
 
-```{r b, eval = FALSE}
+```{r, eval = FALSE}
 make(my_plan, parallelism = "future", jobs = 2)
 ```
 The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the best choice is usually [`clustermq`](https://github.com/mschubert/clustermq). (It is faster than [`future`](https://github.com/HenrikBengtsson/future).) However, [`future`](https://github.com/HenrikBengtsson/future) is more accessible: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) (`drake_example("Docker-psock")`).
@@ -125,7 +125,7 @@ Persistent workers require the [`clustermq`](https://github.com/mschubert/cluste
 
 To run your targets in parallel over the cores of your local machine, set the global option below and run `make()`.
 
-```{r clustermqmulticore, eval = FALSE}
+```{r, eval = FALSE}
 options(clustermq.scheduler = "multicore")
 make(plan, parallelism = "clustermq", jobs = 2)
 ```
@@ -134,19 +134,19 @@ make(plan, parallelism = "clustermq", jobs = 2)
 
 Set the [`clustermq`](https://github.com/mschubert/clustermq) global options to register your computing resources. For [SLURM](https://slurm.schedmd.com/slurmd.html):
 
-```{r clustermqopts, eval = FALSE}
+```{r, eval = FALSE}
 options(clustermq.scheduler = "slurm", clustermq.template = "slurm_clustermq.tmpl")
 ```
 
 Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
 
-```{r clustermqtemplatefile, eval = FALSE}
+```{r, eval = FALSE}
 drake_hpc_template_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
 ```
 
 After modifying `slurm_clustermq.tmpl` by hand to meet your needs, call `make()` as usual.
 
-```{r clustermqrun, eval = FALSE}
+```{r, eval = FALSE}
 make(plan, parallelism = "clustermq", jobs = 4)
 ```
 
@@ -162,7 +162,7 @@ make(plan, parallelism = "clustermq", jobs = 4)
 
 Install the [`future`](https://github.com/HenrikBengtsson/future) package.
 
-```{r installfuture, eval = FALSE}
+```{r, eval = FALSE}
 install.packages("future") # CRAN release
 # Alternatively, install the GitHub development version.
 devtools::install_github("HenrikBengtsson/future", ref = "develop")
@@ -174,13 +174,13 @@ If you intend to use a cluster, be sure to install the [`future.batchtools`](htt
 
 First, select a [`future`](https://github.com/HenrikBengtsson/future) plan to tell [`future`](https://github.com/HenrikBengtsson/future) how to create the workers. See [this table](https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved) for descriptions of the core options.
 
-```{r futureworkers, eval = FALSE}
+```{r, eval = FALSE}
 future::plan(future::multiprocess) 
 ```
 
 Next, run `make()`.
 
-```{r futureworkersmake, eval = FALSE}
+```{r, eval = FALSE}
 make(plan, parallelism = "future", jobs = 2)
 ```
 
@@ -188,20 +188,20 @@ make(plan, parallelism = "future", jobs = 2)
 
 Install the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) package and use [this list](https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend) to select a [`future`](https://github.com/HenrikBengtsson/future) plan that matches your resources. You will also need a compatible [template file](https://github.com/mllg/batchtools/tree/master/inst/templates) with configuration details. As with [`clustermq`](https://github.com/mschubert/clustermq), `drake` can generate some examples:
 
-```{r exlksjdf, eval = FALSE}
+```{r, eval = FALSE}
 drake_hpc_template_file("slurm_batchtools.tmpl") # Edit by hand.
 ```
 
 Next, register the template file with a plan.
 
-```{r futureslurmplan, eval = FALSE}
+```{r, eval = FALSE}
 library(future.batchtools)
 future::plan(batchtools_slurm, template = "slurm_batchtools.tmpl")
 ```
 
 Finally, run `make()`.
 
-```{r futureslurmmake, eval = FALSE}
+```{r, eval = FALSE}
 make(plan, parallelism = "future", jobs = 2)
 ```
 
@@ -211,7 +211,7 @@ make(plan, parallelism = "future", jobs = 2)
 
 Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the master process, define a special `hpc` column of your `drake` plan. Below, `NA` and `TRUE` are treated the same, and `make(plan, parallelism = "clustermq")` only sends `model_1` and `model_2` to parallel workers.
 
-```{r hybrid1}
+```{r}
 drake_plan(
   model = target(
     crazy_long_computation(index),
@@ -274,7 +274,7 @@ CMQ_AUTH={{ auth }} R --no-save --no-restore -e 'clustermq:::worker("{{ master }
 
 Then when you run `make()`, use the `template` argument to set `n_slots`.
 
-```{r templateslots, eval = FALSE}
+```{r, eval = FALSE}
 options(clustermq.scheduler = "sge", clustermq.template = "sge_clustermq.tmpl")
 library(drake)
 load_mtcars_example()
@@ -292,7 +292,7 @@ Custom placeholders like `n_slots` are processed with the [`infuser`](https://gi
 
 Different targets may need different resources. For example,
 
-```{r diffresources1}
+```{r}
 plan <- drake_plan(
   data = download_data(),
   model = big_machine_learning_model(data)
@@ -301,7 +301,7 @@ plan <- drake_plan(
 
 The `model` needs a GPU and multiple CPU cores, and the `data` only needs the bare minimum resources. Declare these requirements with `target()`, as below. This is equivalent to adding a new list column to the `plan`, where each element is a named list for the `resources` argument of `future::future()`.
 
-```{r planresources}
+```{r}
 plan <- drake_plan(
   data = target(
     download_data(),
@@ -335,7 +335,7 @@ exit 0
 
 Finally, register the template file and run your project.
 
-```{r futuresgeplanresources, eval = FALSE}
+```{r, eval = FALSE}
 library(drake)
 library(future.batchtools)
 future::plan(batchtools_sge, template = "sge_batchtools.tmpl")
@@ -350,7 +350,7 @@ To recruit parallel processes within individual targets, we recommend the [`futu
 
 Use [`future.callr`](https://github.com/HenrikBengtsson/future.callr) and [`furrr`](https://github.com/DavisVaughan/furrr) normally.
 
-```{r parlocally, eval = FALSE}
+```{r, eval = FALSE}
 library(drake)
 
 # The targets just collect the process IDs of the callr processes.
@@ -374,7 +374,7 @@ readd(x)
 
 Each persistent worker needs its own [`future::plan()`](https://github.com/HenrikBengtsson/future), which we set with the `prework` argument of `make()`. The following example uses [SGE](http://gridscheduler.sourceforge.net/htmlman/manuals.html). To learn about templates for other clusters, please consult the [`clustermq`](https://github.com/mschubert/clustermq) documentation.
 
-```{r parwithinpersistentworkers, eval = FALSE}
+```{r, eval = FALSE}
 library(drake)
 
 # The targets just collect the process IDs of the callr processes.
@@ -424,7 +424,7 @@ readd(x)
 
 As explained in the [`future` vignette](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html), we can nest our `future::plans()`. Each target gets its own remote job, and each job can spawn up to 4 local `callr` processes. The following example uses [SGE](http://gridscheduler.sourceforge.net/htmlman/manuals.html). To learn about templates for other clusters, please consult the [`future.batchtools`](https://github.com/HenrikBengtsson/future.batchtools) documentation.
 
-```{r parwithintransientworkers, eval = FALSE}
+```{r, eval = FALSE}
 library(drake)
 
 # The targets just collect the process IDs of the callr processes.
@@ -473,7 +473,7 @@ readd(x)
 
 By default, `future::availableCores()` determines the number of local [`callr`](https://github.com/r-lib/callr) workers. To better manage resources, you may wish to further restrict the number of [`callr`](https://github.com/r-lib/callr) workers for all targets in the plan, e.g. `future::plan(future::callr, workers = 4L)` or:
 
-```{r futurecallr4workers, eval = FALSE}
+```{r, eval = FALSE}
 future::plan(
   list(
     future::tweak(
@@ -494,7 +494,7 @@ Some workflows unavoidably use `mclapply()`, which is known to modify the global
 1. Use `make(lock_envir = FALSE)`.
 2. Use the `envir` argument of `make()`. That way, `drake` locks your special custom environment instead of the global environment.
 
-```{r lockenvirworkaround, eval = FALSE}
+```{r, eval = FALSE}
 # Load the main example: https://github.com/wlandau/drake-examples
 library(drake)
 drake_example("main")

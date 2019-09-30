@@ -1,11 +1,11 @@
 # Triggers: decision rules for building targets {#triggers}
 
-```{r triggers_setup, message = FALSE, warning = FALSE, include = FALSE}
+```{r, message = FALSE, warning = FALSE, include = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r triggers_setup2, message = FALSE, warning = FALSE, include = FALSE}
+```{r, message = FALSE, warning = FALSE, include = FALSE}
 library(drake)
 library(tidyverse)
 invisible(drake_example("main", overwrite = TRUE))
@@ -38,7 +38,7 @@ If *any* trigger detects something wrong or different with the target or its dep
 
 With the `trigger()` function, you can create your own customized checklist of triggers. Let's run a simple workflow with just the **missing** trigger. We deactivate the **command**, **depend**, and **file** triggers by setting the respective `command`, `depend`, and `file` arguments to `FALSE`.
 
-```{r missingtrigger1}
+```{r}
 plan <- drake_plan(
   psi_1 = (sqrt(5) + 1) / 2,
   psi_2 = (sqrt(5) - 1) / 2
@@ -48,7 +48,7 @@ make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
 
 Now, even if you wreck all the commands, nothing rebuilds.
 
-```{r missingtrigger2}
+```{r}
 plan <- drake_plan(
   psi_1 = (sqrt(5) + 1) / 2 + 9999999999999,
   psi_2 = (sqrt(5) - 1) / 2 - 9999999999999
@@ -58,7 +58,7 @@ make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
 
 You can also give different targets to different triggers. Triggers in the `drake` plan override the `trigger` argument to `make()`. Below, `psi_2` always builds, but `psi_1` only builds if it has never been built before.
 
-```{r missingtrigger3}
+```{r}
 plan <- drake_plan(
   psi_1 = (sqrt(5) + 1) / 2 + 9999999999999,
   psi_2 = target(
@@ -73,13 +73,13 @@ make(plan, trigger = trigger(command = FALSE, depend = FALSE, file = FALSE))
 
 Interestingly, `psi_2` now depends on `psi_1`. Since `psi_1` is part of the because of the **condition** trigger, it needs to be up to date before we attempt `psi_2`. However, since `psi_1` is not part of the command, changing it will not trip the other triggers such as **depend**.
 
-```{r missingtrigger4}
+```{r}
 vis_drake_graph(drake_config(plan))
 ```
 
 In the next toy example below, `drake` reads from a file to decide whether to build `x`. Try it out.
 
-```{r randomcondition}
+```{r}
 plan <- drake_plan(
   x = target(
     1 + 1,
@@ -98,7 +98,7 @@ make(plan)
 
 In a real project with remote data sources, you may want to use the **condition** trigger to limit your builds to times when enough bandwidth is available for a large download. For example,
 
-```{r tuesday, eval = FALSE}
+```{r, eval = FALSE}
 drake_plan(
   x = target(
     command = download_large_dataset(),
@@ -109,7 +109,7 @@ drake_plan(
 
 Since the **change** trigger can return any value, it is often easier to use than the **condition** trigger.
 
-```{r changetrigger}
+```{r}
 clean(destroy = TRUE)
 plan <- drake_plan(
   x = target(
@@ -126,7 +126,7 @@ make(plan)
 
 In practice, you may want to use the **change** trigger to check a large remote before downloading it.
 
-```{r scrapetrigger, eval = FALSE}
+```{r, eval = FALSE}
 drake_plan(
   x = target(
     command = download_large_dataset(),
@@ -140,7 +140,7 @@ drake_plan(
 
 A word of caution: every non-`NULL` **change** trigger is always evaluated, and its value is carried around in memory throughout `make()`. So if you are not careful, heavy use of the **change** trigger could slow down your workflow and consume extra resources. The **change** trigger should return small values (and should ideally be quick to evaluate). To reduce memory consumption, you may want to return a fingerprint of your trigger value rather than the value itself. See the [`digest`](https://github.com/eddelbuettel/digest) package for more information on computing hashes/fingerprints.
 
-```{r scrapetrigger2, eval = FALSE}
+```{r, eval = FALSE}
 library(digest)
 drake_plan(
   x = target(

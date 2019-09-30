@@ -1,6 +1,6 @@
 # Debugging and testing drake projects {#debugging}
 
-```{r debug_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r debug_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(tidyverse)
 ```
@@ -29,7 +29,7 @@ If your workflow is large, consider running a downsized version to debug and tes
 
 To avoid frustration early on, please use [`drake`'s dependency graph visualizations](#visuals) to see how the steps of your workflow fit together. `drake` resolves the dependency relationships in the graph by analyzing the code in your commands and the functions in your environment.
 
-```{r demoplotgraphdebug}
+```{r}
 load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
 config <- drake_config(my_plan)
 # Hover, click, drag, zoom, and pan. See args 'from' and 'to'.
@@ -40,7 +40,7 @@ vis_drake_graph(config, width = "100%", height = "500px")
 
 With the `deps_code()` function, you can see for yourself how `drake` detects first-order dependencies from code.
 
-```{r checkdepsdebug}
+```{r}
 print(simulate)
 
 deps_code(simulate)
@@ -59,7 +59,7 @@ deps_code(my_plan$command[[nrow(my_plan)]])
 
 With `deps_target()`, you can see the dependencies that `drake` has already detected for your targets and imports.
 
-```{r checkdepsdebug2}
+```{r}
 deps_target("simulate", config)
 
 deps_target("small", config)
@@ -69,7 +69,7 @@ deps_target("report", config)
 
 And with `tracked()`, you can list all the reproducibly tracked objects and files.
 
-```{r trackeddebug}
+```{r}
 tracked(config)
 ```
 
@@ -77,13 +77,13 @@ tracked(config)
 
 `missed()` shows any imports missing from your environment
 
-```{r misseddebug}
+```{r}
 missed(config) # Nothing is missing right now.
 ```
 
 `outdated()` reports any targets that are outdated.
 
-```{r outdateddebug}
+```{r}
 outdated(config)
 
 make(my_plan)
@@ -95,23 +95,23 @@ outdated(config)
 
 `drake` has the option to produce a cache log with the fingerprint of every target and import.
 
-```{r cachelog}
+```{r}
 drake_cache_log()
 ```
 
-```{r cachelog1}
+```{r}
 filter(drake_cache_log(), type == "import")
 ```
 
 We highly recommend that you automatically produce a cache log file on every `make()` and put it under [version control](https://github.com) with the rest of your project.
 
-```{r cachelog2}
+```{r}
 make(my_plan, cache_log_file = "cache_log.csv")
 ```
 
 Suppose we go back and add input checking to one of our functions.
 
-```{r changerandomrowsdebug}
+```{r}
 print(random_rows)
 
 random_rows <- function(data, n){
@@ -122,13 +122,13 @@ random_rows <- function(data, n){
 
 Then, we forget to run `make()` again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.
 
-```{r whyoutdated}
+```{r}
 outdated(config)
 ```
 
 At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to `outdated()` already re-cached the imports, so any changed imports will show up in the new cache log.
 
-```{r whyoutdated2}
+```{r}
 read_csv("cache_log.csv", col_types = cols()) %>%
   left_join(drake_cache_log(), by = "name") %>%
   filter(hash.x != hash.y) %>%
@@ -137,7 +137,7 @@ read_csv("cache_log.csv", col_types = cols()) %>%
 
 Now, we see that `random_rows()` has changed since last time, and we have a new dependency `stopifnot()`. `simulate()` shows up in the changes too because `random_rows()` is nested in the body of `simulate()`. If we revert `random_rows()` to its original state, all our targets are up to date again.
 
-```{r revertrandomrows}
+```{r}
 random_rows <- function(data, n){
   data[sample.int(n = nrow(data), size = n, replace = TRUE), ]
 }
@@ -155,7 +155,7 @@ read_csv("cache_log.csv", col_types = cols()) %>%
 
 `drake` records diagnostic metadata on all your targets, including the latest errors, warnings, messages, and other bits of context.
 
-```{r diagnosedebug}
+```{r}
 f <- function(x){
   if (x < 0){
     stop("`x` cannot be negative.")
@@ -189,7 +189,7 @@ str(error$calls) # View the traceback.
 
 To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call `drake_build()` or `drake_debug()`. These functions first call `loadd(deps = TRUE)` to load any missing dependencies (see the `replace` argument here) and then build your target. `drake_build()` simply runs the command, and `drake_debug()` runs the command in debug mode using `debugonce()`.
 
-```{r loaddeps}
+```{r}
 # Pretend we just opened a new R session.
 library(drake)
 
@@ -237,7 +237,7 @@ readd(my_target)
 
 See the `elapsed`, `cpu`, and `retries` argument to `make()`.
 
-```{r timeoutretry}
+```{r}
 clean(verbose = 0L)
 f <- function(...){
   Sys.sleep(1)
@@ -253,7 +253,7 @@ withr::with_message_sink(
 
 To tailor these settings to each individual target, create new `elapsed`, `cpu`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
 
-```{r message = FALSE, warning = FALSE, timeoutretry2}
+```{r, message = FALSE, warning = FALSE, timeoutretry2}
 clean(verbose = 0L)
 debug_plan$elapsed <- c(1e-3, 2e-3)
 debug_plan$retries <- 1:2

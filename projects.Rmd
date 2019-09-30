@@ -1,12 +1,12 @@
 # `drake` projects {#projects}
 
-```{r projects_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(crayon.enabled = FALSE)
 ```
 
-```{r projects_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(dplyr)
 library(ggplot2)
@@ -39,7 +39,7 @@ Here, `make.R` is a master script that
 
 Let's consider the [main example](https://github.com/wlandau/drake-examples/tree/master/main), which you can download with `drake_example("main")`. Here, our master script is called `make.R`:
 
-```{r proj1, eval = FALSE}
+```{r, eval = FALSE}
 source("R/packages.R")  # loads packages
 source("R/functions.R") # defines the create_plot() function
 source("R/plan.R")      # creates the drake plan
@@ -52,7 +52,7 @@ make(
 
 We have an `R` folder containing our supporting files, including `packages.R`:
 
-```{r packagesr, eval = FALSE}
+```{r, eval = FALSE}
 library(drake)
 require(dplyr)
 require(ggplot2)
@@ -60,7 +60,7 @@ require(ggplot2)
 
 `functions.R`:
 
-```{r functionsr, eval = FALSE}
+```{r, eval = FALSE}
 create_plot <- function(data) {
   ggplot(data, aes(x = Petal.Width, fill = Species)) +
     geom_histogram(binwidth = 0.25) +
@@ -70,7 +70,7 @@ create_plot <- function(data) {
 
 and `plan.R`:
 
-```{r planr, eval = FALSE}
+```{r, eval = FALSE}
 plan <- drake_plan(
   raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
   data = raw_data %>%
@@ -96,7 +96,7 @@ Note: this part of `drake` does not inherently focus on your script files. There
 
 `drake` has other functions to inspect your results and examine your workflow. Before invoking them interactively, it is best to start with a clean new R session.
 
-```{r visproj, eval = FALSE}
+```{r, eval = FALSE}
 # Restart R.
 interactive()
 #> [1] TRUE
@@ -131,7 +131,7 @@ R/
 
 Like our previous `make.R` script, `_drake.R` runs all our pre-`make()` setup steps. But this time, rather than calling `make()`, it ends with a call to `drake_config()`. Example `_drake.R`:
 
-```{r supportingscripts, eval = FALSE}
+```{r, eval = FALSE}
 source("R/packages.R")
 source("R/functions.R")
 source("R/plan.R")
@@ -149,7 +149,7 @@ Here is what happens when you call `r_make()`.
 
 The purpose of `drake_config()` is to collect and sanitize all the parameters and settings that `make()` needs to do its job. In fact, if you do not set the `config` argument explicitly, then `make()` invokes `drake_config()` behind the scenes. `make(plan, parallelism = "clustermq", jobs = 2, verbose = 6)` is equivalent to
 
-```{r exconfig, eval = FALSE}
+```{r, eval = FALSE}
 config <- drake_config(plan, verbose = 2)
 make(config = config)
 ```
@@ -170,7 +170,7 @@ Outer function call | Inner function call
 `r_predict_workers(...)` | `predict_workers(config, ...)`
 
 
-```{r work}
+```{r}
 clean()
 r_outdated(r_args = list(show = FALSE))
 
@@ -190,7 +190,7 @@ Remarks:
 
 Despite the above discussion of R scripts, `drake` plans rely more on in-memory functions. You might be tempted to write a plan like the following, but then `drake` cannot tell that `my_analysis` depends on `my_data`.
 
-```{r badsource}
+```{r}
 bad_plan <- drake_plan(
   my_data = source(file_in("get_data.R")),
   my_analysis = source(file_in("analyze_data.R")),
@@ -202,7 +202,7 @@ vis_drake_graph(bad_config, targets_only = TRUE)
 
 When it comes to plans, use *functions* instead.
 
-```{r storecode1, eval = FALSE}
+```{r, eval = FALSE}
 source("my_functions.R") # defines get_data(), analyze_data(), etc.
 good_plan <- drake_plan(
   my_data = get_data(file_in("data.csv")), # External files need to be in commands explicitly. # nolint
@@ -213,7 +213,7 @@ good_config <- drake_config(good_plan)
 vis_drake_graph(good_config, targets_only = TRUE)
 ```
 
-```{r storecode2, echo = FALSE}
+```{r, echo = FALSE}
 good_plan <- drake_plan(
   my_data = get_data(file_in("data.csv")), # External files need to be in commands explicitly. # nolint
   my_analysis = analyze_data(my_data),

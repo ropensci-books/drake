@@ -1,11 +1,11 @@
 # `drake` plans {#plans}
 
-```{r plans_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r plans_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(glue)
 library(purrr)
@@ -24,7 +24,7 @@ A `drake` plan is a data frame with columns named `target` and `command`. Each t
 [^1]: You can turn the `command` column of your plan into a character vector (e.g. `plan$command <- purrr::map_chr(plan$command, rlang::expr_text)`) and `drake` will still understand you. However, the recommended format is a list of [expressions](http://adv-r.had.co.nz/Expressions.html). `drake_plan()` and friends always supply [expression](http://adv-r.had.co.nz/Expressions.html) lists.
 [^2]: `drake_plan()` is the best way to create plans, but you can create plans any way you like. `drake` will understand plans you create directly using `data.frame()` or `tibble()`.
 
-```{r firstexampleplan}
+```{r}
 plan <- drake_plan(
   raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
   data = raw_data %>%
@@ -47,7 +47,7 @@ plan
 
 <!-- Your `drake` plan is like a top-level R script that runs everything from end to end. In fact, you can convert back and forth between plans and scripts using functions [`plan_to_code()`](https://docs.ropensci.org/drake/reference/plan_to_code.html) and [`code_to_plan()`](https://docs.ropensci.org/drake/reference/code_to_plan.html) (with some [caveats](https://docs.ropensci.org/drake/reference/code_to_plan.html#details)). -->
 
-```{r plan_to_code_planschapter}
+```{r}
 plan_to_code(plan, "new_script.R")
 cat(readLines("new_script.R"), sep = "\n")
 
@@ -56,7 +56,7 @@ code_to_plan("new_script.R")
 
 And [`plan_to_notebook()`](https://docs.ropensci.org/drake/reference/plan_to_notebook.html) turns plans into [R notebooks](https://bookdown.org/yihui/rmarkdown/notebook.html).
 
-```{r plan_to_notebook_planschapter}
+```{r}
 plan_to_notebook(plan, "new_notebook.Rmd")
 cat(readLines("new_notebook.Rmd"), sep = "\n")
 
@@ -75,7 +75,7 @@ Some targets may need an update while others may not. In the [walkthrough](#walk
 
 `make()` automatically learns the build order of your targets and [how to run them in parallel](#hpc). The underlying magic is [_static code analysis_](http://adv-r.had.co.nz/Expressions.html#ast-funs), which automatically detects the dependencies of each target without having to run its command.
 
-```{r depscode_plans}
+```{r}
 create_plot <- function(data) {
   ggplot(data, aes(x = .data$Petal.Width, fill = .data$Species)) +
     geom_histogram(bins = 20)
@@ -88,7 +88,7 @@ deps_code(quote(create_plot(datasets::iris)))
 
 Because of the dependency relationships, row order does not matter once the plan is fully defined. The following plan declares `file` before `plot`.
 
-```{r smallplan__}
+```{r}
 small_plan <- drake_plan(
   file = ggsave(file_out("plot.png"), plot, width = 7, height = 5),
   plot = create_plot(datasets::iris)
@@ -97,14 +97,14 @@ small_plan <- drake_plan(
 
 But `file` actually depends on `plot`.
 
-```{r smallvis__}
+```{r}
 small_config <- drake_config(small_plan)
 vis_drake_graph(small_config)
 ```
 
 So `make()` builds `plot` first.
 
-```{r smallmake__}
+```{r}
 library(ggplot2)
 make(small_plan)
 ```
@@ -113,13 +113,13 @@ make(small_plan)
 
 You can add other columns besides the required `target` and `command`.
 
-```{r addcolplan}
+```{r}
 cbind(small_plan, cpu = c(1, 2))
 ```
 
 Within `drake_plan()`, `target()` lets you create any custom column except `target`, `command`, and `transform`, the last of which [has a special meaning](https://ropenscilabs.github.io/drake-manual/plans.html#create-large-plans-the-easy-way).
 
-```{r targetfn}
+```{r}
 drake_plan(
   file = target(
     ggsave(file_out("plot.png"), plot),
@@ -167,7 +167,7 @@ The following columns have special meanings for `make()`.
 
 `drake` version 7.0.0 introduced new syntax to make it easier to create plans. To try it out before the next [CRAN](http://cran.r-project.org) release, install the [current development version](https://github.com/ropensci/drake) from GitHub.
 
-```{r installdevdrakedsl, eval = FALSE}
+```{r, eval = FALSE}
 install.packages("remotes")
 library(remotes)
 install_github("ropensci/drake")
@@ -177,7 +177,7 @@ install_github("ropensci/drake")
 
 Ordinarily, `drake_plan()` requires you to write out all the targets one-by-one. This is a literal pain.
 
-```{r fulldrakeplanlongstats, eval = FALSE}
+```{r, eval = FALSE}
 drake_plan(
   data = get_data(),
   analysis_1_1 = fit_model_x(data, mean = 1, sd = 1),
@@ -198,7 +198,7 @@ drake_plan(
 
 Transformations reduce typing, especially when combined with tidy evaluation (`!!`).
 
-```{r draketrans1}
+```{r}
 lots_of_sds <- as.numeric(1:1e3)
 
 drake_plan(
@@ -212,7 +212,7 @@ drake_plan(
 
 Behind the scenes during a transformation, `drake_plan()` creates new columns to track what is happening. You can see them with `trace = TRUE`.
 
-```{r draketrans3}
+```{r}
 drake_plan(
   data = get_data(),
   analysis = target(
@@ -225,7 +225,7 @@ drake_plan(
 
 Because of those columns, you can chain transformations together in complex pipelines.
 
-```{r draketrans4}
+```{r}
 plan1 <- drake_plan(
   small = get_small_data(),
   large = get_large_data(),
@@ -260,7 +260,7 @@ vis_drake_graph(config1)
 
 And you can write the transformations in any order. The following plan is equivalent to `plan1` despite the rearranged rows.
 
-```{r draketrans4b}
+```{r}
 plan2 <- drake_plan(
   # Calculate 2 different performance metrics on every model fit.
   summ_metric = target(
@@ -298,7 +298,7 @@ vis_drake_graph(config2)
 
 Some plans are too large to deploy right away.
 
-```{r max_expand_dsl}
+```{r}
 plan <- drake_plan(
   data = target(
     get_data(source),
@@ -325,7 +325,7 @@ It is extremely difficult to understand, visualize, test, and debug a workflow w
 
 To speed up initial testing and experimentation, you may want to limit the number of extra targets created by the `map()` and `cross()` transformations. Simply set `max_expand` in `drake_plan()`.
 
-```{r max_expand_dslfinal}
+```{r}
 plan <- drake_plan(
   max_expand = 2,
   data = target(
@@ -351,14 +351,14 @@ plan
 
 With a downsized plan, we can inspect the graph to make sure the dependencies line up correctly.
 
-```{r max_expand_dsl2}
+```{r}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
 We can even run `make(plan)` and check a strategic subset of targets.
 
-```{r max_expand_dsl3, eval = FALSE}
+```{r, eval = FALSE}
 make(plan)                       # Run the small subset of targets we kept.
 loadd()                          # Load all those targets into memory.
 summary(analysis_z_25L_data_13L) # Look at the values of those targets
@@ -367,7 +367,7 @@ summary(analysis_z_25L_data_13L) # Look at the values of those targets
 
 When we are ready to scale back up, we simply remove `max_expand` from the call to `drake_plan()`. Nothing else needs to change.
 
-```{r max_expand_dsl4}
+```{r}
 plan <- drake_plan(
   data = target(
     get_data(source),
@@ -405,7 +405,7 @@ nrow(plan)
 
 `map()` creates a new target for each row in a grid.
 
-```{r drakemap1}
+```{r}
 drake_plan(
   x = target(
     simulate_data(center, scale),
@@ -416,7 +416,7 @@ drake_plan(
 
 You can supply your own custom grid using the `.data` argument. Note the use of `!!` below.
 
-```{r drakemapgrid}
+```{r}
 my_grid <- tibble(
   sim_function = c("rnrom", "rt", "rcauchy"),
   title = c("Normal", "Student t", "Cauchy")
@@ -443,7 +443,7 @@ drake_plan(
 
 `map()` column-binds variables together to create a grid. The lengths of those variables need to be conformable just as with `data.frame()`.
 
-```{r drakemaperr, error = TRUE}
+```{r, error = TRUE}
 drake_plan(
   x = target(
     simulate_data(center, scale),
@@ -454,7 +454,7 @@ drake_plan(
 
 Sometimes, the results are sensible when grouping variable lengths are multiples of each other, but be careful.
 
-```{r drakemap2}
+```{r}
 drake_plan(
   x = target(
     simulate_data(center, scale),
@@ -465,7 +465,7 @@ drake_plan(
 
 Things get tricker when `drake` reuses grouping variables from previous transformations. For example, below, each `x_*` target has an associated `nrow` value. So if you write `transform = map(x)`, then `nrow` goes along for the ride.
 
-```{r drakemap3}
+```{r}
 drake_plan(
   x = target(
     simulate_data(center),
@@ -481,7 +481,7 @@ drake_plan(
 
 But if other targets have `centers`'s of their own, `drake_plan()` may not know what to do with them.
 
-```{r drakemap4}
+```{r}
 drake_plan(
   w = target(
     simulate_data(center),
@@ -501,7 +501,7 @@ drake_plan(
 
 The problems is that there are 4 values of `center` and only two `x_*` targets (and two `y_*` targets). Even if you explicitly supply `center` to the transformation, `map()` can only takes the first two values.
 
-```{r drakemap5}
+```{r}
 drake_plan(
   w = target(
     simulate_data(center),
@@ -525,7 +525,7 @@ So please inspect the plan before you run it with `make()`. Once you have a `dra
 
 `cross()` creates a new target for each combination of argument values.
 
-```{r drakecross}
+```{r}
 drake_plan(
   x = target(
     simulate_data(nrow, ncol),
@@ -558,14 +558,14 @@ plan <- drake_plan(
 plan
 ```
 
-```{r split3}
+```{r}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
 
 Here, `drake_slice()` takes a single subset of the data at runtime. 
 
-```{r darke_slice}
+```{r}
 dataset <- tibble::as_tibble(iris)
 dim(dataset)
 
@@ -578,7 +578,7 @@ drake_slice(dataset, slices = 3, index = 1, margin = 2)
 
 `drake_slice()` supports data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc). Even better, you can split up ordinary vectors and lists. Instead of taking slices of the actual dataset, you can split up a set of indices. Combined with [high-performance computing](#hpc), this should help you avoid loading an entire big data file into memory on a single compute node.
 
-```{r splitfilenomem}
+```{r}
 plan <- drake_plan(
   all_rows = file_in("huge.csv") %>%
     number_of_rows() %>%
@@ -605,7 +605,7 @@ drake_plan_source(plan)
 
 In `combine()`, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator `!!!` from the Tidyverse.
 
-```{r transform5}
+```{r}
 plan <- drake_plan(
   data = target(
     sim_data(mean = x, sd = y),
@@ -629,7 +629,7 @@ vis_drake_graph(config)
 
 You can different groups of targets in the same command.
 
-```{r transform5b}
+```{r}
 plan <- drake_plan(
   data_group1 = target(
     sim_data(mean = x, sd = y),
@@ -652,7 +652,7 @@ drake_plan_source(plan)
 
 And as with `group_by()` from `dplyr`, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional `.by` argument of `combine()`.
 
-```{r transform6}
+```{r}
 plan <- drake_plan(
   data = target(
     sim_data(mean = x, sd = y, skew = z),
@@ -671,7 +671,7 @@ drake_plan_source(plan)
 
 In your post-processing, you may need the values of `x` and `y` that underly `data_1_3` and `data_2_4`. Solution: get the trace and the target names. We define a new plan
 
-```{r transform7}
+```{r}
 plan <- drake_plan(
   data = target(
     sim_data(mean = x, sd = y),
@@ -691,7 +691,7 @@ drake_plan_source(plan)
 
 and a new function
 
-```{r transform8, eval = FALSE}
+```{r, eval = FALSE}
 post_process <- function(..., plan) {
   args <- list(...)
   names(args) <- all.vars(substitute(list(...)))
@@ -708,30 +708,30 @@ A grouping variable is an argument to `map()`, `cross()`, or `combine()` that id
 
 When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write `map(c(1, 2))`.
 
-```{r namedlittrans}
+```{r}
 drake_plan(x = target(sqrt(y), transform = map(y = c(1, 2))))
 ```
 
 And if you supply integer sequences the usual way, you may notice some rows are missing.
 
-```{r namedlittrans2}
+```{r}
 drake_plan(x = target(sqrt(y), transform = map(y = 1:3)))
 ```
 
 Tidy evaluation and `as.numeric()` make sure all the data points show up.
 
-```{r namedlittrans3}
+```{r}
 y_vals <- as.numeric(1:3)
 drake_plan(x = target(sqrt(y), transform = map(y = !!y_vals)))
 ```
 
 Character vectors usually work without a hitch, and quotes are converted into dots to make valid target names.
 
-```{r namedlittrans4}
+```{r}
 drake_plan(x = target(get_data(y), transform = map(y = c("a", "b", "c"))))
 ```
 
-```{r namedlittrans5}
+```{r}
 y_vals <- letters
 drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
 ```
@@ -740,14 +740,14 @@ drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
 
 Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the `map()` and `cross()` transformations can accept them this ways. To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
 
-```{r mapsym2}
+```{r}
 vals <- rlang::syms(letters)
 drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
 ```
 
 The new groupings carry over to downstream targets by default, which you can see with `trace = TRUE`. Below, the rows for targets `w_x` and `w_y` have entries in the and `z` column.
 
-```{r mapsym3}
+```{r}
 drake_plan(
   x = abs(mean(rnorm(10))),
   y = abs(mean(rnorm(100, 1))),
@@ -759,7 +759,7 @@ drake_plan(
 
 However, this is *incorrect* because `w` does not depend on `z_x` or `z_y`. So for `w`, you should write `map(val = c(x, y))` instead of `map(val)` to tell `drake` to clear the trace. Then, you will see `NA`s in the `z` column for `w_x` and `w_y`, which is right and proper.
 
-```{r mapsym4}
+```{r}
 drake_plan(
   x = abs(mean(rnorm(10))),
   y = abs(mean(rnorm(100, 1))),
@@ -776,7 +776,7 @@ Tags are special optional grouping variables. They are ignored while the transfo
 1. In-tags, which contain the target name you start with, and
 2. Out-tags, which contain the target names generated by the transformations.
 
-```{r gettags}
+```{r}
 drake_plan(
   x = target(
     command,
@@ -788,7 +788,7 @@ drake_plan(
 
 Subsequent transformations can use tags as grouping variables and add to existing tags.
 
-```{r draketrans2}
+```{r}
 plan <- drake_plan(
   prep_work = do_prep_work(),
   local = target(
@@ -821,7 +821,7 @@ vis_drake_graph(config)
 
 All transformations have an optional `.id` argument to control the names of targets. Use it to select the grouping variables that go into the names, as well as the order they appear in the suffixes. 
 
-```{r dslidnames}
+```{r}
 drake_plan(
   data = target(
     get_data(param1, param2),
@@ -835,7 +835,7 @@ drake_plan(
 )
 ```
 
-```{r dslidnames2}
+```{r}
 drake_plan(
   data = target(
     get_data(param1, param2),
@@ -849,7 +849,7 @@ drake_plan(
 )
 ```
 
-```{r dslidnames3}
+```{r}
 drake_plan(
   data = target(
     get_data(param1, param2),
@@ -865,7 +865,7 @@ drake_plan(
 
 Set `.id` to `FALSE` to ignore the grouping variables altogether.
 
-```{r dslidnames4}
+```{r}
 drake_plan(
   data = target(
     get_data(param1, param2),
@@ -881,7 +881,7 @@ drake_plan(
 
 Finally, `drake` supports a special `.id_chr` symbol in commands to let you refer to the name of the current target as a character string.
 
-```{r dslidnames5}
+```{r}
 as_chr <- function(x) {
   deparse(substitute(x))
 }
@@ -903,6 +903,6 @@ plan <- drake_plan(
 plan
 ```
 
-```{r dslnames6}
+```{r}
 drake_plan_source(plan)
 ```

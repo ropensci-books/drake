@@ -21,7 +21,7 @@ favicon: "images/favicon.ico"
 always_allow_html: yes
 ---
 
-```{r index_setup, message = FALSE, warning = FALSE,  echo = FALSE}
+```{r, message = FALSE, warning = FALSE,  echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
@@ -48,7 +48,7 @@ For projects in R, the `drake` package can help. It [analyzes your workflow](htt
 
 You can choose among different versions of `drake`. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.
 
-```{r installreadme, eval = FALSE}
+```{r, eval = FALSE}
 # Install the latest stable release from CRAN.
 install.packages("drake")
 
@@ -90,7 +90,7 @@ The R community emphasizes reproducibility. Traditional themes include [scientif
 
 Suppose you are reviewing someone else's data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With `drake`, it is quick and easy to find out.
 
-```{r introuptodate, eval = FALSE}
+```{r, eval = FALSE}
 make(plan)
 
 config <- drake_config(plan)
@@ -103,7 +103,7 @@ With everything already up to date, you have **tangible evidence** of reproducib
 
 When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.
 
-```{r introcleanmake, eval = FALSE}
+```{r, eval = FALSE}
 clean()       # Remove the original author's results.
 make(plan) # Independently re-create the results from the code and input data.
 ```
@@ -141,7 +141,7 @@ build_times(type = "build")
 
 As of version 7.5.0, `drake` tracks the history of your analysis: what you built, when you built it, how you built it, the arguments you used in your function calls, and how to get the data back. (Disable with `make(history = FALSE)`)
 
-```{r history, eval = FALSE}
+```{r, eval = FALSE}
 drake_history(analyze = TRUE)
 #> # A tibble: 7 x 8
 #>   target  time        hash   exists command            runtime latest quiet
@@ -179,7 +179,7 @@ Ideally, independent observers should be able to read your code and understand i
 
 Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. `drake` knows what to do. Parallelism is implicit and automatic. See the [high-performance computing guide](https://ropenscilabs.github.io/drake-manual/hpc.html) for all the details.
 
-```{r scaleup, eval = FALSE}
+```{r, eval = FALSE}
 # Use the spare cores on your local machine.
 options(clustermq.scheduler = "multicore")
 make(plan, parallelism = "clustermq", jobs = 4)

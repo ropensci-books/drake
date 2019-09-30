@@ -1,6 +1,6 @@
 # Time: logging, prediction, and strategy {#time}
 
-```{r time_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -11,13 +11,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r time_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 ```
 
 Thanks to [Jasper Clarkberg](https://github.com/dapperjapper), `drake` records how long it takes to build each target. For large projects that take hours or days to run, this feature becomes important for planning and execution.
 
-```{r timing_intro}
+```{r}
 library(drake)
 load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
 make(my_plan)
@@ -32,14 +32,14 @@ build_times(starts_with("coef"), digits = 8)
 
 `drake` uses these times to predict the runtime of the next `make()`. At this moment, everything is up to date in the current example, so the next `make()` should ideally take no time at all (except for preprocessing overhead).
 
-```{r predict_runtime}
+```{r}
 config <- drake_config(my_plan, verbose = 0L)
 predict_runtime(config)
 ```
 
 Suppose we change a dependency to make some targets out of date. Now, the next `make()` should take longer since some targets are out of date.
 
-```{r changedep_timing}
+```{r}
 reg2 <- function(d){
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
@@ -50,7 +50,7 @@ predict_runtime(config)
 
 And what if you plan to delete the cache and build all the targets from scratch?
 
-```{r predict_runtime_scratch}
+```{r}
 predict_runtime(config, from_scratch = TRUE)
 ```
 
@@ -58,7 +58,7 @@ predict_runtime(config, from_scratch = TRUE)
 
 Let's say you are scaling up your workflow. You just put bigger data and heavier computation in your custom code, and the next time you run `make()`, your targets will take much longer to build. In fact, you estimate that every target except for your R Markdown report will take two hours to complete. Let's write down these known times in seconds.
 
-```{r knowntimes}
+```{r}
 known_times <- rep(7200, nrow(my_plan))
 names(known_times) <- my_plan$target
 known_times["report"] <- 5
@@ -67,7 +67,7 @@ known_times
 
 How many parallel jobs should you use in the next `make()`? The `predict_runtime()` function can help you decide. `predict_runtime(jobs = n)` simulates persistent parallel workers and reports the estimated total runtime of `make(jobs = n)`. (See also `predict_workers()`.)
 
-```{r predictjobs}
+```{r}
 time <- c()
 for (jobs in 1:12){
   time[jobs] <- predict_runtime(

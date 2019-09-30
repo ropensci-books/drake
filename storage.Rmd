@@ -1,18 +1,18 @@
 # Storage {#storage}
 
-```{r store_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r store_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(tidyverse)
 ```
 
 When you run `make()`, `drake` stores your targets in a cache.
 
-```{r mtcars_storage}
+```{r}
 library(drake)
 load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
 make(my_plan, verbose = 0L)
@@ -20,14 +20,14 @@ make(my_plan, verbose = 0L)
 
 The default cache is a hidden `.drake` folder. 
 
-```{r getdefaultcache, eval = FALSE}
+```{r, eval = FALSE}
 find_cache()
 ### [1] "/home/you/project/.drake"
 ```
 
 `drake` uses the [storr](https://github.com/richfitz/storr) package to create and modify caches.
 
-```{r oopcache}
+```{r}
 library(storr)
 cache <- storr_rds(".drake")
 
@@ -38,7 +38,7 @@ head(cache$get("small"))
 
 `drake` has its own interface on top of [storr](https://github.com/richfitz/storr) to make it easier to work with the default  `.drake/` cache. The `loadd()`, `readd()`, and `cached()` functions explore saved targets.
 
-```{r explore_mtcars}
+```{r}
 head(cached())
 
 head(readd(small))
@@ -52,7 +52,7 @@ rm(large) # Does not remove `large` from the cache.
 
 Functions `drake_cache()`, `storr::storr_rds()`, and `new_cache()` recover and create caches. (`drake_cache()` is only supported in `drake` version 7.4.0 and above.)
 
-```{r recovercache}
+```{r}
 cache <- drake_cache()
 cache$driver$path
 
@@ -68,7 +68,7 @@ cache2$driver$path
 
 You can supply your own cache to `make()` and similar functions.
 
-```{r makecache}
+```{r}
 cache2$list()
 
 plan2 <- drake_plan(x = 1, y = sqrt(x))
@@ -82,7 +82,7 @@ vis_drake_graph(config)
 
 Destroy caches to remove them from your file system.
 
-```{r rm3}
+```{r}
 cache$destroy()
 cache2$destroy()
 ```
@@ -93,7 +93,7 @@ cache2$destroy()
 
 By default, `drake` uses `storr_rds()` caches because they allow `make(jobs = 4)` to safely store multiple targets in parallel. To achieve this thread safety, however, [`storr`](https://github.com/richfitz/storr) splits up the data into a pool of tiny cryptically-named files.
 
-```{r rdsinternals}
+```{r}
 make(my_plan, verbose = 0L)
 head(list.files(".drake/data"))
 head(list.files(".drake/keys/objects"))
@@ -103,7 +103,7 @@ This makes RDS caches difficult to share with collaborators and put under versio
 
 Alternatively, you can track changes in a cache log with fingerprints of all your targets.
 
-```{r cachelogfile}
+```{r}
 drake_cache_log()
 make(my_plan, verbose = 0L, cache_log_file = TRUE)
 read_csv("drake_cache.csv", col_types = cols())
@@ -115,7 +115,7 @@ Use the `cache_log_file` argument of `make()` to refresh the cache log file ever
 
 It is possible use a single SQLite database file as the cache.
 
-```{r databaseinit}
+```{r}
 mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
 cache <- storr::storr_dbi("datatable", "keystable", mydb)
 make(my_plan, cache = cache, verbose = 0L)
@@ -123,7 +123,7 @@ loadd(small, cache = cache)
 head(small)
 ```
 
-```{r portabledisconnect2, echo = FALSE}
+```{r, echo = FALSE}
 cache$destroy()
 ```
 
@@ -138,7 +138,7 @@ For a more complete demonstration, please see [this example code](https://github
 
 Environment caches live in computer memory, not your file system, so they are a nice way to run small and fast experiments. However, unless you save the cache manually, all your data will be lost when you quit your R session. And for large projects, you may not be able to fit all your data in memory anyway.
 
-```{r envircache, eval = FALSE}
+```{r, eval = FALSE}
 cache <- storr_environment()
 make(my_plan, cache = cache)
 ```
@@ -147,7 +147,7 @@ make(my_plan, cache = cache)
 
 [storr](https://github.com/richfitz/storr) caches use [hash functions ](https://en.wikipedia.org/wiki/Hash_function) to keep track of stored objects. A hash function is just a way to fingerprint data. The idea is to represent an arbitrary chunks of data using (nearly) unique strings of fixed size.
 
-```{r hashes}
+```{r}
 library(digest) # package for hashing objects and files
 smaller_data <- 12
 larger_data <- rnorm(1000)
@@ -159,7 +159,7 @@ digest(larger_data)
 
 The `digest` package (used by both `drake` and `storr`) supports a wide variety of hash functions. Some generate larger hash keys, some are slower to compute, and others are more prone to "collisions" (where two different data objects are given the same hash key). The `digest` package supports a variety of hash algorithms.
 
-```{r compare_algo_lengths}
+```{r}
 digest(larger_data, algo = "sha512")
 
 digest(larger_data, algo = "md5")
@@ -171,7 +171,7 @@ digest(larger_data, algo = "murmur32")
 
 For `drake`, the default hash algorithm is `xxhash64`. You can choose different hash functions with the `hash_algorithm` argument to `new_cache()`, `storr_rds()`, and similar functions. (For `drake` version 6.2.1 and earlier, see the `long_hash_algo` and `short_hash_algo` arguments.)
 
-```{r cachehashoptions, eval = FALSE}
+```{r, eval = FALSE}
 cache3 <- new_cache("cache_3_path", hash_algorithm = "murmur32")
 cache4 <- storr_rds("cache_4_path", hash_algorithm = "crc32")
 ```

@@ -1,11 +1,11 @@
 # An analysis of R package download trends {#packages}
 
-```{r pkgs_setup, message = FALSE, warning = FALSE, include = FALSE}
+```{r, message = FALSE, warning = FALSE, include = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r pkgs_setup2, message = FALSE, warning = FALSE, include = FALSE}
+```{r, message = FALSE, warning = FALSE, include = FALSE}
 library(cranlogs)
 library(curl)
 library(drake)
@@ -26,7 +26,7 @@ This chapter explores R package download trends using the `cranlogs` package, an
 
 Write the code files to your workspace.
 
-```{r getthequickstartcode02, eval = FALSE}
+```{r, eval = FALSE}
 drake_example("packages")
 ```
 
@@ -36,7 +36,7 @@ The new `packages` folder now includes a file structure of a serious `drake` pro
 
 This small data analysis project explores some trends in R package downloads over time. The datasets are downloaded using the [cranlogs package](https://github.com/metacran/cranlogs).
 
-```{r cranlogsintroreport}
+```{r}
 library(cranlogs)
 cran_downloads(packages = "dplyr", when = "last-week")
 ```
@@ -47,7 +47,7 @@ Above, each count is the number of times `dplyr` was downloaded from the RStudio
 
 First, we load the required packages. `drake` detects the packages you install and load.
 
-```{r pkgspkgs}
+```{r}
 library(cranlogs)
 library(drake)
 library(dplyr)
@@ -58,7 +58,7 @@ library(rvest)
 
 We will want custom functions to summarize the CRAN logs we download.
 
-```{r summplotdatapackages}
+```{r}
 make_my_table <- function(downloads){
   group_by(downloads, package) %>%
     summarize(mean_downloads = mean(count))
@@ -76,7 +76,7 @@ We want to explore the daily downloads from the `knitr`, `Rcpp`, and `ggplot2` p
 
 The following `drake_plan()` syntax is described [here](https://ropenscilabs.github.io/drake-manual/plans.html#create-large-plans-the-easy-way), which is supported in `drake` 7.0.0 and above (and the [current development version](https://github.com/ropensci/drake)).
 
-```{r datadataplan}
+```{r}
 plan <- drake_plan(
   older = cran_downloads(
     packages = c("knitr", "Rcpp", "ggplot2"),
@@ -107,7 +107,7 @@ plan <- drake_plan(
 
 Notice the custom trigger for the target `recent`. Here, we are telling `drake` to rebuild `recent` whenever a new day's log is uploaded to [http://cran-logs.rstudio.com](http://cran-logs.rstudio.com). In other words, `drake` keeps track of the return value of `latest_log_date()` and recomputes `recent` (during `make()`) if that value changed since the last `make()`. Here, `latest_log_date()` is one of our custom imported functions. We use it to scrape [http://cran-logs.rstudio.com](http://cran-logs.rstudio.com) using the [`rvest`](https://github.com/hadley/rvest) package.
 
-```{r latestlogdate}
+```{r}
 latest_log_date <- function(){
   read_html("http://cran-logs.rstudio.com/") %>%
     html_nodes("li:last-of-type") %>%
@@ -121,7 +121,7 @@ Now, we run the project to download the data and analyze it.
 The results will be summarized in the knitted report, `report.md`,
 but you can also read the results directly from the cache.
 
-```{r firstmakepackages, fig.width = 7, fig.height = 4}
+```{r, fig.width = 7, fig.height = 4}
 make(plan)
 
 readd(averages_recent)
@@ -135,13 +135,13 @@ readd(plot_older)
 
 If we run `make()` again right away, we see that everything is up to date. But if we wait until a new day's log is uploaded, `make()` will update `recent` and everything that depends on it.
 
-```{r packagessecondmake}
+```{r}
 make(plan)
 ```
 
 To visualize the build behavior, you can plot the dependency network.
 
-```{r plotpackagesgraph}
+```{r}
 config <- drake_config(plan)
 vis_drake_graph(config)
 ```
@@ -150,20 +150,20 @@ vis_drake_graph(config)
 
 Sometimes, our remote data sources get revised, and web scraping may not  be the best way to detect changes. We may want to look at our remote dataset's modification time or HTTP ETag. To see how this works, consider the CRAN log file from February 9, 2018.
 
-```{r logurl}
+```{r}
 url <- "http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz"
 ```
 
 We can track the modification date using the [`httr`](https://github.com/r-lib/httr) package.
 
-```{r logs2}
+```{r}
 library(httr)    # For querying websites.
 HEAD(url)$headers[["last-modified"]]
 ```
 
 In our `drake` plan, we can track this timestamp and trigger a download whenever it changes.
 
-```{r logs3}
+```{r}
 plan <- drake_plan(
   logs = target(
     get_logs(url),
@@ -175,7 +175,7 @@ plan
 
 where
 
-```{r logs5}
+```{r}
 library(R.utils) # For unzipping the files we download.
 library(curl)    # For downloading data.
 get_logs <- function(url){
@@ -189,7 +189,7 @@ get_logs <- function(url){
 
 When we are ready, we run the workflow.
 
-```{r logs6}
+```{r}
 make(plan)
 
 readd(logs)
