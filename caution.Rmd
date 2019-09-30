@@ -1,6 +1,6 @@
 # Cautionary notes {#caution}
 
-```{r caution_setup, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r caution_setup2, message = FALSE, warning = FALSE, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
 library(magrittr)
 ```
@@ -27,7 +27,7 @@ It is common practice to divide the work of a project into multiple R files, but
 
 In your `drake` plan (produced by `drake_plan()` and accepted by `make()`), your commands can usually be flexible R expressions.
 
-```{r tidyplancaution11}
+```{r}
 drake_plan(
   target1 = 1 + 1 - sqrt(sqrt(3)),
   target2 = my_function(web_scraped_data) %>% my_tidy
@@ -51,7 +51,7 @@ Your workflow may depend on external packages such as
 
 Running commands in your R console is not always exactly like running them with `make()`. That's because `make()` uses tidy evaluation as implemented in the [`rlang` package](https://github.com/tidyverse/rlang).
 
-```{r demotidyeval11}
+```{r}
 ## This `drake` plan uses rlang's quasiquotation operator `!!`.
 my_plan <- drake_plan(list = c(
   little_b = "\"b\"",
@@ -62,9 +62,9 @@ make(my_plan)
 readd(letter)
 ```
 
-For the commands you specify the free-form `...` argument, `drake_plan()` also supports tidy evaluation. For example, it supports quasiquotation with the `!!` argument. Use `tidy_evaluation = FALSE` or the `list` argument to suppress this behavior.
+For the commands you specify the free-form `...` argument, `drake_plan()` also supports tidy evaluation. For example, it supports quasiquotation with the `!!` argument. Use `tidy_eval = FALSE` or the `list` argument to suppress this behavior.
 
-```{r testquasiquoplan11}
+```{r}
 my_variable <- 5
 
 drake_plan(
@@ -77,7 +77,7 @@ drake_plan(
   a = !!my_variable,
   b = !!my_variable + 1,
   list = c(d = "!!my_variable"),
-  tidy_evaluation = FALSE
+  tidy_eval = FALSE
 )
 ```
 
@@ -87,7 +87,7 @@ For instances of `!!` that remain in the `drake` plan, `make()` will run these c
 
 When `make()` fails, use `failed()` and `diagnose()` to debug. Try the following out yourself.
 
-```{r diagnosecaution11}
+```{r}
 ## Targets with available diagnostic metadata, incluing errors, warnings, etc.
 diagnose()
 
@@ -132,7 +132,7 @@ Ordinarily, `drake` prunes the execution environment at every parallelizable sta
 
 1. `make(..., lazy_load = TRUE, parallelism = "parLapply", jobs = 2)` does not work. If you want to use local multisession parallelism with multiple jobs and lazy loading, try `"future_lapply"` parallelism instead.
 
-    ```{r lazyloadfuture11, eval = FALSE}
+    ```{r, eval = FALSE}
     library(future)
     future::plan(multisession)
     load_mtcars_example() # Get the code with drake_example("mtcars").
@@ -151,7 +151,7 @@ You can call `make(..., timeout = 10)` to time out all each target after 10 seco
 
 For example, an `R6` class changes whenever a new `R6` object of that class is created.
 
-```{r r6change11}
+```{r}
 library(digest)
 library(R6)
 circle_class <- R6Class(
@@ -174,7 +174,7 @@ rm(circle)
 
 Ordinarily, `drake` overreacts to this change and builds targets repeatedly.
 
-```{r r6rebuild11}
+```{r}
 clean()
 plan <- drake_plan(
   circle = circle_class$new(radius = 10),
@@ -187,7 +187,7 @@ make(plan) # Builds `circle` again because `circle_class` changed.
 The solution is to define your `R6` class inside a function. `drake` does the right thing when it comes to tracking changes to functions.
 
 
-```{r r6build2}
+```{r}
 clean()
 new_circle <- function(radius){
   circle_class <- R6Class(
@@ -216,7 +216,7 @@ make(plan)
 
 You should explicitly learn the items in your workflow and the dependencies of your targets.
 
-```{r helpfuncitons11, eval = FALSE}
+```{r, eval = FALSE}
 ?deps
 ?tracked
 ?vis_drake_graph
@@ -224,7 +224,7 @@ You should explicitly learn the items in your workflow and the dependencies of y
 
 `drake` can be fooled into skipping objects that should be treated as dependencies. For example:
 
-```{r cautiondeps11}
+```{r}
 f <- function(){
   b <- get("x", envir = globalenv()) # x is incorrectly ignored
   digest::digest(file_dependency)
@@ -246,7 +246,7 @@ If you have `knitr` reports, you can use `knitr_in()` in your commands so that y
 
 If you reference S3 methods, only the generic method is tracked as a dependency.
 
-```{r s3}
+```{r}
 plan <- drake_plan(x = base::print(data.frame(y = 1)))
 cache <- storr::storr_environment()
 make(plan, cache = cache)
@@ -261,7 +261,7 @@ This is unavoidable because `drake` uses static code analysis to detect dependen
 
 Do not call `file_out()` inside imported functions that you write. Only targets in your `drake` plan should have file outputs.
 
-```{r fileimportsfunctions11}
+```{r}
 ## toally_fine() will depend on the imported data.csv file.
 ## But make sure data.csv is an imported file and not a file target.
 totally_okay <- function(x, y, z){
@@ -279,7 +279,7 @@ avoid_this <- function(x, y, z){
 
 With functions produced by `Vectorize()`, detecting dependencies is especially hard because the body of every such function is
 
-```{r vectorizedfunctioncaution11, eval = FALSE}
+```{r, eval = FALSE}
 args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
 names <- if (is.null(names(args)))
     character(length(args)) else names(args)
@@ -309,7 +309,7 @@ In your `drake` plan, you can use `file_in()`, `file_out()`, and `knitr_in()` to
 
 The following workflow fails because [`make()` locks your environment](https://github.com/ropensci/drake/issues/664#issuecomment-453163562) and [`mclapply()` tries to add new variables to it](https://stackoverflow.com/questions/54229295/parallelmclapply-adds-bindings-to-the-global-environment-which-ones).
 
-```{r fromplanworkers, eval = FALSE}
+```{r, eval = FALSE}
 plan <- drake_plan(parallel::mclapply(1:8, sqrt, mc.cores = 2))
 make(plan)
 ```
@@ -321,7 +321,7 @@ But there are plenty of workarounds, including `make(plan, lock_envir = FALSE)` 
 
 Some parallel backends, particularly `make(parallelism = "future")` with `future::multicore`, may create zombie processes. Zombie children are not usually harmful, but you may wish to kill them yourself. The following function by [Carl Boneri](https://github.com/CarlBoneri) should work on Unix-like systems. For a discussion, see [drake issue 116](https://github.com/ropensci/drake/issues/116).
 
-```{r cautionzombies11, eval = FALSE}
+```{r, eval = FALSE}
 fork_kill_zombies <- function(){
   require(inline)
   includes <- "#include <sys/wait.h>"
@@ -364,7 +364,7 @@ keys/config/c2VlZA (Sandy Sum's conflicted copy 2018-01-31)
 
 Just remove these files using `drake_gc()` and proceed with your work.
 
-```{r drakegc11, eval = FALSE}
+```{r, eval = FALSE}
 cache <- drake_cache()
 drake_gc(cache)
 ```
