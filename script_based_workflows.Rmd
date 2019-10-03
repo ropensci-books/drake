@@ -1,0 +1,190 @@
+# `drake` and script-based workflows {#scripts}
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(glue)
+library(purrr)
+library(rlang)
+library(tidyverse)
+invisible(drake_example("script-based-workflows", overwrite = TRUE))
+tmp <- file.copy("script-based-workflows/R", ".", recursive = TRUE)
+tmp <- file.copy("script-based-workflows/raw_data.xlsx", ".")
+tmp <- file.copy("script-based-workflows/report.Rmd", ".")
+```
+
+`drake` has been built with the firm belief that the best workflows rely on approaching problems from a function perspective. This idea is supported in "Good enough practices in scientific computing", that approaching your project by writing modular code increases the end product.
+
+> The core realization in these practices is that being readable, reusable, and testable are all side effects of writing modular code, i.e., of building programs out of short, single-purpose functions with clearly-defined inputs and outputs 
+> 2017 Wilson et al.
+
+That being said, not all projects and workflows are written using this mantra and for others the lift would be too great to re-factor to a purely functional approach. 
+
+## Traditional and Legacy Workflows
+
+A common approach to creating workflows is to write steps of the analysis into scripts that perform specific tasks. By giving these scripts meaningful names, , e.g. 01_data.R, 02_munge.R, 03_analysis.R,  one can surmise both their contents and the order in which these scripts should be run.
+
+It was acknowledged in the ("What we left out")[https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510#sec027] section that build tools to manage projects when code gets out of date are ideal, but can be substituted with a simple master script called `make.R` that reruns each of the scripts in order.
+
+```{r,eval=FALSE}
+
+# Preprocessing steps
+source("01_data.R")
+source("02_munge.R")
+source("03_histogram.R")
+source("04_regression.R")
+
+# Calls rmarkdown::render on report.Rmd
+source("05_report.R")
+```
+
+The argument being that while some code may be reran, for small projects this likely is not going to be a bottleneck. 
+
+## Overcoming Technical Debt
+
+The argument against the workflow manager as above is the whole reason `drake` was developed: For non-trivial or long running processes, simply rerunning all the steps is unfeasible.
+
+> With the `code_to_function()` we can now move these encumbered workflows into the managed plan ecosystem of `drake`.
+
+`code_to_function()` accepts the path to either an R or Rmd script and will generate a function that contains the contents of the script you provided as a function.
+
+
+```{r}
+
+load_data <- code_to_function("01_data.R")
+
+```
+
+By turning these scripts into functions, they can be added into a `drake` plan for workflow management.
+
+
+## Dependencies
+
+An important aspect of drake plans is the capability to track the dependencies of each function and only rerun the parts of the plan that have updated, either in code or input. To take advantage of this feature, we will need to first generate a plan from loading the data to generating a histogram. In a normal non-`drake` workflow, the format might some something along the lines of the following.
+
+```{r eval=FALSE}
+
+source("01_data.R")
+source("02_munge.R")
+source("03_histogram.R")
+
+```
+
+Lets convert all of these into functions via `code_to_function()` and put them into a plan.
+
+```{r}
+
+load_data <- code_to_function("01_data.R")
+do_munge  <- code_to_function("02_munge.R")
+generate_histogram <-code_to_function("03_histogram.R")
+
+simple_plan <- drake_plan(
+  data     = load_data(),
+  munged_data = do_munge(),
+  hist     = generate_histogram()
+)
+
+```
+
+This looks good and dandy, but right now `drake` has no idea which part to run first, and what scripts depend on the outputs of the next!
+
+```{r}
+
+simple_config <- drake_config(simple_plan)
+vis_drake_graph(simple_config)
+
+```
+
+## Building the connections
+
+If we knew what scripts need to be run before others, we can use `targets` to indicate to `drake` in which order scripts need to be evaluated. 
+
+In the case described above, the final script, "03_histogram.R", generates a plot of a histogram using the data generated from "02_munge.R", which in turn relies on "01_data.R" to load the data. "01_data.R" is the first script that needs to be evaluated and does not rely on any other inputs.
+
+```{r}
+
+simple_plan <- drake_plan(
+  data     = load_data(),
+  munged_data = do_munge(data),
+  hist     = generate_histogram(munged_data)
+)
+```
+
+```{r echo=FALSE}
+
+simple_config <- drake_config(simple_plan)
+vis_drake_graph(simple_config)
+
+```
+
+
+## Putting it all together
+
+Using the first example of a make script in this chapter as the framework, the new `make.R` would look as follows.
+
+```{r eval=FALSE}
+
+# Convert Script based workflow to functions
+load_data <- code_to_function("01_data.R")
+do_munge <- code_to_function("02_munge.R")
+do_histogram <- code_to_function("03_histogram.R")
+do_regression <- code_to_function("04_model.R")
+generate_report <- code_to_function("05_report.R")
+
+# Create Drake Plan
+script_based_plan <- drake_plan(
+  data        = load_data(),
+  munged_data = do_munge(data),
+  hist        = do_histogram(munged_data),
+  fit         = do_regression(munged_data),
+  report      = generate_report(hist, fit)
+)
+
+make(script_based_plan)
+
+```
+
+By converting everything as a function and passing targets of the prior dependencies, `drake` is able track dependencies and when make.R is rerun, only the updated scripts will be rerun.
+
+```{r echo=FALSE}
+# Convert Script based workflow to functions
+load_data <- code_to_function("01_data.R")
+do_munge <- code_to_function("02_munge.R")
+do_histogram <- code_to_function("03_histogram.R")
+do_regression <- code_to_function("04_model.R")
+generate_report <- code_to_function("05_report.R")
+
+# Create Drake Plan
+script_based_plan <- drake_plan(
+  data        = load_data(),
+  munged_data = do_munge(data),
+  hist        = do_histogram(munged_data),
+  fit         = do_regression(munged_data),
+  report      = generate_report(hist,fit)
+)
+
+make(script_based_plan)
+
+```
+
+```{r}
+
+script_based_config <- drake_config(script_based_plan)
+vis_drake_graph(script_based_config, targets_only = TRUE)
+
+```
+
+<!-- ##  -->
+<!-- #Start with a workflow with numbered scripts, e.g. 01_data.R, 02_munge.R, 03_analysis.R, etc. -->
+<!-- #Make a function out of each script (ropensci/drake#994). -->
+<!-- #Call all the functions in a simple plan. -->
+<!-- #Iterate between drake_plan() and vis_drake_graph() to connect the targets in the correct order. End up with a working plan. -->
+<!-- Walk through some refactoring. -->
+<!-- Edit each script file: put all the code in a function. -->
+<!-- Replace script_to_function() with source(). -->
+<!-- Decompose the functions into smaller functions with formal arguments. -->
+

@@ -200,7 +200,7 @@ bad_config <- drake_config(bad_plan)
 vis_drake_graph(bad_config, targets_only = TRUE)
 ```
 
-When it comes to plans, use *functions* instead.
+When it comes to plans, use *functions* instead. As of `drake` version `7.6.2.9000`, there is a function called `code_to_function()` that will assist in moving your scripts based workflow into a `drake` plan. 
 
 ```{r, eval = FALSE}
 source("my_functions.R") # defines get_data(), analyze_data(), etc.
@@ -222,6 +222,27 @@ good_plan <- drake_plan(
 good_config <- drake_config(good_plan)
 vis_drake_graph(good_config, targets_only = TRUE)
 ```
+
+```{r, echo = FALSE}
+
+get_data <- code_to_function("get_data.R")
+do_analysis <- code_to_function("analyze_data.R")
+do_summary <- code_to_function("summarize_data.R")
+
+
+good_plan <- drake_plan(
+  my_data = get_data(),
+  my_analysis = do_analysis(my_data),
+  my_summaries = do_summary(my_analysis)
+)
+
+good_config <- drake_config(good_plan)
+vis_drake_graph(good_config, targets_only = TRUE)
+
+```
+
+
+
 
 ## Workflows as R packages
 
