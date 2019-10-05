@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>B Cautionary notes | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
 
   <meta property="og:title" content="B Cautionary notes | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -40,6 +40,7 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
 
 
 
@@ -47,7 +48,9 @@
 
 
 
-<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+
+
+<script src="libs/htmlwidgets-1.5/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.8/visNetwork.js"></script>
@@ -424,45 +427,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb244-3" data-line-number="3">  <span class="dt">little_b =</span> <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">b</span><span class="ch">\&quot;</span><span class="st">&quot;</span>,</a>
 <a class="sourceLine" id="cb244-4" data-line-number="4">  <span class="dt">letter =</span> <span class="st">&quot;!!little_b&quot;</span></a>
 <a class="sourceLine" id="cb244-5" data-line-number="5">))</a>
-<a class="sourceLine" id="cb244-6" data-line-number="6"><span class="co">#&gt; Warning in drake_plan(list = c(little_b = &quot;\&quot;b\&quot;&quot;, letter = &quot;!!little_b&quot;)):</span></a>
-<a class="sourceLine" id="cb244-7" data-line-number="7"><span class="co">#&gt; The `list` argument of `drake_plan()` is deprecated. Use the interface</span></a>
-<a class="sourceLine" id="cb244-8" data-line-number="8"><span class="co">#&gt; described at https://ropenscilabs.github.io/drake-manual/plans.html#large-</span></a>
-<a class="sourceLine" id="cb244-9" data-line-number="9"><span class="co">#&gt; plans.</span></a>
-<a class="sourceLine" id="cb244-10" data-line-number="10"><span class="co">#&gt; Error in enexpr(expr): object &#39;little_b&#39; not found</span></a>
-<a class="sourceLine" id="cb244-11" data-line-number="11">my_plan</a>
-<a class="sourceLine" id="cb244-12" data-line-number="12"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
-<a class="sourceLine" id="cb244-13" data-line-number="13"><span class="co">#&gt;    target              command                                             </span></a>
-<a class="sourceLine" id="cb244-14" data-line-number="14"><span class="co">#&gt;    &lt;chr&gt;               &lt;expr&gt;                                              </span></a>
-<a class="sourceLine" id="cb244-15" data-line-number="15"><span class="co">#&gt;  1 report              knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;),…</span></a>
-<a class="sourceLine" id="cb244-16" data-line-number="16"><span class="co">#&gt;  2 small               simulate(48)                                       …</span></a>
-<a class="sourceLine" id="cb244-17" data-line-number="17"><span class="co">#&gt;  3 large               simulate(64)                                       …</span></a>
-<a class="sourceLine" id="cb244-18" data-line-number="18"><span class="co">#&gt;  4 regression1_small   reg1(small)                                        …</span></a>
-<a class="sourceLine" id="cb244-19" data-line-number="19"><span class="co">#&gt;  5 regression1_large   reg1(large)                                        …</span></a>
-<a class="sourceLine" id="cb244-20" data-line-number="20"><span class="co">#&gt;  6 regression2_small   reg2(small)                                        …</span></a>
-<a class="sourceLine" id="cb244-21" data-line-number="21"><span class="co">#&gt;  7 regression2_large   reg2(large)                                        …</span></a>
-<a class="sourceLine" id="cb244-22" data-line-number="22"><span class="co">#&gt;  8 summ_regression1_s… suppressWarnings(summary(regression1_small$residual…</span></a>
-<a class="sourceLine" id="cb244-23" data-line-number="23"><span class="co">#&gt;  9 summ_regression1_l… suppressWarnings(summary(regression1_large$residual…</span></a>
-<a class="sourceLine" id="cb244-24" data-line-number="24"><span class="co">#&gt; 10 summ_regression2_s… suppressWarnings(summary(regression2_small$residual…</span></a>
-<a class="sourceLine" id="cb244-25" data-line-number="25"><span class="co">#&gt; 11 summ_regression2_l… suppressWarnings(summary(regression2_large$residual…</span></a>
-<a class="sourceLine" id="cb244-26" data-line-number="26"><span class="co">#&gt; 12 coef_regression1_s… suppressWarnings(summary(regression1_small))$coeffi…</span></a>
-<a class="sourceLine" id="cb244-27" data-line-number="27"><span class="co">#&gt; 13 coef_regression1_l… suppressWarnings(summary(regression1_large))$coeffi…</span></a>
-<a class="sourceLine" id="cb244-28" data-line-number="28"><span class="co">#&gt; 14 coef_regression2_s… suppressWarnings(summary(regression2_small))$coeffi…</span></a>
-<a class="sourceLine" id="cb244-29" data-line-number="29"><span class="co">#&gt; 15 coef_regression2_l… suppressWarnings(summary(regression2_large))$coeffi…</span></a>
-<a class="sourceLine" id="cb244-30" data-line-number="30"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb244-31" data-line-number="31"><span class="co">#&gt; Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be</span></a>
-<a class="sourceLine" id="cb244-32" data-line-number="32"><span class="co">#&gt; inspected for dependencies.</span></a>
-<a class="sourceLine" id="cb244-33" data-line-number="33"><span class="co">#&gt; Warning: missing input files:</span></a>
-<a class="sourceLine" id="cb244-34" data-line-number="34"><span class="co">#&gt;   report.Rmd</span></a>
-<a class="sourceLine" id="cb244-35" data-line-number="35"><span class="co">#&gt; target report</span></a>
-<a class="sourceLine" id="cb244-36" data-line-number="36"><span class="co">#&gt; Warning: Missing files for target report:</span></a>
-<a class="sourceLine" id="cb244-37" data-line-number="37"><span class="co">#&gt;   report.md</span></a>
-<a class="sourceLine" id="cb244-38" data-line-number="38"><span class="co">#&gt; Warning: target report warnings:</span></a>
-<a class="sourceLine" id="cb244-39" data-line-number="39"><span class="co">#&gt;   cannot open file &#39;report.Rmd&#39;: No such file or directory</span></a>
-<a class="sourceLine" id="cb244-40" data-line-number="40"><span class="co">#&gt; fail report</span></a>
-<a class="sourceLine" id="cb244-41" data-line-number="41"><span class="co">#&gt; Error: Target `report` failed. Call `diagnose(report)` for details. Error message:</span></a>
-<a class="sourceLine" id="cb244-42" data-line-number="42"><span class="co">#&gt;   cannot open the connection</span></a>
-<a class="sourceLine" id="cb244-43" data-line-number="43"><span class="kw">readd</span>(letter)</a>
-<a class="sourceLine" id="cb244-44" data-line-number="44"><span class="co">#&gt; Error: key &#39;letter&#39; (&#39;objects&#39;) not found</span></a></code></pre></div>
+<a class="sourceLine" id="cb244-6" data-line-number="6"><span class="co">#&gt; Warning: argument list is deprecated.</span></a>
+<a class="sourceLine" id="cb244-7" data-line-number="7"><span class="co">#&gt; Error in enexpr(expr): object &#39;little_b&#39; not found</span></a>
+<a class="sourceLine" id="cb244-8" data-line-number="8">my_plan</a>
+<a class="sourceLine" id="cb244-9" data-line-number="9"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
+<a class="sourceLine" id="cb244-10" data-line-number="10"><span class="co">#&gt;    target              command                                             </span></a>
+<a class="sourceLine" id="cb244-11" data-line-number="11"><span class="co">#&gt;    &lt;chr&gt;               &lt;expr&gt;                                              </span></a>
+<a class="sourceLine" id="cb244-12" data-line-number="12"><span class="co">#&gt;  1 report              knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;),…</span></a>
+<a class="sourceLine" id="cb244-13" data-line-number="13"><span class="co">#&gt;  2 small               simulate(48)                                       …</span></a>
+<a class="sourceLine" id="cb244-14" data-line-number="14"><span class="co">#&gt;  3 large               simulate(64)                                       …</span></a>
+<a class="sourceLine" id="cb244-15" data-line-number="15"><span class="co">#&gt;  4 regression1_small   reg1(small)                                        …</span></a>
+<a class="sourceLine" id="cb244-16" data-line-number="16"><span class="co">#&gt;  5 regression1_large   reg1(large)                                        …</span></a>
+<a class="sourceLine" id="cb244-17" data-line-number="17"><span class="co">#&gt;  6 regression2_small   reg2(small)                                        …</span></a>
+<a class="sourceLine" id="cb244-18" data-line-number="18"><span class="co">#&gt;  7 regression2_large   reg2(large)                                        …</span></a>
+<a class="sourceLine" id="cb244-19" data-line-number="19"><span class="co">#&gt;  8 summ_regression1_s… suppressWarnings(summary(regression1_small$residual…</span></a>
+<a class="sourceLine" id="cb244-20" data-line-number="20"><span class="co">#&gt;  9 summ_regression1_l… suppressWarnings(summary(regression1_large$residual…</span></a>
+<a class="sourceLine" id="cb244-21" data-line-number="21"><span class="co">#&gt; 10 summ_regression2_s… suppressWarnings(summary(regression2_small$residual…</span></a>
+<a class="sourceLine" id="cb244-22" data-line-number="22"><span class="co">#&gt; 11 summ_regression2_l… suppressWarnings(summary(regression2_large$residual…</span></a>
+<a class="sourceLine" id="cb244-23" data-line-number="23"><span class="co">#&gt; 12 coef_regression1_s… suppressWarnings(summary(regression1_small))$coeffi…</span></a>
+<a class="sourceLine" id="cb244-24" data-line-number="24"><span class="co">#&gt; 13 coef_regression1_l… suppressWarnings(summary(regression1_large))$coeffi…</span></a>
+<a class="sourceLine" id="cb244-25" data-line-number="25"><span class="co">#&gt; 14 coef_regression2_s… suppressWarnings(summary(regression2_small))$coeffi…</span></a>
+<a class="sourceLine" id="cb244-26" data-line-number="26"><span class="co">#&gt; 15 coef_regression2_l… suppressWarnings(summary(regression2_large))$coeffi…</span></a>
+<a class="sourceLine" id="cb244-27" data-line-number="27"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb244-28" data-line-number="28"><span class="co">#&gt; Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be</span></a>
+<a class="sourceLine" id="cb244-29" data-line-number="29"><span class="co">#&gt; inspected for dependencies.</span></a>
+<a class="sourceLine" id="cb244-30" data-line-number="30"><span class="co">#&gt; Warning: missing input files:</span></a>
+<a class="sourceLine" id="cb244-31" data-line-number="31"><span class="co">#&gt;   report.Rmd</span></a>
+<a class="sourceLine" id="cb244-32" data-line-number="32"><span class="co">#&gt; target report</span></a>
+<a class="sourceLine" id="cb244-33" data-line-number="33"><span class="co">#&gt; Warning: Missing files for target report:</span></a>
+<a class="sourceLine" id="cb244-34" data-line-number="34"><span class="co">#&gt;   report.md</span></a>
+<a class="sourceLine" id="cb244-35" data-line-number="35"><span class="co">#&gt; Warning: target report warnings:</span></a>
+<a class="sourceLine" id="cb244-36" data-line-number="36"><span class="co">#&gt;   cannot open file &#39;report.Rmd&#39;: No such file or directory</span></a>
+<a class="sourceLine" id="cb244-37" data-line-number="37"><span class="co">#&gt; fail report</span></a>
+<a class="sourceLine" id="cb244-38" data-line-number="38"><span class="co">#&gt; Error: Target `report` failed. Call `diagnose(report)` for details. Error message:</span></a>
+<a class="sourceLine" id="cb244-39" data-line-number="39"><span class="co">#&gt;   cannot open the connection</span></a>
+<a class="sourceLine" id="cb244-40" data-line-number="40"><span class="kw">readd</span>(letter)</a>
+<a class="sourceLine" id="cb244-41" data-line-number="41"><span class="co">#&gt; Error: key &#39;letter&#39; (&#39;objects&#39;) not found</span></a></code></pre></div>
 <p>For the commands you specify the free-form <code>...</code> argument, <code>drake_plan()</code> also supports tidy evaluation. For example, it supports quasiquotation with the <code>!!</code> argument. Use <code>tidy_eval = FALSE</code> or the <code>list</code> argument to suppress this behavior.</p>
 <div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb245-1" data-line-number="1">my_variable &lt;-<span class="st"> </span><span class="dv">5</span></a>
 <a class="sourceLine" id="cb245-2" data-line-number="2"></a>
@@ -471,33 +471,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb245-5" data-line-number="5">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb245-6" data-line-number="6">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>)</a>
 <a class="sourceLine" id="cb245-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb245-8" data-line-number="8"><span class="co">#&gt; Warning in drake_plan(a = !!my_variable, b = !!my_variable + 1, list = c(d</span></a>
-<a class="sourceLine" id="cb245-9" data-line-number="9"><span class="co">#&gt; = &quot;!!my_variable&quot;)): The `list` argument of `drake_plan()` is deprecated.</span></a>
-<a class="sourceLine" id="cb245-10" data-line-number="10"><span class="co">#&gt; Use the interface described at https://ropenscilabs.github.io/drake-manual/</span></a>
-<a class="sourceLine" id="cb245-11" data-line-number="11"><span class="co">#&gt; plans.html#large-plans.</span></a>
-<a class="sourceLine" id="cb245-12" data-line-number="12"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb245-13" data-line-number="13"><span class="co">#&gt;   target command</span></a>
-<a class="sourceLine" id="cb245-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
-<a class="sourceLine" id="cb245-15" data-line-number="15"><span class="co">#&gt; 1 a      5      </span></a>
-<a class="sourceLine" id="cb245-16" data-line-number="16"><span class="co">#&gt; 2 b      5 + 1  </span></a>
-<a class="sourceLine" id="cb245-17" data-line-number="17"><span class="co">#&gt; 3 d      5</span></a>
-<a class="sourceLine" id="cb245-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb245-19" data-line-number="19"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb245-20" data-line-number="20">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
-<a class="sourceLine" id="cb245-21" data-line-number="21">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb245-22" data-line-number="22">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),</a>
-<a class="sourceLine" id="cb245-23" data-line-number="23">  <span class="dt">tidy_eval =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb245-24" data-line-number="24">)</a>
-<a class="sourceLine" id="cb245-25" data-line-number="25"><span class="co">#&gt; Warning in drake_plan(a = !!my_variable, b = !!my_variable + 1, list = c(d</span></a>
-<a class="sourceLine" id="cb245-26" data-line-number="26"><span class="co">#&gt; = &quot;!!my_variable&quot;), : The `list` argument of `drake_plan()` is deprecated.</span></a>
-<a class="sourceLine" id="cb245-27" data-line-number="27"><span class="co">#&gt; Use the interface described at https://ropenscilabs.github.io/drake-manual/</span></a>
-<a class="sourceLine" id="cb245-28" data-line-number="28"><span class="co">#&gt; plans.html#large-plans.</span></a>
-<a class="sourceLine" id="cb245-29" data-line-number="29"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb245-30" data-line-number="30"><span class="co">#&gt;   target command                  </span></a>
-<a class="sourceLine" id="cb245-31" data-line-number="31"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                   </span></a>
-<a class="sourceLine" id="cb245-32" data-line-number="32"><span class="co">#&gt; 1 a      !!my_variable            </span></a>
-<a class="sourceLine" id="cb245-33" data-line-number="33"><span class="co">#&gt; 2 b      !!my_variable + 1        </span></a>
-<a class="sourceLine" id="cb245-34" data-line-number="34"><span class="co">#&gt; 3 d      expression(!!my_variable)</span></a></code></pre></div>
+<a class="sourceLine" id="cb245-8" data-line-number="8"><span class="co">#&gt; Warning: argument list is deprecated.</span></a>
+<a class="sourceLine" id="cb245-9" data-line-number="9"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
+<a class="sourceLine" id="cb245-10" data-line-number="10"><span class="co">#&gt;   target command</span></a>
+<a class="sourceLine" id="cb245-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
+<a class="sourceLine" id="cb245-12" data-line-number="12"><span class="co">#&gt; 1 a      5      </span></a>
+<a class="sourceLine" id="cb245-13" data-line-number="13"><span class="co">#&gt; 2 b      5 + 1  </span></a>
+<a class="sourceLine" id="cb245-14" data-line-number="14"><span class="co">#&gt; 3 d      5</span></a>
+<a class="sourceLine" id="cb245-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb245-16" data-line-number="16"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb245-17" data-line-number="17">  <span class="dt">a =</span> <span class="op">!!</span>my_variable,</a>
+<a class="sourceLine" id="cb245-18" data-line-number="18">  <span class="dt">b =</span> <span class="op">!!</span>my_variable <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb245-19" data-line-number="19">  <span class="dt">list =</span> <span class="kw">c</span>(<span class="dt">d =</span> <span class="st">&quot;!!my_variable&quot;</span>),</a>
+<a class="sourceLine" id="cb245-20" data-line-number="20">  <span class="dt">tidy_eval =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb245-21" data-line-number="21">)</a>
+<a class="sourceLine" id="cb245-22" data-line-number="22"><span class="co">#&gt; Warning: argument list is deprecated.</span></a>
+<a class="sourceLine" id="cb245-23" data-line-number="23"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
+<a class="sourceLine" id="cb245-24" data-line-number="24"><span class="co">#&gt;   target command                  </span></a>
+<a class="sourceLine" id="cb245-25" data-line-number="25"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                   </span></a>
+<a class="sourceLine" id="cb245-26" data-line-number="26"><span class="co">#&gt; 1 a      !!my_variable            </span></a>
+<a class="sourceLine" id="cb245-27" data-line-number="27"><span class="co">#&gt; 2 b      !!my_variable + 1        </span></a>
+<a class="sourceLine" id="cb245-28" data-line-number="28"><span class="co">#&gt; 3 d      expression(!!my_variable)</span></a></code></pre></div>
 <p>For instances of <code>!!</code> that remain in the <code>drake</code> plan, <code>make()</code> will run these commands in tidy fashion, evaluating the <code>!!</code> operator using the environment you provided.</p>
 </div>
 <div id="find-and-diagnose-your-errors." class="section level3">
@@ -611,10 +605,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb248-13" data-line-number="13">  )</a>
 <a class="sourceLine" id="cb248-14" data-line-number="14">)</a>
 <a class="sourceLine" id="cb248-15" data-line-number="15"><span class="kw">digest</span>(circle_class)</a>
-<a class="sourceLine" id="cb248-16" data-line-number="16"><span class="co">#&gt; [1] &quot;8c73cd67cef77962af4f728282178214&quot;</span></a>
+<a class="sourceLine" id="cb248-16" data-line-number="16"><span class="co">#&gt; [1] &quot;86cf6cda76e05730e3ea5bb2112bed1a&quot;</span></a>
 <a class="sourceLine" id="cb248-17" data-line-number="17">circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb248-18" data-line-number="18"><span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span></a>
-<a class="sourceLine" id="cb248-19" data-line-number="19"><span class="co">#&gt; [1] &quot;f54b8b0ea1299a209b00c0af78f1524e&quot;</span></a>
+<a class="sourceLine" id="cb248-19" data-line-number="19"><span class="co">#&gt; [1] &quot;883cc42af5682f64b81348e90f704dc7&quot;</span></a>
 <a class="sourceLine" id="cb248-20" data-line-number="20"><span class="kw">rm</span>(circle)</a></code></pre></div>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb249-1" data-line-number="1"><span class="kw">clean</span>()</a>
@@ -835,11 +829,13 @@ keys/config/c2VlZA (Sandy Sum's conflicted copy 2018-01-31)
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
