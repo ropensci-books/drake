@@ -14,7 +14,7 @@ library(tidyverse)
 invisible(drake_example("script-based-workflows", overwrite = TRUE))
 tmp <- file.copy(
   list.files("script-based-workflows/R/",
-             pattern = "*.R",full.names = TRUE),
+             pattern = "*.R", full.names = TRUE),
   ".",
   recursive = TRUE)
 tmp <- file.copy("script-based-workflows/raw_data.xlsx", ".")
@@ -31,9 +31,9 @@ That being said, not all projects and workflows are written using this mantra an
 
 ## Traditional and Legacy Workflows
 
-A common approach to creating workflows is to write steps of the analysis into scripts that perform specific tasks. By giving these scripts meaningful names, , e.g. 01_data.R, 02_munge.R, 03_analysis.R,  one can surmise both their contents and the order in which these scripts should be run.
+A common approach to creating workflows is to write steps of the analysis into scripts that perform specific tasks. By giving these scripts meaningful names, e.g. 01_data.R, 02_munge.R, 03_analysis.R,  one can surmise both their contents and the order in which these scripts should be run.
 
-It was acknowledged in the ("What we left out")[https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510#sec027] section that build tools to manage projects when code gets out of date are ideal, but can be substituted with a simple master script called `make.R` that reruns each of the scripts in order.
+It was acknowledged in the (What we left out)[https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510#sec027] section that build tools to manage projects when code gets out of date are ideal, but can be substituted with a simple master script called `make.R` that reruns each of the scripts in order.
 
 ```{r,eval=FALSE}
 
@@ -85,7 +85,7 @@ Lets convert all of these into functions via `code_to_function()` and put them i
 
 load_data <- code_to_function("01_data.R")
 do_munge  <- code_to_function("02_munge.R")
-generate_histogram <-code_to_function("03_histogram.R")
+generate_histogram <- code_to_function("03_histogram.R")
 
 simple_plan <- drake_plan(
   data     = load_data(),
@@ -170,7 +170,7 @@ By converting everything as a function and passing targets of the prior dependen
 load_data <- code_to_function("01_data.R")
 do_munge <- code_to_function("02_munge.R")
 do_histogram <- code_to_function("03_histogram.R")
-do_regression <- code_to_function("04_model.R")
+do_regression <- code_to_function("04_regression.R")
 generate_report <- code_to_function("05_report.R")
 
 # Create Drake Plan
@@ -179,10 +179,8 @@ script_based_plan <- drake_plan(
   munged_data = do_munge(data),
   hist        = do_histogram(munged_data),
   fit         = do_regression(munged_data),
-  report      = generate_report(hist,fit)
+  report      = generate_report(hist, fit)
 )
-
-make(script_based_plan)
 
 ```
 
@@ -190,7 +188,6 @@ make(script_based_plan)
 
 script_based_config <- drake_config(script_based_plan)
 vis_drake_graph(script_based_config, targets_only = TRUE)
-
 ```
 
 
