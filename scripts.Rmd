@@ -69,7 +69,9 @@ By turning these scripts into functions, they can be added into a `drake` plan f
 
 ## Dependencies
 
-An important aspect of drake plans is the capability to track the dependencies of each function and only rerun the parts of the plan that have updated, either in code or input. To take advantage of this feature, we will need to first generate a plan from loading the data to generating a histogram. In a normal non-`drake` workflow, the format might some something along the lines of the following.
+An important aspect of drake plans is the capability to track the dependencies of each function and only rerun the parts of the plan that have updated, either in code or input. Dependencies in the terms of `drake` means to rely on prior steps to have been run and generated output that will then be used in the current step. Any time the prior step updates, then any down-stream steps that rely on its outputs need to be updated.
+
+To take advantage of this feature, we will need to first generate a plan from loading the data to generating a histogram. In a normal non-`drake` workflow, the format might some something along the lines of the following.
 
 ```{r eval=FALSE}
 
@@ -165,7 +167,7 @@ generate_report <- code_to_function("05_report.R")
 
 By converting everything as a function and passing targets of the prior dependencies, `drake` is able track dependencies and when make.R is rerun, only the updated scripts will be rerun.
 
-```{r echo=FALSE}
+```{r echo=FALSE,message=FALSE}
 # Convert Script based workflow to functions
 load_data <- code_to_function("01_data.R")
 do_munge <- code_to_function("02_munge.R")
@@ -182,6 +184,7 @@ script_based_plan <- drake_plan(
   report      = generate_report(hist, fit)
 )
 
+make(script_based_plan)
 ```
 
 ```{r}
@@ -191,7 +194,58 @@ vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
 
 
-Any time a script is updated, either `functions.R` can be sourced again to update the representative function, or the specific `code_to_function()` line can be rerun. `drake` can see that the function is updated and when `make()` is called, it will rerun the updated function and all dependencies. 
+Any time a script is updated, either `functions.R` can be sourced again to update the representative function, or the specific `code_to_function()` line can be rerun. `drake` can see that the function is updated and when `make()` is called, it will rerun the updated function and all down-stream functions that rely on the output. 
+
+For example, if in "03_histogram.R" were to be updated so the `binwidth` of the histogram was now `0.5` as opposed to the original `0.25`, for `drake` to detect that the script has been updated, exectute `code_to_function()` on the script.
+
+```{r echo=FALSE}
+writeLines(
+  c("munged_data <- readRDS(\"data/munged_data.RDS\")",
+    "gg <- munged_data %>%",
+    "ggplot() +",
+    "geom_histogram(",
+    "  aes(",
+    "    x = Petal.Width,",
+    "    fill = Species",
+    "    ),",
+    "  binwidth = 0.5) +",
+    "  theme_gray(20)",
+    "ggsave(",
+    "filename = \"data/Petal_Width_vs_Species.PNG\",",
+    "plot = gg",
+    ")",
+    "saveRDS(gg, \"data/Petal_Width_vs_Species.RDS\")"),
+  "03_histogram.R"
+  )
+
+```
+
+```{r}
+# "03_historgram.R" has been updated with a new bin-width of 0.5. Re-running 
+# code_to_function()` to generate the the new function is required for
+# `drake` to recognize that the script has been updated. 
+do_histogram <- code_to_function("03_histogram.R")
+```
+
+`drake` has now marked both `hist` and `report` as outdated, as the function that generates `hist` has been updated, and since `generate_report()` depends on `hist`, it also has been outdated.
+
+```{r echo=FALSE,message=FALSE}
+outdated_targets<-outdated(script_based_config)
+#needs to be run, for some reason `drake` is not recognizing the update when compiling
+vis_drake_graph(script_based_config, targets_only = TRUE)
+```
+
+When `make()` is now called, `drake` will rerun only `do_histogram()` to update `hist`, and `generate_report()` since it depends on `hist`.
+
+```{r}
+make(script_based_plan)
+```
+
+The dependency graph is now all up to date!
+
+```{r, echo=FALSE}
+vis_drake_graph(script_based_config, targets_only = TRUE)
+```
 
 
 ## `drake` and scripts
