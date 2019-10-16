@@ -50,7 +50,7 @@
 
 
 
-<script src="libs/htmlwidgets-1.5/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.8/visNetwork.js"></script>
@@ -873,7 +873,7 @@ when <code>drake</code> saves the target.</li>
 <a class="sourceLine" id="cb45-12" data-line-number="12"><span class="co">#&gt; 3 x_0_1  simulate_data(0, 1)</span></a></code></pre></div>
 <p>You can supply your own custom grid using the <code>.data</code> argument. Note the use of <code>!!</code> below.</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">my_grid &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb46-2" data-line-number="2">  <span class="dt">sim_function =</span> <span class="kw">c</span>(<span class="st">&quot;rnrom&quot;</span>, <span class="st">&quot;rt&quot;</span>, <span class="st">&quot;rcauchy&quot;</span>),</a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">  <span class="dt">sim_function =</span> <span class="kw">c</span>(<span class="st">&quot;rnorm&quot;</span>, <span class="st">&quot;rt&quot;</span>, <span class="st">&quot;rcauchy&quot;</span>),</a>
 <a class="sourceLine" id="cb46-3" data-line-number="3">  <span class="dt">title =</span> <span class="kw">c</span>(<span class="st">&quot;Normal&quot;</span>, <span class="st">&quot;Student t&quot;</span>, <span class="st">&quot;Cauchy&quot;</span>)</a>
 <a class="sourceLine" id="cb46-4" data-line-number="4">)</a>
 <a class="sourceLine" id="cb46-5" data-line-number="5">my_grid<span class="op">$</span>sim_function &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(my_grid<span class="op">$</span>sim_function)</a>
@@ -895,7 +895,7 @@ when <code>drake</code> saves the target.</li>
 <a class="sourceLine" id="cb46-21" data-line-number="21"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
 <a class="sourceLine" id="cb46-22" data-line-number="22"><span class="co">#&gt;   target    command                               </span></a>
 <a class="sourceLine" id="cb46-23" data-line-number="23"><span class="co">#&gt;   &lt;chr&gt;     &lt;expr&gt;                                </span></a>
-<a class="sourceLine" id="cb46-24" data-line-number="24"><span class="co">#&gt; 1 x_rnrom   simulate_data(rnrom, &quot;Normal&quot;, 2, 3)  </span></a>
+<a class="sourceLine" id="cb46-24" data-line-number="24"><span class="co">#&gt; 1 x_rnorm   simulate_data(rnorm, &quot;Normal&quot;, 2, 3)  </span></a>
 <a class="sourceLine" id="cb46-25" data-line-number="25"><span class="co">#&gt; 2 x_rt      simulate_data(rt, &quot;Student t&quot;, 1, 2)  </span></a>
 <a class="sourceLine" id="cb46-26" data-line-number="26"><span class="co">#&gt; 3 x_rcauchy simulate_data(rcauchy, &quot;Cauchy&quot;, 0, 1)</span></a></code></pre></div>
 </div>
@@ -926,7 +926,7 @@ when <code>drake</code> saves the target.</li>
 <a class="sourceLine" id="cb48-10" data-line-number="10"><span class="co">#&gt; 1 x_2_4  simulate_data(2, 4)</span></a>
 <a class="sourceLine" id="cb48-11" data-line-number="11"><span class="co">#&gt; 2 x_1_4  simulate_data(1, 4)</span></a>
 <a class="sourceLine" id="cb48-12" data-line-number="12"><span class="co">#&gt; 3 x_0_4  simulate_data(0, 4)</span></a></code></pre></div>
-<p>Things get tricker when <code>drake</code> reuses grouping variables from previous transformations. For example, below, each <code>x_*</code> target has an associated <code>nrow</code> value. So if you write <code>transform = map(x)</code>, then <code>nrow</code> goes along for the ride.</p>
+<p>Things get tricker when <code>drake</code> reuses grouping variables from previous transformations. For example, below, each <code>x_*</code> target has an associated <code>center</code> value. So if you write <code>transform = map(x)</code>, then <code>center</code> goes along for the ride.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
 <a class="sourceLine" id="cb49-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
 <a class="sourceLine" id="cb49-3" data-line-number="3">    <span class="kw">simulate_data</span>(center),</a>
