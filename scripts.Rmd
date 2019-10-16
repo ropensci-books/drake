@@ -97,8 +97,8 @@ source("05_report.R")
 
 # R/functions.R
 load_data <- code_to_function("01_data.R")
-do_munge <- code_to_function("02_munge.R")
-do_histogram <- code_to_function("03_histogram.R")
+munge_data <- code_to_function("02_munge.R")
+make_histogram <- code_to_function("03_histogram.R")
 do_regression <- code_to_function("04_regression.R")
 generate_report <- code_to_function("05_report.R")
 ```
@@ -138,7 +138,7 @@ Instead, we can use the functions of the scripts that were generated via
 
 simple_plan <- drake_plan(
   data        = load_data(),
-  munged_data = do_munge(),
+  munged_data = munge_data(),
   hist        = generate_histogram()
 )
 
@@ -172,7 +172,7 @@ generated functions as arguments in the dependent script-functions.
 
 simple_plan <- drake_plan(
   data     = load_data(),
-  munged_data = do_munge(data),
+  munged_data = munge_data(data),
   hist     = generate_histogram(munged_data)
 )
 ```
@@ -199,8 +199,8 @@ source("R/functions.R")
 # Create drake Plan
 script_based_plan <- drake_plan(
   data        = load_data(),
-  munged_data = do_munge(data),
-  hist        = do_histogram(munged_data),
+  munged_data = munge_data(data),
+  hist        = make_histogram(munged_data),
   fit         = do_regression(munged_data),
   report      = generate_report(hist, fit)
 )
@@ -218,8 +218,8 @@ only the updated scripts will be rerun.
 # Create Drake Plan
 script_based_plan <- drake_plan(
   data        = load_data(),
-  munged_data = do_munge(data),
-  hist        = do_histogram(munged_data),
+  munged_data = munge_data(data),
+  hist        = make_histogram(munged_data),
   fit         = do_regression(munged_data),
   report      = generate_report(hist, fit)
 )
@@ -270,7 +270,7 @@ writeLines(
 # "03_historgram.R" has been updated with a new bin-width of 0.5. Re-running 
 # code_to_function()` to generate the the new function is required for
 # `drake` to recognize that the script has been updated. 
-do_histogram <- code_to_function("03_histogram.R")
+make_histogram <- code_to_function("03_histogram.R")
 ```
 
 `drake` has now marked both `hist` and `report` as outdated, as the function 
@@ -283,7 +283,7 @@ outdated_targets<-outdated(script_based_config)
 vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
 
-When `make()` is now called, `drake` will rerun only `do_histogram()` to update
+When `make()` is now called, `drake` will rerun only `make_histogram()` to update
 `hist`, and `generate_report()` since it depends on `hist`.
 
 ```{r}
