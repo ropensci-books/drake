@@ -23,8 +23,7 @@ dir.create("data")
 ```
 ## Function-oriented workflows
 
-`drake` was built around the idea that writing functions for data analysis allows
-the author to break down complicated ideas into manageable pieces.
+`drake` works best when you write functions for data analysis. Functions break down complicated ideas into manageable pieces.
 
 ```{r}
 # R/functions.R
@@ -59,13 +58,13 @@ plan <- drake_plan(
 This function-oriented approach is elegant, powerful, testable, scalable, and 
 maintainable. However, it can be challenging to convert pre-existing traditional
 script-based analyses to function-oriented `drake`-powered workflows. This
-chapter describes a stopgap that quickly retrofits `drake` and functions onto
-existing projects without needing to change the original underlying scripts with
-minimal overhead.
+chapter describes a stopgap to retrofit drake and functions onto existing 
+projects. It is quick and painless, and you do not need to change your original 
+scripts.
 
 ## Traditional and Legacy Workflows
 
-The common approach to express data analysis tasks is in numbered scripts.
+It is common to express data analysis tasks in numbered scripts.
 
 ```
 01_data.R
@@ -75,7 +74,7 @@ The common approach to express data analysis tasks is in numbered scripts.
 05_report.R
 ```
 
-The numeric prefixes are used to indicate the order in which these scripts
+The numeric prefixes indicate the order in which these scripts
 should be run.
 
 ```{r,eval=FALSE}
@@ -91,7 +90,7 @@ source("05_report.R")
 
 ## Overcoming Technical Debt
 
-`code_to_function()` can create a `drake`-plan-ready from each numbered script.
+`code_to_function()` creates `drake_plan()`-ready functions from scripts like these.
 
 ```{r}
 
@@ -103,8 +102,8 @@ do_regression <- code_to_function("04_regression.R")
 generate_report <- code_to_function("05_report.R")
 ```
 
-The newly created script-functions contain all the executable code from each of
-scripts that they are based off of.
+Each function contains all the code from its corresponding script. And when you
+run it, it never returns the same value twice.
 
 ```{r}
 print(load_data)
@@ -112,40 +111,34 @@ print(load_data)
 
 ## Dependencies
 
-An important aspect of `drake` plans is the capability to track the dependencies 
-of each function and only rerun the parts of the plan that have updated, either
-in code or input. In `drake`, a target's dependencies are the things it needs
-in order to build. Dependencies can include functions, files, and other targets
-upstream. Any time the prior step updates, then any down-stream steps that rely 
-on its outputs need to be updated.
+`drake` pays close attention to dependencies. In `drake`, a target's dependencies 
+are the things it needs in order to build. Dependencies can include functions,
+files, and other targets upstream. Any time the one of those dependencies 
+changes, the target is no longer valid. The `make()` function automatically 
+detects when dependencies change, and it rebuilds the targets that need to 
+rebuild.
 
-To take advantage of this feature, we will need to first generate a plan from 
-loading the data to generating a histogram. In a normal non-`drake` workflow,
-the format might some something along the lines of the following.
+To leverage drake's dependency-watching capabilities, we first need to create a
+plan. This plan should include all the steps of the analysis, from loading the 
+data to generating a report.
 
-```{r eval=FALSE}
-
-source("01_data.R")
-source("02_munge.R")
-source("03_histogram.R")
-
-```
-
-Instead, we can use the functions of the scripts that were generated via
-`code_to_function()` and generate a `drake` plan.
+To write the plan, we plug in the functions we created from `code_to_function()`.
 
 ```{r}
 
 simple_plan <- drake_plan(
   data        = load_data(),
   munged_data = munge_data(),
-  hist        = make_histogram()
+  hist        = make_histogram(),
+  fit         = do_regression(),
+  report      = generate_report()
 )
 
 ```
 
 This looks good and dandy, but right now `drake` has no idea which part to run 
-first, and which targets depend on the outputs of the next!
+first, and which targets depend on the outputs of the next! Note that there are
+no edges (arrows) connecting the nodes that represent the targets in the graph!
 
 ```{r}
 
@@ -157,93 +150,45 @@ vis_drake_graph(simple_config)
 
 ## Building the connections
 
-If we know which scripts need to be run before others, we use `targets` to 
-indicate to `drake` the order each function need to be evaluated by passing 
-targets as arguments in functions. 
+Just as the scripts needed to run in a certain order, so do our targets now. We
+pass targets as function arguments to express this execution order.
 
-In the case described above, the final script, "03_histogram.R", generates a 
-plot of a histogram using the data generated from "02_munge.R", which relies on
-"01_data.R" to load the data. "01_data.R" is the first script that needs to be
-evaluated and does not rely on any other inputs. 
+For example, when we write `munged_data = munge_data(data)`, we are signaling to
+`drake` that the `munged_data` target depends on the function `munge_data()` and 
+the target data.
 
 We can apply the same logic by passing the targets of the `code_to_function()`
 generated functions as arguments in the dependent script-functions.
 
 ```{r}
 
-simple_plan <- drake_plan(
-  data     = load_data(),
+script_based_plan <- drake_plan(
+  data        = load_data(),
   munged_data = munge_data(data),
-  hist     = make_histogram(munged_data)
+  hist        = make_histogram(munged_data),
+  fit         = do_regression(munged_data),
+  report      = generate_report(hist, fit)
 )
 ```
 
 ```{r echo=FALSE}
 
-simple_config <- drake_config(simple_plan)
-vis_drake_graph(simple_config)
-
-```
-
-
-## Putting it all together
-
-Using the first example of a make script in this chapter as the framework, the
-new script that evaluates the entire workflow would look as follows.
-
-```{r eval=FALSE}
-
-# R/make.R
-
-source("R/functions.R")
-
-# Create drake Plan
-script_based_plan <- drake_plan(
-  data        = load_data(),
-  munged_data = munge_data(data),
-  hist        = make_histogram(munged_data),
-  fit         = do_regression(munged_data),
-  report      = generate_report(hist, fit)
-)
-
-make(script_based_plan)
-
-```
-
-By converting the scripts to functions and passing targets of the prior 
-dependencies, `drake` is able track dependencies and when make.R is rerun,
-only the updated scripts will be rerun.
-
-```{r echo=FALSE,message=FALSE}
-
-# Create Drake Plan
-script_based_plan <- drake_plan(
-  data        = load_data(),
-  munged_data = munge_data(data),
-  hist        = make_histogram(munged_data),
-  fit         = do_regression(munged_data),
-  report      = generate_report(hist, fit)
-)
-
-make(script_based_plan)
-```
-
-```{r}
-
 script_based_config <- drake_config(script_based_plan)
-vis_drake_graph(script_based_config, targets_only = TRUE)
+vis_drake_graph(script_based_config)
+
 ```
 
 
-Any time a script is updated, either `functions.R` can be sourced again to 
-update the representative function, or the specific `code_to_function()` line 
-can be rerun. `drake` can see that the function is updated and when `make()` 
-is called, it will rerun the updated function and all down-stream functions that
-rely on the output. 
+## Keeping up to date
 
-For example, if in "03_histogram.R" were to be updated so the `binwidth` of the 
-histogram was now `0.5` as opposed to the original `0.25`, for `drake` to detect
-that the script has been updated, execute `code_to_function()` on the script.
+Any time we change a script, we need to run `code_to_function()` again to make 
+sure we have an up-to-date script-function. `drake` can see that the function is 
+updated and when `make()` is called, it will rerun the updated function and all
+down-stream functions that rely on the output. 
+
+For example, let's fine tune our histogram. We open 03_histogram.R, change the 
+binwidth argument from 0.5 to 0.25, and call code_to_function("03_histogram.R")
+all over again.
 
 ```{r echo=FALSE}
 writeLines(
@@ -268,15 +213,12 @@ writeLines(
 ```
 
 ```{r}
-# "03_historgram.R" has been updated with a new bin-width of 0.5. Re-running 
-# code_to_function()` to generate the the new function is required for
-# `drake` to recognize that the script has been updated. 
+# We need to rerun code_to_function() to tell drake that the script changed.
 make_histogram <- code_to_function("03_histogram.R")
 ```
 
-`drake` has now marked both `hist` and `report` as outdated, as the function 
-that generates `hist` has been updated, and since `generate_report()` depends on
-`hist`, it also has been outdated.
+Targets `hist` and `report` depend on the code we modified, so `drake` marks 
+those targets as outdated.
 
 ```{r echo=FALSE,message=FALSE}
 outdated_targets<-outdated(script_based_config)
@@ -284,8 +226,9 @@ outdated_targets<-outdated(script_based_config)
 vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
 
-When `make()` is now called, `drake` will rerun only `make_histogram()` to update
-`hist`, and `generate_report()` since it depends on `hist`.
+When you call `make()`, `drake` runs `make_histogram()` because the underlying 
+cript changed, and it runs `generate_report()` because the report depends on 
+`hist`.
 
 ```{r}
 make(script_based_plan)
@@ -300,19 +243,16 @@ vis_drake_graph(script_based_config, targets_only = TRUE)
 
 ## `drake` and scripts
 
-Hopefully this chapter gave some insight on how to use the `code_to_function()`
-functionality available in `drake`. `code_to_function()`is a quick and dirty way
-to retrofit `drake` to an existing script-based project. _This approach should
-only be taken when re-factoring the workflow into functions is determined to be
-unfeasible._ `code_to_function()` was developed to overcome the issue that a
-number of preexisting data science workflows consist of imperative scripts that 
-are numbered in their order of execution and have a naive make script that 
-executes every single script when it is run without regard to updates. `drake`
-overcomes this problem of repeated work.
+> A large number of preexisting data science workflows consist of numbered,
+imperative scripts. Many such projects are already too big and cumbersome to
+seriously refactor. The purpose of `code_to_function()` is to quickly and 
+painlessly allow `drake` to accommodate these situations.
+ 
+However, for new projects, we strongly recommend that you write functions.
+Functions help organize your thoughts, and they improve portability, readability,
+and compatibility with `drake`. For a deeper discussion of functions and their
+role in `drake`, consider watching the 
+[webinar recording of the 2019-09-23 rOpenSci Community Call](https://ropensci.org/commcalls/2019-09-24).
 
-All this being said, `drake` still assumes you write *functions* as opposed to 
-scripts to help organize thoughts and improve portability and readability. When 
-feasible, it is suggested to re-work existing workflows into factors. There is 
-currently a package available on called
-[`Rclean`](https://github.com/provtools/rclean) that can help with re-factoring 
-scripts into functions. 
+Even old projects are sometimes pliable enough to refactor into functions,
+especially with the new [`Rclean`](https://github.com/provtools/rclean) package.
