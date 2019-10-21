@@ -65,7 +65,7 @@ visNetwork(nodes = legend_nodes())
 
 ### `drake_ggraph()`
 
-`drake_ggraph()` can handle larger workflows than the other graphing functions. If your project has thousands of targets and `vis_drake_graph()`/`sankey_drake_graph()` does not render properly, consider `drake_ggraph()`. Powered by [`ggraph`](https://github.com/thomasp85/ggraph), `drake_ggraph()`s are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`. 
+`drake_ggraph()` can handle larger workflows than the other graphing functions. If your project has thousands of targets and `vis_drake_graph()`/`sankey_drake_graph()` does not render properly, consider `drake_ggraph()`. Powered by [`ggraph`](https://github.com/thomasp85/ggraph), `drake_ggraph()`s are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`.
 
 ```{r}
 drake_ggraph(config)
@@ -78,7 +78,7 @@ If you are running R in a terminal without [X Window](https://en.wikipedia.org/w
 ```{r}
 # Use nchar = 0 or nchar = 1 for better results.
 # The color display is better in your own terminal.
-text_drake_graph(config, nchar = 3) 
+text_drake_graph(config, nchar = 3)
 ```
 
 
@@ -229,17 +229,19 @@ vis_drake_graph(
 
 ## Node Selection
 
+*(Supported in drake > 7.7.0, non-inclusive)*
+
 First, we define our plan, adding a custom column named "link".
 
 ```{r}
-mtcars_link <- 
+mtcars_link <-
   "https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html"
-iris_link <- 
+iris_link <-
   "https://archive.ics.uci.edu/ml/datasets/iris"
-iris3_link <- 
+iris3_link <-
   "https://www.rdocumentation.org/packages/datasets/versions/3.6.1/topics/iris"
 
-plan <- drake::drake_plan(
+plan <- drake_plan(
   mtc = target(
     mtcars,
     link = !!mtcars_link
@@ -257,43 +259,52 @@ plan <- drake::drake_plan(
 )
 ```
 ```{r}
-config <- drake::drake_config(plan)
+config <- drake_config(plan)
 unique_stems <- unique(plan$cluster_id)
 ```
 
 
 ### Perform the default action on select
 
-By supplying `on_select = TRUE`, `vis_drake_graph()` knows to treat values in
-the column given by `on_select_col` as hyperlinks.
+By supplying `vis_drake_graph(on_select = TRUE, on_select_col = "my_column")`,
+treats the values in the `on_select_col` as hyperlinks.
 
 ```{r}
-drake::vis_drake_graph(config, clusters = unique_stems, group = "cluster_id",
-                       hover = FALSE, on_select_col = "link", on_select = TRUE)
+vis_drake_graph(
+  config,
+  clusters = unique_stems,
+  group = "cluster_id",
+  on_select_col = "link",
+  on_select = TRUE
+)
 ```
 
 ### Perform no action on select
 
-By supplying `on_select = NULL`, no action will be taken when a node is
-clicked. 
+No action will be taken if any of the following are given to
+`vis_drake_graph()`:
 
-This is the default behaviour.  
+- `on_select = NULL`,
+- `on_select = FALSE`,
+- `on_select_col = NULL`
 
-Supplying `on_select = FALSE` is equivalent to this.
+This is the default behaviour.
+
 ```{r}
-drake::vis_drake_graph(config, clusters = unique_stems, hover = FALSE, 
-                       on_select_col = "link", on_select = NULL)
+vis_drake_graph(
+  config,
+  clusters = unique_stems,
+  group = "cluster_id",
+  on_select_col = "link",
+  on_select = NULL
+)
 ```
 
 
 ### Customize the onSelect event behaviour
 
-What if we instead wanted the browser to display an alert when a node is 
+What if we instead wanted the browser to display an alert when a node is
 clicked?
-
-(Any good web developer knows that action blocking browser alerts provide
-the best and most conveninent user experience **;)** )
-
 
 ```{r}
 alert_behaviour <- function(){
@@ -304,9 +315,11 @@ alert_behaviour <- function(){
   }"
 }
 
-drake::vis_drake_graph(config, clusters = unique_stems, group = "cluster_id",
-                       hover = FALSE, on_select_col = "link",
-                       on_select = alert_behaviour())
+vis_drake_graph(
+  config,
+  on_select_col = "link",
+  on_select = alert_behaviour()
+)
 ```
 
 
