@@ -42,9 +42,8 @@ fit_model <- function(munged_data){
 ```
 
 By turning the steps of processing into functions like `get_data()`, `munge_data()`, 
-and `fit_model()`, they become special shorthand that make the plan easier to
-read and understand exactly what is being done.
-
+and `fit_model()`, we create special shorthand to make the rest of our code
+easier to read and understand.
 
 ```{r}
 # R/plan.R
@@ -58,11 +57,11 @@ plan <- drake_plan(
 This function-oriented approach is elegant, powerful, testable, scalable, and 
 maintainable. However, it can be challenging to convert pre-existing traditional
 script-based analyses to function-oriented `drake`-powered workflows. This
-chapter describes a stopgap to retrofit drake and functions onto existing 
+chapter describes a stopgap to retrofit `drake` and functions onto existing 
 projects. It is quick and painless, and you do not need to change your original 
 scripts.
 
-## Traditional and Legacy Workflows
+## Traditional and legacy workflows
 
 It is common to express data analysis tasks in numbered scripts.
 
@@ -136,8 +135,8 @@ simple_plan <- drake_plan(
 
 ```
 
-This looks good and dandy, but right now `drake` has no idea which part to run 
-first, and which targets depend on the outputs of the next! Note that there are
+It's a start, but right now `drake` has no idea which part to run 
+first and which targets depend on the outputs of the next! Note that there are
 no edges (arrows) connecting the nodes that represent the targets in the graph!
 
 ```{r}
@@ -178,8 +177,17 @@ vis_drake_graph(script_based_config)
 
 ```
 
+## Run the workflow
 
-## Keeping up to date
+The workflow can now be run using the `make()` function on the plan.
+
+```{r}
+
+make(script_based_plan)
+
+```
+
+## Keeping the results up to date
 
 Any time we change a script, we need to run `code_to_function()` again to make 
 sure we have an up-to-date script-function. `drake` can see that the function is 
@@ -221,7 +229,7 @@ Targets `hist` and `report` depend on the code we modified, so `drake` marks
 those targets as outdated.
 
 ```{r echo=FALSE,message=FALSE}
-outdated_targets<-outdated(script_based_config)
+outdated_targets <- outdated(script_based_config)
 #needs to be run, for some reason `drake` is not recognizing the update when compiling
 vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
@@ -240,13 +248,11 @@ The dependency graph is now all up to date!
 vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
 
+## Final thoughts
 
-## `drake` and scripts
-
-> A large number of preexisting data science workflows consist of numbered,
-imperative scripts. Many such projects are already too big and cumbersome to
-seriously refactor. The purpose of `code_to_function()` is to quickly and 
-painlessly allow `drake` to accommodate these situations.
+A large number of preexisting data science workflows consist of numbered,
+imperative scripts. `code_to_function()` lets drake to accommodate script-based 
+projects too big and cumbersome to refactor.
  
 However, for new projects, we strongly recommend that you write functions.
 Functions help organize your thoughts, and they improve portability, readability,
