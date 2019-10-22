@@ -234,7 +234,7 @@ drake_plan(
 )
 ```
 
-### Memory
+### Memory options
 
 By default, `make()` keeps targets in memory during runtime. Some targets are dependencies of other targets downstream, while others may be no longer actually need to be in memory. The `memory_strategy` argument to `make()` allows you to choose the tradeoff that best suits your project. Options:
 
@@ -242,7 +242,7 @@ By default, `make()` keeps targets in memory during runtime. Some targets are de
 - `"memory"`: Just before building each new target, unload everything from memory except the target's direct dependencies. This option conserves memory, but it sacrifices speed because each new target needs to reload any previously unloaded targets from storage.
 - `"lookahead"`: Just before building each new target, search the dependency graph to find targets that will not be needed for the rest of the current `make()` session. In this mode, targets are only in memory if they need to be loaded, and we avoid superfluous reads from the cache. However, searching the graph takes time, and it could even double the computational overhead for large projects.
 
-### Storage
+### Storage options
 
 In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. `caching = "master"` is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
 
