@@ -21,8 +21,8 @@
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="twitter:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
 
-<meta name="author" content="Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert" />
 <meta name="author" content="Copyright Eli Lilly and Company" />
+<meta name="author" content="Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert, Matthew Mark Strasiotto" />
 
 
 
@@ -306,6 +306,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.4" data-path="visuals.html"><a href="visuals.html#control-the-vis_drake_graph-legend."><i class="fa fa-check"></i><b>13.4</b> Control the <code>vis_drake_graph()</code> legend.</a></li>
 <li class="chapter" data-level="13.5" data-path="visuals.html"><a href="visuals.html#clusters"><i class="fa fa-check"></i><b>13.5</b> Clusters</a></li>
 <li class="chapter" data-level="13.6" data-path="visuals.html"><a href="visuals.html#output-files"><i class="fa fa-check"></i><b>13.6</b> Output files</a></li>
+<li class="chapter" data-level="13.7" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>13.7</b> Node Selection</a><ul>
+<li class="chapter" data-level="13.7.1" data-path="visuals.html"><a href="visuals.html#perform-the-default-action-on-select"><i class="fa fa-check"></i><b>13.7.1</b> Perform the default action on select</a></li>
+<li class="chapter" data-level="13.7.2" data-path="visuals.html"><a href="visuals.html#perform-no-action-on-select"><i class="fa fa-check"></i><b>13.7.2</b> Perform no action on select</a></li>
+<li class="chapter" data-level="13.7.3" data-path="visuals.html"><a href="visuals.html#customize-the-onselect-event-behaviour"><i class="fa fa-check"></i><b>13.7.3</b> Customize the onSelect event behaviour</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="14" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>14</b> Debugging and testing drake projects</a><ul>
 <li class="chapter" data-level="14.0.1" data-path="debugging.html"><a href="debugging.html#start-small-2"><i class="fa fa-check"></i><b>14.0.1</b> Start small</a></li>
@@ -440,19 +445,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Functions <code>drake_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
 <div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb182-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</a>
 <a class="sourceLine" id="cb182-2" data-line-number="2">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb182-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/RtmpjcrLBo/file2ee477994746/.drake&quot;</span></a>
+<a class="sourceLine" id="cb182-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/RtmpYZB5FA/file2ebc6d4d2211/.drake&quot;</span></a>
 <a class="sourceLine" id="cb182-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb182-5" data-line-number="5">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></a>
 <a class="sourceLine" id="cb182-6" data-line-number="6">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb182-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/RtmpjcrLBo/file2ee477994746/.drake&quot;</span></a>
+<a class="sourceLine" id="cb182-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/RtmpYZB5FA/file2ebc6d4d2211/.drake&quot;</span></a>
 <a class="sourceLine" id="cb182-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb182-9" data-line-number="9">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)</a>
 <a class="sourceLine" id="cb182-10" data-line-number="10">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb182-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/RtmpjcrLBo/file2ee477994746/.drake&quot;</span></a>
+<a class="sourceLine" id="cb182-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/RtmpYZB5FA/file2ebc6d4d2211/.drake&quot;</span></a>
 <a class="sourceLine" id="cb182-12" data-line-number="12"></a>
 <a class="sourceLine" id="cb182-13" data-line-number="13">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)</a>
 <a class="sourceLine" id="cb182-14" data-line-number="14">cache2<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb182-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/RtmpjcrLBo/file2ee477994746/my_new_cache&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb182-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/RtmpYZB5FA/file2ebc6d4d2211/my_new_cache&quot;</span></a></code></pre></div>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1">cache2<span class="op">$</span><span class="kw">list</span>()</a>
 <a class="sourceLine" id="cb183-2" data-line-number="2"><span class="co">#&gt; character(0)</span></a>
@@ -468,7 +473,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb183-12" data-line-number="12">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> plan2, <span class="dt">cache =</span> cache2)</a>
 <a class="sourceLine" id="cb183-13" data-line-number="13"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
 <div id="htmlwidget-c8516da0fd67d2a7be16" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c8516da0fd67d2a7be16">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.005s","y\n0.004s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-c8516da0fd67d2a7be16">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.004s","y\n0.003s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Destroy caches to remove them from your file system.</p>
 <div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">cache<span class="op">$</span><span class="kw">destroy</span>()</a>
 <a class="sourceLine" id="cb184-2" data-line-number="2">cache2<span class="op">$</span><span class="kw">destroy</span>()</a></code></pre></div>
@@ -479,8 +484,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a>
 <a class="sourceLine" id="cb185-2" data-line-number="2"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))</a>
-<a class="sourceLine" id="cb185-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0729bf49c98d72e1.rds&quot; &quot;0926bdeb1f9da3dd.rds&quot; &quot;0cb4fd3558462be0.rds&quot;</span></a>
-<a class="sourceLine" id="cb185-4" data-line-number="4"><span class="co">#&gt; [4] &quot;1732b7a4efdc1922.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot; &quot;21935c86f12692e2.rds&quot;</span></a>
+<a class="sourceLine" id="cb185-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0076f797142e4645.rds&quot; &quot;0a44486afbb5335f.rds&quot; &quot;0c8a1a87cc4a8fbf.rds&quot;</span></a>
+<a class="sourceLine" id="cb185-4" data-line-number="4"><span class="co">#&gt; [4] &quot;0f0270b66200b764.rds&quot; &quot;16407a9e1db4a6e6.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot;</span></a>
 <a class="sourceLine" id="cb185-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))</a>
 <a class="sourceLine" id="cb185-6" data-line-number="6"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
 <a class="sourceLine" id="cb185-7" data-line-number="7"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
