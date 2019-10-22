@@ -227,6 +227,37 @@ vis_drake_graph(
 )
 ```
 
+
+## Output files
+
+`drake` can reproducibly track multiple output files per target and show them in the graph.
+
+```{r}
+plan <- drake_plan(
+  target1 = {
+    file.copy(file_in("in1.txt"), file_out("out1.txt"))
+    file.copy(file_in("in2.txt"), file_out("out2.txt"))
+  },
+  target2 = {
+    file.copy(file_in("out1.txt"), file_out("out3.txt"))
+    file.copy(file_in("out2.txt"), file_out("out4.txt"))
+  }
+)
+writeLines("in1", "in1.txt")
+writeLines("in2", "in2.txt")
+make(plan)
+config <- drake_config(plan)
+writeLines("abcdefg", "out3.txt")
+vis_drake_graph(config, targets_only = TRUE)
+```
+
+If your graph is too busy, you can hide the output files with `show_output_files = FALSE`.
+
+```{r}
+vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
+```
+
+
 ## Node Selection
 
 *(Supported in drake > 7.7.0, non-inclusive)*
@@ -322,33 +353,3 @@ vis_drake_graph(
 )
 ```
 
-
-
-## Output files
-
-`drake` can reproducibly track multiple output files per target and show them in the graph.
-
-```{r}
-plan <- drake_plan(
-  target1 = {
-    file.copy(file_in("in1.txt"), file_out("out1.txt"))
-    file.copy(file_in("in2.txt"), file_out("out2.txt"))
-  },
-  target2 = {
-    file.copy(file_in("out1.txt"), file_out("out3.txt"))
-    file.copy(file_in("out2.txt"), file_out("out4.txt"))
-  }
-)
-writeLines("in1", "in1.txt")
-writeLines("in2", "in2.txt")
-make(plan)
-config <- drake_config(plan)
-writeLines("abcdefg", "out3.txt")
-vis_drake_graph(config, targets_only = TRUE)
-```
-
-If your graph is too busy, you can hide the output files with `show_output_files = FALSE`.
-
-```{r}
-vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
-```
