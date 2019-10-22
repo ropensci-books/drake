@@ -14,7 +14,11 @@ drake_example("main")
 tmp <- file.copy("main/R", ".", recursive = TRUE)
 tmp <- file.copy("main/_drake.R", ".")
 tmp <- file.copy("main/raw_data.xlsx", ".")
+tmp <- file.copy("main/", ".")
 tmp <- file.copy("main/report.Rmd", ".")
+tmp <- file.copy("main/report.Rmd", ".")
+tmp <- file.copy("main/report.Rmd", ".")
+
 ```
 
 `drake`'s design philosophy is extremely R-focused. It embraces in-memory configuration, in-memory dependencies, interactivity, and flexibility. 
@@ -213,6 +217,24 @@ good_config <- drake_config(good_plan)
 vis_drake_graph(good_config, targets_only = TRUE)
 ```
 
+In `drake` >= 7.6.2.9000, code_to_function() leverages existing imperative scripts for use in a `drake` plan.
+
+```{r, eval=FALSE}
+get_data <- code_to_function("get_data.R")
+do_analysis <- code_to_function("analyze_data.R")
+do_summary <- code_to_function("summarize_data.R")
+
+good_plan <- drake_plan(
+  my_data = get_data(),
+  my_analysis = do_analysis(my_data),
+  my_summaries = do_summary(my_data, my_analysis)
+)
+
+good_config <- drake_config(good_plan)
+vis_drake_graph(good_config, targets_only = TRUE)
+
+```
+
 ```{r, echo = FALSE}
 good_plan <- drake_plan(
   my_data = get_data(file_in("data.csv")), # External files need to be in commands explicitly. # nolint
@@ -222,6 +244,7 @@ good_plan <- drake_plan(
 good_config <- drake_config(good_plan)
 vis_drake_graph(good_config, targets_only = TRUE)
 ```
+
 
 ## Workflows as R packages
 
