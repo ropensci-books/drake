@@ -7,20 +7,19 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 ```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
-library(glue)
-library(purrr)
-library(rlang)
 library(tidyverse)
 invisible(drake_example("script-based-workflows", overwrite = TRUE))
-tmp <- file.copy(
-  list.files("script-based-workflows/R/",
-             pattern = "*.R", full.names = TRUE),
-  ".",
-  recursive = TRUE)
+files <- list.files(
+  "script-based-workflows/R/",
+  pattern = "*.R",
+  full.names = TRUE
+)
+tmp <- file.copy(files, ".", recursive = TRUE)
 tmp <- file.copy("script-based-workflows/raw_data.xlsx", ".")
 tmp <- file.copy("script-based-workflows/report.Rmd", ".")
 dir.create("data")
 ```
+
 ## Function-oriented workflows
 
 `drake` works best when you write functions for data analysis. Functions break down complicated ideas into manageable pieces.
@@ -69,7 +68,6 @@ It is common to express data analysis tasks as numbered scripts.
 The numeric prefixes indicate the order in which these scripts need to run.
 
 ```{r,eval=FALSE}
-
 # run_everything.R
 source("01_data.R")
 source("02_munge.R")
@@ -106,7 +104,6 @@ To leverage drake's dependency-watching capabilities, we create a `drake` plan. 
 To write the plan, we plug in the functions we created from `code_to_function()`.
 
 ```{r}
-
 simple_plan <- drake_plan(
   data        = load_data(),
   munged_data = munge_data(),
@@ -114,16 +111,13 @@ simple_plan <- drake_plan(
   fit         = do_regression(),
   report      = generate_report()
 )
-
 ```
 
 It's a start, but right now, `drake` has no idea which targets to run first and which need to wait for dependencies! In the following graph, there are no edges (arrows) connecting the targets!
 
 ```{r}
-
 simple_config <- drake_config(simple_plan)
 vis_drake_graph(simple_config)
-
 ```
 
 
@@ -146,7 +140,7 @@ script_based_plan <- drake_plan(
 )
 ```
 
-```{r echo=FALSE}
+```{r}
 script_based_config <- drake_config(script_based_plan)
 vis_drake_graph(script_based_config)
 ```
@@ -165,26 +159,26 @@ Any time we change a script, we need to run `code_to_function()` again to keep o
 
 For example, let's fine tune our histogram. We open `03_histogram.R`, change the `binwidth` argument from 0.5 to 0.25, and call `code_to_function("03_histogram.R")` all over again.
 
-```{r echo=FALSE}
+```{r echo = FALSE}
 writeLines(
-  c("munged_data <- readRDS(\"data/munged_data.RDS\")",
-    "gg <- munged_data %>%",
-    "ggplot() +",
-    "geom_histogram(",
-    "  aes(",
-    "    x = Petal.Width,",
-    "    fill = Species",
-    "    ),",
-    "  binwidth = 0.5) +",
+  c(
+    "munged_data <- readRDS(\"data/munged_data.RDS\")",
+    "gg <- ggplot(munged_data) +",
+    "  geom_histogram(",
+    "    aes(x = Petal.Width, fill = Species),",
+    "    binwidth = 0.5",
+    "  ) + ",
     "  theme_gray(20)",
     "ggsave(",
-    "filename = \"data/Petal_Width_vs_Species.PNG\",",
-    "plot = gg",
+    "  filename = \"data/Petal_Width_vs_Species.PNG\",",
+    "  plot = gg,",
+    "  width = 6,",
+    "  height = 6",
     ")",
-    "saveRDS(gg, \"data/Petal_Width_vs_Species.RDS\")"),
+    "saveRDS(gg, \"data/Petal_Width_vs_Species.RDS\")"
+  ),
   "03_histogram.R"
-  )
-
+)
 ```
 
 ```{r}
@@ -195,7 +189,7 @@ make_histogram <- code_to_function("03_histogram.R")
 Targets `hist` and `report` depend on the code we modified, so `drake` marks 
 those targets as outdated.
 
-```{r echo=FALSE,message=FALSE}
+```{r message = FALSE}
 outdated(script_based_config)
 
 vis_drake_graph(script_based_config, targets_only = TRUE)
@@ -211,7 +205,7 @@ make(script_based_plan)
 
 All the targets are now up to date!
 
-```{r, echo=FALSE}
+```{r}
 vis_drake_graph(script_based_config, targets_only = TRUE)
 ```
 
