@@ -434,238 +434,238 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="dynamic-targets" class="section level2">
 <h2><span class="header-section-number">5.1</span> Dynamic targets</h2>
 <p>A dynamic target has multiple <em>sub-targets</em>. Prior to running <code>make()</code>, we do not know how many sub-targets there will be, nor what they will contain. This flexibility lets the data drive the plan. For example, we can fit a regression model to each continent in <a href="https://github.com/jennybc/gapminder">Gapminder data</a> and give each model its own target. To activate dynamic branching, use the <code>dynamic</code> argument of <code>target()</code>.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">library</span>(broom)</a>
-<a class="sourceLine" id="cb46-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb46-3" data-line-number="3"><span class="kw">library</span>(gapminder)</a>
-<a class="sourceLine" id="cb46-4" data-line-number="4"><span class="kw">library</span>(tidyverse)</a>
-<a class="sourceLine" id="cb46-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb46-6" data-line-number="6">fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(dataset, continent) {</a>
-<a class="sourceLine" id="cb46-7" data-line-number="7">  dataset <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb46-8" data-line-number="8"><span class="st">    </span><span class="kw">filter</span>(continent <span class="op">==</span><span class="st"> </span><span class="op">!!</span>continent) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># The !! is important.</span></a>
-<a class="sourceLine" id="cb46-9" data-line-number="9"><span class="st">    </span><span class="kw">lm</span>(<span class="dt">formula =</span> gdpPercap <span class="op">~</span><span class="st"> </span>year) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb46-10" data-line-number="10"><span class="st">    </span><span class="kw">tidy</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb46-11" data-line-number="11"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">continent =</span> <span class="op">!!</span>continent)</a>
-<a class="sourceLine" id="cb46-12" data-line-number="12">}</a>
-<a class="sourceLine" id="cb46-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb46-14" data-line-number="14">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb46-15" data-line-number="15">  <span class="co"># This dataset can change, and we want</span></a>
-<a class="sourceLine" id="cb46-16" data-line-number="16">  <span class="co"># the downstream targets to update.</span></a>
-<a class="sourceLine" id="cb46-17" data-line-number="17">  <span class="dt">dataset =</span> gapminder <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb46-18" data-line-number="18"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)),</a>
-<a class="sourceLine" id="cb46-19" data-line-number="19">  </a>
-<a class="sourceLine" id="cb46-20" data-line-number="20">  <span class="co"># We need a grouping variable .</span></a>
-<a class="sourceLine" id="cb46-21" data-line-number="21">  <span class="dt">continent =</span> <span class="kw">unique</span>(dataset<span class="op">$</span>continent),</a>
-<a class="sourceLine" id="cb46-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb46-23" data-line-number="23">  <span class="co"># Fit GDP vs year for each country.</span></a>
-<a class="sourceLine" id="cb46-24" data-line-number="24">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb46-25" data-line-number="25">    <span class="kw">fit_model</span>(dataset, continent),</a>
-<a class="sourceLine" id="cb46-26" data-line-number="26">    <span class="dt">dynamic =</span> <span class="kw">map</span>(continent) <span class="co"># Activate dynamic branching!</span></a>
-<a class="sourceLine" id="cb46-27" data-line-number="27">  )</a>
-<a class="sourceLine" id="cb46-28" data-line-number="28">)</a>
-<a class="sourceLine" id="cb46-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb46-30" data-line-number="30"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb46-31" data-line-number="31"><span class="co">#&gt; target dataset</span></a>
-<a class="sourceLine" id="cb46-32" data-line-number="32"><span class="co">#&gt; target continent</span></a>
-<a class="sourceLine" id="cb46-33" data-line-number="33"><span class="co">#&gt; subtarget model_b0cb11b5</span></a>
-<a class="sourceLine" id="cb46-34" data-line-number="34"><span class="co">#&gt; subtarget model_f3eaf4f9</span></a>
-<a class="sourceLine" id="cb46-35" data-line-number="35"><span class="co">#&gt; subtarget model_ffd4e544</span></a>
-<a class="sourceLine" id="cb46-36" data-line-number="36"><span class="co">#&gt; subtarget model_d2e01bcc</span></a>
-<a class="sourceLine" id="cb46-37" data-line-number="37"><span class="co">#&gt; subtarget model_ff9e33d1</span></a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">library</span>(broom)</a>
+<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="kw">library</span>(gapminder)</a>
+<a class="sourceLine" id="cb49-4" data-line-number="4"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb49-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb49-6" data-line-number="6">fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(dataset, continent) {</a>
+<a class="sourceLine" id="cb49-7" data-line-number="7">  dataset <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb49-8" data-line-number="8"><span class="st">    </span><span class="kw">filter</span>(continent <span class="op">==</span><span class="st"> </span><span class="op">!!</span>continent) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># The !! is important.</span></a>
+<a class="sourceLine" id="cb49-9" data-line-number="9"><span class="st">    </span><span class="kw">lm</span>(<span class="dt">formula =</span> gdpPercap <span class="op">~</span><span class="st"> </span>year) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb49-10" data-line-number="10"><span class="st">    </span><span class="kw">tidy</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb49-11" data-line-number="11"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">continent =</span> <span class="op">!!</span>continent)</a>
+<a class="sourceLine" id="cb49-12" data-line-number="12">}</a>
+<a class="sourceLine" id="cb49-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb49-14" data-line-number="14">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb49-15" data-line-number="15">  <span class="co"># This dataset can change, and we want</span></a>
+<a class="sourceLine" id="cb49-16" data-line-number="16">  <span class="co"># the downstream targets to update.</span></a>
+<a class="sourceLine" id="cb49-17" data-line-number="17">  <span class="dt">dataset =</span> gapminder <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb49-18" data-line-number="18"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)),</a>
+<a class="sourceLine" id="cb49-19" data-line-number="19">  </a>
+<a class="sourceLine" id="cb49-20" data-line-number="20">  <span class="co"># We need a grouping variable .</span></a>
+<a class="sourceLine" id="cb49-21" data-line-number="21">  <span class="dt">continent =</span> <span class="kw">unique</span>(dataset<span class="op">$</span>continent),</a>
+<a class="sourceLine" id="cb49-22" data-line-number="22">  </a>
+<a class="sourceLine" id="cb49-23" data-line-number="23">  <span class="co"># Fit GDP vs year for each country.</span></a>
+<a class="sourceLine" id="cb49-24" data-line-number="24">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb49-25" data-line-number="25">    <span class="kw">fit_model</span>(dataset, continent),</a>
+<a class="sourceLine" id="cb49-26" data-line-number="26">    <span class="dt">dynamic =</span> <span class="kw">map</span>(continent) <span class="co"># Activate dynamic branching!</span></a>
+<a class="sourceLine" id="cb49-27" data-line-number="27">  )</a>
+<a class="sourceLine" id="cb49-28" data-line-number="28">)</a>
+<a class="sourceLine" id="cb49-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb49-30" data-line-number="30"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb49-31" data-line-number="31"><span class="co">#&gt; target dataset</span></a>
+<a class="sourceLine" id="cb49-32" data-line-number="32"><span class="co">#&gt; target continent</span></a>
+<a class="sourceLine" id="cb49-33" data-line-number="33"><span class="co">#&gt; subtarget model_b0cb11b5</span></a>
+<a class="sourceLine" id="cb49-34" data-line-number="34"><span class="co">#&gt; subtarget model_f3eaf4f9</span></a>
+<a class="sourceLine" id="cb49-35" data-line-number="35"><span class="co">#&gt; subtarget model_ffd4e544</span></a>
+<a class="sourceLine" id="cb49-36" data-line-number="36"><span class="co">#&gt; subtarget model_d2e01bcc</span></a>
+<a class="sourceLine" id="cb49-37" data-line-number="37"><span class="co">#&gt; subtarget model_ff9e33d1</span></a></code></pre></div>
 <p>The sub-targets have strange names (<a href="https://github.com/ropensci/drake/issues/685#issuecomment-549096373">there are good reasons!</a>) but you do not need sub-target names in order to fetch values.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="co">#&gt; [[1]]</span></a>
-<a class="sourceLine" id="cb47-3" data-line-number="3"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
-<a class="sourceLine" id="cb47-4" data-line-number="4"><span class="co">#&gt;   term        estimate std.error statistic p.value continent</span></a>
-<a class="sourceLine" id="cb47-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;    </span></a>
-<a class="sourceLine" id="cb47-6" data-line-number="6"><span class="co">#&gt; 1 (Intercept) -22.3      8.14        -2.74 0.00639 Asia     </span></a>
-<a class="sourceLine" id="cb47-7" data-line-number="7"><span class="co">#&gt; 2 year          0.0113   0.00411      2.75 0.00623 Asia     </span></a>
-<a class="sourceLine" id="cb47-8" data-line-number="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb47-9" data-line-number="9"><span class="co">#&gt; [[2]]</span></a>
-<a class="sourceLine" id="cb47-10" data-line-number="10"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
-<a class="sourceLine" id="cb47-11" data-line-number="11"><span class="co">#&gt;   term        estimate std.error statistic  p.value continent</span></a>
-<a class="sourceLine" id="cb47-12" data-line-number="12"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
-<a class="sourceLine" id="cb47-13" data-line-number="13"><span class="co">#&gt; 1 (Intercept) -65.4      4.56        -14.4 3.12e-37 Europe   </span></a>
-<a class="sourceLine" id="cb47-14" data-line-number="14"><span class="co">#&gt; 2 year          0.0334   0.00230      14.5 7.06e-38 Europe</span></a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="co">#&gt; [[1]]</span></a>
+<a class="sourceLine" id="cb50-3" data-line-number="3"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
+<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="co">#&gt;   term        estimate std.error statistic p.value continent</span></a>
+<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;    </span></a>
+<a class="sourceLine" id="cb50-6" data-line-number="6"><span class="co">#&gt; 1 (Intercept) -22.3      8.14        -2.74 0.00639 Asia     </span></a>
+<a class="sourceLine" id="cb50-7" data-line-number="7"><span class="co">#&gt; 2 year          0.0113   0.00411      2.75 0.00623 Asia     </span></a>
+<a class="sourceLine" id="cb50-8" data-line-number="8"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-9" data-line-number="9"><span class="co">#&gt; [[2]]</span></a>
+<a class="sourceLine" id="cb50-10" data-line-number="10"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
+<a class="sourceLine" id="cb50-11" data-line-number="11"><span class="co">#&gt;   term        estimate std.error statistic  p.value continent</span></a>
+<a class="sourceLine" id="cb50-12" data-line-number="12"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
+<a class="sourceLine" id="cb50-13" data-line-number="13"><span class="co">#&gt; 1 (Intercept) -65.4      4.56        -14.4 3.12e-37 Europe   </span></a>
+<a class="sourceLine" id="cb50-14" data-line-number="14"><span class="co">#&gt; 2 year          0.0334   0.00230      14.5 7.06e-38 Europe</span></a></code></pre></div>
 <p>To select specific targets, simply load the original grouping variable and select the indices you need.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">loadd</span>(continent)</a>
-<a class="sourceLine" id="cb48-2" data-line-number="2">index &lt;-<span class="st"> </span><span class="kw">which</span>(continent <span class="op">==</span><span class="st"> &quot;Oceania&quot;</span>)</a>
-<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> index)[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb48-4" data-line-number="4"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
-<a class="sourceLine" id="cb48-5" data-line-number="5"><span class="co">#&gt;   term        estimate std.error statistic  p.value continent</span></a>
-<a class="sourceLine" id="cb48-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
-<a class="sourceLine" id="cb48-7" data-line-number="7"><span class="co">#&gt; 1 (Intercept) -65.9      5.85        -11.3 1.32e-10 Oceania  </span></a>
-<a class="sourceLine" id="cb48-8" data-line-number="8"><span class="co">#&gt; 2 year          0.0339   0.00295      11.5 9.48e-11 Oceania</span></a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw">loadd</span>(continent)</a>
+<a class="sourceLine" id="cb51-2" data-line-number="2">index &lt;-<span class="st"> </span><span class="kw">which</span>(continent <span class="op">==</span><span class="st"> &quot;Oceania&quot;</span>)</a>
+<a class="sourceLine" id="cb51-3" data-line-number="3"><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> index)[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="co">#&gt; # A tibble: 2 x 6</span></a>
+<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="co">#&gt;   term        estimate std.error statistic  p.value continent</span></a>
+<a class="sourceLine" id="cb51-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
+<a class="sourceLine" id="cb51-7" data-line-number="7"><span class="co">#&gt; 1 (Intercept) -65.9      5.85        -11.3 1.32e-10 Oceania  </span></a>
+<a class="sourceLine" id="cb51-8" data-line-number="8"><span class="co">#&gt; 2 year          0.0339   0.00295      11.5 9.48e-11 Oceania</span></a></code></pre></div>
 <p>The visuals load faster and look nicer because we omit the sub-targets.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
-<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="co">#&gt; unload targets from environment:</span></a>
-<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="co">#&gt;    continent</span></a>
-<a class="sourceLine" id="cb49-4" data-line-number="4"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
-<div id="htmlwidget-094a7ca09aea0953f3fb" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-094a7ca09aea0953f3fb">{"x":{"nodes":{"id":["fit_model","dataset","continent","model"],"imported":[true,false,false,false],"label":["fit_model","dataset\n0.006s","continent\n0.003s","model\n0.002s"],"status":["imported","up to date","up to date","up to date"],"type":["function","object","object","dynamic"],"font.size":[20,20,20,20],"color":["#1874CD","#228B22","#228B22","#228B22"],"shape":["triangle","dot","dot","star"],"level":[1,1,2,3],"x":[-1,-1,0,1],"y":[-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["continent","fit_model","dataset","dataset"],"to":["model","model","continent","model"],"arrows":["to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Dynamic","Function"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","star","triangle"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,8,9]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="co">#&gt; unload targets from environment:</span></a>
+<a class="sourceLine" id="cb52-3" data-line-number="3"><span class="co">#&gt;    continent</span></a>
+<a class="sourceLine" id="cb52-4" data-line-number="4"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
+<div id="htmlwidget-d6a708145d7725acdca8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d6a708145d7725acdca8">{"x":{"nodes":{"id":["fit_model","dataset","continent","model"],"imported":[true,false,false,false],"label":["fit_model","dataset\n0.007s","continent\n0.004s","model\n0.003s"],"status":["imported","up to date","up to date","up to date"],"type":["function","object","object","dynamic"],"font.size":[20,20,20,20],"color":["#1874CD","#228B22","#228B22","#228B22"],"shape":["triangle","dot","dot","star"],"level":[1,1,2,3],"x":[-1,-1,0,1],"y":[-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["continent","fit_model","dataset","dataset"],"to":["model","model","continent","model"],"arrows":["to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Dynamic","Function"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","star","triangle"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,8,9]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="map" class="section level2">
 <h2><span class="header-section-number">5.2</span> map()</h2>
 <p>The dynamic <code>map()</code> transformation creates a new sub-target for each element of the grouping variables you supply.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb50-2" data-line-number="2">  <span class="dt">static_numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb50-3" data-line-number="3">  <span class="dt">static_letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</a>
-<a class="sourceLine" id="cb50-4" data-line-number="4">  <span class="dt">dynamic_lowercase =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb50-5" data-line-number="5">    <span class="kw">paste0</span>(static_numbers, static_letters),</a>
-<a class="sourceLine" id="cb50-6" data-line-number="6">    <span class="dt">dynamic =</span> <span class="kw">map</span>(static_numbers, static_letters)</a>
-<a class="sourceLine" id="cb50-7" data-line-number="7">  ),</a>
-<a class="sourceLine" id="cb50-8" data-line-number="8">  <span class="dt">dynamic_uppercase =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb50-9" data-line-number="9">    <span class="kw">toupper</span>(dynamic_lowercase),</a>
-<a class="sourceLine" id="cb50-10" data-line-number="10">    <span class="dt">dynamic =</span> <span class="kw">map</span>(dynamic_lowercase)</a>
-<a class="sourceLine" id="cb50-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb50-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb50-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb50-14" data-line-number="14"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb50-15" data-line-number="15"><span class="co">#&gt; target static_numbers</span></a>
-<a class="sourceLine" id="cb50-16" data-line-number="16"><span class="co">#&gt; target static_letters</span></a>
-<a class="sourceLine" id="cb50-17" data-line-number="17"><span class="co">#&gt; subtarget dynamic_lowercase_13620767</span></a>
-<a class="sourceLine" id="cb50-18" data-line-number="18"><span class="co">#&gt; subtarget dynamic_lowercase_ff3dee4f</span></a>
-<a class="sourceLine" id="cb50-19" data-line-number="19"><span class="co">#&gt; subtarget dynamic_uppercase_18b049f3</span></a>
-<a class="sourceLine" id="cb50-20" data-line-number="20"><span class="co">#&gt; subtarget dynamic_uppercase_9e51c7b4</span></a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb53-2" data-line-number="2">  <span class="dt">static_numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</a>
+<a class="sourceLine" id="cb53-3" data-line-number="3">  <span class="dt">static_letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</a>
+<a class="sourceLine" id="cb53-4" data-line-number="4">  <span class="dt">dynamic_lowercase =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb53-5" data-line-number="5">    <span class="kw">paste0</span>(static_numbers, static_letters),</a>
+<a class="sourceLine" id="cb53-6" data-line-number="6">    <span class="dt">dynamic =</span> <span class="kw">map</span>(static_numbers, static_letters)</a>
+<a class="sourceLine" id="cb53-7" data-line-number="7">  ),</a>
+<a class="sourceLine" id="cb53-8" data-line-number="8">  <span class="dt">dynamic_uppercase =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb53-9" data-line-number="9">    <span class="kw">toupper</span>(dynamic_lowercase),</a>
+<a class="sourceLine" id="cb53-10" data-line-number="10">    <span class="dt">dynamic =</span> <span class="kw">map</span>(dynamic_lowercase)</a>
+<a class="sourceLine" id="cb53-11" data-line-number="11">  )</a>
+<a class="sourceLine" id="cb53-12" data-line-number="12">)</a>
+<a class="sourceLine" id="cb53-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb53-14" data-line-number="14"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb53-15" data-line-number="15"><span class="co">#&gt; target static_numbers</span></a>
+<a class="sourceLine" id="cb53-16" data-line-number="16"><span class="co">#&gt; target static_letters</span></a>
+<a class="sourceLine" id="cb53-17" data-line-number="17"><span class="co">#&gt; subtarget dynamic_lowercase_13620767</span></a>
+<a class="sourceLine" id="cb53-18" data-line-number="18"><span class="co">#&gt; subtarget dynamic_lowercase_ff3dee4f</span></a>
+<a class="sourceLine" id="cb53-19" data-line-number="19"><span class="co">#&gt; subtarget dynamic_uppercase_18b049f3</span></a>
+<a class="sourceLine" id="cb53-20" data-line-number="20"><span class="co">#&gt; subtarget dynamic_uppercase_9e51c7b4</span></a></code></pre></div>
 <p>For grouping variables that are vectors and simple lists, dynamic branching iterates over the elements.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw">readd</span>(dynamic_lowercase)</a>
-<a class="sourceLine" id="cb51-2" data-line-number="2"><span class="co">#&gt; [[1]]</span></a>
-<a class="sourceLine" id="cb51-3" data-line-number="3"><span class="co">#&gt; [1] &quot;1a&quot;</span></a>
-<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="co">#&gt; [[2]]</span></a>
-<a class="sourceLine" id="cb51-6" data-line-number="6"><span class="co">#&gt; [1] &quot;2b&quot;</span></a>
-<a class="sourceLine" id="cb51-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb51-8" data-line-number="8"><span class="kw">readd</span>(dynamic_uppercase)</a>
-<a class="sourceLine" id="cb51-9" data-line-number="9"><span class="co">#&gt; [[1]]</span></a>
-<a class="sourceLine" id="cb51-10" data-line-number="10"><span class="co">#&gt; [1] &quot;1A&quot;</span></a>
-<a class="sourceLine" id="cb51-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb51-12" data-line-number="12"><span class="co">#&gt; [[2]]</span></a>
-<a class="sourceLine" id="cb51-13" data-line-number="13"><span class="co">#&gt; [1] &quot;2B&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="kw">readd</span>(dynamic_lowercase)</a>
+<a class="sourceLine" id="cb54-2" data-line-number="2"><span class="co">#&gt; [[1]]</span></a>
+<a class="sourceLine" id="cb54-3" data-line-number="3"><span class="co">#&gt; [1] &quot;1a&quot;</span></a>
+<a class="sourceLine" id="cb54-4" data-line-number="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb54-5" data-line-number="5"><span class="co">#&gt; [[2]]</span></a>
+<a class="sourceLine" id="cb54-6" data-line-number="6"><span class="co">#&gt; [1] &quot;2b&quot;</span></a>
+<a class="sourceLine" id="cb54-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb54-8" data-line-number="8"><span class="kw">readd</span>(dynamic_uppercase)</a>
+<a class="sourceLine" id="cb54-9" data-line-number="9"><span class="co">#&gt; [[1]]</span></a>
+<a class="sourceLine" id="cb54-10" data-line-number="10"><span class="co">#&gt; [1] &quot;1A&quot;</span></a>
+<a class="sourceLine" id="cb54-11" data-line-number="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb54-12" data-line-number="12"><span class="co">#&gt; [[2]]</span></a>
+<a class="sourceLine" id="cb54-13" data-line-number="13"><span class="co">#&gt; [1] &quot;2B&quot;</span></a></code></pre></div>
 <p>For grouping variables that are array-like objects (anything with a non-null <code>dim()</code>) dynamic branching iterates over the <em>rows</em>. This includes not only arrays and matrices, but <em>data frames</em> and <em>tibble</em>s as well.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb52-2" data-line-number="2">  <span class="dt">dataset =</span> <span class="kw">head</span>(gapminder, <span class="dt">n =</span> <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb52-3" data-line-number="3">  <span class="dt">row =</span> <span class="kw">target</span>(dataset, <span class="dt">dynamic =</span> <span class="kw">map</span>(dataset))</a>
-<a class="sourceLine" id="cb52-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb52-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb52-6" data-line-number="6"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb52-7" data-line-number="7"><span class="co">#&gt; target dataset</span></a>
-<a class="sourceLine" id="cb52-8" data-line-number="8"><span class="co">#&gt; subtarget row_9939cae3</span></a>
-<a class="sourceLine" id="cb52-9" data-line-number="9"><span class="co">#&gt; subtarget row_e8047114</span></a>
-<a class="sourceLine" id="cb52-10" data-line-number="10"><span class="co">#&gt; subtarget row_2ef3db10</span></a>
-<a class="sourceLine" id="cb52-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb52-12" data-line-number="12"><span class="kw">readd</span>(row)</a>
-<a class="sourceLine" id="cb52-13" data-line-number="13"><span class="co">#&gt; [[1]]</span></a>
-<a class="sourceLine" id="cb52-14" data-line-number="14"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
-<a class="sourceLine" id="cb52-15" data-line-number="15"><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></a>
-<a class="sourceLine" id="cb52-16" data-line-number="16"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb52-17" data-line-number="17"><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779.</span></a>
-<a class="sourceLine" id="cb52-18" data-line-number="18"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb52-19" data-line-number="19"><span class="co">#&gt; [[2]]</span></a>
-<a class="sourceLine" id="cb52-20" data-line-number="20"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
-<a class="sourceLine" id="cb52-21" data-line-number="21"><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></a>
-<a class="sourceLine" id="cb52-22" data-line-number="22"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb52-23" data-line-number="23"><span class="co">#&gt; 1 Afghanistan Asia       1957    30.3 9240934      821.</span></a>
-<a class="sourceLine" id="cb52-24" data-line-number="24"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb52-25" data-line-number="25"><span class="co">#&gt; [[3]]</span></a>
-<a class="sourceLine" id="cb52-26" data-line-number="26"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
-<a class="sourceLine" id="cb52-27" data-line-number="27"><span class="co">#&gt;   country     continent  year lifeExp      pop gdpPercap</span></a>
-<a class="sourceLine" id="cb52-28" data-line-number="28"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb52-29" data-line-number="29"><span class="co">#&gt; 1 Afghanistan Asia       1962    32.0 10267083      853.</span></a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb55-2" data-line-number="2">  <span class="dt">dataset =</span> <span class="kw">head</span>(gapminder, <span class="dt">n =</span> <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb55-3" data-line-number="3">  <span class="dt">row =</span> <span class="kw">target</span>(dataset, <span class="dt">dynamic =</span> <span class="kw">map</span>(dataset))</a>
+<a class="sourceLine" id="cb55-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb55-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb55-6" data-line-number="6"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb55-7" data-line-number="7"><span class="co">#&gt; target dataset</span></a>
+<a class="sourceLine" id="cb55-8" data-line-number="8"><span class="co">#&gt; subtarget row_9939cae3</span></a>
+<a class="sourceLine" id="cb55-9" data-line-number="9"><span class="co">#&gt; subtarget row_e8047114</span></a>
+<a class="sourceLine" id="cb55-10" data-line-number="10"><span class="co">#&gt; subtarget row_2ef3db10</span></a>
+<a class="sourceLine" id="cb55-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb55-12" data-line-number="12"><span class="kw">readd</span>(row)</a>
+<a class="sourceLine" id="cb55-13" data-line-number="13"><span class="co">#&gt; [[1]]</span></a>
+<a class="sourceLine" id="cb55-14" data-line-number="14"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
+<a class="sourceLine" id="cb55-15" data-line-number="15"><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></a>
+<a class="sourceLine" id="cb55-16" data-line-number="16"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb55-17" data-line-number="17"><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779.</span></a>
+<a class="sourceLine" id="cb55-18" data-line-number="18"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb55-19" data-line-number="19"><span class="co">#&gt; [[2]]</span></a>
+<a class="sourceLine" id="cb55-20" data-line-number="20"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
+<a class="sourceLine" id="cb55-21" data-line-number="21"><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></a>
+<a class="sourceLine" id="cb55-22" data-line-number="22"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb55-23" data-line-number="23"><span class="co">#&gt; 1 Afghanistan Asia       1957    30.3 9240934      821.</span></a>
+<a class="sourceLine" id="cb55-24" data-line-number="24"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb55-25" data-line-number="25"><span class="co">#&gt; [[3]]</span></a>
+<a class="sourceLine" id="cb55-26" data-line-number="26"><span class="co">#&gt; # A tibble: 1 x 6</span></a>
+<a class="sourceLine" id="cb55-27" data-line-number="27"><span class="co">#&gt;   country     continent  year lifeExp      pop gdpPercap</span></a>
+<a class="sourceLine" id="cb55-28" data-line-number="28"><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb55-29" data-line-number="29"><span class="co">#&gt; 1 Afghanistan Asia       1962    32.0 10267083      853.</span></a></code></pre></div>
 <p>Regardless of the data type of object <code>x</code>, <code>NROW(x)</code> tells you how many sub-targets you will get from <code>map(x)</code>.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw">NROW</span>(letters)</a>
-<a class="sourceLine" id="cb53-2" data-line-number="2"><span class="co">#&gt; [1] 26</span></a>
-<a class="sourceLine" id="cb53-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="kw">NROW</span>(mtcars)</a>
-<a class="sourceLine" id="cb53-5" data-line-number="5"><span class="co">#&gt; [1] 32</span></a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="kw">NROW</span>(letters)</a>
+<a class="sourceLine" id="cb56-2" data-line-number="2"><span class="co">#&gt; [1] 26</span></a>
+<a class="sourceLine" id="cb56-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb56-4" data-line-number="4"><span class="kw">NROW</span>(mtcars)</a>
+<a class="sourceLine" id="cb56-5" data-line-number="5"><span class="co">#&gt; [1] 32</span></a></code></pre></div>
 </div>
 <div id="cross" class="section level2">
 <h2><span class="header-section-number">5.3</span> cross()</h2>
 <p><code>cross()</code> is like <code>map()</code> except we create a new target for each combination of grouping variables.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb54-2" data-line-number="2">  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb54-3" data-line-number="3">  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</a>
-<a class="sourceLine" id="cb54-4" data-line-number="4">  <span class="dt">result =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb54-5" data-line-number="5">    <span class="kw">c</span>(numbers, letters),</a>
-<a class="sourceLine" id="cb54-6" data-line-number="6">    <span class="dt">dynamic =</span> <span class="kw">cross</span>(numbers, letters)</a>
-<a class="sourceLine" id="cb54-7" data-line-number="7">  )</a>
-<a class="sourceLine" id="cb54-8" data-line-number="8">)</a>
-<a class="sourceLine" id="cb54-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb54-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb54-11" data-line-number="11"><span class="co">#&gt; target numbers</span></a>
-<a class="sourceLine" id="cb54-12" data-line-number="12"><span class="co">#&gt; target letters</span></a>
-<a class="sourceLine" id="cb54-13" data-line-number="13"><span class="co">#&gt; subtarget result_13620767</span></a>
-<a class="sourceLine" id="cb54-14" data-line-number="14"><span class="co">#&gt; subtarget result_fcae20ae</span></a>
-<a class="sourceLine" id="cb54-15" data-line-number="15"><span class="co">#&gt; subtarget result_461b9aa9</span></a>
-<a class="sourceLine" id="cb54-16" data-line-number="16"><span class="co">#&gt; subtarget result_ff3dee4f</span></a>
-<a class="sourceLine" id="cb54-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb54-18" data-line-number="18"><span class="kw">readd</span>(result)</a>
-<a class="sourceLine" id="cb54-19" data-line-number="19"><span class="co">#&gt; [[1]]</span></a>
-<a class="sourceLine" id="cb54-20" data-line-number="20"><span class="co">#&gt; [1] &quot;1&quot; &quot;a&quot;</span></a>
-<a class="sourceLine" id="cb54-21" data-line-number="21"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb54-22" data-line-number="22"><span class="co">#&gt; [[2]]</span></a>
-<a class="sourceLine" id="cb54-23" data-line-number="23"><span class="co">#&gt; [1] &quot;1&quot; &quot;b&quot;</span></a>
-<a class="sourceLine" id="cb54-24" data-line-number="24"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb54-25" data-line-number="25"><span class="co">#&gt; [[3]]</span></a>
-<a class="sourceLine" id="cb54-26" data-line-number="26"><span class="co">#&gt; [1] &quot;2&quot; &quot;a&quot;</span></a>
-<a class="sourceLine" id="cb54-27" data-line-number="27"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb54-28" data-line-number="28"><span class="co">#&gt; [[4]]</span></a>
-<a class="sourceLine" id="cb54-29" data-line-number="29"><span class="co">#&gt; [1] &quot;2&quot; &quot;b&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb57-2" data-line-number="2">  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</a>
+<a class="sourceLine" id="cb57-3" data-line-number="3">  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</a>
+<a class="sourceLine" id="cb57-4" data-line-number="4">  <span class="dt">result =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb57-5" data-line-number="5">    <span class="kw">c</span>(numbers, letters),</a>
+<a class="sourceLine" id="cb57-6" data-line-number="6">    <span class="dt">dynamic =</span> <span class="kw">cross</span>(numbers, letters)</a>
+<a class="sourceLine" id="cb57-7" data-line-number="7">  )</a>
+<a class="sourceLine" id="cb57-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb57-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb57-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb57-11" data-line-number="11"><span class="co">#&gt; target numbers</span></a>
+<a class="sourceLine" id="cb57-12" data-line-number="12"><span class="co">#&gt; target letters</span></a>
+<a class="sourceLine" id="cb57-13" data-line-number="13"><span class="co">#&gt; subtarget result_13620767</span></a>
+<a class="sourceLine" id="cb57-14" data-line-number="14"><span class="co">#&gt; subtarget result_fcae20ae</span></a>
+<a class="sourceLine" id="cb57-15" data-line-number="15"><span class="co">#&gt; subtarget result_461b9aa9</span></a>
+<a class="sourceLine" id="cb57-16" data-line-number="16"><span class="co">#&gt; subtarget result_ff3dee4f</span></a>
+<a class="sourceLine" id="cb57-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb57-18" data-line-number="18"><span class="kw">readd</span>(result)</a>
+<a class="sourceLine" id="cb57-19" data-line-number="19"><span class="co">#&gt; [[1]]</span></a>
+<a class="sourceLine" id="cb57-20" data-line-number="20"><span class="co">#&gt; [1] &quot;1&quot; &quot;a&quot;</span></a>
+<a class="sourceLine" id="cb57-21" data-line-number="21"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb57-22" data-line-number="22"><span class="co">#&gt; [[2]]</span></a>
+<a class="sourceLine" id="cb57-23" data-line-number="23"><span class="co">#&gt; [1] &quot;1&quot; &quot;b&quot;</span></a>
+<a class="sourceLine" id="cb57-24" data-line-number="24"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb57-25" data-line-number="25"><span class="co">#&gt; [[3]]</span></a>
+<a class="sourceLine" id="cb57-26" data-line-number="26"><span class="co">#&gt; [1] &quot;2&quot; &quot;a&quot;</span></a>
+<a class="sourceLine" id="cb57-27" data-line-number="27"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb57-28" data-line-number="28"><span class="co">#&gt; [[4]]</span></a>
+<a class="sourceLine" id="cb57-29" data-line-number="29"><span class="co">#&gt; [1] &quot;2&quot; &quot;b&quot;</span></a></code></pre></div>
 </div>
 <div id="combine" class="section level2">
 <h2><span class="header-section-number">5.4</span> <code>combine()</code></h2>
 <p><code>combine()</code> can group together sub-targets or split up static targets. The <code>.by</code> argument lets us control the aggregation. Let’s fit a model to each continent in the Gapminder dataset and then combine all the results at the end.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1">fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(dataset) {</a>
-<a class="sourceLine" id="cb55-2" data-line-number="2">  dataset <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb55-3" data-line-number="3"><span class="st">    </span><span class="kw">lm</span>(<span class="dt">formula =</span> gdpPercap <span class="op">~</span><span class="st"> </span>year) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb55-4" data-line-number="4"><span class="st">    </span><span class="kw">tidy</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb55-5" data-line-number="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">continent =</span> dataset<span class="op">$</span>continent[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb55-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb55-7" data-line-number="7">  </a>
-<a class="sourceLine" id="cb55-8" data-line-number="8">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb55-9" data-line-number="9">  <span class="co"># Let&#39;s fit a model for each continent and then</span></a>
-<a class="sourceLine" id="cb55-10" data-line-number="10">  <span class="co"># combine the results at the end.</span></a>
-<a class="sourceLine" id="cb55-11" data-line-number="11">  <span class="dt">dataset =</span> gapminder <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb55-12" data-line-number="12"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)),</a>
-<a class="sourceLine" id="cb55-13" data-line-number="13">  </a>
-<a class="sourceLine" id="cb55-14" data-line-number="14">  <span class="co"># We need a target to act as a grouping variable.</span></a>
-<a class="sourceLine" id="cb55-15" data-line-number="15">  <span class="dt">continent =</span> dataset<span class="op">$</span>continent,</a>
-<a class="sourceLine" id="cb55-16" data-line-number="16">  </a>
-<a class="sourceLine" id="cb55-17" data-line-number="17">  <span class="co"># Fit a model for each continent.</span></a>
-<a class="sourceLine" id="cb55-18" data-line-number="18">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb55-19" data-line-number="19">    <span class="kw">fit_model</span>(dataset),</a>
-<a class="sourceLine" id="cb55-20" data-line-number="20">    <span class="dt">dynamic =</span> <span class="kw">combine</span>(dataset, <span class="dt">.by =</span> continent)</a>
-<a class="sourceLine" id="cb55-21" data-line-number="21">  ),</a>
-<a class="sourceLine" id="cb55-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb55-23" data-line-number="23">  <span class="co"># Aggregate the results together.</span></a>
-<a class="sourceLine" id="cb55-24" data-line-number="24">  <span class="dt">results =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb55-25" data-line-number="25">    <span class="kw">bind_rows</span>(model),</a>
-<a class="sourceLine" id="cb55-26" data-line-number="26">    <span class="dt">dynamic =</span> <span class="kw">combine</span>(model) <span class="co"># no .by necessary</span></a>
-<a class="sourceLine" id="cb55-27" data-line-number="27">  )</a>
-<a class="sourceLine" id="cb55-28" data-line-number="28">)</a>
-<a class="sourceLine" id="cb55-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb55-30" data-line-number="30"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb55-31" data-line-number="31"><span class="co">#&gt; target dataset</span></a>
-<a class="sourceLine" id="cb55-32" data-line-number="32"><span class="co">#&gt; target continent</span></a>
-<a class="sourceLine" id="cb55-33" data-line-number="33"><span class="co">#&gt; subtarget model_73e4ffb3</span></a>
-<a class="sourceLine" id="cb55-34" data-line-number="34"><span class="co">#&gt; subtarget model_835a0a23</span></a>
-<a class="sourceLine" id="cb55-35" data-line-number="35"><span class="co">#&gt; subtarget model_9fe29976</span></a>
-<a class="sourceLine" id="cb55-36" data-line-number="36"><span class="co">#&gt; subtarget model_0387d1cd</span></a>
-<a class="sourceLine" id="cb55-37" data-line-number="37"><span class="co">#&gt; subtarget model_74e15cf6</span></a>
-<a class="sourceLine" id="cb55-38" data-line-number="38"><span class="co">#&gt; subtarget results_5c0d6a19</span></a>
-<a class="sourceLine" id="cb55-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb55-40" data-line-number="40"><span class="kw">readd</span>(results)[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb55-41" data-line-number="41"><span class="co">#&gt; # A tibble: 10 x 6</span></a>
-<a class="sourceLine" id="cb55-42" data-line-number="42"><span class="co">#&gt;    term         estimate std.error statistic  p.value continent</span></a>
-<a class="sourceLine" id="cb55-43" data-line-number="43"><span class="co">#&gt;    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
-<a class="sourceLine" id="cb55-44" data-line-number="44"><span class="co">#&gt;  1 (Intercept) -22.3      8.14         -2.74 6.39e- 3 Asia     </span></a>
-<a class="sourceLine" id="cb55-45" data-line-number="45"><span class="co">#&gt;  2 year          0.0113   0.00411       2.75 6.23e- 3 Asia     </span></a>
-<a class="sourceLine" id="cb55-46" data-line-number="46"><span class="co">#&gt;  3 (Intercept) -65.4      4.56        -14.4  3.12e-37 Europe   </span></a>
-<a class="sourceLine" id="cb55-47" data-line-number="47"><span class="co">#&gt;  4 year          0.0334   0.00230      14.5  7.06e-38 Europe   </span></a>
-<a class="sourceLine" id="cb55-48" data-line-number="48"><span class="co">#&gt;  5 (Intercept)  -5.77     1.30         -4.44 1.08e- 5 Africa   </span></a>
-<a class="sourceLine" id="cb55-49" data-line-number="49"><span class="co">#&gt;  6 year          0.00266  0.000657      4.04 5.90e- 5 Africa   </span></a>
-<a class="sourceLine" id="cb55-50" data-line-number="50"><span class="co">#&gt;  7 (Intercept) -22.8      4.10         -5.56 6.10e- 8 Americas </span></a>
-<a class="sourceLine" id="cb55-51" data-line-number="51"><span class="co">#&gt;  8 year          0.0115   0.00207       5.55 6.16e- 8 Americas </span></a>
-<a class="sourceLine" id="cb55-52" data-line-number="52"><span class="co">#&gt;  9 (Intercept) -65.9      5.85        -11.3  1.32e-10 Oceania  </span></a>
-<a class="sourceLine" id="cb55-53" data-line-number="53"><span class="co">#&gt; 10 year          0.0339   0.00295      11.5  9.48e-11 Oceania</span></a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1">fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(dataset) {</a>
+<a class="sourceLine" id="cb58-2" data-line-number="2">  dataset <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-3" data-line-number="3"><span class="st">    </span><span class="kw">lm</span>(<span class="dt">formula =</span> gdpPercap <span class="op">~</span><span class="st"> </span>year) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-4" data-line-number="4"><span class="st">    </span><span class="kw">tidy</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-5" data-line-number="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">continent =</span> dataset<span class="op">$</span>continent[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb58-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb58-7" data-line-number="7">  </a>
+<a class="sourceLine" id="cb58-8" data-line-number="8">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb58-9" data-line-number="9">  <span class="co"># Let&#39;s fit a model for each continent and then</span></a>
+<a class="sourceLine" id="cb58-10" data-line-number="10">  <span class="co"># combine the results at the end.</span></a>
+<a class="sourceLine" id="cb58-11" data-line-number="11">  <span class="dt">dataset =</span> gapminder <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-12" data-line-number="12"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)),</a>
+<a class="sourceLine" id="cb58-13" data-line-number="13">  </a>
+<a class="sourceLine" id="cb58-14" data-line-number="14">  <span class="co"># We need a target to act as a grouping variable.</span></a>
+<a class="sourceLine" id="cb58-15" data-line-number="15">  <span class="dt">continent =</span> dataset<span class="op">$</span>continent,</a>
+<a class="sourceLine" id="cb58-16" data-line-number="16">  </a>
+<a class="sourceLine" id="cb58-17" data-line-number="17">  <span class="co"># Fit a model for each continent.</span></a>
+<a class="sourceLine" id="cb58-18" data-line-number="18">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb58-19" data-line-number="19">    <span class="kw">fit_model</span>(dataset),</a>
+<a class="sourceLine" id="cb58-20" data-line-number="20">    <span class="dt">dynamic =</span> <span class="kw">combine</span>(dataset, <span class="dt">.by =</span> continent)</a>
+<a class="sourceLine" id="cb58-21" data-line-number="21">  ),</a>
+<a class="sourceLine" id="cb58-22" data-line-number="22">  </a>
+<a class="sourceLine" id="cb58-23" data-line-number="23">  <span class="co"># Aggregate the results together.</span></a>
+<a class="sourceLine" id="cb58-24" data-line-number="24">  <span class="dt">results =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb58-25" data-line-number="25">    <span class="kw">bind_rows</span>(model),</a>
+<a class="sourceLine" id="cb58-26" data-line-number="26">    <span class="dt">dynamic =</span> <span class="kw">combine</span>(model) <span class="co"># no .by necessary</span></a>
+<a class="sourceLine" id="cb58-27" data-line-number="27">  )</a>
+<a class="sourceLine" id="cb58-28" data-line-number="28">)</a>
+<a class="sourceLine" id="cb58-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb58-30" data-line-number="30"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb58-31" data-line-number="31"><span class="co">#&gt; target dataset</span></a>
+<a class="sourceLine" id="cb58-32" data-line-number="32"><span class="co">#&gt; target continent</span></a>
+<a class="sourceLine" id="cb58-33" data-line-number="33"><span class="co">#&gt; subtarget model_73e4ffb3</span></a>
+<a class="sourceLine" id="cb58-34" data-line-number="34"><span class="co">#&gt; subtarget model_835a0a23</span></a>
+<a class="sourceLine" id="cb58-35" data-line-number="35"><span class="co">#&gt; subtarget model_9fe29976</span></a>
+<a class="sourceLine" id="cb58-36" data-line-number="36"><span class="co">#&gt; subtarget model_0387d1cd</span></a>
+<a class="sourceLine" id="cb58-37" data-line-number="37"><span class="co">#&gt; subtarget model_74e15cf6</span></a>
+<a class="sourceLine" id="cb58-38" data-line-number="38"><span class="co">#&gt; subtarget results_5c0d6a19</span></a>
+<a class="sourceLine" id="cb58-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb58-40" data-line-number="40"><span class="kw">readd</span>(results)[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb58-41" data-line-number="41"><span class="co">#&gt; # A tibble: 10 x 6</span></a>
+<a class="sourceLine" id="cb58-42" data-line-number="42"><span class="co">#&gt;    term         estimate std.error statistic  p.value continent</span></a>
+<a class="sourceLine" id="cb58-43" data-line-number="43"><span class="co">#&gt;    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></a>
+<a class="sourceLine" id="cb58-44" data-line-number="44"><span class="co">#&gt;  1 (Intercept) -22.3      8.14         -2.74 6.39e- 3 Asia     </span></a>
+<a class="sourceLine" id="cb58-45" data-line-number="45"><span class="co">#&gt;  2 year          0.0113   0.00411       2.75 6.23e- 3 Asia     </span></a>
+<a class="sourceLine" id="cb58-46" data-line-number="46"><span class="co">#&gt;  3 (Intercept) -65.4      4.56        -14.4  3.12e-37 Europe   </span></a>
+<a class="sourceLine" id="cb58-47" data-line-number="47"><span class="co">#&gt;  4 year          0.0334   0.00230      14.5  7.06e-38 Europe   </span></a>
+<a class="sourceLine" id="cb58-48" data-line-number="48"><span class="co">#&gt;  5 (Intercept)  -5.77     1.30         -4.44 1.08e- 5 Africa   </span></a>
+<a class="sourceLine" id="cb58-49" data-line-number="49"><span class="co">#&gt;  6 year          0.00266  0.000657      4.04 5.90e- 5 Africa   </span></a>
+<a class="sourceLine" id="cb58-50" data-line-number="50"><span class="co">#&gt;  7 (Intercept) -22.8      4.10         -5.56 6.10e- 8 Americas </span></a>
+<a class="sourceLine" id="cb58-51" data-line-number="51"><span class="co">#&gt;  8 year          0.0115   0.00207       5.55 6.16e- 8 Americas </span></a>
+<a class="sourceLine" id="cb58-52" data-line-number="52"><span class="co">#&gt;  9 (Intercept) -65.9      5.85        -11.3  1.32e-10 Oceania  </span></a>
+<a class="sourceLine" id="cb58-53" data-line-number="53"><span class="co">#&gt; 10 year          0.0339   0.00295      11.5  9.48e-11 Oceania</span></a></code></pre></div>
 
 </div>
 </div>
