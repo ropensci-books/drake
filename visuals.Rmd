@@ -12,6 +12,21 @@ library(visNetwork)
 
 Data analysis projects have complicated networks of dependencies, and `drake` can help you visualize them with `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` (note the two g's).
 
+## Plotting plans
+
+Except for `drake` 7.7.0 and below, you can simply `plot()` the plan to show the targets and their dependency relationships.
+
+```{r}
+library(drake)
+# from https://github.com/wlandau/drake-examples/tree/master/mtcars
+load_mtcars_example()
+
+my_plan
+
+plot(my_plan)
+```
+
+
 ### `vis_drake_graph()`
 
 Powered by [`visNetwork`](http://datastorm-open.github.io/visNetwork/). Colors represent target status, and shapes represent data type. These graphs are interactive, so you can click, drag, zoom, and and pan to adjust the size and position. Double-click on nodes to contract neighborhoods into clusters or expand them back out again. If you hover over a node, you will see text in a tooltip showing the first few lines of
@@ -21,9 +36,6 @@ Powered by [`visNetwork`](http://datastorm-open.github.io/visNetwork/). Colors r
 - The content of an imported text file.
 
 ```{r}
-library(drake)
-# from https://github.com/wlandau/drake-examples/tree/master/mtcars
-load_mtcars_example()
 config <- drake_config(my_plan)
 vis_drake_graph(config)
 ```
