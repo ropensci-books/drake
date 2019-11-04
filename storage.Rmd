@@ -10,6 +10,41 @@ library(drake)
 library(tidyverse)
 ```
 
+## Special data formats for targets
+
+`drake` supports custom formats for large unwiedly targets. For example, the `"fst"` format uses the [`fst`](https://github.com/fstpackage/fst) package to save targets faster. Simply enclose the command and the format together with the `target()` function.
+
+```{r, eval = FALSE}
+library(drake)
+n <- 1e8 # Each target is 1.6 GB in memory.
+plan <- drake_plan(
+  data_fst = target(
+    data.frame(x = runif(n), y = runif(n)),
+    format = "fst"
+  ),
+  data_old = data.frame(x = runif(n), y = runif(n))
+)
+make(plan)
+#> target data_fst
+#> target data_old
+build_times(type = "build")
+#> # A tibble: 2 x 4
+#>   target   elapsed              user                 system    
+#>   <chr>    <Duration>           <Duration>           <Duration>
+#> 1 data_fst 13.93s               37.562s              7.954s    
+#> 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s
+```
+
+Other available formats:
+
+- `"fst_dt"`: like `"fst"`, but for [`data.table`](https://github.com/Rdatatable/data.table) objects.
+- `"diskframe"`: for larger-than-memory targets. Uses the [`disk.frame`](https://github.com/xiaodaigh/disk.frame) package.
+- `"keras"`: for [`keras`](https://github.com/rstudio/keras) models. See [these slides](https://wlandau.github.io/learndrake) for an example.
+- `"rds"`: for any target compatible with `saveRDS()`. This format is basically the same as `drake`'s default format except that it consumes less memory during the storage process.
+
+
+## Cache management
+
 When you run `make()`, `drake` stores your targets in a cache.
 
 ```{r}
