@@ -9,14 +9,40 @@ library(gapminder)
 library(tidyverse)
 ```
 
+## Motivation
+
 With [static branching](#static) (explained in the [following chapter](#static)) we can concisely create plans with large numbers of targets. However, static branching has major issues.
 
-1. If a plan gets too large, functions `drake_config()` and `outdated()` become very slow, which creates a significant delay in `make()` before it starts building targets.
-2. We need to declare every single target in advance. We cannot define targets based on the the values of previous targets, which limits the kinds of workflows we can create.
-3. The [graph visualizations](#visuals) get too slow, too cumbersome, and too unresponsive with a large number of static targets.
-4. [static branching](#static) is based on metaprogramming and code manipulation, which makes it difficult to use and understand.
+1. If a plan gets too large, functions `drake_config()` and `outdated()` become very slow, which severely slows down the initialization of `make()`.
+2. We need to declare every single target in advance. We cannot *define* new targets based the values returned from other targets.
+3. The [graph visualizations](#visuals) are too slow, too cumbersome, and too unresponsive when the number of static targets is large.
+4. [static branching](#static) relies on metaprogramming and code manipulation, which makes it difficult to use and understand.
 
 [Dynamic branching](#dynamic), supported in versions above 7.7.0, solves these problems.
+
+## Which kind of branching should I use?
+
+With dynamic branching, `make()` is faster to initialize, and you have far more flexibility. With [static branching](#static), you have meaningful target names, and it is easier to predict what the plan is going to do in advance. There is a ton of room for overlap and personal judgement, and you can even use both kinds of branching together!
+
+```{r}
+library(drake)
+
+plan <- drake_plan(
+  locations = get_location_db(), # many rows
+  coordinates = target(
+    my_geocode_fn(locations, method),
+    dynamic = map(locations),
+    transform = map(method = c("address", "postal", "boundary")) #static
+  ),
+  results = target(
+    bind_rows(coordinates),
+    dynamic = combine(coordinates),
+    transform = combine(coordinates)
+  )
+)
+
+plot(plan)
+```
 
 ## Dynamic targets
 
