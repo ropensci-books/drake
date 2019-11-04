@@ -1,0 +1,176 @@
+# Dynamic branching {#dynamic}
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(broom)
+library(drake)
+library(gapminder)
+library(tidyverse)
+```
+
+With [static branching](#static) (explained in the [following chapter](#static)) we can concisely create plans with large numbers of targets. However, static branching has major issues.
+
+1. If a plan gets too large, functions `drake_config()` and `outdated()` become very slow, which creates a significant delay in `make()` before it starts building targets.
+2. We need to declare every single target in advance. We cannot define targets based on the the values of previous targets, which limits the kinds of workflows we can create.
+3. The [graph visualizations](#visuals) get too slow, too cumbersome, and too unresponsive with a large number of static targets.
+4. [static branching](#static) is based on metaprogramming and code manipulation, which makes it difficult to use and understand.
+
+[Dynamic branching](#dynamic), supported in versions above 7.7.0, solves these problems.
+
+## Dynamic targets
+
+A dynamic target has multiple *sub-targets*. Prior to running `make()`, we do not know how many sub-targets there will be, nor what they will contain. This flexibility lets the data drive the plan. For example, we can fit a regression model to each continent in [Gapminder data](https://github.com/jennybc/gapminder) and give each model its own target. To activate dynamic branching, use the `dynamic` argument of `target()`.
+
+```{r}
+library(broom)
+library(drake)
+library(gapminder)
+library(tidyverse)
+
+fit_model <- function(dataset, continent) {
+  dataset %>%
+    filter(continent == !!continent) %>% # The !! is important.
+    lm(formula = gdpPercap ~ year) %>%
+    tidy() %>%
+    mutate(continent = !!continent)
+}
+
+plan <- drake_plan(
+  # This dataset can change, and we want
+  # the downstream targets to update.
+  dataset = gapminder %>%
+    mutate(gdpPercap = scale(gdpPercap)),
+  
+  # We need a grouping variable .
+  continent = unique(dataset$continent),
+  
+  # Fit GDP vs year for each country.
+  model = target(
+    fit_model(dataset, continent),
+    dynamic = map(continent) # Activate dynamic branching!
+  )
+)
+
+make(plan)
+```
+
+The sub-targets have strange names ([there are good reasons!](https://github.com/ropensci/drake/issues/685#issuecomment-549096373)) but you do not need sub-target names in order to fetch values.
+
+```{r}
+readd(model, subtargets = c(1, 2))
+```
+
+To select specific targets, simply load the original grouping variable and select the indices you need.
+
+```{r}
+loadd(continent)
+index <- which(continent == "Oceania")
+readd(model, subtargets = index)[[1]]
+```
+
+The visuals load faster and look nicer because we omit the sub-targets.
+
+```{r}
+config <- drake_config(plan)
+vis_drake_graph(config)
+```
+
+## map()
+
+The dynamic `map()` transformation creates a new sub-target for each element of the grouping variables you supply. Those grouping variables can be either static or dynamic, but they must all be the same length.
+
+```{r}
+plan <- drake_plan(
+  static_numbers = seq_len(2),
+  static_letters = c("a", "b"),
+  dynamic_lowercase = target(
+    paste0(static_numbers, static_letters),
+    dynamic = map(static_numbers, static_letters)
+  ),
+  dynamic_uppercase = target(
+    toupper(dynamic_lowercase),
+    dynamic = map(dynamic_lowercase)
+  )
+)
+
+make(plan)
+
+readd(dynamic_lowercase)
+
+readd(dynamic_uppercase)
+```
+
+For array-like objects (anything with a non-null `dim()`) `drake` the length is the size of the first dimension. In other words, dynamic branching always iterates over the *rows* of data frames, not the columns.[^1]
+
+[^1]: This behavior is a deliberate design choice. Yes, it contradicts `purrr::map()`, but [row-oriented workflows](https://github.com/jennybc/row-oriented-workflows) come up far more often than column-oriented workflows in `drake`. If you want to loop over the columns of a data frame, convert it to a list first.
+
+```{r}
+plan <- drake_plan(
+  dataset = head(gapminder, 3),
+  row = target(dataset, dynamic = map(dataset))
+)
+
+make(plan)
+
+readd(row)
+```
+
+## cross()
+
+`cross()` is like `map()` except we create a new target for each combination of grouping variables.
+
+
+```{r}
+plan <- drake_plan(
+  numbers = seq_len(2),
+  letters = c("a", "b"),
+  result = target(
+    c(numbers, letters),
+    dynamic = cross(numbers, letters)
+  )
+)
+
+make(plan)
+
+readd(result)
+```
+
+## `combine()`
+
+`combine()` can group together sub-targets or split up static targets. The `.by` argument lets us control the aggregation. Let's fit a model to each continent in the Gapminder dataset and then combine all the results at the end.
+
+```{r}
+fit_model <- function(dataset) {
+  dataset %>%
+    lm(formula = gdpPercap ~ year) %>%
+    tidy() %>%
+    mutate(continent = dataset$continent[1])
+}
+  
+plan <- drake_plan(
+  # Let's fit a model for each continent and then
+  # combine the results at the end.
+  dataset = gapminder %>%
+    mutate(gdpPercap = scale(gdpPercap)),
+  
+  # We need a target to act as a grouping variable.
+  continent = dataset$continent,
+  
+  # Fit a model for each continent.
+  model = target(
+    fit_model(dataset),
+    dynamic = combine(dataset, .by = continent)
+  ),
+  
+  # Aggregate the results together.
+  results = target(
+    bind_rows(model),
+    dynamic = combine(model) # no .by necessary
+  )
+)
+
+make(plan)
+
+readd(results)[[1]]
+```
