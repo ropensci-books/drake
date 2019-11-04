@@ -310,7 +310,19 @@ That is why we have an arrow from `hist` to `report` in the graph.
 vis_drake_graph(config)
 ```
 
-An important caveat: `file_in()`, `file_out()`, and `knitr_in()` require you to mention file names *explicitly*. You cannot use a variable containing the name of a file.
+### URLs
+
+`file_in()` understands URLs. If you supply a string beginning with `http://`, `https://`, or `ftp://`, `drake` watches the HTTP ETag, file size, and timestamp for changes.
+
+```{r}
+drake_plan(
+  external_data = download.file(file_in("http://example.com/file.zip"))
+)
+```
+
+### Limitations of file tracking
+
+`file_in()`, `file_out()`, and `knitr_in()` require you to mention file names *explicitly*. You cannot use a variable containing the name of a file.
 
 ```{r}
 bad_plan <- drake_plan(
