@@ -448,106 +448,106 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="customization" class="section level2">
 <h2><span class="header-section-number">18.2</span> Customization</h2>
 <p>With the <code>trigger()</code> function, you can create your own customized checklist of triggers. Let’s run a simple workflow with just the <strong>missing</strong> trigger. We deactivate the <strong>command</strong>, <strong>depend</strong>, and <strong>file</strong> triggers by setting the respective <code>command</code>, <code>depend</code>, and <code>file</code> arguments to <code>FALSE</code>.</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb278-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb278-2" data-line-number="2">  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb278-3" data-line-number="3">  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb278-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb278-5" data-line-number="5"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb278-6" data-line-number="6"><span class="co">#&gt; target psi_1</span></a>
-<a class="sourceLine" id="cb278-7" data-line-number="7"><span class="co">#&gt; target psi_2</span></a></code></pre></div>
-<p>Now, even if you wreck all the commands, nothing rebuilds.</p>
 <div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb279-2" data-line-number="2">  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,</a>
-<a class="sourceLine" id="cb279-3" data-line-number="3">  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span></a>
+<a class="sourceLine" id="cb279-2" data-line-number="2">  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb279-3" data-line-number="3">  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a>
 <a class="sourceLine" id="cb279-4" data-line-number="4">)</a>
 <a class="sourceLine" id="cb279-5" data-line-number="5"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
-<p>You can also give different targets to different triggers. Triggers in the <code>drake</code> plan override the <code>trigger</code> argument to <code>make()</code>. Below, <code>psi_2</code> always builds, but <code>psi_1</code> only builds if it has never been built before.</p>
+<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt; target psi_1</span></a>
+<a class="sourceLine" id="cb279-7" data-line-number="7"><span class="co">#&gt; target psi_2</span></a></code></pre></div>
+<p>Now, even if you wreck all the commands, nothing rebuilds.</p>
 <div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
 <a class="sourceLine" id="cb280-2" data-line-number="2">  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,</a>
-<a class="sourceLine" id="cb280-3" data-line-number="3">  <span class="dt">psi_2 =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb280-4" data-line-number="4">    <span class="dt">command =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span>,</a>
-<a class="sourceLine" id="cb280-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> psi_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb280-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb280-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb280-8" data-line-number="8">plan</a>
-<a class="sourceLine" id="cb280-9" data-line-number="9"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
-<a class="sourceLine" id="cb280-10" data-line-number="10"><span class="co">#&gt;   target command                         trigger                       </span></a>
-<a class="sourceLine" id="cb280-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                          &lt;expr&gt;                        </span></a>
-<a class="sourceLine" id="cb280-12" data-line-number="12"><span class="co">#&gt; 1 psi_1  (sqrt(5) + 1)/2 + 9999999999999 NA                            </span></a>
-<a class="sourceLine" id="cb280-13" data-line-number="13"><span class="co">#&gt; 2 psi_2  (sqrt(5) - 1)/2 - 9999999999999 trigger(condition = psi_1 &gt; 0)</span></a>
-<a class="sourceLine" id="cb280-14" data-line-number="14"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb280-15" data-line-number="15"><span class="co">#&gt; target psi_2</span></a>
-<a class="sourceLine" id="cb280-16" data-line-number="16"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb280-17" data-line-number="17"><span class="co">#&gt; target psi_2</span></a></code></pre></div>
+<a class="sourceLine" id="cb280-3" data-line-number="3">  <span class="dt">psi_2 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span></a>
+<a class="sourceLine" id="cb280-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb280-5" data-line-number="5"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb280-6" data-line-number="6"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
+<p>You can also give different targets to different triggers. Triggers in the <code>drake</code> plan override the <code>trigger</code> argument to <code>make()</code>. Below, <code>psi_2</code> always builds, but <code>psi_1</code> only builds if it has never been built before.</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb281-2" data-line-number="2">  <span class="dt">psi_1 =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">9999999999999</span>,</a>
+<a class="sourceLine" id="cb281-3" data-line-number="3">  <span class="dt">psi_2 =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb281-4" data-line-number="4">    <span class="dt">command =</span> (<span class="kw">sqrt</span>(<span class="dv">5</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">9999999999999</span>,</a>
+<a class="sourceLine" id="cb281-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> psi_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb281-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb281-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb281-8" data-line-number="8">plan</a>
+<a class="sourceLine" id="cb281-9" data-line-number="9"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
+<a class="sourceLine" id="cb281-10" data-line-number="10"><span class="co">#&gt;   target command                         trigger                       </span></a>
+<a class="sourceLine" id="cb281-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;                          &lt;expr&gt;                        </span></a>
+<a class="sourceLine" id="cb281-12" data-line-number="12"><span class="co">#&gt; 1 psi_1  (sqrt(5) + 1)/2 + 9999999999999 NA                            </span></a>
+<a class="sourceLine" id="cb281-13" data-line-number="13"><span class="co">#&gt; 2 psi_2  (sqrt(5) - 1)/2 - 9999999999999 trigger(condition = psi_1 &gt; 0)</span></a>
+<a class="sourceLine" id="cb281-14" data-line-number="14"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb281-15" data-line-number="15"><span class="co">#&gt; target psi_2</span></a>
+<a class="sourceLine" id="cb281-16" data-line-number="16"><span class="kw">make</span>(plan, <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">command =</span> <span class="ot">FALSE</span>, <span class="dt">depend =</span> <span class="ot">FALSE</span>, <span class="dt">file =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb281-17" data-line-number="17"><span class="co">#&gt; target psi_2</span></a></code></pre></div>
 <p>Interestingly, <code>psi_2</code> now depends on <code>psi_1</code>. Since <code>psi_1</code> is part of the because of the <strong>condition</strong> trigger, it needs to be up to date before we attempt <code>psi_2</code>. However, since <code>psi_1</code> is not part of the command, changing it will not trip the other triggers such as <strong>depend</strong>.</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</a></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(<span class="kw">drake_config</span>(plan))</a></code></pre></div>
 <div id="htmlwidget-bcd3875ae205e6d170c5" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bcd3875ae205e6d170c5">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.004s","psi_2\n0.004s"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-bcd3875ae205e6d170c5">{"x":{"nodes":{"id":["psi_1","psi_2"],"imported":[false,false],"label":["psi_1\n0.005s","psi_2\n0.004s"],"status":["outdated","outdated"],"type":["object","object"],"font.size":[20,20],"color":["#000000","#000000"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["psi_1"],"to":["psi_2"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>In the next toy example below, <code>drake</code> reads from a file to decide whether to build <code>x</code>. Try it out.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb282-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb282-3" data-line-number="3">    <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb282-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">file_in</span>(<span class="kw">readRDS</span>(<span class="st">&quot;file.rds&quot;</span>)))</a>
-<a class="sourceLine" id="cb282-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb282-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb282-7" data-line-number="7"><span class="kw">saveRDS</span>(<span class="ot">TRUE</span>, <span class="st">&quot;file.rds&quot;</span>)</a>
-<a class="sourceLine" id="cb282-8" data-line-number="8"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-9" data-line-number="9"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb282-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-11" data-line-number="11"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb282-12" data-line-number="12"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-13" data-line-number="13"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb282-14" data-line-number="14"><span class="kw">saveRDS</span>(<span class="ot">FALSE</span>, <span class="st">&quot;file.rds&quot;</span>)</a>
-<a class="sourceLine" id="cb282-15" data-line-number="15"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-16" data-line-number="16"><span class="co">#&gt; All targets are already up to date.</span></a>
-<a class="sourceLine" id="cb282-17" data-line-number="17"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-18" data-line-number="18"><span class="co">#&gt; All targets are already up to date.</span></a>
-<a class="sourceLine" id="cb282-19" data-line-number="19"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb282-20" data-line-number="20"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
-<p>In a real project with remote data sources, you may want to use the <strong>condition</strong> trigger to limit your builds to times when enough bandwidth is available for a large download. For example,</p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
 <a class="sourceLine" id="cb283-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb283-3" data-line-number="3">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
-<a class="sourceLine" id="cb283-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>())</a>
+<a class="sourceLine" id="cb283-3" data-line-number="3">    <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb283-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">file_in</span>(<span class="kw">readRDS</span>(<span class="st">&quot;file.rds&quot;</span>)))</a>
 <a class="sourceLine" id="cb283-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb283-6" data-line-number="6">)</a></code></pre></div>
+<a class="sourceLine" id="cb283-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="kw">saveRDS</span>(<span class="ot">TRUE</span>, <span class="st">&quot;file.rds&quot;</span>)</a>
+<a class="sourceLine" id="cb283-8" data-line-number="8"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-9" data-line-number="9"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb283-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-11" data-line-number="11"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb283-12" data-line-number="12"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-13" data-line-number="13"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb283-14" data-line-number="14"><span class="kw">saveRDS</span>(<span class="ot">FALSE</span>, <span class="st">&quot;file.rds&quot;</span>)</a>
+<a class="sourceLine" id="cb283-15" data-line-number="15"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-16" data-line-number="16"><span class="co">#&gt; All targets are already up to date.</span></a>
+<a class="sourceLine" id="cb283-17" data-line-number="17"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-18" data-line-number="18"><span class="co">#&gt; All targets are already up to date.</span></a>
+<a class="sourceLine" id="cb283-19" data-line-number="19"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb283-20" data-line-number="20"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
+<p>In a real project with remote data sources, you may want to use the <strong>condition</strong> trigger to limit your builds to times when enough bandwidth is available for a large download. For example,</p>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb284-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb284-3" data-line-number="3">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
+<a class="sourceLine" id="cb284-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>())</a>
+<a class="sourceLine" id="cb284-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb284-6" data-line-number="6">)</a></code></pre></div>
 <p>Since the <strong>change</strong> trigger can return any value, it is often easier to use than the <strong>condition</strong> trigger.</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb284-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb284-3" data-line-number="3">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb284-4" data-line-number="4">    <span class="dt">command =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb284-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">sqrt</span>(y))</a>
-<a class="sourceLine" id="cb284-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb284-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb284-8" data-line-number="8">y &lt;-<span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb284-9" data-line-number="9"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb284-10" data-line-number="10"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb284-11" data-line-number="11"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb284-12" data-line-number="12"><span class="co">#&gt; All targets are already up to date.</span></a>
-<a class="sourceLine" id="cb284-13" data-line-number="13">y &lt;-<span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb284-14" data-line-number="14"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb284-15" data-line-number="15"><span class="co">#&gt; target x</span></a></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">destroy =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb285-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb285-3" data-line-number="3">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb285-4" data-line-number="4">    <span class="dt">command =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb285-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">sqrt</span>(y))</a>
+<a class="sourceLine" id="cb285-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb285-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb285-8" data-line-number="8">y &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb285-9" data-line-number="9"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb285-10" data-line-number="10"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb285-11" data-line-number="11"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb285-12" data-line-number="12"><span class="co">#&gt; All targets are already up to date.</span></a>
+<a class="sourceLine" id="cb285-13" data-line-number="13">y &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb285-14" data-line-number="14"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb285-15" data-line-number="15"><span class="co">#&gt; target x</span></a></code></pre></div>
 <p>In practice, you may want to use the <strong>change</strong> trigger to check a large remote before downloading it.</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb285-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb285-3" data-line-number="3">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
-<a class="sourceLine" id="cb285-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(</a>
-<a class="sourceLine" id="cb285-5" data-line-number="5">      <span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>(),</a>
-<a class="sourceLine" id="cb285-6" data-line-number="6">      <span class="dt">change =</span> <span class="kw">date_last_modified</span>()</a>
-<a class="sourceLine" id="cb285-7" data-line-number="7">    )</a>
-<a class="sourceLine" id="cb285-8" data-line-number="8">  )</a>
-<a class="sourceLine" id="cb285-9" data-line-number="9">)</a></code></pre></div>
-<p>A word of caution: every non-<code>NULL</code> <strong>change</strong> trigger is always evaluated, and its value is carried around in memory throughout <code>make()</code>. So if you are not careful, heavy use of the <strong>change</strong> trigger could slow down your workflow and consume extra resources. The <strong>change</strong> trigger should return small values (and should ideally be quick to evaluate). To reduce memory consumption, you may want to return a fingerprint of your trigger value rather than the value itself. See the <a href="https://github.com/eddelbuettel/digest"><code>digest</code></a> package for more information on computing hashes/fingerprints.</p>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb286-1" data-line-number="1"><span class="kw">library</span>(digest)</a>
-<a class="sourceLine" id="cb286-2" data-line-number="2"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb286-3" data-line-number="3">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb286-4" data-line-number="4">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
-<a class="sourceLine" id="cb286-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(</a>
-<a class="sourceLine" id="cb286-6" data-line-number="6">      <span class="dt">change =</span> <span class="kw">digest</span>(<span class="kw">download_medium_dataset</span>())</a>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb286-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb286-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb286-3" data-line-number="3">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
+<a class="sourceLine" id="cb286-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(</a>
+<a class="sourceLine" id="cb286-5" data-line-number="5">      <span class="dt">condition =</span> <span class="kw">is_enough_bandwidth</span>(),</a>
+<a class="sourceLine" id="cb286-6" data-line-number="6">      <span class="dt">change =</span> <span class="kw">date_last_modified</span>()</a>
 <a class="sourceLine" id="cb286-7" data-line-number="7">    )</a>
 <a class="sourceLine" id="cb286-8" data-line-number="8">  )</a>
 <a class="sourceLine" id="cb286-9" data-line-number="9">)</a></code></pre></div>
+<p>A word of caution: every non-<code>NULL</code> <strong>change</strong> trigger is always evaluated, and its value is carried around in memory throughout <code>make()</code>. So if you are not careful, heavy use of the <strong>change</strong> trigger could slow down your workflow and consume extra resources. The <strong>change</strong> trigger should return small values (and should ideally be quick to evaluate). To reduce memory consumption, you may want to return a fingerprint of your trigger value rather than the value itself. See the <a href="https://github.com/eddelbuettel/digest"><code>digest</code></a> package for more information on computing hashes/fingerprints.</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb287-1" data-line-number="1"><span class="kw">library</span>(digest)</a>
+<a class="sourceLine" id="cb287-2" data-line-number="2"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb287-3" data-line-number="3">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb287-4" data-line-number="4">    <span class="dt">command =</span> <span class="kw">download_large_dataset</span>(),</a>
+<a class="sourceLine" id="cb287-5" data-line-number="5">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(</a>
+<a class="sourceLine" id="cb287-6" data-line-number="6">      <span class="dt">change =</span> <span class="kw">digest</span>(<span class="kw">download_medium_dataset</span>())</a>
+<a class="sourceLine" id="cb287-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb287-8" data-line-number="8">  )</a>
+<a class="sourceLine" id="cb287-9" data-line-number="9">)</a></code></pre></div>
 </div>
 <div id="alternative-trigger-modes" class="section level2">
 <h2><span class="header-section-number">18.3</span> Alternative trigger modes</h2>
