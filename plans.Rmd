@@ -191,7 +191,7 @@ Creating targets for the plan is more of an art than a science, and it requires 
 1. Long enough to eat up a decent chunk of runtime, and
 2. Small enough that `make()` frequently skips it, and
 3. Meaningful to your project, and
-4. A well-behaved R object compatible with `saveRDS()`. For example, data frames behave better than [R6 classes](https://github.com/ropensci/drake/issues/345) and [`xgboost` matrices](https://github.com/ropensci/drake/issues/1038).
+4. A well-behaved R object compatible with `saveRDS()`. For example, data frames behave better than database connection objects (discussions [here](https://github.com/ropensci/drake/issues/1046) and [here](https://github.com/ropenscilabs/drake-manual/issues/46)), [R6 classes](https://github.com/ropensci/drake/issues/345), and [`xgboost` matrices](https://github.com/ropensci/drake/issues/1038).
 
 Above, "long" and "short" refer to computational runtime, not the size of the target's value. The more data you return to the targets, the more data `drake` puts in storage, and the slower your workflow becomes. If you have a large dataset, it may not be wise to copy it over several targets.
 
@@ -322,6 +322,8 @@ drake_plan(
 
 ### Limitations of file tracking
 
+#### Paths must be literal strings
+
 `file_in()`, `file_out()`, and `knitr_in()` require you to mention file names *explicitly*. You cannot use a variable containing the name of a file.
 
 ```{r}
@@ -332,6 +334,50 @@ bad_plan <- drake_plan(
 
 bad_config <- drake_config(bad_plan)
 vis_drake_graph(bad_config)
+```
+
+Instead, write this:
+
+```{r}
+good_plan <- drake_plan(
+  file = read_csv(file_in("my_data.csv")),
+)
+
+good_config <- drake_config(good_plan)
+vis_drake_graph(good_config)
+```
+
+#### Database connections
+
+`file_in()` and friends do not help us manage database connections. If you work with a database, the most general best practice is to always [trigger](#triggers) a snapshot to make sure you have the latest data.
+
+```{r, eval = FALSE}
+plan <- drake_plan(
+  data = target(
+     get_data_from_db("my_table"), # Define yourself.
+     trigger = trigger(condition = TRUE) # Always runs.
+  ),
+  preprocess = my_preprocessing(data) # Runs when the data change.
+)
+```
+
+In specific use cases, you may be able to watch database metadata for changes, but this information is situation-specific.
+
+```{r, eval = FALSE}
+library(DBI)
+
+# Connection objects are brittle, so they should not be targets.
+# We define them up front, and we use ignore() to prevent
+# drake from rerunning targets when the connection object changes.
+con <-  dbConnect(...)
+
+plan <- drake_plan(
+  data = target(
+     dbReadTable(ignore(con), "my_table"), # Use ignore() for db connection objects.
+     trigger = trigger(change = somehow_get_db_timestamp()) # Define yourself.
+  ),
+  preprocess = my_preprocessing(data) # runs when the data change
+)
 ```
 
 ## Large plans
