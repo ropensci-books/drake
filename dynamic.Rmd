@@ -29,15 +29,15 @@ library(drake)
 
 plan <- drake_plan(
   locations = get_location_db(), # many rows
-  coordinates = target(
-    my_geocode_fn(locations, method),
+  coord = target(
+    geocode_location(locations, method),
     dynamic = map(locations),
     transform = map(method = c("address", "postal", "boundary")) #static
   ),
   results = target(
-    bind_rows(coordinates),
-    dynamic = combine(coordinates),
-    transform = combine(coordinates)
+    bind_rows(coord),
+    dynamic = combine(coord),
+    transform = combine(coord)
   )
 )
 
@@ -68,7 +68,7 @@ plan <- drake_plan(
   dataset = gapminder %>%
     mutate(gdpPercap = scale(gdpPercap)),
   
-  # We need a grouping variable .
+  # We need a grouping variable.
   continent = unique(dataset$continent),
   
   # Fit GDP vs year for each country.
