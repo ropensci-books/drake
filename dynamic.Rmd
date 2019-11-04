@@ -95,21 +95,17 @@ plan <- drake_plan(
 )
 
 make(plan)
+```
 
+For grouping variables that are vectors and simple lists, dynamic branching iterates over the elements.
+
+```{r}
 readd(dynamic_lowercase)
 
 readd(dynamic_uppercase)
 ```
 
-If you put multiple grouping variables in the same `map()` (e.g. `static_numbers` and `static_letters` for `dynamic_lowercase` above) they must have the same `NROW()`.
-
-```{r}
-NROW(readd(static_numbers))
-
-NROW(readd(static_letters))
-```
-
-For vectors and simple lists, `NROW()` is just the length. For array-like objects (anything with a non-null `dim()`) `NROW()` is the size of first dimension. For data frames, this is the number of rows. In other words, dynamic branching always iterates over the *rows* of data frames, not the columns.[^1]
+For grouping variables that are array-like objects (anything with a non-null `dim()`) dynamic branching iterates over the *rows*. This includes not only arrays and matrices, but *data frames* and *tibble*s as well.[^1]
 
 [^1]: This behavior is a deliberate design choice. Yes, it contradicts `purrr::map()`, but [row-oriented workflows](https://github.com/jennybc/row-oriented-workflows) come up far more often than column-oriented workflows in `drake`. If you want to loop over the columns of a data frame, convert it to a list first.
 
@@ -121,12 +117,17 @@ plan <- drake_plan(
 
 make(plan)
 
-NROW(readd(dataset))
-
-length(readd(row))
-
 readd(row)
 ```
+
+Regardless of the data type of object `x`, `NROW(x)` tells you how many sub-targets you will get from `map(x)`.
+
+```{r}
+NROW(letters)
+
+NROW(mtcars)
+```
+
 
 ## cross()
 
