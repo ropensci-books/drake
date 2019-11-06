@@ -213,3 +213,68 @@ make(plan)
 
 readd(results)[[1]]
 ```
+
+## max_expand
+
+If we want to fit a model for every single *country* in the Gapminder dataset, the number of sub-targets grows large, and the workflow becomes cumbersome.
+
+```{r}
+length(unique(gapminder$country)) # number of countries
+```
+
+To make things easier to manage, we should develop and test on a downsized version of the workflow before scaling up. Simply set `max_expand` to a small number in `make()`.
+
+```{r}
+library(broom)
+library(drake)
+library(gapminder)
+library(tidyverse)
+
+fit_model <- function(dataset, country) {
+  dataset %>%
+    filter(country == !!country) %>% # The !! is important.
+    lm(formula = gdpPercap ~ year) %>%
+    tidy() %>%
+    mutate(country = !!country)
+}
+
+plan <- drake_plan(
+  # This dataset can change, and we want
+  # the downstream targets to update.
+  dataset = gapminder %>%
+    mutate(gdpPercap = scale(gdpPercap)),
+  
+  # We need a grouping variable.
+  country = unique(dataset$country),
+  
+  # Fit GDP vs year for each country.
+  model = target(
+    fit_model(dataset, country),
+    dynamic = map(country) # Activate dynamic branching!
+  )
+)
+
+make(plan, max_expand = 2)
+
+readd(model)
+```
+
+If we scale up to more models and leave the dependencies alone, the old models stay up to date.
+
+```{r}
+make(plan, max_expand = 3) # previously 2
+
+readd(model)
+```
+
+Likewise, we can reuse old models if we scale back down.
+
+```{r}
+make(plan, max_expand = 1) # Does not fit any new models.
+
+# All make() did was associate the dynamic target "model" with
+# a different set of sub-targets.
+progress()
+
+readd(model)
+```
