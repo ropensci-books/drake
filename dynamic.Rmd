@@ -222,7 +222,7 @@ If we want to fit a model for every single *country* in the Gapminder dataset, t
 length(unique(gapminder$country)) # number of countries
 ```
 
-To make things easier to manage, we should develop and test on a downsized version of the workflow before scaling up. Simply set `max_expand` to a small number in `make()`.
+To make things easier to manage, we should develop and test on a downsized version of the workflow before scaling up. Simply set `max_expand` to a small number in `make()`. That way, `drake` only builds the first few sub-targets for each dynamic target.
 
 ```{r}
 library(broom)
@@ -254,7 +254,7 @@ plan <- drake_plan(
   )
 )
 
-make(plan, max_expand = 2)
+make(plan, max_expand = 2) # Only run the first 2 models.
 
 readd(model)
 ```
