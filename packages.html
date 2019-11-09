@@ -218,7 +218,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
 <li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
-<li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.7</b> max_expand</a></li>
+<li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#the-trace"><i class="fa fa-check"></i><b>5.7</b> The trace</a></li>
+<li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>6</b> Static branching</a><ul>
 <li class="chapter" data-level="6.0.1" data-path="static.html"><a href="static.html#how-to-create-large-plans"><i class="fa fa-check"></i><b>6.0.1</b> How to create large plans</a></li>
@@ -430,162 +431,162 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="get-the-code." class="section level2">
 <h2><span class="header-section-number">10.1</span> Get the code.</h2>
 <p>Write the code files to your workspace.</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</a></code></pre></div>
 <p>The new <code>packages</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/wlandau/drake-examples/tree/master/packages">online here</a>.</p>
 </div>
 <div id="overview" class="section level2">
 <h2><span class="header-section-number">10.2</span> Overview</h2>
 <p>This small data analysis project explores some trends in R package downloads over time. The datasets are downloaded using the <a href="https://github.com/metacran/cranlogs">cranlogs package</a>.</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" data-line-number="1"><span class="kw">library</span>(cranlogs)</a>
-<a class="sourceLine" id="cb156-2" data-line-number="2"><span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)</a>
-<a class="sourceLine" id="cb156-3" data-line-number="3"><span class="co">#&gt;         date count package</span></a>
-<a class="sourceLine" id="cb156-4" data-line-number="4"><span class="co">#&gt; 1 2019-10-30 42319   dplyr</span></a>
-<a class="sourceLine" id="cb156-5" data-line-number="5"><span class="co">#&gt; 2 2019-10-31 40498   dplyr</span></a>
-<a class="sourceLine" id="cb156-6" data-line-number="6"><span class="co">#&gt; 3 2019-11-01 33060   dplyr</span></a>
-<a class="sourceLine" id="cb156-7" data-line-number="7"><span class="co">#&gt; 4 2019-11-02 22150   dplyr</span></a>
-<a class="sourceLine" id="cb156-8" data-line-number="8"><span class="co">#&gt; 5 2019-11-03 23426   dplyr</span></a>
-<a class="sourceLine" id="cb156-9" data-line-number="9"><span class="co">#&gt; 6 2019-11-04 39746   dplyr</span></a>
-<a class="sourceLine" id="cb156-10" data-line-number="10"><span class="co">#&gt; 7 2019-11-05 43888   dplyr</span></a></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1"><span class="kw">library</span>(cranlogs)</a>
+<a class="sourceLine" id="cb160-2" data-line-number="2"><span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)</a>
+<a class="sourceLine" id="cb160-3" data-line-number="3"><span class="co">#&gt;         date count package</span></a>
+<a class="sourceLine" id="cb160-4" data-line-number="4"><span class="co">#&gt; 1 2019-11-01 33060   dplyr</span></a>
+<a class="sourceLine" id="cb160-5" data-line-number="5"><span class="co">#&gt; 2 2019-11-02 22150   dplyr</span></a>
+<a class="sourceLine" id="cb160-6" data-line-number="6"><span class="co">#&gt; 3 2019-11-03 23426   dplyr</span></a>
+<a class="sourceLine" id="cb160-7" data-line-number="7"><span class="co">#&gt; 4 2019-11-04 39746   dplyr</span></a>
+<a class="sourceLine" id="cb160-8" data-line-number="8"><span class="co">#&gt; 5 2019-11-05 43888   dplyr</span></a>
+<a class="sourceLine" id="cb160-9" data-line-number="9"><span class="co">#&gt; 6 2019-11-06 43630   dplyr</span></a>
+<a class="sourceLine" id="cb160-10" data-line-number="10"><span class="co">#&gt; 7 2019-11-07 40729   dplyr</span></a></code></pre></div>
 <p>Above, each count is the number of times <code>dplyr</code> was downloaded from the RStudio CRAN mirror on the given day. To stay up to date with the latest download statistics, we need to refresh the data frequently. With <code>drake</code>, we can bring all our work up to date without restarting everything from scratch.</p>
 </div>
 <div id="analysis" class="section level2">
 <h2><span class="header-section-number">10.3</span> Analysis</h2>
 <p>First, we load the required packages. <code>drake</code> detects the packages you install and load.</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="kw">library</span>(cranlogs)</a>
-<a class="sourceLine" id="cb157-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb157-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb157-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb157-5" data-line-number="5"><span class="kw">library</span>(knitr)</a>
-<a class="sourceLine" id="cb157-6" data-line-number="6"><span class="kw">library</span>(rvest)</a></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">library</span>(cranlogs)</a>
+<a class="sourceLine" id="cb161-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb161-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb161-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb161-5" data-line-number="5"><span class="kw">library</span>(knitr)</a>
+<a class="sourceLine" id="cb161-6" data-line-number="6"><span class="kw">library</span>(rvest)</a></code></pre></div>
 <p>We will want custom functions to summarize the CRAN logs we download.</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" data-line-number="1">make_my_table &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</a>
-<a class="sourceLine" id="cb158-2" data-line-number="2">  <span class="kw">group_by</span>(downloads, package) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb158-3" data-line-number="3"><span class="st">    </span><span class="kw">summarize</span>(<span class="dt">mean_downloads =</span> <span class="kw">mean</span>(count))</a>
-<a class="sourceLine" id="cb158-4" data-line-number="4">}</a>
-<a class="sourceLine" id="cb158-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb158-6" data-line-number="6">make_my_plot &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</a>
-<a class="sourceLine" id="cb158-7" data-line-number="7">  <span class="kw">ggplot</span>(downloads) <span class="op">+</span></a>
-<a class="sourceLine" id="cb158-8" data-line-number="8"><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> count, <span class="dt">group =</span> package, <span class="dt">color =</span> package))</a>
-<a class="sourceLine" id="cb158-9" data-line-number="9">}</a></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" data-line-number="1">make_my_table &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</a>
+<a class="sourceLine" id="cb162-2" data-line-number="2">  <span class="kw">group_by</span>(downloads, package) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb162-3" data-line-number="3"><span class="st">    </span><span class="kw">summarize</span>(<span class="dt">mean_downloads =</span> <span class="kw">mean</span>(count))</a>
+<a class="sourceLine" id="cb162-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb162-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb162-6" data-line-number="6">make_my_plot &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</a>
+<a class="sourceLine" id="cb162-7" data-line-number="7">  <span class="kw">ggplot</span>(downloads) <span class="op">+</span></a>
+<a class="sourceLine" id="cb162-8" data-line-number="8"><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> count, <span class="dt">group =</span> package, <span class="dt">color =</span> package))</a>
+<a class="sourceLine" id="cb162-9" data-line-number="9">}</a></code></pre></div>
 <p>Next, we generate the plan.</p>
 <p>We want to explore the daily downloads from the <code>knitr</code>, <code>Rcpp</code>, and <code>ggplot2</code> packages. We will use the <a href="https://github.com/metacran/cranlogs"><code>cranlogs</code> package</a> to get daily logs of package downloads from RStudio’s CRAN mirror. In our <code>drake_plan()</code>, we declare targets <code>older</code> and <code>recent</code> to contain snapshots of the logs.</p>
 <p>The following <code>drake_plan()</code> syntax is described <a href="https://ropenscilabs.github.io/drake-manual/plans.html#create-large-plans-the-easy-way">here</a>, which is supported in <code>drake</code> 7.0.0 and above (and the <a href="https://github.com/ropensci/drake">current development version</a>).</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb159-2" data-line-number="2">  <span class="dt">older =</span> <span class="kw">cran_downloads</span>(</a>
-<a class="sourceLine" id="cb159-3" data-line-number="3">    <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</a>
-<a class="sourceLine" id="cb159-4" data-line-number="4">    <span class="dt">from =</span> <span class="st">&quot;2016-11-01&quot;</span>,</a>
-<a class="sourceLine" id="cb159-5" data-line-number="5">    <span class="dt">to =</span> <span class="st">&quot;2016-12-01&quot;</span>,</a>
-<a class="sourceLine" id="cb159-6" data-line-number="6">  ),</a>
-<a class="sourceLine" id="cb159-7" data-line-number="7">  <span class="dt">recent =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb159-8" data-line-number="8">    <span class="dt">command =</span> <span class="kw">cran_downloads</span>(</a>
-<a class="sourceLine" id="cb159-9" data-line-number="9">      <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</a>
-<a class="sourceLine" id="cb159-10" data-line-number="10">      <span class="dt">when =</span> <span class="st">&quot;last-month&quot;</span>),</a>
-<a class="sourceLine" id="cb159-11" data-line-number="11">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">latest_log_date</span>())</a>
-<a class="sourceLine" id="cb159-12" data-line-number="12">  ),</a>
-<a class="sourceLine" id="cb159-13" data-line-number="13">  <span class="dt">averages =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb159-14" data-line-number="14">    <span class="kw">make_my_table</span>(data),</a>
-<a class="sourceLine" id="cb159-15" data-line-number="15">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data =</span> <span class="kw">c</span>(older, recent))</a>
-<a class="sourceLine" id="cb159-16" data-line-number="16">  ),</a>
-<a class="sourceLine" id="cb159-17" data-line-number="17">  <span class="dt">plot =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb159-18" data-line-number="18">    <span class="kw">make_my_plot</span>(data),</a>
-<a class="sourceLine" id="cb159-19" data-line-number="19">    <span class="dt">transform =</span> <span class="kw">map</span>(data)</a>
-<a class="sourceLine" id="cb159-20" data-line-number="20">  ),</a>
-<a class="sourceLine" id="cb159-21" data-line-number="21">  <span class="dt">report =</span> <span class="kw">knit</span>(</a>
-<a class="sourceLine" id="cb159-22" data-line-number="22">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb159-23" data-line-number="23">    <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>),</a>
-<a class="sourceLine" id="cb159-24" data-line-number="24">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb159-25" data-line-number="25">  )</a>
-<a class="sourceLine" id="cb159-26" data-line-number="26">)</a></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb163-2" data-line-number="2">  <span class="dt">older =</span> <span class="kw">cran_downloads</span>(</a>
+<a class="sourceLine" id="cb163-3" data-line-number="3">    <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</a>
+<a class="sourceLine" id="cb163-4" data-line-number="4">    <span class="dt">from =</span> <span class="st">&quot;2016-11-01&quot;</span>,</a>
+<a class="sourceLine" id="cb163-5" data-line-number="5">    <span class="dt">to =</span> <span class="st">&quot;2016-12-01&quot;</span>,</a>
+<a class="sourceLine" id="cb163-6" data-line-number="6">  ),</a>
+<a class="sourceLine" id="cb163-7" data-line-number="7">  <span class="dt">recent =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb163-8" data-line-number="8">    <span class="dt">command =</span> <span class="kw">cran_downloads</span>(</a>
+<a class="sourceLine" id="cb163-9" data-line-number="9">      <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</a>
+<a class="sourceLine" id="cb163-10" data-line-number="10">      <span class="dt">when =</span> <span class="st">&quot;last-month&quot;</span>),</a>
+<a class="sourceLine" id="cb163-11" data-line-number="11">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">latest_log_date</span>())</a>
+<a class="sourceLine" id="cb163-12" data-line-number="12">  ),</a>
+<a class="sourceLine" id="cb163-13" data-line-number="13">  <span class="dt">averages =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb163-14" data-line-number="14">    <span class="kw">make_my_table</span>(data),</a>
+<a class="sourceLine" id="cb163-15" data-line-number="15">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data =</span> <span class="kw">c</span>(older, recent))</a>
+<a class="sourceLine" id="cb163-16" data-line-number="16">  ),</a>
+<a class="sourceLine" id="cb163-17" data-line-number="17">  <span class="dt">plot =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb163-18" data-line-number="18">    <span class="kw">make_my_plot</span>(data),</a>
+<a class="sourceLine" id="cb163-19" data-line-number="19">    <span class="dt">transform =</span> <span class="kw">map</span>(data)</a>
+<a class="sourceLine" id="cb163-20" data-line-number="20">  ),</a>
+<a class="sourceLine" id="cb163-21" data-line-number="21">  <span class="dt">report =</span> <span class="kw">knit</span>(</a>
+<a class="sourceLine" id="cb163-22" data-line-number="22">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
+<a class="sourceLine" id="cb163-23" data-line-number="23">    <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>),</a>
+<a class="sourceLine" id="cb163-24" data-line-number="24">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb163-25" data-line-number="25">  )</a>
+<a class="sourceLine" id="cb163-26" data-line-number="26">)</a></code></pre></div>
 <p>Notice the custom trigger for the target <code>recent</code>. Here, we are telling <code>drake</code> to rebuild <code>recent</code> whenever a new day’s log is uploaded to <a href="http://cran-logs.rstudio.com" class="uri">http://cran-logs.rstudio.com</a>. In other words, <code>drake</code> keeps track of the return value of <code>latest_log_date()</code> and recomputes <code>recent</code> (during <code>make()</code>) if that value changed since the last <code>make()</code>. Here, <code>latest_log_date()</code> is one of our custom imported functions. We use it to scrape <a href="http://cran-logs.rstudio.com" class="uri">http://cran-logs.rstudio.com</a> using the <a href="https://github.com/hadley/rvest"><code>rvest</code></a> package.</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1">latest_log_date &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb160-2" data-line-number="2">  <span class="kw">read_html</span>(<span class="st">&quot;http://cran-logs.rstudio.com/&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb160-3" data-line-number="3"><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;li:last-of-type&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb160-4" data-line-number="4"><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;a:last-of-type&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb160-5" data-line-number="5"><span class="st">    </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb160-6" data-line-number="6"><span class="st">    </span>max</a>
-<a class="sourceLine" id="cb160-7" data-line-number="7">}</a></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" data-line-number="1">latest_log_date &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb164-2" data-line-number="2">  <span class="kw">read_html</span>(<span class="st">&quot;http://cran-logs.rstudio.com/&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb164-3" data-line-number="3"><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;li:last-of-type&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb164-4" data-line-number="4"><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;a:last-of-type&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb164-5" data-line-number="5"><span class="st">    </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb164-6" data-line-number="6"><span class="st">    </span>max</a>
+<a class="sourceLine" id="cb164-7" data-line-number="7">}</a></code></pre></div>
 <p>Now, we run the project to download the data and analyze it.
 The results will be summarized in the knitted report, <code>report.md</code>,
 but you can also read the results directly from the cache.</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb161-2" data-line-number="2"><span class="co">#&gt; target recent</span></a>
-<a class="sourceLine" id="cb161-3" data-line-number="3"><span class="co">#&gt; target older</span></a>
-<a class="sourceLine" id="cb161-4" data-line-number="4"><span class="co">#&gt; target averages_recent</span></a>
-<a class="sourceLine" id="cb161-5" data-line-number="5"><span class="co">#&gt; target plot_recent</span></a>
-<a class="sourceLine" id="cb161-6" data-line-number="6"><span class="co">#&gt; target averages_older</span></a>
-<a class="sourceLine" id="cb161-7" data-line-number="7"><span class="co">#&gt; target plot_older</span></a>
-<a class="sourceLine" id="cb161-8" data-line-number="8"><span class="co">#&gt; target report</span></a>
-<a class="sourceLine" id="cb161-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb161-10" data-line-number="10"><span class="kw">readd</span>(averages_recent)</a>
-<a class="sourceLine" id="cb161-11" data-line-number="11"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb161-12" data-line-number="12"><span class="co">#&gt;   package mean_downloads</span></a>
-<a class="sourceLine" id="cb161-13" data-line-number="13"><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb161-14" data-line-number="14"><span class="co">#&gt; 1 ggplot2         33520.</span></a>
-<a class="sourceLine" id="cb161-15" data-line-number="15"><span class="co">#&gt; 2 knitr           22808.</span></a>
-<a class="sourceLine" id="cb161-16" data-line-number="16"><span class="co">#&gt; 3 Rcpp            35640</span></a>
-<a class="sourceLine" id="cb161-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb161-18" data-line-number="18"><span class="kw">readd</span>(averages_older)</a>
-<a class="sourceLine" id="cb161-19" data-line-number="19"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb161-20" data-line-number="20"><span class="co">#&gt;   package mean_downloads</span></a>
-<a class="sourceLine" id="cb161-21" data-line-number="21"><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb161-22" data-line-number="22"><span class="co">#&gt; 1 ggplot2         14641.</span></a>
-<a class="sourceLine" id="cb161-23" data-line-number="23"><span class="co">#&gt; 2 knitr            9069.</span></a>
-<a class="sourceLine" id="cb161-24" data-line-number="24"><span class="co">#&gt; 3 Rcpp            14408.</span></a>
-<a class="sourceLine" id="cb161-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb161-26" data-line-number="26"><span class="kw">readd</span>(plot_recent)</a></code></pre></div>
-<p><img src="drake-manual_files/figure-html/unnamed-chunk-171-1.png" width="672" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb162-2" data-line-number="2"><span class="kw">readd</span>(plot_older)</a></code></pre></div>
-<p><img src="drake-manual_files/figure-html/unnamed-chunk-171-2.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb165-2" data-line-number="2"><span class="co">#&gt; target recent</span></a>
+<a class="sourceLine" id="cb165-3" data-line-number="3"><span class="co">#&gt; target older</span></a>
+<a class="sourceLine" id="cb165-4" data-line-number="4"><span class="co">#&gt; target averages_recent</span></a>
+<a class="sourceLine" id="cb165-5" data-line-number="5"><span class="co">#&gt; target plot_recent</span></a>
+<a class="sourceLine" id="cb165-6" data-line-number="6"><span class="co">#&gt; target averages_older</span></a>
+<a class="sourceLine" id="cb165-7" data-line-number="7"><span class="co">#&gt; target plot_older</span></a>
+<a class="sourceLine" id="cb165-8" data-line-number="8"><span class="co">#&gt; target report</span></a>
+<a class="sourceLine" id="cb165-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb165-10" data-line-number="10"><span class="kw">readd</span>(averages_recent)</a>
+<a class="sourceLine" id="cb165-11" data-line-number="11"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
+<a class="sourceLine" id="cb165-12" data-line-number="12"><span class="co">#&gt;   package mean_downloads</span></a>
+<a class="sourceLine" id="cb165-13" data-line-number="13"><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb165-14" data-line-number="14"><span class="co">#&gt; 1 ggplot2         33253.</span></a>
+<a class="sourceLine" id="cb165-15" data-line-number="15"><span class="co">#&gt; 2 knitr           22734.</span></a>
+<a class="sourceLine" id="cb165-16" data-line-number="16"><span class="co">#&gt; 3 Rcpp            35546.</span></a>
+<a class="sourceLine" id="cb165-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb165-18" data-line-number="18"><span class="kw">readd</span>(averages_older)</a>
+<a class="sourceLine" id="cb165-19" data-line-number="19"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
+<a class="sourceLine" id="cb165-20" data-line-number="20"><span class="co">#&gt;   package mean_downloads</span></a>
+<a class="sourceLine" id="cb165-21" data-line-number="21"><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb165-22" data-line-number="22"><span class="co">#&gt; 1 ggplot2         14641.</span></a>
+<a class="sourceLine" id="cb165-23" data-line-number="23"><span class="co">#&gt; 2 knitr            9069.</span></a>
+<a class="sourceLine" id="cb165-24" data-line-number="24"><span class="co">#&gt; 3 Rcpp            14408.</span></a>
+<a class="sourceLine" id="cb165-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb165-26" data-line-number="26"><span class="kw">readd</span>(plot_recent)</a></code></pre></div>
+<p><img src="drake-manual_files/figure-html/unnamed-chunk-175-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb166-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb166-2" data-line-number="2"><span class="kw">readd</span>(plot_older)</a></code></pre></div>
+<p><img src="drake-manual_files/figure-html/unnamed-chunk-175-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>If we run <code>make()</code> again right away, we see that everything is up to date. But if we wait until a new day’s log is uploaded, <code>make()</code> will update <code>recent</code> and everything that depends on it.</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb163-2" data-line-number="2"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb167-2" data-line-number="2"><span class="co">#&gt; All targets are already up to date.</span></a></code></pre></div>
 <p>To visualize the build behavior, you can plot the dependency network.</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
-<a class="sourceLine" id="cb164-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb168-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
+<a class="sourceLine" id="cb168-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
 <div id="htmlwidget-5ae10376b6dc8d6e7c52" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5ae10376b6dc8d6e7c52">{"x":{"nodes":{"id":["p-OJSXA33SOQXFE3LE","make_my_plot","older","make_my_table","latest_log_date","plot_older","averages_older","recent","averages_recent","plot_recent","report","p-OJSXA33SOQXG2ZA"],"imported":[true,true,false,true,true,false,false,false,false,false,false,false],"label":["file report.Rmd","make_my_plot","older\n0.195s","make_my_table","latest_log_date","plot_older\n0.032s","averages_older\n0.012s","recent\n0.771s","averages_recent\n0.008s","plot_recent\n0.027s","report\n1.354s","file report.md"],"status":["imported","imported","up to date","imported","imported","up to date","up to date","up to date","up to date","up to date","up to date","up to date"],"type":["file","function","object","function","function","object","object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#228B22","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["square","triangle","dot","triangle","triangle","dot","dot","dot","dot","dot","dot","square"],"level":[1,1,1,1,1,2,2,2,3,3,4,5],"x":[-1,-1,-1,-1,-1,-0.5,-0.5,-0.5,0,0,0.5,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.75,2.22044604925031e-16,0.75,-0.5,0.5,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["averages_recent","averages_older","plot_recent","plot_older","p-OJSXA33SOQXFE3LE","report","make_my_plot","make_my_plot","recent","recent","older","older","make_my_table","make_my_table","latest_log_date"],"to":["report","report","report","report","report","p-OJSXA33SOQXG2ZA","plot_recent","plot_older","averages_recent","plot_recent","averages_older","plot_older","averages_recent","averages_older","recent"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Function","File"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,9,10]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-5ae10376b6dc8d6e7c52">{"x":{"nodes":{"id":["p-OJSXA33SOQXFE3LE","make_my_plot","older","make_my_table","latest_log_date","plot_older","averages_older","recent","averages_recent","plot_recent","report","p-OJSXA33SOQXG2ZA"],"imported":[true,true,false,true,true,false,false,false,false,false,false,false],"label":["file report.Rmd","make_my_plot","older\n0.164s","make_my_table","latest_log_date","plot_older\n0.028s","averages_older\n0.01s","recent\n0.689s","averages_recent\n0.005s","plot_recent\n0.024s","report\n1.224s","file report.md"],"status":["imported","imported","up to date","imported","imported","up to date","up to date","up to date","up to date","up to date","up to date","up to date"],"type":["file","function","object","function","function","object","object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#228B22","#1874CD","#1874CD","#228B22","#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["square","triangle","dot","triangle","triangle","dot","dot","dot","dot","dot","dot","square"],"level":[1,1,1,1,1,2,2,2,3,3,4,5],"x":[-1,-1,-1,-1,-1,-0.5,-0.5,-0.5,0,0,0.5,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.75,2.22044604925031e-16,0.75,-0.5,0.5,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["averages_recent","averages_older","plot_recent","plot_older","p-OJSXA33SOQXFE3LE","report","make_my_plot","make_my_plot","recent","recent","older","older","make_my_table","make_my_table","latest_log_date"],"to":["report","report","report","report","report","p-OJSXA33SOQXG2ZA","plot_recent","plot_older","averages_recent","plot_recent","averages_older","plot_older","averages_recent","averages_older","recent"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Imported","Object","Function","File"],"color":["#228B22","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[1,5,7,9,10]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="other-ways-to-trigger-downloads" class="section level2">
 <h2><span class="header-section-number">10.4</span> Other ways to trigger downloads</h2>
 <p>Sometimes, our remote data sources get revised, and web scraping may not be the best way to detect changes. We may want to look at our remote dataset’s modification time or HTTP ETag. To see how this works, consider the CRAN log file from February 9, 2018.</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1">url &lt;-<span class="st"> &quot;http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1">url &lt;-<span class="st"> &quot;http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz&quot;</span></a></code></pre></div>
 <p>We can track the modification date using the <a href="https://github.com/r-lib/httr"><code>httr</code></a> package.</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb166-1" data-line-number="1"><span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span></a>
-<a class="sourceLine" id="cb166-2" data-line-number="2"><span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]</a>
-<a class="sourceLine" id="cb166-3" data-line-number="3"><span class="co">#&gt; [1] &quot;Mon, 12 Feb 2018 16:34:48 GMT&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb170-1" data-line-number="1"><span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span></a>
+<a class="sourceLine" id="cb170-2" data-line-number="2"><span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]</a>
+<a class="sourceLine" id="cb170-3" data-line-number="3"><span class="co">#&gt; [1] &quot;Mon, 12 Feb 2018 16:34:48 GMT&quot;</span></a></code></pre></div>
 <p>In our <code>drake</code> plan, we can track this timestamp and trigger a download whenever it changes.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb167-2" data-line-number="2">  <span class="dt">logs =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb167-3" data-line-number="3">    <span class="kw">get_logs</span>(url),</a>
-<a class="sourceLine" id="cb167-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]])</a>
-<a class="sourceLine" id="cb167-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb167-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb167-7" data-line-number="7">plan</a>
-<a class="sourceLine" id="cb167-8" data-line-number="8"><span class="co">#&gt; # A tibble: 1 x 3</span></a>
-<a class="sourceLine" id="cb167-9" data-line-number="9"><span class="co">#&gt;   target command       trigger                                             </span></a>
-<a class="sourceLine" id="cb167-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;        &lt;expr&gt;                                              </span></a>
-<a class="sourceLine" id="cb167-11" data-line-number="11"><span class="co">#&gt; 1 logs   get_logs(url) trigger(change = HEAD(url)$headers[[&quot;last-modified&quot;…</span></a></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb171-2" data-line-number="2">  <span class="dt">logs =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb171-3" data-line-number="3">    <span class="kw">get_logs</span>(url),</a>
+<a class="sourceLine" id="cb171-4" data-line-number="4">    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]])</a>
+<a class="sourceLine" id="cb171-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb171-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb171-7" data-line-number="7">plan</a>
+<a class="sourceLine" id="cb171-8" data-line-number="8"><span class="co">#&gt; # A tibble: 1 x 3</span></a>
+<a class="sourceLine" id="cb171-9" data-line-number="9"><span class="co">#&gt;   target command       trigger                                             </span></a>
+<a class="sourceLine" id="cb171-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;        &lt;expr&gt;                                              </span></a>
+<a class="sourceLine" id="cb171-11" data-line-number="11"><span class="co">#&gt; 1 logs   get_logs(url) trigger(change = HEAD(url)$headers[[&quot;last-modified&quot;…</span></a></code></pre></div>
 <p>where</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb168-1" data-line-number="1"><span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span></a>
-<a class="sourceLine" id="cb168-2" data-line-number="2"><span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span></a>
-<a class="sourceLine" id="cb168-3" data-line-number="3">get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url){</a>
-<a class="sourceLine" id="cb168-4" data-line-number="4">  <span class="kw">curl_download</span>(url, <span class="st">&quot;logs.csv.gz&quot;</span>)       <span class="co"># Get a big file.</span></a>
-<a class="sourceLine" id="cb168-5" data-line-number="5">  <span class="kw">gunzip</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>) <span class="co"># Unzip it.</span></a>
-<a class="sourceLine" id="cb168-6" data-line-number="6">  out &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;logs.csv&quot;</span>, <span class="dt">nrows =</span> <span class="dv">4</span>)  <span class="co"># Extract the data you need.</span></a>
-<a class="sourceLine" id="cb168-7" data-line-number="7">  <span class="kw">unlink</span>(<span class="kw">c</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="st">&quot;logs.csv&quot;</span>))    <span class="co"># Remove the big files</span></a>
-<a class="sourceLine" id="cb168-8" data-line-number="8">  out                                     <span class="co"># Value of the target.</span></a>
-<a class="sourceLine" id="cb168-9" data-line-number="9">}</a></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1"><span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span></a>
+<a class="sourceLine" id="cb172-2" data-line-number="2"><span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span></a>
+<a class="sourceLine" id="cb172-3" data-line-number="3">get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url){</a>
+<a class="sourceLine" id="cb172-4" data-line-number="4">  <span class="kw">curl_download</span>(url, <span class="st">&quot;logs.csv.gz&quot;</span>)       <span class="co"># Get a big file.</span></a>
+<a class="sourceLine" id="cb172-5" data-line-number="5">  <span class="kw">gunzip</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>) <span class="co"># Unzip it.</span></a>
+<a class="sourceLine" id="cb172-6" data-line-number="6">  out &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;logs.csv&quot;</span>, <span class="dt">nrows =</span> <span class="dv">4</span>)  <span class="co"># Extract the data you need.</span></a>
+<a class="sourceLine" id="cb172-7" data-line-number="7">  <span class="kw">unlink</span>(<span class="kw">c</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="st">&quot;logs.csv&quot;</span>))    <span class="co"># Remove the big files</span></a>
+<a class="sourceLine" id="cb172-8" data-line-number="8">  out                                     <span class="co"># Value of the target.</span></a>
+<a class="sourceLine" id="cb172-9" data-line-number="9">}</a></code></pre></div>
 <p>When we are ready, we run the workflow.</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb169-2" data-line-number="2"><span class="co">#&gt; target logs</span></a>
-<a class="sourceLine" id="cb169-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb169-4" data-line-number="4"><span class="kw">readd</span>(logs)</a>
-<a class="sourceLine" id="cb169-5" data-line-number="5"><span class="co">#&gt;         date     time     size version  os country ip_id</span></a>
-<a class="sourceLine" id="cb169-6" data-line-number="6"><span class="co">#&gt; 1 2018-02-09 13:01:13 82375220   3.4.3 win      RO     1</span></a>
-<a class="sourceLine" id="cb169-7" data-line-number="7"><span class="co">#&gt; 2 2018-02-09 13:02:06 74286541   3.3.3 win      US     2</span></a>
-<a class="sourceLine" id="cb169-8" data-line-number="8"><span class="co">#&gt; 3 2018-02-09 13:02:10 82375216   3.4.3 win      US     3</span></a>
-<a class="sourceLine" id="cb169-9" data-line-number="9"><span class="co">#&gt; 4 2018-02-09 13:03:30 82375220   3.4.3 win      IS     4</span></a></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb173-2" data-line-number="2"><span class="co">#&gt; target logs</span></a>
+<a class="sourceLine" id="cb173-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb173-4" data-line-number="4"><span class="kw">readd</span>(logs)</a>
+<a class="sourceLine" id="cb173-5" data-line-number="5"><span class="co">#&gt;         date     time     size version  os country ip_id</span></a>
+<a class="sourceLine" id="cb173-6" data-line-number="6"><span class="co">#&gt; 1 2018-02-09 13:01:13 82375220   3.4.3 win      RO     1</span></a>
+<a class="sourceLine" id="cb173-7" data-line-number="7"><span class="co">#&gt; 2 2018-02-09 13:02:06 74286541   3.3.3 win      US     2</span></a>
+<a class="sourceLine" id="cb173-8" data-line-number="8"><span class="co">#&gt; 3 2018-02-09 13:02:10 82375216   3.4.3 win      US     3</span></a>
+<a class="sourceLine" id="cb173-9" data-line-number="9"><span class="co">#&gt; 4 2018-02-09 13:03:30 82375220   3.4.3 win      IS     4</span></a></code></pre></div>
 <p>If the log file at the <code>url</code> ever changes, the timestamp will update remotely, and <code>make()</code> will download the file again.</p>
 
 </div>
