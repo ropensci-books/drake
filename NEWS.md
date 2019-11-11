@@ -1,4 +1,4 @@
-## Version 7.7.0.9001
+## Version 7.7.0.9002
 
 - Add a chapter called `scripts` describing `drake`'s approach to script-based workflows and using `code_to_function()`.(#41, @thebioengineer) 
 - Document new `on_select` behaviour of `vis_drake_graph()`, `drake_graph_info()`, and `render_drake_graph()`.
