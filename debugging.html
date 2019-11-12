@@ -10,16 +10,16 @@
 
   <meta property="og:title" content="Chapter 17 Debugging and testing drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://ropenscilabs.github.io/drake-manual" />
-  <meta property="og:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
+  <meta property="og:url" content="https://books.ropensci.org/drake/" />
+  <meta property="og:image" content="https://books.ropensci.org/drake//images/logo.png" />
   <meta property="og:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="github-repo" content="ropenscilabs/drake-manual" />
+  <meta name="github-repo" content="ropensci-books/drake" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Chapter 17 Debugging and testing drake projects | The drake R Package User Manual" />
   
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="twitter:image" content="https://ropenscilabs.github.io/drake-manual/images/logo.png" />
+  <meta name="twitter:image" content="https://books.ropensci.org/drake//images/logo.png" />
 
 <meta name="author" content="Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert, Ellis Hughes, Matthew Mark Strasiotto" />
 <meta name="author" content="Copyright Eli Lilly and Company" />
@@ -364,8 +364,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="18.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>18.2</b> Customization</a></li>
 <li class="chapter" data-level="18.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>18.3</b> Alternative trigger modes</a></li>
-<li class="chapter" data-level="18.4" data-path="triggers.html"><a href="triggers.html#consider-hasty-mode"><i class="fa fa-check"></i><b>18.4</b> Consider hasty mode</a></li>
-<li class="chapter" data-level="18.5" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>18.5</b> A more practical example</a></li>
+<li class="chapter" data-level="18.4" data-path="triggers.html"><a href="triggers.html#a-more-practical-example"><i class="fa fa-check"></i><b>18.4</b> A more practical example</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
@@ -430,7 +429,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This chapter is a guide to debugging and testing <code>drake</code> projects.</p>
 <div id="start-small-2" class="section level3">
 <h3><span class="header-section-number">17.0.1</span> Start small</h3>
-<p>If your workflow is large, consider running a downsized version to debug and test things first. That way, you can find the bugs early on without wasting as much time. Create a test plan with <code>drake_plan(max_expand = SMALL_NUMBER)</code> before scaling up to the full set of targets. See <a href="https://ropenscilabs.github.io/drake-manual/plans.html#start-small">this section on plans</a> for details.</p>
+<p>If your workflow is large, consider running a downsized version to debug and test things first. That way, you can find the bugs early on without wasting as much time. Create a test plan with <code>drake_plan(max_expand = SMALL_NUMBER)</code> before scaling up to the full set of targets. See <a href="https://books.ropensci.org/drake/plans.html#start-small">this section on plans</a> for details.</p>
 </div>
 <div id="dependencies-1" class="section level2">
 <h2><span class="header-section-number">17.1</span> Dependencies</h2>
@@ -601,7 +600,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb283-4" data-line-number="4"><span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span></a>
 <a class="sourceLine" id="cb283-5" data-line-number="5"><span class="co">#&gt;         ]</span></a>
 <a class="sourceLine" id="cb283-6" data-line-number="6"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x106c5e78&gt;</span></a>
+<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x144877c8&gt;</span></a>
 <a class="sourceLine" id="cb283-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb283-9" data-line-number="9">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){</a>
 <a class="sourceLine" id="cb283-10" data-line-number="10">  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
@@ -700,7 +699,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb287-52" data-line-number="52"><span class="co">#&gt;  $ : language f(b)</span></a>
 <a class="sourceLine" id="cb287-53" data-line-number="53"><span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span></a>
 <a class="sourceLine" id="cb287-54" data-line-number="54"><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span></a>
-<a class="sourceLine" id="cb287-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xfa35d38&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb287-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xcd2f1c8&gt;</span></a></code></pre></div>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb288-1" data-line-number="1"><span class="co"># Pretend we just opened a new R session.</span></a>
 <a class="sourceLine" id="cb288-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
@@ -742,7 +741,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb288-38" data-line-number="38"><span class="co">#&gt;   }</span></a>
 <a class="sourceLine" id="cb288-39" data-line-number="39"><span class="co">#&gt;   x</span></a>
 <a class="sourceLine" id="cb288-40" data-line-number="40"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb288-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x162a3528&gt;</span></a>
+<a class="sourceLine" id="cb288-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x1f211f98&gt;</span></a>
 <a class="sourceLine" id="cb288-42" data-line-number="42"></a>
 <a class="sourceLine" id="cb288-43" data-line-number="43"><span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span></a>
 <a class="sourceLine" id="cb288-44" data-line-number="44">f &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
@@ -847,11 +846,11 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ropenscilabs/drake-manual/edit/master/debugging.Rmd",
+"link": "https://github.com/ropensci-books/drake/edit/master/debugging.Rmd",
 "text": "Edit this chapter"
 },
 "history": {
-"link": "https://github.com/ropenscilabs/drake-manual/commits/master/debugging.Rmd",
+"link": "https://github.com/ropensci-books/drake/commits/master/debugging.Rmd",
 "text": "Chapter edit history"
 },
 "download": null,
