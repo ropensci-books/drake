@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 14 Memory management | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 14 Memory management | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>5.3</b> Dynamic targets</a></li>
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
-<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>5.6</b> <code>group()</code></a></li>
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#tracing-sub-dependencies"><i class="fa fa-check"></i><b>5.7</b> Tracing sub-dependencies</a></li>
 <li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
@@ -457,20 +457,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb217-28" data-line-number="28"></a>
 <a class="sourceLine" id="cb217-29" data-line-number="29"><span class="kw">print</span>(plan)</a>
 <a class="sourceLine" id="cb217-30" data-line-number="30"><span class="co">#&gt; # A tibble: 12 x 2</span></a>
-<a class="sourceLine" id="cb217-31" data-line-number="31"><span class="co">#&gt;    target       command                                                    </span></a>
-<a class="sourceLine" id="cb217-32" data-line-number="32"><span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                                     </span></a>
-<a class="sourceLine" id="cb217-33" data-line-number="33"><span class="co">#&gt;  1 large_data   generate_large_data(1L)                                   …</span></a>
-<a class="sourceLine" id="cb217-34" data-line-number="34"><span class="co">#&gt;  2 large_data_2 generate_large_data(2L)                                   …</span></a>
-<a class="sourceLine" id="cb217-35" data-line-number="35"><span class="co">#&gt;  3 large_data_3 generate_large_data(3L)                                   …</span></a>
-<a class="sourceLine" id="cb217-36" data-line-number="36"><span class="co">#&gt;  4 large_data_4 generate_large_data(4L)                                   …</span></a>
-<a class="sourceLine" id="cb217-37" data-line-number="37"><span class="co">#&gt;  5 large_data_5 generate_large_data(5L)                                   …</span></a>
-<a class="sourceLine" id="cb217-38" data-line-number="38"><span class="co">#&gt;  6 large_data_6 generate_large_data(6L)                                   …</span></a>
-<a class="sourceLine" id="cb217-39" data-line-number="39"><span class="co">#&gt;  7 large_data_7 generate_large_data(7L)                                   …</span></a>
-<a class="sourceLine" id="cb217-40" data-line-number="40"><span class="co">#&gt;  8 large_data_8 generate_large_data(8L)                                   …</span></a>
-<a class="sourceLine" id="cb217-41" data-line-number="41"><span class="co">#&gt;  9 large_data_9 generate_large_data(9L)                                   …</span></a>
-<a class="sourceLine" id="cb217-42" data-line-number="42"><span class="co">#&gt; 10 large_data_… generate_large_data(10L)                                  …</span></a>
-<a class="sourceLine" id="cb217-43" data-line-number="43"><span class="co">#&gt; 11 means        get_means(large_data, large_data_2, large_data_3, large_da…</span></a>
-<a class="sourceLine" id="cb217-44" data-line-number="44"><span class="co">#&gt; 12 summ         summary(means)                                            …</span></a></code></pre></div>
+<a class="sourceLine" id="cb217-31" data-line-number="31"><span class="co">#&gt;    target       command                                                         </span></a>
+<a class="sourceLine" id="cb217-32" data-line-number="32"><span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                                          </span></a>
+<a class="sourceLine" id="cb217-33" data-line-number="33"><span class="co">#&gt;  1 large_data   generate_large_data(1L)                                        …</span></a>
+<a class="sourceLine" id="cb217-34" data-line-number="34"><span class="co">#&gt;  2 large_data_2 generate_large_data(2L)                                        …</span></a>
+<a class="sourceLine" id="cb217-35" data-line-number="35"><span class="co">#&gt;  3 large_data_3 generate_large_data(3L)                                        …</span></a>
+<a class="sourceLine" id="cb217-36" data-line-number="36"><span class="co">#&gt;  4 large_data_4 generate_large_data(4L)                                        …</span></a>
+<a class="sourceLine" id="cb217-37" data-line-number="37"><span class="co">#&gt;  5 large_data_5 generate_large_data(5L)                                        …</span></a>
+<a class="sourceLine" id="cb217-38" data-line-number="38"><span class="co">#&gt;  6 large_data_6 generate_large_data(6L)                                        …</span></a>
+<a class="sourceLine" id="cb217-39" data-line-number="39"><span class="co">#&gt;  7 large_data_7 generate_large_data(7L)                                        …</span></a>
+<a class="sourceLine" id="cb217-40" data-line-number="40"><span class="co">#&gt;  8 large_data_8 generate_large_data(8L)                                        …</span></a>
+<a class="sourceLine" id="cb217-41" data-line-number="41"><span class="co">#&gt;  9 large_data_9 generate_large_data(9L)                                        …</span></a>
+<a class="sourceLine" id="cb217-42" data-line-number="42"><span class="co">#&gt; 10 large_data_… generate_large_data(10L)                                       …</span></a>
+<a class="sourceLine" id="cb217-43" data-line-number="43"><span class="co">#&gt; 11 means        get_means(large_data, large_data_2, large_data_3, large_data_4,…</span></a>
+<a class="sourceLine" id="cb217-44" data-line-number="44"><span class="co">#&gt; 12 summ         summary(means)                                                 …</span></a></code></pre></div>
 <div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb218-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
 <a class="sourceLine" id="cb218-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
 <div id="htmlwidget-0c6990c78d7aa3112fac" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
@@ -514,20 +514,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb219-27" data-line-number="27"></a>
 <a class="sourceLine" id="cb219-28" data-line-number="28"><span class="kw">print</span>(plan)</a>
 <a class="sourceLine" id="cb219-29" data-line-number="29"><span class="co">#&gt; # A tibble: 12 x 2</span></a>
-<a class="sourceLine" id="cb219-30" data-line-number="30"><span class="co">#&gt;    target       command                                                    </span></a>
-<a class="sourceLine" id="cb219-31" data-line-number="31"><span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                                     </span></a>
-<a class="sourceLine" id="cb219-32" data-line-number="32"><span class="co">#&gt;  1 large_data   generate_large_data(file = file_out(&quot;1.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-33" data-line-number="33"><span class="co">#&gt;  2 large_data_2 generate_large_data(file = file_out(&quot;2.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-34" data-line-number="34"><span class="co">#&gt;  3 large_data_3 generate_large_data(file = file_out(&quot;3.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-35" data-line-number="35"><span class="co">#&gt;  4 large_data_4 generate_large_data(file = file_out(&quot;4.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-36" data-line-number="36"><span class="co">#&gt;  5 large_data_5 generate_large_data(file = file_out(&quot;5.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-37" data-line-number="37"><span class="co">#&gt;  6 large_data_6 generate_large_data(file = file_out(&quot;6.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-38" data-line-number="38"><span class="co">#&gt;  7 large_data_7 generate_large_data(file = file_out(&quot;7.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-39" data-line-number="39"><span class="co">#&gt;  8 large_data_8 generate_large_data(file = file_out(&quot;8.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-40" data-line-number="40"><span class="co">#&gt;  9 large_data_9 generate_large_data(file = file_out(&quot;9.rds&quot;))             …</span></a>
-<a class="sourceLine" id="cb219-41" data-line-number="41"><span class="co">#&gt; 10 large_data_… generate_large_data(file = file_out(&quot;10.rds&quot;))            …</span></a>
-<a class="sourceLine" id="cb219-42" data-line-number="42"><span class="co">#&gt; 11 means        get_means(file_in(c(&quot;1.rds&quot;, &quot;2.rds&quot;, &quot;3.rds&quot;, &quot;4.rds&quot;, &quot;5…</span></a>
-<a class="sourceLine" id="cb219-43" data-line-number="43"><span class="co">#&gt; 12 summ         summary(means)                                            …</span></a></code></pre></div>
+<a class="sourceLine" id="cb219-30" data-line-number="30"><span class="co">#&gt;    target       command                                                         </span></a>
+<a class="sourceLine" id="cb219-31" data-line-number="31"><span class="co">#&gt;    &lt;chr&gt;        &lt;expr&gt;                                                          </span></a>
+<a class="sourceLine" id="cb219-32" data-line-number="32"><span class="co">#&gt;  1 large_data   generate_large_data(file = file_out(&quot;1.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-33" data-line-number="33"><span class="co">#&gt;  2 large_data_2 generate_large_data(file = file_out(&quot;2.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-34" data-line-number="34"><span class="co">#&gt;  3 large_data_3 generate_large_data(file = file_out(&quot;3.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-35" data-line-number="35"><span class="co">#&gt;  4 large_data_4 generate_large_data(file = file_out(&quot;4.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-36" data-line-number="36"><span class="co">#&gt;  5 large_data_5 generate_large_data(file = file_out(&quot;5.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-37" data-line-number="37"><span class="co">#&gt;  6 large_data_6 generate_large_data(file = file_out(&quot;6.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-38" data-line-number="38"><span class="co">#&gt;  7 large_data_7 generate_large_data(file = file_out(&quot;7.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-39" data-line-number="39"><span class="co">#&gt;  8 large_data_8 generate_large_data(file = file_out(&quot;8.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-40" data-line-number="40"><span class="co">#&gt;  9 large_data_9 generate_large_data(file = file_out(&quot;9.rds&quot;))                  …</span></a>
+<a class="sourceLine" id="cb219-41" data-line-number="41"><span class="co">#&gt; 10 large_data_… generate_large_data(file = file_out(&quot;10.rds&quot;))                 …</span></a>
+<a class="sourceLine" id="cb219-42" data-line-number="42"><span class="co">#&gt; 11 means        get_means(file_in(c(&quot;1.rds&quot;, &quot;2.rds&quot;, &quot;3.rds&quot;, &quot;4.rds&quot;, &quot;5.rds&quot;…</span></a>
+<a class="sourceLine" id="cb219-43" data-line-number="43"><span class="co">#&gt; 12 summ         summary(means)                                                 …</span></a></code></pre></div>
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
 <a class="sourceLine" id="cb220-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
 <div id="htmlwidget-95676f40e1049cb3cefd" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
@@ -652,20 +652,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb224-14" data-line-number="14"></a>
 <a class="sourceLine" id="cb224-15" data-line-number="15"><span class="kw">print</span>(plan)</a>
 <a class="sourceLine" id="cb224-16" data-line-number="16"><span class="co">#&gt; # A tibble: 12 x 3</span></a>
-<a class="sourceLine" id="cb224-17" data-line-number="17"><span class="co">#&gt;    target      command                                      memory_strategy</span></a>
-<a class="sourceLine" id="cb224-18" data-line-number="18"><span class="co">#&gt;    &lt;chr&gt;       &lt;expr&gt;                                       &lt;chr&gt;          </span></a>
-<a class="sourceLine" id="cb224-19" data-line-number="19"><span class="co">#&gt;  1 large_data  generate_large_data(1L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-20" data-line-number="20"><span class="co">#&gt;  2 large_data… generate_large_data(2L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-21" data-line-number="21"><span class="co">#&gt;  3 large_data… generate_large_data(3L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-22" data-line-number="22"><span class="co">#&gt;  4 large_data… generate_large_data(4L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-23" data-line-number="23"><span class="co">#&gt;  5 large_data… generate_large_data(5L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-24" data-line-number="24"><span class="co">#&gt;  6 large_data… generate_large_data(6L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-25" data-line-number="25"><span class="co">#&gt;  7 large_data… generate_large_data(7L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-26" data-line-number="26"><span class="co">#&gt;  8 large_data… generate_large_data(8L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-27" data-line-number="27"><span class="co">#&gt;  9 large_data… generate_large_data(9L)                    … none           </span></a>
-<a class="sourceLine" id="cb224-28" data-line-number="28"><span class="co">#&gt; 10 large_data… generate_large_data(10L)                   … none           </span></a>
-<a class="sourceLine" id="cb224-29" data-line-number="29"><span class="co">#&gt; 11 means       get_means(large_data, large_data_2, large_d… unload         </span></a>
-<a class="sourceLine" id="cb224-30" data-line-number="30"><span class="co">#&gt; 12 summ        summary(means)                             … &lt;NA&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb224-17" data-line-number="17"><span class="co">#&gt;    target      command                                           memory_strategy</span></a>
+<a class="sourceLine" id="cb224-18" data-line-number="18"><span class="co">#&gt;    &lt;chr&gt;       &lt;expr&gt;                                            &lt;chr&gt;          </span></a>
+<a class="sourceLine" id="cb224-19" data-line-number="19"><span class="co">#&gt;  1 large_data  generate_large_data(1L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-20" data-line-number="20"><span class="co">#&gt;  2 large_data… generate_large_data(2L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-21" data-line-number="21"><span class="co">#&gt;  3 large_data… generate_large_data(3L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-22" data-line-number="22"><span class="co">#&gt;  4 large_data… generate_large_data(4L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-23" data-line-number="23"><span class="co">#&gt;  5 large_data… generate_large_data(5L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-24" data-line-number="24"><span class="co">#&gt;  6 large_data… generate_large_data(6L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-25" data-line-number="25"><span class="co">#&gt;  7 large_data… generate_large_data(7L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-26" data-line-number="26"><span class="co">#&gt;  8 large_data… generate_large_data(8L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-27" data-line-number="27"><span class="co">#&gt;  9 large_data… generate_large_data(9L)                         … none           </span></a>
+<a class="sourceLine" id="cb224-28" data-line-number="28"><span class="co">#&gt; 10 large_data… generate_large_data(10L)                        … none           </span></a>
+<a class="sourceLine" id="cb224-29" data-line-number="29"><span class="co">#&gt; 11 means       get_means(large_data, large_data_2, large_data_3… unload         </span></a>
+<a class="sourceLine" id="cb224-30" data-line-number="30"><span class="co">#&gt; 12 summ        summary(means)                                  … &lt;NA&gt;</span></a></code></pre></div>
 <p>In fact, now you can run <code>make()</code> without setting a global memory strategy at all.</p>
 <div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1"><span class="kw">make</span>(plan, <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
@@ -710,13 +710,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb227-19" data-line-number="19"></a>
 <a class="sourceLine" id="cb227-20" data-line-number="20">plan</a>
 <a class="sourceLine" id="cb227-21" data-line-number="21"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
-<a class="sourceLine" id="cb227-22" data-line-number="22"><span class="co">#&gt;   target      command                                                      </span></a>
-<a class="sourceLine" id="cb227-23" data-line-number="23"><span class="co">#&gt;   &lt;chr&gt;       &lt;expr&gt;                                                       </span></a>
-<a class="sourceLine" id="cb227-24" data-line-number="24"><span class="co">#&gt; 1 row_indices file_in(&quot;large_file.csv&quot;) %&gt;% get_number_of_rows() %&gt;% seq_l…</span></a>
-<a class="sourceLine" id="cb227-25" data-line-number="25"><span class="co">#&gt; 2 subset_1    drake_slice(data = row_indices, slices = 4, index = 1) %&gt;% r…</span></a>
-<a class="sourceLine" id="cb227-26" data-line-number="26"><span class="co">#&gt; 3 subset_2    drake_slice(data = row_indices, slices = 4, index = 2) %&gt;% r…</span></a>
-<a class="sourceLine" id="cb227-27" data-line-number="27"><span class="co">#&gt; 4 subset_3    drake_slice(data = row_indices, slices = 4, index = 3) %&gt;% r…</span></a>
-<a class="sourceLine" id="cb227-28" data-line-number="28"><span class="co">#&gt; 5 subset_4    drake_slice(data = row_indices, slices = 4, index = 4) %&gt;% r…</span></a>
+<a class="sourceLine" id="cb227-22" data-line-number="22"><span class="co">#&gt;   target      command                                                           </span></a>
+<a class="sourceLine" id="cb227-23" data-line-number="23"><span class="co">#&gt;   &lt;chr&gt;       &lt;expr&gt;                                                            </span></a>
+<a class="sourceLine" id="cb227-24" data-line-number="24"><span class="co">#&gt; 1 row_indices file_in(&quot;large_file.csv&quot;) %&gt;% get_number_of_rows() %&gt;% seq_len() …</span></a>
+<a class="sourceLine" id="cb227-25" data-line-number="25"><span class="co">#&gt; 2 subset_1    drake_slice(data = row_indices, slices = 4, index = 1) %&gt;% read_s…</span></a>
+<a class="sourceLine" id="cb227-26" data-line-number="26"><span class="co">#&gt; 3 subset_2    drake_slice(data = row_indices, slices = 4, index = 2) %&gt;% read_s…</span></a>
+<a class="sourceLine" id="cb227-27" data-line-number="27"><span class="co">#&gt; 4 subset_3    drake_slice(data = row_indices, slices = 4, index = 3) %&gt;% read_s…</span></a>
+<a class="sourceLine" id="cb227-28" data-line-number="28"><span class="co">#&gt; 5 subset_4    drake_slice(data = row_indices, slices = 4, index = 4) %&gt;% read_s…</span></a>
 <a class="sourceLine" id="cb227-29" data-line-number="29"></a>
 <a class="sourceLine" id="cb227-30" data-line-number="30"><span class="kw">drake_plan_source</span>(plan)</a>
 <a class="sourceLine" id="cb227-31" data-line-number="31"><span class="co">#&gt; drake_plan(</span></a>

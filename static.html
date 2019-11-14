@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Static branching | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Static branching | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>5.3</b> Dynamic targets</a></li>
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
-<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>5.6</b> <code>group()</code></a></li>
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#tracing-sub-dependencies"><i class="fa fa-check"></i><b>5.7</b> Tracing sub-dependencies</a></li>
 <li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
@@ -517,20 +517,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb72-26" data-line-number="26"></a>
 <a class="sourceLine" id="cb72-27" data-line-number="27">plan1</a>
 <a class="sourceLine" id="cb72-28" data-line-number="28"><span class="co">#&gt; # A tibble: 12 x 2</span></a>
-<a class="sourceLine" id="cb72-29" data-line-number="29"><span class="co">#&gt;    target                 command                                          </span></a>
-<a class="sourceLine" id="cb72-30" data-line-number="30"><span class="co">#&gt;    &lt;chr&gt;                  &lt;expr&gt;                                           </span></a>
-<a class="sourceLine" id="cb72-31" data-line-number="31"><span class="co">#&gt;  1 small                  get_small_data()                                …</span></a>
-<a class="sourceLine" id="cb72-32" data-line-number="32"><span class="co">#&gt;  2 large                  get_large_data()                                …</span></a>
-<a class="sourceLine" id="cb72-33" data-line-number="33"><span class="co">#&gt;  3 analysis_small_1       analyze(small, 1)                               …</span></a>
-<a class="sourceLine" id="cb72-34" data-line-number="34"><span class="co">#&gt;  4 analysis_large_2       analyze(large, 2)                               …</span></a>
-<a class="sourceLine" id="cb72-35" data-line-number="35"><span class="co">#&gt;  5 metric_mse_analysis_s… mse(analysis_small_1)                           …</span></a>
-<a class="sourceLine" id="cb72-36" data-line-number="36"><span class="co">#&gt;  6 metric_mae_analysis_s… mae(analysis_small_1)                           …</span></a>
-<a class="sourceLine" id="cb72-37" data-line-number="37"><span class="co">#&gt;  7 metric_mse_analysis_l… mse(analysis_large_2)                           …</span></a>
-<a class="sourceLine" id="cb72-38" data-line-number="38"><span class="co">#&gt;  8 metric_mae_analysis_l… mae(analysis_large_2)                           …</span></a>
-<a class="sourceLine" id="cb72-39" data-line-number="39"><span class="co">#&gt;  9 summ_data_large        summary(metric_mse_analysis_large_2, metric_mae_…</span></a>
-<a class="sourceLine" id="cb72-40" data-line-number="40"><span class="co">#&gt; 10 summ_data_small        summary(metric_mse_analysis_small_1, metric_mae_…</span></a>
-<a class="sourceLine" id="cb72-41" data-line-number="41"><span class="co">#&gt; 11 summ_metric_mae        summary(metric_mae_analysis_small_1, metric_mae_…</span></a>
-<a class="sourceLine" id="cb72-42" data-line-number="42"><span class="co">#&gt; 12 summ_metric_mse        summary(metric_mse_analysis_small_1, metric_mse_…</span></a>
+<a class="sourceLine" id="cb72-29" data-line-number="29"><span class="co">#&gt;    target                  command                                              </span></a>
+<a class="sourceLine" id="cb72-30" data-line-number="30"><span class="co">#&gt;    &lt;chr&gt;                   &lt;expr&gt;                                               </span></a>
+<a class="sourceLine" id="cb72-31" data-line-number="31"><span class="co">#&gt;  1 small                   get_small_data()                                    …</span></a>
+<a class="sourceLine" id="cb72-32" data-line-number="32"><span class="co">#&gt;  2 large                   get_large_data()                                    …</span></a>
+<a class="sourceLine" id="cb72-33" data-line-number="33"><span class="co">#&gt;  3 analysis_small_1        analyze(small, 1)                                   …</span></a>
+<a class="sourceLine" id="cb72-34" data-line-number="34"><span class="co">#&gt;  4 analysis_large_2        analyze(large, 2)                                   …</span></a>
+<a class="sourceLine" id="cb72-35" data-line-number="35"><span class="co">#&gt;  5 metric_mse_analysis_sm… mse(analysis_small_1)                               …</span></a>
+<a class="sourceLine" id="cb72-36" data-line-number="36"><span class="co">#&gt;  6 metric_mae_analysis_sm… mae(analysis_small_1)                               …</span></a>
+<a class="sourceLine" id="cb72-37" data-line-number="37"><span class="co">#&gt;  7 metric_mse_analysis_la… mse(analysis_large_2)                               …</span></a>
+<a class="sourceLine" id="cb72-38" data-line-number="38"><span class="co">#&gt;  8 metric_mae_analysis_la… mae(analysis_large_2)                               …</span></a>
+<a class="sourceLine" id="cb72-39" data-line-number="39"><span class="co">#&gt;  9 summ_data_large         summary(metric_mse_analysis_large_2, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb72-40" data-line-number="40"><span class="co">#&gt; 10 summ_data_small         summary(metric_mse_analysis_small_1, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb72-41" data-line-number="41"><span class="co">#&gt; 11 summ_metric_mae         summary(metric_mae_analysis_small_1, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb72-42" data-line-number="42"><span class="co">#&gt; 12 summ_metric_mse         summary(metric_mse_analysis_small_1, metric_mse_anal…</span></a>
 <a class="sourceLine" id="cb72-43" data-line-number="43"></a>
 <a class="sourceLine" id="cb72-44" data-line-number="44">config1 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan1)</a>
 <a class="sourceLine" id="cb72-45" data-line-number="45"><span class="kw">vis_drake_graph</span>(config1)</a></code></pre></div>
@@ -565,20 +565,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb73-26" data-line-number="26"></a>
 <a class="sourceLine" id="cb73-27" data-line-number="27">plan2</a>
 <a class="sourceLine" id="cb73-28" data-line-number="28"><span class="co">#&gt; # A tibble: 12 x 2</span></a>
-<a class="sourceLine" id="cb73-29" data-line-number="29"><span class="co">#&gt;    target                 command                                          </span></a>
-<a class="sourceLine" id="cb73-30" data-line-number="30"><span class="co">#&gt;    &lt;chr&gt;                  &lt;expr&gt;                                           </span></a>
-<a class="sourceLine" id="cb73-31" data-line-number="31"><span class="co">#&gt;  1 summ_metric_mae        summary(metric_mae_analysis_small_1, metric_mae_…</span></a>
-<a class="sourceLine" id="cb73-32" data-line-number="32"><span class="co">#&gt;  2 summ_metric_mse        summary(metric_mse_analysis_small_1, metric_mse_…</span></a>
-<a class="sourceLine" id="cb73-33" data-line-number="33"><span class="co">#&gt;  3 metric_mse_analysis_s… mse(analysis_small_1)                           …</span></a>
-<a class="sourceLine" id="cb73-34" data-line-number="34"><span class="co">#&gt;  4 metric_mae_analysis_s… mae(analysis_small_1)                           …</span></a>
-<a class="sourceLine" id="cb73-35" data-line-number="35"><span class="co">#&gt;  5 metric_mse_analysis_l… mse(analysis_large_2)                           …</span></a>
-<a class="sourceLine" id="cb73-36" data-line-number="36"><span class="co">#&gt;  6 metric_mae_analysis_l… mae(analysis_large_2)                           …</span></a>
-<a class="sourceLine" id="cb73-37" data-line-number="37"><span class="co">#&gt;  7 small                  get_small_data()                                …</span></a>
-<a class="sourceLine" id="cb73-38" data-line-number="38"><span class="co">#&gt;  8 analysis_small_1       analyze(small, 1)                               …</span></a>
-<a class="sourceLine" id="cb73-39" data-line-number="39"><span class="co">#&gt;  9 analysis_large_2       analyze(large, 2)                               …</span></a>
-<a class="sourceLine" id="cb73-40" data-line-number="40"><span class="co">#&gt; 10 summ_data_large        summary(metric_mse_analysis_large_2, metric_mae_…</span></a>
-<a class="sourceLine" id="cb73-41" data-line-number="41"><span class="co">#&gt; 11 summ_data_small        summary(metric_mse_analysis_small_1, metric_mae_…</span></a>
-<a class="sourceLine" id="cb73-42" data-line-number="42"><span class="co">#&gt; 12 large                  get_large_data()                                …</span></a>
+<a class="sourceLine" id="cb73-29" data-line-number="29"><span class="co">#&gt;    target                  command                                              </span></a>
+<a class="sourceLine" id="cb73-30" data-line-number="30"><span class="co">#&gt;    &lt;chr&gt;                   &lt;expr&gt;                                               </span></a>
+<a class="sourceLine" id="cb73-31" data-line-number="31"><span class="co">#&gt;  1 summ_metric_mae         summary(metric_mae_analysis_small_1, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb73-32" data-line-number="32"><span class="co">#&gt;  2 summ_metric_mse         summary(metric_mse_analysis_small_1, metric_mse_anal…</span></a>
+<a class="sourceLine" id="cb73-33" data-line-number="33"><span class="co">#&gt;  3 metric_mse_analysis_sm… mse(analysis_small_1)                               …</span></a>
+<a class="sourceLine" id="cb73-34" data-line-number="34"><span class="co">#&gt;  4 metric_mae_analysis_sm… mae(analysis_small_1)                               …</span></a>
+<a class="sourceLine" id="cb73-35" data-line-number="35"><span class="co">#&gt;  5 metric_mse_analysis_la… mse(analysis_large_2)                               …</span></a>
+<a class="sourceLine" id="cb73-36" data-line-number="36"><span class="co">#&gt;  6 metric_mae_analysis_la… mae(analysis_large_2)                               …</span></a>
+<a class="sourceLine" id="cb73-37" data-line-number="37"><span class="co">#&gt;  7 small                   get_small_data()                                    …</span></a>
+<a class="sourceLine" id="cb73-38" data-line-number="38"><span class="co">#&gt;  8 analysis_small_1        analyze(small, 1)                                   …</span></a>
+<a class="sourceLine" id="cb73-39" data-line-number="39"><span class="co">#&gt;  9 analysis_large_2        analyze(large, 2)                                   …</span></a>
+<a class="sourceLine" id="cb73-40" data-line-number="40"><span class="co">#&gt; 10 summ_data_large         summary(metric_mse_analysis_large_2, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb73-41" data-line-number="41"><span class="co">#&gt; 11 summ_data_small         summary(metric_mse_analysis_small_1, metric_mae_anal…</span></a>
+<a class="sourceLine" id="cb73-42" data-line-number="42"><span class="co">#&gt; 12 large                   get_large_data()                                    …</span></a>
 <a class="sourceLine" id="cb73-43" data-line-number="43"></a>
 <a class="sourceLine" id="cb73-44" data-line-number="44">config2 &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan2)</a>
 <a class="sourceLine" id="cb73-45" data-line-number="45"><span class="kw">vis_drake_graph</span>(config2)</a></code></pre></div>
@@ -884,14 +884,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb87-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb87-14" data-line-number="14">plan</a>
 <a class="sourceLine" id="cb87-15" data-line-number="15"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
-<a class="sourceLine" id="cb87-16" data-line-number="16"><span class="co">#&gt;   target         command                                                   </span></a>
-<a class="sourceLine" id="cb87-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                                    </span></a>
-<a class="sourceLine" id="cb87-18" data-line-number="18"><span class="co">#&gt; 1 large_data     get_data()                                               …</span></a>
-<a class="sourceLine" id="cb87-19" data-line-number="19"><span class="co">#&gt; 2 slice_analysi… drake_slice(data = large_data, slices = 4, index = 1) %&gt;%…</span></a>
-<a class="sourceLine" id="cb87-20" data-line-number="20"><span class="co">#&gt; 3 slice_analysi… drake_slice(data = large_data, slices = 4, index = 2) %&gt;%…</span></a>
-<a class="sourceLine" id="cb87-21" data-line-number="21"><span class="co">#&gt; 4 slice_analysi… drake_slice(data = large_data, slices = 4, index = 3) %&gt;%…</span></a>
-<a class="sourceLine" id="cb87-22" data-line-number="22"><span class="co">#&gt; 5 slice_analysi… drake_slice(data = large_data, slices = 4, index = 4) %&gt;%…</span></a>
-<a class="sourceLine" id="cb87-23" data-line-number="23"><span class="co">#&gt; 6 results        dplyr::bind_rows(slice_analysis_1, slice_analysis_2, slic…</span></a></code></pre></div>
+<a class="sourceLine" id="cb87-16" data-line-number="16"><span class="co">#&gt;   target         command                                                        </span></a>
+<a class="sourceLine" id="cb87-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                                         </span></a>
+<a class="sourceLine" id="cb87-18" data-line-number="18"><span class="co">#&gt; 1 large_data     get_data()                                                    …</span></a>
+<a class="sourceLine" id="cb87-19" data-line-number="19"><span class="co">#&gt; 2 slice_analysi… drake_slice(data = large_data, slices = 4, index = 1) %&gt;% anal…</span></a>
+<a class="sourceLine" id="cb87-20" data-line-number="20"><span class="co">#&gt; 3 slice_analysi… drake_slice(data = large_data, slices = 4, index = 2) %&gt;% anal…</span></a>
+<a class="sourceLine" id="cb87-21" data-line-number="21"><span class="co">#&gt; 4 slice_analysi… drake_slice(data = large_data, slices = 4, index = 3) %&gt;% anal…</span></a>
+<a class="sourceLine" id="cb87-22" data-line-number="22"><span class="co">#&gt; 5 slice_analysi… drake_slice(data = large_data, slices = 4, index = 4) %&gt;% anal…</span></a>
+<a class="sourceLine" id="cb87-23" data-line-number="23"><span class="co">#&gt; 6 results        dplyr::bind_rows(slice_analysis_1, slice_analysis_2, slice_ana…</span></a></code></pre></div>
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
 <a class="sourceLine" id="cb88-2" data-line-number="2"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
 <div id="htmlwidget-05518fdb4a90a0243a52" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
@@ -964,7 +964,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb90-29" data-line-number="29"><span class="co">#&gt;   analysis_3 = read_rows(file = file_in(&quot;huge.csv&quot;), rows = rows_3) %&gt;% analyze_data()</span></a>
 <a class="sourceLine" id="cb90-30" data-line-number="30"><span class="co">#&gt; )</span></a></code></pre></div>
 </div>
-<div id="combine-1" class="section level4">
+<div id="combine" class="section level4">
 <h4><span class="header-section-number">6.0.3.5</span> <code>combine()</code></h4>
 <p>In <code>combine()</code>, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator <code>!!!</code> from the Tidyverse.</p>
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
@@ -982,11 +982,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb91-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb91-14" data-line-number="14">plan</a>
 <a class="sourceLine" id="cb91-15" data-line-number="15"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb91-16" data-line-number="16"><span class="co">#&gt;   target   command                                                         </span></a>
-<a class="sourceLine" id="cb91-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;    &lt;expr&gt;                                                          </span></a>
-<a class="sourceLine" id="cb91-18" data-line-number="18"><span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)                                     …</span></a>
-<a class="sourceLine" id="cb91-19" data-line-number="19"><span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)                                     …</span></a>
-<a class="sourceLine" id="cb91-20" data-line-number="20"><span class="co">#&gt; 3 larger   bind_rows(data_1_3, data_2_4, .id = &quot;id&quot;) %&gt;% arrange(sd) %&gt;%  …</span></a>
+<a class="sourceLine" id="cb91-16" data-line-number="16"><span class="co">#&gt;   target   command                                                              </span></a>
+<a class="sourceLine" id="cb91-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;    &lt;expr&gt;                                                               </span></a>
+<a class="sourceLine" id="cb91-18" data-line-number="18"><span class="co">#&gt; 1 data_1_3 sim_data(mean = 1, sd = 3)                                          …</span></a>
+<a class="sourceLine" id="cb91-19" data-line-number="19"><span class="co">#&gt; 2 data_2_4 sim_data(mean = 2, sd = 4)                                          …</span></a>
+<a class="sourceLine" id="cb91-20" data-line-number="20"><span class="co">#&gt; 3 larger   bind_rows(data_1_3, data_2_4, .id = &quot;id&quot;) %&gt;% arrange(sd) %&gt;%      h…</span></a>
 <a class="sourceLine" id="cb91-21" data-line-number="21"></a>
 <a class="sourceLine" id="cb91-22" data-line-number="22"><span class="kw">drake_plan_source</span>(plan)</a>
 <a class="sourceLine" id="cb91-23" data-line-number="23"><span class="co">#&gt; drake_plan(</span></a>
@@ -1371,14 +1371,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb110-18" data-line-number="18"></a>
 <a class="sourceLine" id="cb110-19" data-line-number="19">plan</a>
 <a class="sourceLine" id="cb110-20" data-line-number="20"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
-<a class="sourceLine" id="cb110-21" data-line-number="21"><span class="co">#&gt;   target         command                                                   </span></a>
-<a class="sourceLine" id="cb110-22" data-line-number="22"><span class="co">#&gt;   &lt;chr&gt;          &lt;expr&gt;                                                    </span></a>
-<a class="sourceLine" id="cb110-23" data-line-number="23"><span class="co">#&gt; 1 data_123       get_data(123)                                            …</span></a>
-<a class="sourceLine" id="cb110-24" data-line-number="24"><span class="co">#&gt; 2 data_456       get_data(456)                                            …</span></a>
-<a class="sourceLine" id="cb110-25" data-line-number="25"><span class="co">#&gt; 3 keras_model_1… save_model_hdf5(fit_model(data_123), file_out(&quot;keras_mode…</span></a>
-<a class="sourceLine" id="cb110-26" data-line-number="26"><span class="co">#&gt; 4 keras_model_4… save_model_hdf5(fit_model(data_456), file_out(&quot;keras_mode…</span></a>
-<a class="sourceLine" id="cb110-27" data-line-number="27"><span class="co">#&gt; 5 result_123     predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;)))  …</span></a>
-<a class="sourceLine" id="cb110-28" data-line-number="28"><span class="co">#&gt; 6 result_456     predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))  …</span></a></code></pre></div>
+<a class="sourceLine" id="cb110-21" data-line-number="21"><span class="co">#&gt;   target          command                                                       </span></a>
+<a class="sourceLine" id="cb110-22" data-line-number="22"><span class="co">#&gt;   &lt;chr&gt;           &lt;expr&gt;                                                        </span></a>
+<a class="sourceLine" id="cb110-23" data-line-number="23"><span class="co">#&gt; 1 data_123        get_data(123)                                                …</span></a>
+<a class="sourceLine" id="cb110-24" data-line-number="24"><span class="co">#&gt; 2 data_456        get_data(456)                                                …</span></a>
+<a class="sourceLine" id="cb110-25" data-line-number="25"><span class="co">#&gt; 3 keras_model_123 save_model_hdf5(fit_model(data_123), file_out(&quot;keras_model_12…</span></a>
+<a class="sourceLine" id="cb110-26" data-line-number="26"><span class="co">#&gt; 4 keras_model_456 save_model_hdf5(fit_model(data_456), file_out(&quot;keras_model_45…</span></a>
+<a class="sourceLine" id="cb110-27" data-line-number="27"><span class="co">#&gt; 5 result_123      predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;)))      …</span></a>
+<a class="sourceLine" id="cb110-28" data-line-number="28"><span class="co">#&gt; 6 result_456      predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))      …</span></a></code></pre></div>
 <div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="kw">drake_plan_source</span>(plan)</a>
 <a class="sourceLine" id="cb111-2" data-line-number="2"><span class="co">#&gt; drake_plan(</span></a>
 <a class="sourceLine" id="cb111-3" data-line-number="3"><span class="co">#&gt;   data_123 = get_data(123),</span></a>

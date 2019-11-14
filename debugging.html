@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 17 Debugging and testing drake projects | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 17 Debugging and testing drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>5.3</b> Dynamic targets</a></li>
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
-<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>5.6</b> <code>group()</code></a></li>
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#tracing-sub-dependencies"><i class="fa fa-check"></i><b>5.7</b> Tracing sub-dependencies</a></li>
 <li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
@@ -514,17 +514,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb276-22" data-line-number="22"><span class="co">#&gt; 5 report.Rmd             knitr_in</span></a></code></pre></div>
 <p>And with <code>tracked()</code>, you can list all the reproducibly tracked objects and files.</p>
 <div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1"><span class="kw">tracked</span>(config)</a>
-<a class="sourceLine" id="cb277-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span></a>
-<a class="sourceLine" id="cb277-3" data-line-number="3"><span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span></a>
-<a class="sourceLine" id="cb277-4" data-line-number="4"><span class="co">#&gt;  [5] &quot;large&quot;                  &quot;datasets::mtcars&quot;      </span></a>
-<a class="sourceLine" id="cb277-5" data-line-number="5"><span class="co">#&gt;  [7] &quot;file report.Rmd&quot;        &quot;file report.md&quot;        </span></a>
-<a class="sourceLine" id="cb277-6" data-line-number="6"><span class="co">#&gt;  [9] &quot;random_rows&quot;            &quot;reg1&quot;                  </span></a>
-<a class="sourceLine" id="cb277-7" data-line-number="7"><span class="co">#&gt; [11] &quot;reg2&quot;                   &quot;regression1_large&quot;     </span></a>
-<a class="sourceLine" id="cb277-8" data-line-number="8"><span class="co">#&gt; [13] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span></a>
-<a class="sourceLine" id="cb277-9" data-line-number="9"><span class="co">#&gt; [15] &quot;regression2_small&quot;      &quot;report&quot;                </span></a>
-<a class="sourceLine" id="cb277-10" data-line-number="10"><span class="co">#&gt; [17] &quot;simulate&quot;               &quot;small&quot;                 </span></a>
-<a class="sourceLine" id="cb277-11" data-line-number="11"><span class="co">#&gt; [19] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;</span></a>
-<a class="sourceLine" id="cb277-12" data-line-number="12"><span class="co">#&gt; [21] &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb277-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
+<a class="sourceLine" id="cb277-3" data-line-number="3"><span class="co">#&gt;  [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;datasets::mtcars&quot;      </span></a>
+<a class="sourceLine" id="cb277-4" data-line-number="4"><span class="co">#&gt;  [7] &quot;file report.Rmd&quot;        &quot;file report.md&quot;         &quot;random_rows&quot;           </span></a>
+<a class="sourceLine" id="cb277-5" data-line-number="5"><span class="co">#&gt; [10] &quot;reg1&quot;                   &quot;reg2&quot;                   &quot;regression1_large&quot;     </span></a>
+<a class="sourceLine" id="cb277-6" data-line-number="6"><span class="co">#&gt; [13] &quot;regression1_small&quot;      &quot;regression2_large&quot;      &quot;regression2_small&quot;     </span></a>
+<a class="sourceLine" id="cb277-7" data-line-number="7"><span class="co">#&gt; [16] &quot;report&quot;                 &quot;simulate&quot;               &quot;small&quot;                 </span></a>
+<a class="sourceLine" id="cb277-8" data-line-number="8"><span class="co">#&gt; [19] &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span></a>
+<a class="sourceLine" id="cb277-9" data-line-number="9"><span class="co">#&gt; [22] &quot;summ_regression2_small&quot;</span></a></code></pre></div>
 </div>
 <div id="outdated-targets-and-missing-dependencies" class="section level3">
 <h3><span class="header-section-number">17.1.3</span> Outdated targets and missing dependencies</h3>
@@ -533,34 +530,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb278-2" data-line-number="2"><span class="co">#&gt; character(0)</span></a></code></pre></div>
 <p><code>outdated()</code> reports any targets that are outdated.</p>
 <div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1"><span class="kw">outdated</span>(config)</a>
-<a class="sourceLine" id="cb279-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span></a>
-<a class="sourceLine" id="cb279-3" data-line-number="3"><span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span></a>
-<a class="sourceLine" id="cb279-4" data-line-number="4"><span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span></a>
-<a class="sourceLine" id="cb279-5" data-line-number="5"><span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span></a>
-<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span></a>
-<a class="sourceLine" id="cb279-7" data-line-number="7"><span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span></a>
-<a class="sourceLine" id="cb279-8" data-line-number="8"><span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span></a>
-<a class="sourceLine" id="cb279-9" data-line-number="9"><span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span></a>
-<a class="sourceLine" id="cb279-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb279-11" data-line-number="11"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb279-12" data-line-number="12"><span class="co">#&gt; target large</span></a>
-<a class="sourceLine" id="cb279-13" data-line-number="13"><span class="co">#&gt; target small</span></a>
-<a class="sourceLine" id="cb279-14" data-line-number="14"><span class="co">#&gt; target regression2_large</span></a>
-<a class="sourceLine" id="cb279-15" data-line-number="15"><span class="co">#&gt; target regression1_large</span></a>
-<a class="sourceLine" id="cb279-16" data-line-number="16"><span class="co">#&gt; target regression2_small</span></a>
-<a class="sourceLine" id="cb279-17" data-line-number="17"><span class="co">#&gt; target regression1_small</span></a>
-<a class="sourceLine" id="cb279-18" data-line-number="18"><span class="co">#&gt; target summ_regression2_large</span></a>
-<a class="sourceLine" id="cb279-19" data-line-number="19"><span class="co">#&gt; target coef_regression2_large</span></a>
-<a class="sourceLine" id="cb279-20" data-line-number="20"><span class="co">#&gt; target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb279-21" data-line-number="21"><span class="co">#&gt; target summ_regression1_large</span></a>
-<a class="sourceLine" id="cb279-22" data-line-number="22"><span class="co">#&gt; target coef_regression2_small</span></a>
-<a class="sourceLine" id="cb279-23" data-line-number="23"><span class="co">#&gt; target summ_regression2_small</span></a>
-<a class="sourceLine" id="cb279-24" data-line-number="24"><span class="co">#&gt; target summ_regression1_small</span></a>
-<a class="sourceLine" id="cb279-25" data-line-number="25"><span class="co">#&gt; target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb279-26" data-line-number="26"><span class="co">#&gt; target report</span></a>
-<a class="sourceLine" id="cb279-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb279-28" data-line-number="28"><span class="kw">outdated</span>(config)</a>
-<a class="sourceLine" id="cb279-29" data-line-number="29"><span class="co">#&gt; character(0)</span></a></code></pre></div>
+<a class="sourceLine" id="cb279-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
+<a class="sourceLine" id="cb279-3" data-line-number="3"><span class="co">#&gt;  [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;     </span></a>
+<a class="sourceLine" id="cb279-4" data-line-number="4"><span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;      &quot;regression2_small&quot;     </span></a>
+<a class="sourceLine" id="cb279-5" data-line-number="5"><span class="co">#&gt; [10] &quot;report&quot;                 &quot;small&quot;                  &quot;summ_regression1_large&quot;</span></a>
+<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;</span></a>
+<a class="sourceLine" id="cb279-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb279-8" data-line-number="8"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb279-9" data-line-number="9"><span class="co">#&gt; target large</span></a>
+<a class="sourceLine" id="cb279-10" data-line-number="10"><span class="co">#&gt; target small</span></a>
+<a class="sourceLine" id="cb279-11" data-line-number="11"><span class="co">#&gt; target regression2_large</span></a>
+<a class="sourceLine" id="cb279-12" data-line-number="12"><span class="co">#&gt; target regression1_large</span></a>
+<a class="sourceLine" id="cb279-13" data-line-number="13"><span class="co">#&gt; target regression2_small</span></a>
+<a class="sourceLine" id="cb279-14" data-line-number="14"><span class="co">#&gt; target regression1_small</span></a>
+<a class="sourceLine" id="cb279-15" data-line-number="15"><span class="co">#&gt; target summ_regression2_large</span></a>
+<a class="sourceLine" id="cb279-16" data-line-number="16"><span class="co">#&gt; target coef_regression2_large</span></a>
+<a class="sourceLine" id="cb279-17" data-line-number="17"><span class="co">#&gt; target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb279-18" data-line-number="18"><span class="co">#&gt; target summ_regression1_large</span></a>
+<a class="sourceLine" id="cb279-19" data-line-number="19"><span class="co">#&gt; target coef_regression2_small</span></a>
+<a class="sourceLine" id="cb279-20" data-line-number="20"><span class="co">#&gt; target summ_regression2_small</span></a>
+<a class="sourceLine" id="cb279-21" data-line-number="21"><span class="co">#&gt; target summ_regression1_small</span></a>
+<a class="sourceLine" id="cb279-22" data-line-number="22"><span class="co">#&gt; target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb279-23" data-line-number="23"><span class="co">#&gt; target report</span></a>
+<a class="sourceLine" id="cb279-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb279-25" data-line-number="25"><span class="kw">outdated</span>(config)</a>
+<a class="sourceLine" id="cb279-26" data-line-number="26"><span class="co">#&gt; character(0)</span></a></code></pre></div>
 </div>
 <div id="but-why-are-my-targets-out-of-date" class="section level3">
 <h3><span class="header-section-number">17.1.4</span> But <em>why</em> are my targets out of date?</h3>
@@ -600,7 +594,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb283-4" data-line-number="4"><span class="co">#&gt;     data[sample.int(n = nrow(data), size = n, replace = TRUE), </span></a>
 <a class="sourceLine" id="cb283-5" data-line-number="5"><span class="co">#&gt;         ]</span></a>
 <a class="sourceLine" id="cb283-6" data-line-number="6"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0x144877c8&gt;</span></a>
+<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="co">#&gt; &lt;bytecode: 0xd82d918&gt;</span></a>
 <a class="sourceLine" id="cb283-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb283-9" data-line-number="9">random_rows &lt;-<span class="st"> </span><span class="cf">function</span>(data, n){</a>
 <a class="sourceLine" id="cb283-10" data-line-number="10">  <span class="kw">stopifnot</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
@@ -608,14 +602,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb283-12" data-line-number="12">}</a></code></pre></div>
 <p>Then, we forget to run <code>make()</code> again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.</p>
 <div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">outdated</span>(config)</a>
-<a class="sourceLine" id="cb284-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot;</span></a>
-<a class="sourceLine" id="cb284-3" data-line-number="3"><span class="co">#&gt;  [3] &quot;coef_regression2_large&quot; &quot;coef_regression2_small&quot;</span></a>
-<a class="sourceLine" id="cb284-4" data-line-number="4"><span class="co">#&gt;  [5] &quot;large&quot;                  &quot;regression1_large&quot;     </span></a>
-<a class="sourceLine" id="cb284-5" data-line-number="5"><span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;     </span></a>
-<a class="sourceLine" id="cb284-6" data-line-number="6"><span class="co">#&gt;  [9] &quot;regression2_small&quot;      &quot;report&quot;                </span></a>
-<a class="sourceLine" id="cb284-7" data-line-number="7"><span class="co">#&gt; [11] &quot;small&quot;                  &quot;summ_regression1_large&quot;</span></a>
-<a class="sourceLine" id="cb284-8" data-line-number="8"><span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot;</span></a>
-<a class="sourceLine" id="cb284-9" data-line-number="9"><span class="co">#&gt; [15] &quot;summ_regression2_small&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb284-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
+<a class="sourceLine" id="cb284-3" data-line-number="3"><span class="co">#&gt;  [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;     </span></a>
+<a class="sourceLine" id="cb284-4" data-line-number="4"><span class="co">#&gt;  [7] &quot;regression1_small&quot;      &quot;regression2_large&quot;      &quot;regression2_small&quot;     </span></a>
+<a class="sourceLine" id="cb284-5" data-line-number="5"><span class="co">#&gt; [10] &quot;report&quot;                 &quot;small&quot;                  &quot;summ_regression1_large&quot;</span></a>
+<a class="sourceLine" id="cb284-6" data-line-number="6"><span class="co">#&gt; [13] &quot;summ_regression1_small&quot; &quot;summ_regression2_large&quot; &quot;summ_regression2_small&quot;</span></a></code></pre></div>
 <p>At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to <code>outdated()</code> already re-cached the imports, so any changed imports will show up in the new cache log.</p>
 <div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="kw">read_csv</span>(<span class="st">&quot;cache_log.csv&quot;</span>, <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb285-2" data-line-number="2"><span class="st">  </span><span class="kw">left_join</span>(<span class="kw">drake_cache_log</span>(), <span class="dt">by =</span> <span class="st">&quot;name&quot;</span>) <span class="op">%&gt;%</span></a>
@@ -699,7 +690,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb287-52" data-line-number="52"><span class="co">#&gt;  $ : language f(b)</span></a>
 <a class="sourceLine" id="cb287-53" data-line-number="53"><span class="co">#&gt;  $ : language stop(&quot;`x` cannot be negative.&quot;)</span></a>
 <a class="sourceLine" id="cb287-54" data-line-number="54"><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 3 5 3 35 5 35 3 3</span></a>
-<a class="sourceLine" id="cb287-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0xcd2f1c8&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb287-55" data-line-number="55"><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x11019530&gt;</span></a></code></pre></div>
 <p>To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call <code>drake_build()</code> or <code>drake_debug()</code>. These functions first call <code>loadd(deps = TRUE)</code> to load any missing dependencies (see the <code>replace</code> argument here) and then build your target. <code>drake_build()</code> simply runs the command, and <code>drake_debug()</code> runs the command in debug mode using <code>debugonce()</code>.</p>
 <div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb288-1" data-line-number="1"><span class="co"># Pretend we just opened a new R session.</span></a>
 <a class="sourceLine" id="cb288-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
@@ -741,7 +732,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb288-38" data-line-number="38"><span class="co">#&gt;   }</span></a>
 <a class="sourceLine" id="cb288-39" data-line-number="39"><span class="co">#&gt;   x</span></a>
 <a class="sourceLine" id="cb288-40" data-line-number="40"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb288-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x1f211f98&gt;</span></a>
+<a class="sourceLine" id="cb288-41" data-line-number="41"><span class="co">#&gt; &lt;bytecode: 0x12e2eaf8&gt;</span></a>
 <a class="sourceLine" id="cb288-42" data-line-number="42"></a>
 <a class="sourceLine" id="cb288-43" data-line-number="43"><span class="co"># Aha! The error was in f(). Let&#39;s fix it and try again.</span></a>
 <a class="sourceLine" id="cb288-44" data-line-number="44">f &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
@@ -765,26 +756,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">17.3</span> Timeouts and retries</h2>
 <p>See the <code>elapsed</code>, <code>cpu</code>, and <code>retries</code> argument to <code>make()</code>.</p>
 <div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb289-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)</a>
-<a class="sourceLine" id="cb289-2" data-line-number="2"><span class="co">#&gt; Warning: Argument `verbose` is deprecated some minor drake utility</span></a>
-<a class="sourceLine" id="cb289-3" data-line-number="3"><span class="co">#&gt; functions.</span></a>
-<a class="sourceLine" id="cb289-4" data-line-number="4">f &lt;-<span class="st"> </span><span class="cf">function</span>(...){</a>
-<a class="sourceLine" id="cb289-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb289-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb289-7" data-line-number="7">debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))</a>
-<a class="sourceLine" id="cb289-8" data-line-number="8">debug_plan</a>
-<a class="sourceLine" id="cb289-9" data-line-number="9"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb289-10" data-line-number="10"><span class="co">#&gt;   target command</span></a>
-<a class="sourceLine" id="cb289-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
-<a class="sourceLine" id="cb289-12" data-line-number="12"><span class="co">#&gt; 1 x      1      </span></a>
-<a class="sourceLine" id="cb289-13" data-line-number="13"><span class="co">#&gt; 2 y      f(x)</span></a>
-<a class="sourceLine" id="cb289-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb289-15" data-line-number="15">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
-<a class="sourceLine" id="cb289-16" data-line-number="16">  <span class="kw">stdout</span>(),</a>
-<a class="sourceLine" id="cb289-17" data-line-number="17">  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb289-18" data-line-number="18">)</a>
-<a class="sourceLine" id="cb289-19" data-line-number="19"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb289-20" data-line-number="20"><span class="co">#&gt; target y</span></a>
-<a class="sourceLine" id="cb289-21" data-line-number="21"><span class="co">#&gt; retry y 1 of 2</span></a></code></pre></div>
+<a class="sourceLine" id="cb289-2" data-line-number="2"><span class="co">#&gt; Warning: Argument `verbose` is deprecated some minor drake utility functions.</span></a>
+<a class="sourceLine" id="cb289-3" data-line-number="3">f &lt;-<span class="st"> </span><span class="cf">function</span>(...){</a>
+<a class="sourceLine" id="cb289-4" data-line-number="4">  <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb289-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb289-6" data-line-number="6">debug_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">f</span>(x))</a>
+<a class="sourceLine" id="cb289-7" data-line-number="7">debug_plan</a>
+<a class="sourceLine" id="cb289-8" data-line-number="8"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb289-9" data-line-number="9"><span class="co">#&gt;   target command</span></a>
+<a class="sourceLine" id="cb289-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt; </span></a>
+<a class="sourceLine" id="cb289-11" data-line-number="11"><span class="co">#&gt; 1 x      1      </span></a>
+<a class="sourceLine" id="cb289-12" data-line-number="12"><span class="co">#&gt; 2 y      f(x)</span></a>
+<a class="sourceLine" id="cb289-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb289-14" data-line-number="14">withr<span class="op">::</span><span class="kw">with_message_sink</span>(</a>
+<a class="sourceLine" id="cb289-15" data-line-number="15">  <span class="kw">stdout</span>(),</a>
+<a class="sourceLine" id="cb289-16" data-line-number="16">  <span class="kw">make</span>(debug_plan, <span class="dt">elapsed =</span> <span class="fl">1e-3</span>, <span class="dt">retries =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb289-17" data-line-number="17">)</a>
+<a class="sourceLine" id="cb289-18" data-line-number="18"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb289-19" data-line-number="19"><span class="co">#&gt; target y</span></a>
+<a class="sourceLine" id="cb289-20" data-line-number="20"><span class="co">#&gt; retry y 1 of 2</span></a></code></pre></div>
 <p>To tailor these settings to each individual target, create new <code>elapsed</code>, <code>cpu</code>, or <code>retries</code> columns in your <code>drake</code> plan. These columns override the analogous arguments to <code>make()</code>.</p>
 <div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb290-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">verbose =</span> 0L)</a>
 <a class="sourceLine" id="cb290-2" data-line-number="2">debug_plan<span class="op">$</span>elapsed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e-3</span>, <span class="fl">2e-3</span>)</a>

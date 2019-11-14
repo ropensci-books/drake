@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 11 Finding the best model of gross state product | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 11 Finding the best model of gross state product | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>5.3</b> Dynamic targets</a></li>
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
-<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>5.6</b> <code>group()</code></a></li>
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#tracing-sub-dependencies"><i class="fa fa-check"></i><b>5.7</b> Tracing sub-dependencies</a></li>
 <li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
@@ -461,20 +461,13 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1"><span class="kw">library</span>(Ecdat)</a>
 <a class="sourceLine" id="cb175-2" data-line-number="2"><span class="kw">data</span>(Produc)</a>
 <a class="sourceLine" id="cb175-3" data-line-number="3"><span class="kw">head</span>(Produc)</a>
-<a class="sourceLine" id="cb175-4" data-line-number="4"><span class="co">#&gt;     state year     pcap     hwy   water    util       pc   gsp    emp</span></a>
-<a class="sourceLine" id="cb175-5" data-line-number="5"><span class="co">#&gt; 1 ALABAMA 1970 15032.67 7325.80 1655.68 6051.20 35793.80 28418 1010.5</span></a>
-<a class="sourceLine" id="cb175-6" data-line-number="6"><span class="co">#&gt; 2 ALABAMA 1971 15501.94 7525.94 1721.02 6254.98 37299.91 29375 1021.9</span></a>
-<a class="sourceLine" id="cb175-7" data-line-number="7"><span class="co">#&gt; 3 ALABAMA 1972 15972.41 7765.42 1764.75 6442.23 38670.30 31303 1072.3</span></a>
-<a class="sourceLine" id="cb175-8" data-line-number="8"><span class="co">#&gt; 4 ALABAMA 1973 16406.26 7907.66 1742.41 6756.19 40084.01 33430 1135.5</span></a>
-<a class="sourceLine" id="cb175-9" data-line-number="9"><span class="co">#&gt; 5 ALABAMA 1974 16762.67 8025.52 1734.85 7002.29 42057.31 33749 1169.8</span></a>
-<a class="sourceLine" id="cb175-10" data-line-number="10"><span class="co">#&gt; 6 ALABAMA 1975 17316.26 8158.23 1752.27 7405.76 43971.71 33604 1155.4</span></a>
-<a class="sourceLine" id="cb175-11" data-line-number="11"><span class="co">#&gt;   unemp</span></a>
-<a class="sourceLine" id="cb175-12" data-line-number="12"><span class="co">#&gt; 1   4.7</span></a>
-<a class="sourceLine" id="cb175-13" data-line-number="13"><span class="co">#&gt; 2   5.2</span></a>
-<a class="sourceLine" id="cb175-14" data-line-number="14"><span class="co">#&gt; 3   4.7</span></a>
-<a class="sourceLine" id="cb175-15" data-line-number="15"><span class="co">#&gt; 4   3.9</span></a>
-<a class="sourceLine" id="cb175-16" data-line-number="16"><span class="co">#&gt; 5   5.5</span></a>
-<a class="sourceLine" id="cb175-17" data-line-number="17"><span class="co">#&gt; 6   7.7</span></a></code></pre></div>
+<a class="sourceLine" id="cb175-4" data-line-number="4"><span class="co">#&gt;     state year     pcap     hwy   water    util       pc   gsp    emp unemp</span></a>
+<a class="sourceLine" id="cb175-5" data-line-number="5"><span class="co">#&gt; 1 ALABAMA 1970 15032.67 7325.80 1655.68 6051.20 35793.80 28418 1010.5   4.7</span></a>
+<a class="sourceLine" id="cb175-6" data-line-number="6"><span class="co">#&gt; 2 ALABAMA 1971 15501.94 7525.94 1721.02 6254.98 37299.91 29375 1021.9   5.2</span></a>
+<a class="sourceLine" id="cb175-7" data-line-number="7"><span class="co">#&gt; 3 ALABAMA 1972 15972.41 7765.42 1764.75 6442.23 38670.30 31303 1072.3   4.7</span></a>
+<a class="sourceLine" id="cb175-8" data-line-number="8"><span class="co">#&gt; 4 ALABAMA 1973 16406.26 7907.66 1742.41 6756.19 40084.01 33430 1135.5   3.9</span></a>
+<a class="sourceLine" id="cb175-9" data-line-number="9"><span class="co">#&gt; 5 ALABAMA 1974 16762.67 8025.52 1734.85 7002.29 42057.31 33749 1169.8   5.5</span></a>
+<a class="sourceLine" id="cb175-10" data-line-number="10"><span class="co">#&gt; 6 ALABAMA 1975 17316.26 8158.23 1752.27 7405.76 43971.71 33604 1155.4   7.7</span></a></code></pre></div>
 </div>
 <div id="analysis-1" class="section level2">
 <h2><span class="header-section-number">11.4</span> Analysis</h2>
@@ -536,18 +529,18 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <a class="sourceLine" id="cb177-47" data-line-number="47"></a>
 <a class="sourceLine" id="cb177-48" data-line-number="48">plan</a>
 <a class="sourceLine" id="cb177-49" data-line-number="49"><span class="co">#&gt; # A tibble: 171 x 2</span></a>
-<a class="sourceLine" id="cb177-50" data-line-number="50"><span class="co">#&gt;    target                command                                           </span></a>
-<a class="sourceLine" id="cb177-51" data-line-number="51"><span class="co">#&gt;    &lt;chr&gt;                 &lt;expr&gt;                                            </span></a>
-<a class="sourceLine" id="cb177-52" data-line-number="52"><span class="co">#&gt;  1 model_state_year_pcap biglm(gsp ~ state + year + pcap, data = Ecdat::Pr…</span></a>
-<a class="sourceLine" id="cb177-53" data-line-number="53"><span class="co">#&gt;  2 model_state_year_hwy  biglm(gsp ~ state + year + hwy, data = Ecdat::Pro…</span></a>
-<a class="sourceLine" id="cb177-54" data-line-number="54"><span class="co">#&gt;  3 model_state_year_wat… biglm(gsp ~ state + year + water, data = Ecdat::P…</span></a>
-<a class="sourceLine" id="cb177-55" data-line-number="55"><span class="co">#&gt;  4 model_state_year_util biglm(gsp ~ state + year + util, data = Ecdat::Pr…</span></a>
-<a class="sourceLine" id="cb177-56" data-line-number="56"><span class="co">#&gt;  5 model_state_year_pc   biglm(gsp ~ state + year + pc, data = Ecdat::Prod…</span></a>
-<a class="sourceLine" id="cb177-57" data-line-number="57"><span class="co">#&gt;  6 model_state_year_emp  biglm(gsp ~ state + year + emp, data = Ecdat::Pro…</span></a>
-<a class="sourceLine" id="cb177-58" data-line-number="58"><span class="co">#&gt;  7 model_state_year_une… biglm(gsp ~ state + year + unemp, data = Ecdat::P…</span></a>
-<a class="sourceLine" id="cb177-59" data-line-number="59"><span class="co">#&gt;  8 model_state_pcap_hwy  biglm(gsp ~ state + pcap + hwy, data = Ecdat::Pro…</span></a>
-<a class="sourceLine" id="cb177-60" data-line-number="60"><span class="co">#&gt;  9 model_state_pcap_wat… biglm(gsp ~ state + pcap + water, data = Ecdat::P…</span></a>
-<a class="sourceLine" id="cb177-61" data-line-number="61"><span class="co">#&gt; 10 model_state_pcap_util biglm(gsp ~ state + pcap + util, data = Ecdat::Pr…</span></a>
+<a class="sourceLine" id="cb177-50" data-line-number="50"><span class="co">#&gt;    target                 command                                               </span></a>
+<a class="sourceLine" id="cb177-51" data-line-number="51"><span class="co">#&gt;    &lt;chr&gt;                  &lt;expr&gt;                                                </span></a>
+<a class="sourceLine" id="cb177-52" data-line-number="52"><span class="co">#&gt;  1 model_state_year_pcap  biglm(gsp ~ state + year + pcap, data = Ecdat::Produc…</span></a>
+<a class="sourceLine" id="cb177-53" data-line-number="53"><span class="co">#&gt;  2 model_state_year_hwy   biglm(gsp ~ state + year + hwy, data = Ecdat::Produc)…</span></a>
+<a class="sourceLine" id="cb177-54" data-line-number="54"><span class="co">#&gt;  3 model_state_year_water biglm(gsp ~ state + year + water, data = Ecdat::Produ…</span></a>
+<a class="sourceLine" id="cb177-55" data-line-number="55"><span class="co">#&gt;  4 model_state_year_util  biglm(gsp ~ state + year + util, data = Ecdat::Produc…</span></a>
+<a class="sourceLine" id="cb177-56" data-line-number="56"><span class="co">#&gt;  5 model_state_year_pc    biglm(gsp ~ state + year + pc, data = Ecdat::Produc) …</span></a>
+<a class="sourceLine" id="cb177-57" data-line-number="57"><span class="co">#&gt;  6 model_state_year_emp   biglm(gsp ~ state + year + emp, data = Ecdat::Produc)…</span></a>
+<a class="sourceLine" id="cb177-58" data-line-number="58"><span class="co">#&gt;  7 model_state_year_unemp biglm(gsp ~ state + year + unemp, data = Ecdat::Produ…</span></a>
+<a class="sourceLine" id="cb177-59" data-line-number="59"><span class="co">#&gt;  8 model_state_pcap_hwy   biglm(gsp ~ state + pcap + hwy, data = Ecdat::Produc)…</span></a>
+<a class="sourceLine" id="cb177-60" data-line-number="60"><span class="co">#&gt;  9 model_state_pcap_water biglm(gsp ~ state + pcap + water, data = Ecdat::Produ…</span></a>
+<a class="sourceLine" id="cb177-61" data-line-number="61"><span class="co">#&gt; 10 model_state_pcap_util  biglm(gsp ~ state + pcap + util, data = Ecdat::Produc…</span></a>
 <a class="sourceLine" id="cb177-62" data-line-number="62"><span class="co">#&gt; # … with 161 more rows</span></a></code></pre></div>
 <p>We also need to define functions for summaries and plots.</p>
 <div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb178-1" data-line-number="1">get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(model_fit, data){</a>

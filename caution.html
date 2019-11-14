@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>B Cautionary notes | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="B Cautionary notes | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>5.3</b> Dynamic targets</a></li>
 <li class="chapter" data-level="5.4" data-path="dynamic.html"><a href="dynamic.html#map"><i class="fa fa-check"></i><b>5.4</b> map()</a></li>
 <li class="chapter" data-level="5.5" data-path="dynamic.html"><a href="dynamic.html#cross"><i class="fa fa-check"></i><b>5.5</b> cross()</a></li>
-<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#combine"><i class="fa fa-check"></i><b>5.6</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.6" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>5.6</b> <code>group()</code></a></li>
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#tracing-sub-dependencies"><i class="fa fa-check"></i><b>5.7</b> Tracing sub-dependencies</a></li>
 <li class="chapter" data-level="5.8" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.8</b> max_expand</a></li>
 </ul></li>
@@ -471,23 +471,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb301-7" data-line-number="7"><span class="co">#&gt; Error in enexpr(expr): object &#39;little_b&#39; not found</span></a>
 <a class="sourceLine" id="cb301-8" data-line-number="8">my_plan</a>
 <a class="sourceLine" id="cb301-9" data-line-number="9"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
-<a class="sourceLine" id="cb301-10" data-line-number="10"><span class="co">#&gt;    target              command                                             </span></a>
-<a class="sourceLine" id="cb301-11" data-line-number="11"><span class="co">#&gt;    &lt;chr&gt;               &lt;expr&gt;                                              </span></a>
-<a class="sourceLine" id="cb301-12" data-line-number="12"><span class="co">#&gt;  1 report              knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;),…</span></a>
-<a class="sourceLine" id="cb301-13" data-line-number="13"><span class="co">#&gt;  2 small               simulate(48)                                       …</span></a>
-<a class="sourceLine" id="cb301-14" data-line-number="14"><span class="co">#&gt;  3 large               simulate(64)                                       …</span></a>
-<a class="sourceLine" id="cb301-15" data-line-number="15"><span class="co">#&gt;  4 regression1_small   reg1(small)                                        …</span></a>
-<a class="sourceLine" id="cb301-16" data-line-number="16"><span class="co">#&gt;  5 regression1_large   reg1(large)                                        …</span></a>
-<a class="sourceLine" id="cb301-17" data-line-number="17"><span class="co">#&gt;  6 regression2_small   reg2(small)                                        …</span></a>
-<a class="sourceLine" id="cb301-18" data-line-number="18"><span class="co">#&gt;  7 regression2_large   reg2(large)                                        …</span></a>
-<a class="sourceLine" id="cb301-19" data-line-number="19"><span class="co">#&gt;  8 summ_regression1_s… suppressWarnings(summary(regression1_small$residual…</span></a>
-<a class="sourceLine" id="cb301-20" data-line-number="20"><span class="co">#&gt;  9 summ_regression1_l… suppressWarnings(summary(regression1_large$residual…</span></a>
-<a class="sourceLine" id="cb301-21" data-line-number="21"><span class="co">#&gt; 10 summ_regression2_s… suppressWarnings(summary(regression2_small$residual…</span></a>
-<a class="sourceLine" id="cb301-22" data-line-number="22"><span class="co">#&gt; 11 summ_regression2_l… suppressWarnings(summary(regression2_large$residual…</span></a>
-<a class="sourceLine" id="cb301-23" data-line-number="23"><span class="co">#&gt; 12 coef_regression1_s… suppressWarnings(summary(regression1_small))$coeffi…</span></a>
-<a class="sourceLine" id="cb301-24" data-line-number="24"><span class="co">#&gt; 13 coef_regression1_l… suppressWarnings(summary(regression1_large))$coeffi…</span></a>
-<a class="sourceLine" id="cb301-25" data-line-number="25"><span class="co">#&gt; 14 coef_regression2_s… suppressWarnings(summary(regression2_small))$coeffi…</span></a>
-<a class="sourceLine" id="cb301-26" data-line-number="26"><span class="co">#&gt; 15 coef_regression2_l… suppressWarnings(summary(regression2_large))$coeffi…</span></a>
+<a class="sourceLine" id="cb301-10" data-line-number="10"><span class="co">#&gt;    target               command                                                 </span></a>
+<a class="sourceLine" id="cb301-11" data-line-number="11"><span class="co">#&gt;    &lt;chr&gt;                &lt;expr&gt;                                                  </span></a>
+<a class="sourceLine" id="cb301-12" data-line-number="12"><span class="co">#&gt;  1 report               knit(knitr_in(&quot;report.Rmd&quot;), file_out(&quot;report.md&quot;), qui…</span></a>
+<a class="sourceLine" id="cb301-13" data-line-number="13"><span class="co">#&gt;  2 small                simulate(48)                                           …</span></a>
+<a class="sourceLine" id="cb301-14" data-line-number="14"><span class="co">#&gt;  3 large                simulate(64)                                           …</span></a>
+<a class="sourceLine" id="cb301-15" data-line-number="15"><span class="co">#&gt;  4 regression1_small    reg1(small)                                            …</span></a>
+<a class="sourceLine" id="cb301-16" data-line-number="16"><span class="co">#&gt;  5 regression1_large    reg1(large)                                            …</span></a>
+<a class="sourceLine" id="cb301-17" data-line-number="17"><span class="co">#&gt;  6 regression2_small    reg2(small)                                            …</span></a>
+<a class="sourceLine" id="cb301-18" data-line-number="18"><span class="co">#&gt;  7 regression2_large    reg2(large)                                            …</span></a>
+<a class="sourceLine" id="cb301-19" data-line-number="19"><span class="co">#&gt;  8 summ_regression1_sm… suppressWarnings(summary(regression1_small$residuals)) …</span></a>
+<a class="sourceLine" id="cb301-20" data-line-number="20"><span class="co">#&gt;  9 summ_regression1_la… suppressWarnings(summary(regression1_large$residuals)) …</span></a>
+<a class="sourceLine" id="cb301-21" data-line-number="21"><span class="co">#&gt; 10 summ_regression2_sm… suppressWarnings(summary(regression2_small$residuals)) …</span></a>
+<a class="sourceLine" id="cb301-22" data-line-number="22"><span class="co">#&gt; 11 summ_regression2_la… suppressWarnings(summary(regression2_large$residuals)) …</span></a>
+<a class="sourceLine" id="cb301-23" data-line-number="23"><span class="co">#&gt; 12 coef_regression1_sm… suppressWarnings(summary(regression1_small))$coefficien…</span></a>
+<a class="sourceLine" id="cb301-24" data-line-number="24"><span class="co">#&gt; 13 coef_regression1_la… suppressWarnings(summary(regression1_large))$coefficien…</span></a>
+<a class="sourceLine" id="cb301-25" data-line-number="25"><span class="co">#&gt; 14 coef_regression2_sm… suppressWarnings(summary(regression2_small))$coefficien…</span></a>
+<a class="sourceLine" id="cb301-26" data-line-number="26"><span class="co">#&gt; 15 coef_regression2_la… suppressWarnings(summary(regression2_large))$coefficien…</span></a>
 <a class="sourceLine" id="cb301-27" data-line-number="27"><span class="kw">make</span>(my_plan)</a>
 <a class="sourceLine" id="cb301-28" data-line-number="28"><span class="co">#&gt; Warning: knitr/rmarkdown report &#39;report.Rmd&#39; does not exist and cannot be</span></a>
 <a class="sourceLine" id="cb301-29" data-line-number="29"><span class="co">#&gt; inspected for dependencies.</span></a>
@@ -648,10 +648,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb305-13" data-line-number="13">  )</a>
 <a class="sourceLine" id="cb305-14" data-line-number="14">)</a>
 <a class="sourceLine" id="cb305-15" data-line-number="15"><span class="kw">digest</span>(circle_class)</a>
-<a class="sourceLine" id="cb305-16" data-line-number="16"><span class="co">#&gt; [1] &quot;8f2a67df034340c3111b2b4fae355867&quot;</span></a>
+<a class="sourceLine" id="cb305-16" data-line-number="16"><span class="co">#&gt; [1] &quot;1fe611bc9ee1959c5d4715803b3454ff&quot;</span></a>
 <a class="sourceLine" id="cb305-17" data-line-number="17">circle &lt;-<span class="st"> </span>circle_class<span class="op">$</span><span class="kw">new</span>(<span class="dt">radius =</span> <span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb305-18" data-line-number="18"><span class="kw">digest</span>(circle_class) <span class="co"># example_class changed</span></a>
-<a class="sourceLine" id="cb305-19" data-line-number="19"><span class="co">#&gt; [1] &quot;b1b895554bda163b0f7676c3cf5aafd1&quot;</span></a>
+<a class="sourceLine" id="cb305-19" data-line-number="19"><span class="co">#&gt; [1] &quot;c18cc05d8ed2f8a850147df012108e4b&quot;</span></a>
 <a class="sourceLine" id="cb305-20" data-line-number="20"><span class="kw">rm</span>(circle)</a></code></pre></div>
 <p>Ordinarily, <code>drake</code> overreacts to this change and builds targets repeatedly.</p>
 <div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb306-1" data-line-number="1"><span class="kw">clean</span>()</a>
