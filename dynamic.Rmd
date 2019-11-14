@@ -36,7 +36,7 @@ plan <- drake_plan(
   ),
   results = target(
     bind_rows(coord),
-    dynamic = combine(coord),
+    dynamic = group(coord),
     transform = combine(coord)
   )
 )
@@ -175,9 +175,9 @@ make(plan)
 readd(result)
 ```
 
-## `combine()`
+## `group()`
 
-`combine()` can group together sub-targets or split up static targets. The `.by` argument lets us control the aggregation. Let's fit a model to each continent in the Gapminder dataset and then combine all the results at the end.
+`group()` covers both splitting and aggregation. It chops up static targets into multiple pieces, and it gathers together existing sub-targets from dynamic dependencies. In both cases, the `.by` argument controls the aggregation. Let's fit a model to each continent in the Gapminder dataset and then combine all the results at the end.
 
 ```{r}
 fit_model <- function(dataset) {
@@ -196,16 +196,17 @@ plan <- drake_plan(
   # We need a target to act as a grouping variable.
   continent = dataset$continent,
   
-  # Fit a model for each continent.
+  # Static data splitting: fit a model for each continent.
   model = target(
     fit_model(dataset),
-    dynamic = combine(dataset, .by = continent)
+    dynamic = group(dataset, .by = continent)
   ),
   
-  # Aggregate the results together.
+  # Dynamic data aggregation: bring the models together.
   results = target(
     bind_rows(model),
-    dynamic = combine(model) # no .by necessary
+    # Ignore .by to get a single all-encompassing group.
+    dynamic = group(model)
   )
 )
 
@@ -216,7 +217,7 @@ readd(results)[[1]]
 
 ## Tracing sub-dependencies
 
-In dynamic branching, tracing keeps track of the sub-dependencies that correspond to individual the sub-targets. We can use tracing to remember which continent belongs to which model. `map()`, `cross()`, and `combine()` each support a `.trace` argument for this purpose.
+In dynamic branching, tracing keeps track of the sub-dependencies that correspond to individual the sub-targets. We can use tracing to remember which continent belongs to which model. `map()`, `cross()`, and `group()` each support a `.trace` argument for this purpose.
 
 ```{r}
 fit_model <- function(dataset, continent) {
@@ -253,7 +254,7 @@ read_trace("continent", "model")[seq_len(3)]
 readd(model, subtargets = seq_len(3))
 ```
 
-The trace also helps us create grouping variables for dynamic targets downstream of `cross()` and `combine()`. Below, we fit multiple models to multiple countries and aggregate on country. `get_trace()` gets grouping variables easily.
+The trace also helps us create grouping variables for dynamic targets downstream of `cross()` and `group()`. Below, we fit multiple models to multiple countries and aggregate on country. `get_trace()` gets grouping variables easily.
 
 ```{r}
 # We need a function to fit the model.
@@ -298,7 +299,7 @@ plan <- drake_plan(
   # Aggregate the models by country
   models_by_country = target(
     bind_rows(model),
-    dynamic = combine(
+    dynamic = group(
       model,
       .by = country_trace,
       # Define a new trace on the aggregates
