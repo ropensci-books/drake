@@ -17,7 +17,9 @@ invisible(file.copy("main/report.Rmd", ".", overwrite = TRUE))
 tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 ```
 
-Static branching helps us write large plans compactly. Instead of typing out every single target by hand, we use a special shorthand to declare entire batches of similar targets. Without static branching, plans like this one become cumbersome.
+Static branching helps us write large plans compactly. Instead of typing out every single target by hand, we use a special shorthand to declare entire batches of similar targets. To practice dynamic branching in a controlled setting, try the interactive exercises at <https://wlandau.shinyapps.io/learndrakeplans> (from the workshop at <https://github.com/wlandau/learndrake>).
+
+Without static branching, plans like this one become cumbersome.
 
 ```{r, eval = FALSE}
 # Without static branching:
@@ -94,7 +96,7 @@ plan <- drake_plan(
     transform = cross(
       tuning_setting = c("fast", "slow"),
       mean_value = c(1, 2, 3, 4),
-      model_function = !!model_functions
+      model_function = !!model_functions ## !! is important here
     )
   ),
   summary = target(
@@ -103,14 +105,14 @@ plan <- drake_plan(
   ),
   model_summary = target(
     dplyr::bind_rows(summary),
-    transform = combine(summary, .by = model_function)
+    transform = combine(summary, .by = model_function) 
   )
 )
 
 plan # a quick and dirty alternative to vis_drake_graph()
 ```
 
-Always check the graph to make sure the plan makes sense.
+*Always* check the graph to make sure the plan makes sense.
 
 ```{r}
 plot(plan)
@@ -128,7 +130,7 @@ plan <- drake_plan(
     transform = cross(
       tuning_setting = c("fast", "slow"),
       mean_value = c(1, 2, 3, 4),
-      model_function = !!model_functions
+      model_function = !!model_functions # See the tidy evaluation section below.
     )
   ),
   summary = target(
@@ -137,7 +139,7 @@ plan <- drake_plan(
   ),
   model_summary = target(
     dplyr::bind_rows(summary),
-    transform = combine(summary, .by = model_function)
+    transform = combine(summary, .by = model_function) # defined in "analysis" 
   )
 )
 
@@ -170,7 +172,7 @@ drake_plan(
 )
 ```
 
-You can supply your own custom grid using the `.data` argument. Note the use of `!!` below.
+You can supply the grid directly with the `.data` argument. Note the use of `!!` below. (See the tidy evaluation section.)
 
 ```{r}
 my_grid <- tibble(
@@ -195,88 +197,6 @@ drake_plan(
 )
 ```
 
-#### Special considerations in `map()`
-
-`map()` column-binds variables together to create a grid. The lengths of those variables need to be conformable just as with `data.frame()`.
-
-```{r, error = TRUE}
-drake_plan(
-  x = target(
-    simulate_data(center, scale),
-    transform = map(center = c(2, 1, 0), scale = c(3, 2))
-  )
-)
-```
-
-Sometimes, the results are sensible when grouping variable lengths are multiples of each other, but be careful.
-
-```{r}
-drake_plan(
-  x = target(
-    simulate_data(center, scale),
-    transform = map(center = c(2, 1, 0), scale = 4)
-  )
-)
-```
-
-Things get tricker when `drake` reuses grouping variables from previous transformations. For example, below, each `x_*` target has an associated `center` value. So if you write `transform = map(x)`, then `center` goes along for the ride.
-
-```{r}
-drake_plan(
-  x = target(
-    simulate_data(center),
-    transform = map(center = c(1, 2))
-  ),
-  y = target(
-    process_data(x, center),
-    transform = map(x)
-  ),
-  trace = TRUE # Adds extra columns for the grouping variables.
-)
-```
-
-But if other targets have `centers`'s of their own, `drake_plan()` may not know what to do with them.
-
-```{r}
-drake_plan(
-  w = target(
-    simulate_data(center),
-    transform = map(center = c(3, 4))
-  ),
-  x = target(
-    simulate_data_2(center),
-    transform = map(center = c(1, 2))
-  ),
-  y = target(
-    process_data(w, x, center),
-    transform = map(w, x)
-  ),
-  trace = TRUE
-)
-```
-
-The problems is that there are 4 values of `center` and only two `x_*` targets (and two `y_*` targets). Even if you explicitly supply `center` to the transformation, `map()` only takes the first two values.
-
-```{r}
-drake_plan(
-  w = target(
-    simulate_data(center),
-    transform = map(center = c(3, 4))
-  ),
-  x = target(
-    simulate_data_2(center),
-    transform = map(center = c(1, 2))
-  ),
-  y = target(
-    process_data(w, x, center),
-    transform = map(w, x, center)
-  ),
-  trace = TRUE
-)
-```
-
-So please inspect the plan before you run it with `make()`. Once you have a `drake_config()` object, `vis_drake_graph()` and `deps_target()` can help.
-
 #### `cross()`
 
 `cross()` creates a new target for each combination of argument values.
@@ -292,8 +212,6 @@ drake_plan(
 
 
 #### `split()`
-
-`split()` is not supported in `drake` 7.3.0 and below. It should reach the next CRAN release in June 2019.
 
 The `split()` transformation distributes a dataset as uniformly as possible across multiple targets.
 
@@ -315,11 +233,10 @@ plan
 ```
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config)
+plot(plan)
 ```
 
-Here, `drake_slice()` takes a single subset of the data at runtime. 
+Here, `drake_slice()` takes a single subset of the data at runtime. It supports data frames, matrices, and arbitrary arrays.
 
 ```{r}
 dataset <- tibble::as_tibble(iris)
@@ -330,30 +247,6 @@ drake_slice(dataset, slices = 50, index = 1)
 drake_slice(dataset, slices = 50, index = 2)
 
 drake_slice(dataset, slices = 3, index = 1, margin = 2)
-```
-
-`drake_slice()` supports data frames, matrices, and arbitrary arrays, and you can subset on any margin (rows, columns, etc). Even better, you can split up ordinary vectors and lists. Instead of taking slices of the actual dataset, you can split up a set of indices. Combined with [high-performance computing](#hpc), this should help you avoid loading an entire big data file into memory on a single compute node.
-
-```{r}
-plan <- drake_plan(
-  all_rows = file_in("huge.csv") %>%
-    number_of_rows() %>%
-    seq_len(),
-  rows = target(
-    all_rows,
-    transform = split(all_rows, slices = 3)
-  ),
-  analysis = target(
-    read_rows( # custom function
-      file = file_in("huge.csv"),
-      rows = rows
-    ) %>%
-      analyze_data(),
-    transform = map(rows, .id = rows_index) # an internal trick
-  )
-)
-
-drake_plan_source(plan)
 ```
 
 
