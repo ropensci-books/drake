@@ -225,7 +225,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.7" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>5.7</b> <code>max_expand</code></a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>6</b> Static branching</a><ul>
-<li class="chapter" data-level="6.0.1" data-path="static.html"><a href="static.html#the-types-of-transformations"><i class="fa fa-check"></i><b>6.0.1</b> The types of transformations</a></li>
+<li class="chapter" data-level="6.0.1" data-path="static.html"><a href="static.html#transformations"><i class="fa fa-check"></i><b>6.0.1</b> Transformations</a></li>
 <li class="chapter" data-level="6.0.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>6.0.2</b> Grouping variables</a></li>
 <li class="chapter" data-level="6.0.3" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>6.0.3</b> Tags</a></li>
 <li class="chapter" data-level="6.0.4" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>6.0.4</b> Target names</a></li>
@@ -511,19 +511,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Functions <code>drake_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
 <div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</a>
 <a class="sourceLine" id="cb228-2" data-line-number="2">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb228-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/Rtmpn5R6jN/file33bf1ce93ae6/.drake&quot;</span></a>
+<a class="sourceLine" id="cb228-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/RtmpC0CvYy/file33ea2d03bdfd/.drake&quot;</span></a>
 <a class="sourceLine" id="cb228-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb228-5" data-line-number="5">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></a>
 <a class="sourceLine" id="cb228-6" data-line-number="6">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb228-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/Rtmpn5R6jN/file33bf1ce93ae6/.drake&quot;</span></a>
+<a class="sourceLine" id="cb228-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/RtmpC0CvYy/file33ea2d03bdfd/.drake&quot;</span></a>
 <a class="sourceLine" id="cb228-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb228-9" data-line-number="9">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)</a>
 <a class="sourceLine" id="cb228-10" data-line-number="10">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb228-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/Rtmpn5R6jN/file33bf1ce93ae6/.drake&quot;</span></a>
+<a class="sourceLine" id="cb228-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/RtmpC0CvYy/file33ea2d03bdfd/.drake&quot;</span></a>
 <a class="sourceLine" id="cb228-12" data-line-number="12"></a>
 <a class="sourceLine" id="cb228-13" data-line-number="13">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)</a>
 <a class="sourceLine" id="cb228-14" data-line-number="14">cache2<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb228-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/Rtmpn5R6jN/file33bf1ce93ae6/my_new_cache&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb228-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/RtmpC0CvYy/file33ea2d03bdfd/my_new_cache&quot;</span></a></code></pre></div>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
 <div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1">cache2<span class="op">$</span><span class="kw">list</span>()</a>
 <a class="sourceLine" id="cb229-2" data-line-number="2"><span class="co">#&gt; character(0)</span></a>
@@ -551,8 +551,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
 <div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a>
 <a class="sourceLine" id="cb231-2" data-line-number="2"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))</a>
-<a class="sourceLine" id="cb231-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0f8195dda65e0e1a.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot; &quot;1e2416dcfce550af.rds&quot;</span></a>
-<a class="sourceLine" id="cb231-4" data-line-number="4"><span class="co">#&gt; [4] &quot;21935c86f12692e2.rds&quot; &quot;23a05d0672181ed2.rds&quot; &quot;29df5d28cbe73922.rds&quot;</span></a>
+<a class="sourceLine" id="cb231-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0571c147e58ebb07.rds&quot; &quot;05951a8a0ade8764.rds&quot; &quot;09634da3df36ef55.rds&quot;</span></a>
+<a class="sourceLine" id="cb231-4" data-line-number="4"><span class="co">#&gt; [4] &quot;0f8195dda65e0e1a.rds&quot; &quot;17fe952cd23575ea.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot;</span></a>
 <a class="sourceLine" id="cb231-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))</a>
 <a class="sourceLine" id="cb231-6" data-line-number="6"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
 <a class="sourceLine" id="cb231-7" data-line-number="7"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
