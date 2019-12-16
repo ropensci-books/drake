@@ -17,6 +17,8 @@ invisible(file.copy("main/report.Rmd", ".", overwrite = TRUE))
 tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 ```
 
+## Why static branching?
+
 Static branching helps us write large plans compactly. Instead of typing out every single target by hand, we use a special shorthand to declare entire batches of similar targets. To practice dynamic branching in a controlled setting, try the interactive exercises at <https://wlandau.shinyapps.io/learndrakeplans> (from the workshop at <https://github.com/wlandau/learndrake>).
 
 Without static branching, plans like this one become cumbersome.
@@ -81,47 +83,55 @@ drake_plan(
 )
 ```
 
-Static branching makes the plan easier to write and understand.
-
+Static branching makes the plan easier to write and understand. To activate static branching, use the `transform` argument of `target()`.
 
 ```{r}
 # With static branching:
 
-model_functions <- rlang::syms(c("main", "altv"))
+model_functions <- rlang::syms(c("main", "altv")) # We need symbols.
+
+model_functions # List of symbols.
 
 plan <- drake_plan(
   data = get_data(),
   analysis = target(
     model_function(data, mean = mean_value, tuning = tuning_setting),
-    transform = cross(
+    # Define an analysis target for each combination of
+    # tuning_setting, mean_value, and model_function.
+    transform = cross( 
       tuning_setting = c("fast", "slow"),
-      mean_value = c(1, 2, 3, 4),
-      model_function = !!model_functions ## !! is important here
+      mean_value = !!(1:4), # Why `!!`? See "Tidy Evaluation" below.
+      model_function = !!model_functions # Why `!!`? See "Tidy Evaluation" below.
     )
   ),
+  # Define a new summary target for each analysis target defined previously.
   summary = target(
     summarize_model(analysis),
     transform = map(analysis)
   ),
+  # Group together the summary targets by the corresponding value
+  # of model_function.
   model_summary = target(
     dplyr::bind_rows(summary),
     transform = combine(summary, .by = model_function) 
   )
 )
 
-plan # a quick and dirty alternative to vis_drake_graph()
+plan
 ```
 
 *Always* check the graph to make sure the plan makes sense.
 
 ```{r}
-plot(plan)
+plot(plan) # a quick and dirty alternative to vis_drake_graph()
 ```
 
 
 If the graph is too complicated to look at or too slow to load, downsize the plan with `max_expand`. Then, when you are done debugging and testing, remove `max_expand` to scale back up to the full plan.
 
 ```{r}
+model_functions <- rlang::syms(c("main", "altv"))
+
 plan <- drake_plan(
   max_expand = 2,
   data = get_data(),
@@ -129,8 +139,8 @@ plan <- drake_plan(
     model_function(data, mean = mean_value, tuning = tuning_setting),
     transform = cross(
       tuning_setting = c("fast", "slow"),
-      mean_value = c(1, 2, 3, 4),
-      model_function = !!model_functions # See the tidy evaluation section below.
+      mean_value = !!(1:4), # Why `!!`? See "Tidy Evaluation" below.
+      model_function = !!model_functions # Why `!!`? See "Tidy Evaluation" below.
     )
   ),
   summary = target(
@@ -147,8 +157,82 @@ plan <- drake_plan(
 plot(plan)
 ```
 
+## Grouping variables and the trace
 
-### Transformations
+*Grouping variables* are the custom arguments to `map()` and `cross()` that govern which targets to create. To better understand how `drake_plan()` works with grouping variables, set the `trace` argument to `TRUE`. Below, the plan has special columns to keep track of the `tuning_setting`, `mean_value`, and `analysis` associated with each target.
+
+```{r}
+drake_plan(
+  trace = TRUE,
+  data = get_data(),
+  analysis = target(
+    fit_model(data, mean = mean_value, tuning = tuning_setting),
+    transform = cross(
+      tuning_setting = c("fast", "slow"),
+      mean_value = c(1, 2)
+    )
+  ),
+  summary = target(
+    summarize_model(analysis),
+    transform = map(analysis)
+  ),
+  summary_by_tuning = target(
+    dplyr::bind_rows(summary),
+    transform = combine(summary, .by = tuning_setting)
+  )
+)
+```
+
+
+## Tidy evaluation
+
+In earlier plans, we used "bang-bang" operator `!!` from [tidy evaluation](https://tidyeval.tidyverse.org/), e.g. `model_function = !!model_functions` in `cross()`. But why? Why not just `model_function = model_functions`? Consider the following incorrect plan. 
+
+```{r}
+model_functions <- rlang::syms(c("main", "altv"))
+
+plan <- drake_plan(
+  data = get_data(),
+  analysis = target(
+    model_function(data, mean = mean_value, tuning = tuning_setting),
+    transform = cross(
+      tuning_setting = c("fast", "slow"),
+      mean_value = 1:4, # without !!
+      model_function = model_functions # without !!
+    )
+  )
+)
+
+drake_plan_source(plan)
+```
+
+Because we omit `!!`, we create two problems:
+
+1. The commands use `model_functions()` instead of the desired `main()` and `altv()`.
+2. We are missing the targets with `mean = 2` and `mean = 3`.
+
+Why? To make static branching work properly, `drake` does not actually evaluate the arguments to `cross()`. It just uses the raw symbols and expressions. To force `drake` to use the *values* instead, we need `!!`.
+
+
+```{r}
+model_functions <- rlang::syms(c("main", "altv"))
+
+plan <- drake_plan(
+  data = get_data(),
+  analysis = target(
+    model_function(data, mean = mean_value, tuning = tuning_setting),
+    transform = cross(
+      tuning_setting = c("fast", "slow"),
+      mean_value = !!(1:4), # with !!
+      model_function = !!model_functions # with !!
+    )
+  )
+)
+
+drake_plan_source(plan)
+```
+
+## Static transformations
 
 There are four transformations in static branching: `map()`, `cross()`, `split()`, and `combine()`. They are not actual functions, just special language to supply to the `transform` argument of `target()` in `drake_plan()`. Each transformation is similar to a function from the [Tidyverse](https://www.tidyverse.org/).
 
@@ -159,7 +243,7 @@ There are four transformations in static branching: `map()`, `cross()`, `split()
 | `split()`   | `group_map()`  from `dplyr` |
 | `combine()` | `summarize()` from `dplyr`  |
 
-#### `map()`
+### `map()`
 
 `map()` creates a new target for each row in a grid.
 
@@ -197,7 +281,7 @@ drake_plan(
 )
 ```
 
-#### `cross()`
+### `cross()`
 
 `cross()` creates a new target for each combination of argument values.
 
@@ -210,8 +294,7 @@ drake_plan(
 )
 ```
 
-
-#### `split()`
+### `split()`
 
 The `split()` transformation distributes a dataset as uniformly as possible across multiple targets.
 
@@ -239,44 +322,15 @@ plot(plan)
 Here, `drake_slice()` takes a single subset of the data at runtime. It supports data frames, matrices, and arbitrary arrays.
 
 ```{r}
-dataset <- tibble::as_tibble(iris)
-dim(dataset)
+drake_slice(iris, slices = 50, index = 1)
 
-drake_slice(dataset, slices = 50, index = 1)
-
-drake_slice(dataset, slices = 50, index = 2)
-
-drake_slice(dataset, slices = 3, index = 1, margin = 2)
+drake_slice(iris, slices = 50, index = 2)
 ```
 
 
-#### `combine()`
+### `combine()`
 
-In `combine()`, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator `!!!` from the Tidyverse.
-
-```{r}
-plan <- drake_plan(
-  data = target(
-    sim_data(mean = x, sd = y),
-    transform = map(x = c(1, 2), y = c(3, 4))
-  ),
-  larger = target(
-    bind_rows(data, .id = "id") %>%
-      arrange(sd) %>%
-      head(n = 400),
-    transform = combine(data)
-  )
-)
-
-plan
-
-drake_plan_source(plan)
-
-config <- drake_config(plan)
-vis_drake_graph(config)
-```
-
-You can different groups of targets in the same command.
+In `combine()`, you can insert multiple targets into individual commands. The closest comparison is the unquote-splice operator `!!!` from tidy evaluation.
 
 ```{r}
 plan <- drake_plan(
@@ -299,7 +353,7 @@ plan <- drake_plan(
 drake_plan_source(plan)
 ```
 
-And as with `group_by()` from `dplyr`, you can create a separate aggregate for each combination of levels of the arguments. Just pass a symbol or vector of symbols to the optional `.by` argument of `combine()`.
+To create multiple combined groups, use the `.by` argument.
 
 ```{r}
 plan <- drake_plan(
@@ -318,109 +372,9 @@ plan <- drake_plan(
 drake_plan_source(plan)
 ```
 
-In your post-processing, you may need the values of `x` and `y` that underly `data_1_3` and `data_2_4`. Solution: get the trace and the target names. We define a new plan
+## Tags
 
-```{r}
-plan <- drake_plan(
-  data = target(
-    sim_data(mean = x, sd = y),
-    transform = map(x = c(1, 2), y = c(3, 4))
-  ),
-  larger = target(
-    post_process(data, plan = ignore(plan)) %>%
-      arrange(sd) %>%
-      head(n = 400),
-    transform = combine(data)
-  ),
-  trace = TRUE
-)
-
-drake_plan_source(plan)
-```
-
-and a new function
-
-```{r, eval = FALSE}
-post_process <- function(..., plan) {
-  args <- list(...)
-  names(args) <- all.vars(substitute(list(...)))
-  trace <- filter(plan, target %in% names(args))
-  # Do post-processing with args and trace.
-}
-```
-
-### Grouping variables
-
-A grouping variable is an argument to `map()`, `cross()`, or `combine()` that identifies a sub-collection of target names. Grouping variables can be either literals or symbols. Symbols can be scalars or vectors, and you can pass them to transformations with or without argument names.
-
-#### Literal arguments
-
-When you pass a grouping variable of literals, you must use an explicit argument name. One does not simply write `map(c(1, 2))`.
-
-```{r}
-drake_plan(x = target(sqrt(y), transform = map(y = c(1, 2))))
-```
-
-And if you supply integer sequences the usual way, you may notice some rows are missing.
-
-```{r}
-drake_plan(x = target(sqrt(y), transform = map(y = 1:3)))
-```
-
-Tidy evaluation and `as.numeric()` make sure all the data points show up.
-
-```{r}
-y_vals <- as.numeric(1:3)
-drake_plan(x = target(sqrt(y), transform = map(y = !!y_vals)))
-```
-
-Character vectors usually work without a hitch, and quotes are converted into dots to make valid target names.
-
-```{r}
-drake_plan(x = target(get_data(y), transform = map(y = c("a", "b", "c"))))
-```
-
-```{r}
-y_vals <- letters
-drake_plan(x = target(get_data(y), transform = map(y = !!y_vals)))
-```
-
-#### Named symbol arguments
-
-Symbols passed with explicit argument names define new groupings of existing targets on the fly, and only the `map()` and `cross()` transformations can accept them this ways. To generate long symbol lists, use the `syms()` function from the `rlang` package. Remember to use the tidy evaluation operator `!!` inside the transformation.
-
-```{r}
-vals <- rlang::syms(letters)
-drake_plan(x = target(get_data(y), transform = map(y = !!vals)))
-```
-
-The new groupings carry over to downstream targets by default, which you can see with `trace = TRUE`. Below, the rows for targets `w_x` and `w_y` have entries in the and `z` column.
-
-```{r}
-drake_plan(
-  x = abs(mean(rnorm(10))),
-  y = abs(mean(rnorm(100, 1))),
-  z = target(sqrt(val), transform = map(val = c(x, y))),
-  w = target(val + 1, transform = map(val)),
-  trace = TRUE
-)
-```
-
-However, this is *incorrect* because `w` does not depend on `z_x` or `z_y`. So for `w`, you should write `map(val = c(x, y))` instead of `map(val)` to tell `drake` to clear the trace. Then, you will see `NA`s in the `z` column for `w_x` and `w_y`, which is right and proper.
-
-```{r}
-drake_plan(
-  x = abs(mean(rnorm(10))),
-  y = abs(mean(rnorm(100, 1))),
-  z = target(sqrt(val), transform = map(val = c(x, y))),
-  w = target(val + 1, transform = map(val = c(x, y))),
-  trace = TRUE
-)
-```
-
-### Tags
-
-Tags are special optional grouping variables. They are ignored while the transformation is happening and then added to the plan to help subsequent transformations. There are two types of tags:
+A tag is a custom grouping variable for a transformation. There are two kinds of tags:
 
 1. In-tags, which contain the target name you start with, and
 2. Out-tags, which contain the target names generated by the transformations.
@@ -458,10 +412,7 @@ plan <- drake_plan(
   )
 )
 
-plan
-
-config <- drake_config(plan)
-vis_drake_graph(config)
+drake_plan_source(plan)
 ```
 
 <br>
