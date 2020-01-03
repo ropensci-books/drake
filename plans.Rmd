@@ -279,9 +279,9 @@ The following columns have special meanings, and `make()` reads and interprets t
 - `retries`: number of times to retry building a target in the event of an error.
 - `seed`: pseudo-random number generator (RNG) seed for each target. `drake` usually computes its own unique reproducible target-specific seeds using the target name and the global seed (the `seed` argument of `make()` and `drake_config()`). Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
 
-## External files
+## External files and directories
 
-`drake` has special functions to declare relationships between targets and files. [`file_in()`](https://docs.ropensci.org/drake/reference/file_in.html) is for input files, [`file_out()`](https://docs.ropensci.org/drake/reference/file_out.html) is for output files, and [`knitr_in()`](https://docs.ropensci.org/drake/reference/knitr_in.html) is for R Markdown reports and `knitr` source files. If you use one of these functions inline in the plan, it tells `drake` to rerun a target when a file changes.
+`drake` has special functions to declare relationships between targets and external storage on disk. [`file_in()`](https://docs.ropensci.org/drake/reference/file_in.html) is for input files and directories, [`file_out()`](https://docs.ropensci.org/drake/reference/file_out.html) is for output files and directories, and [`knitr_in()`](https://docs.ropensci.org/drake/reference/knitr_in.html) is for R Markdown reports and `knitr` source files. If you use one of these functions inline in the plan, it tells `drake` to rerun a target when a file changes (or any of the files in a directory).
 
 All three functions appear in this plan.
 
@@ -325,7 +325,7 @@ drake_plan(
 
 #### Paths must be literal strings
 
-`file_in()`, `file_out()`, and `knitr_in()` require you to mention file names *explicitly*. You cannot use a variable containing the name of a file.
+`file_in()`, `file_out()`, and `knitr_in()` require you to mention file and directory names *explicitly*. You cannot use a variable containing the name of a file.
 
 ```{r}
 bad_plan <- drake_plan(
@@ -341,7 +341,7 @@ Instead, write this:
 
 ```{r}
 good_plan <- drake_plan(
-  file = read_csv(file_in("my_data.csv")),
+  file = read_csv(file_in("my_data.csv"))
 )
 
 good_config <- drake_config(good_plan)
