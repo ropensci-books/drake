@@ -221,7 +221,12 @@ plot(plan)
 
 ### Unnested grouping variables
 
-The forward propagation of grouping variables is powerful, but it requires each grouping variable to be strictly nested inside a *single* group of targets (e.g. a *single* call to `map()` or `cross()`). The following plan disrupts this nesting, so `drake` does not know how to generate `c1`.
+The forward propagation of grouping variables is powerful, but it can easily go wrong. You should 
+
+1. Define each grouping variable only once, and
+2. Propagate the grouping variable in a direct linear downstream path.
+
+In the following plan, we violate both (1) and (2). We violate (1) because we define `a1` twice: once for `b1` and again for `b2`. And we violate (2) because we bypass `b1` and` b2` when we propagate `a1` to `c1`. `a2` and `a3` have the same problems, and when we put it all together, `drake` does not know how to plan `c1`.
 
 ```{r}
 drake_plan(
@@ -233,19 +238,7 @@ drake_plan(
 )
 ```
 
-But if you reinstantiate grouping variables `a1`, `a2`, and `a3` just for `c1`, then `drake` produces the expected `c1`.
-
-```{r}
-drake_plan(
-  b1 = target(1, transform = map(a1 = 1, a2 = 1, .id = FALSE)),
-  b2 = target(1, transform = map(a1 = 1, a3 = 1, .id = FALSE)),
-  b3 = target(1, transform = map(a2 = 1, a3 = 1, .id = FALSE)),
-  c1 = target(1, transform = map(a1 = 1, a2 = 1, a3 = 1, .id = FALSE)),
-  trace = TRUE
-)
-```
-
-Other workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, there is no substitute for checking and visualizing plans as described earlier.
+Workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, you must still check, inspect, and visualize plans before running them.
 
 ## Tidy evaluation
 
