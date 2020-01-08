@@ -213,7 +213,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a><ul>
 <li class="chapter" data-level="5.1" data-path="static.html"><a href="static.html#why-static-branching"><i class="fa fa-check"></i><b>5.1</b> Why static branching?</a></li>
-<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables-and-the-trace"><i class="fa fa-check"></i><b>5.2</b> Grouping variables and the trace</a><ul>
+<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a><ul>
 <li class="chapter" data-level="5.2.1" data-path="static.html"><a href="static.html#unnested-grouping-variables"><i class="fa fa-check"></i><b>5.2.1</b> Unnested grouping variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="static.html"><a href="static.html#tidy-evaluation"><i class="fa fa-check"></i><b>5.3</b> Tidy evaluation</a></li>
@@ -440,24 +440,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="special-data-formats-for-targets-1" class="section level2">
 <h2><span class="header-section-number">15.1</span> Special data formats for targets</h2>
 <p><code>drake</code> supports custom formats for large unwiedly targets. For example, the <code>&quot;fst&quot;</code> format uses the <a href="https://github.com/fstpackage/fst"><code>fst</code></a> package to save targets faster. Simply enclose the command and the format together with the <code>target()</code> function.</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb214-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb214-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="fl">1e8</span> <span class="co"># Each target is 1.6 GB in memory.</span></a>
-<a class="sourceLine" id="cb214-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb214-4" data-line-number="4">  <span class="dt">data_fst =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb214-5" data-line-number="5">    <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n)),</a>
-<a class="sourceLine" id="cb214-6" data-line-number="6">    <span class="dt">format =</span> <span class="st">&quot;fst&quot;</span></a>
-<a class="sourceLine" id="cb214-7" data-line-number="7">  ),</a>
-<a class="sourceLine" id="cb214-8" data-line-number="8">  <span class="dt">data_old =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n))</a>
-<a class="sourceLine" id="cb214-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb214-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb214-11" data-line-number="11"><span class="co">#&gt; target data_fst</span></a>
-<a class="sourceLine" id="cb214-12" data-line-number="12"><span class="co">#&gt; target data_old</span></a>
-<a class="sourceLine" id="cb214-13" data-line-number="13"><span class="kw">build_times</span>(<span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)</a>
-<a class="sourceLine" id="cb214-14" data-line-number="14"><span class="co">#&gt; # A tibble: 2 x 4</span></a>
-<a class="sourceLine" id="cb214-15" data-line-number="15"><span class="co">#&gt;   target   elapsed              user                 system    </span></a>
-<a class="sourceLine" id="cb214-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;    &lt;Duration&gt;           &lt;Duration&gt;           &lt;Duration&gt;</span></a>
-<a class="sourceLine" id="cb214-17" data-line-number="17"><span class="co">#&gt; 1 data_fst 13.93s               37.562s              7.954s    </span></a>
-<a class="sourceLine" id="cb214-18" data-line-number="18"><span class="co">#&gt; 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s</span></a></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb213-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb213-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="fl">1e8</span> <span class="co"># Each target is 1.6 GB in memory.</span></a>
+<a class="sourceLine" id="cb213-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb213-4" data-line-number="4">  <span class="dt">data_fst =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb213-5" data-line-number="5">    <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n)),</a>
+<a class="sourceLine" id="cb213-6" data-line-number="6">    <span class="dt">format =</span> <span class="st">&quot;fst&quot;</span></a>
+<a class="sourceLine" id="cb213-7" data-line-number="7">  ),</a>
+<a class="sourceLine" id="cb213-8" data-line-number="8">  <span class="dt">data_old =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n))</a>
+<a class="sourceLine" id="cb213-9" data-line-number="9">)</a>
+<a class="sourceLine" id="cb213-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb213-11" data-line-number="11"><span class="co">#&gt; target data_fst</span></a>
+<a class="sourceLine" id="cb213-12" data-line-number="12"><span class="co">#&gt; target data_old</span></a>
+<a class="sourceLine" id="cb213-13" data-line-number="13"><span class="kw">build_times</span>(<span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)</a>
+<a class="sourceLine" id="cb213-14" data-line-number="14"><span class="co">#&gt; # A tibble: 2 x 4</span></a>
+<a class="sourceLine" id="cb213-15" data-line-number="15"><span class="co">#&gt;   target   elapsed              user                 system    </span></a>
+<a class="sourceLine" id="cb213-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;    &lt;Duration&gt;           &lt;Duration&gt;           &lt;Duration&gt;</span></a>
+<a class="sourceLine" id="cb213-17" data-line-number="17"><span class="co">#&gt; 1 data_fst 13.93s               37.562s              7.954s    </span></a>
+<a class="sourceLine" id="cb213-18" data-line-number="18"><span class="co">#&gt; 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s</span></a></code></pre></div>
 <p>Other available formats:</p>
 <ul>
 <li><code>&quot;fst_dt&quot;</code>: like <code>&quot;fst&quot;</code>, but for <a href="https://github.com/Rdatatable/data.table"><code>data.table</code></a> objects.</li>
@@ -469,156 +469,156 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="cache-management" class="section level2">
 <h2><span class="header-section-number">15.2</span> Cache management</h2>
 <p>When you run <code>make()</code>, <code>drake</code> stores your targets in a cache.</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb215-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></a>
-<a class="sourceLine" id="cb215-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb214-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb214-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></a>
+<a class="sourceLine" id="cb214-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a></code></pre></div>
 <p>The default cache is a hidden <code>.drake</code> folder.</p>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb216-1" data-line-number="1"><span class="kw">find_cache</span>()</a>
-<a class="sourceLine" id="cb216-2" data-line-number="2">### [1] &quot;/home/you/project/.drake&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1"><span class="kw">find_cache</span>()</a>
+<a class="sourceLine" id="cb215-2" data-line-number="2">### [1] &quot;/home/you/project/.drake&quot;</a></code></pre></div>
 <p><code>drake</code> uses the <a href="https://github.com/richfitz/storr">storr</a> package to create and modify caches.</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="kw">library</span>(storr)</a>
-<a class="sourceLine" id="cb217-2" data-line-number="2">cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;.drake&quot;</span>)</a>
-<a class="sourceLine" id="cb217-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb217-4" data-line-number="4"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">list</span>())</a>
-<a class="sourceLine" id="cb217-5" data-line-number="5"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
-<a class="sourceLine" id="cb217-6" data-line-number="6"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
-<a class="sourceLine" id="cb217-7" data-line-number="7"><span class="co">#&gt; [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;</span></a>
-<a class="sourceLine" id="cb217-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb217-9" data-line-number="9"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))</a>
-<a class="sourceLine" id="cb217-10" data-line-number="10"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb217-11" data-line-number="11"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb217-12" data-line-number="12"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb217-13" data-line-number="13"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb217-14" data-line-number="14"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb217-15" data-line-number="15"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb217-16" data-line-number="16"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb216-1" data-line-number="1"><span class="kw">library</span>(storr)</a>
+<a class="sourceLine" id="cb216-2" data-line-number="2">cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;.drake&quot;</span>)</a>
+<a class="sourceLine" id="cb216-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb216-4" data-line-number="4"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">list</span>())</a>
+<a class="sourceLine" id="cb216-5" data-line-number="5"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
+<a class="sourceLine" id="cb216-6" data-line-number="6"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
+<a class="sourceLine" id="cb216-7" data-line-number="7"><span class="co">#&gt; [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;</span></a>
+<a class="sourceLine" id="cb216-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb216-9" data-line-number="9"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))</a>
+<a class="sourceLine" id="cb216-10" data-line-number="10"><span class="co">#&gt;       x    y</span></a>
+<a class="sourceLine" id="cb216-11" data-line-number="11"><span class="co">#&gt; 1 3.780 15.2</span></a>
+<a class="sourceLine" id="cb216-12" data-line-number="12"><span class="co">#&gt; 2 3.440 17.8</span></a>
+<a class="sourceLine" id="cb216-13" data-line-number="13"><span class="co">#&gt; 3 3.215 21.4</span></a>
+<a class="sourceLine" id="cb216-14" data-line-number="14"><span class="co">#&gt; 4 3.440 19.2</span></a>
+<a class="sourceLine" id="cb216-15" data-line-number="15"><span class="co">#&gt; 5 2.770 19.7</span></a>
+<a class="sourceLine" id="cb216-16" data-line-number="16"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
 <p><code>drake</code> has its own interface on top of <a href="https://github.com/richfitz/storr">storr</a> to make it easier to work with the default <code>.drake/</code> cache. The <code>loadd()</code>, <code>readd()</code>, and <code>cached()</code> functions explore saved targets.</p>
-<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb218-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">cached</span>())</a>
-<a class="sourceLine" id="cb218-2" data-line-number="2"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
-<a class="sourceLine" id="cb218-3" data-line-number="3"><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></a>
-<a class="sourceLine" id="cb218-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb218-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">readd</span>(small))</a>
-<a class="sourceLine" id="cb218-6" data-line-number="6"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb218-7" data-line-number="7"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb218-8" data-line-number="8"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb218-9" data-line-number="9"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb218-10" data-line-number="10"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb218-11" data-line-number="11"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb218-12" data-line-number="12"><span class="co">#&gt; 6 2.465 21.5</span></a>
-<a class="sourceLine" id="cb218-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb218-14" data-line-number="14"><span class="kw">loadd</span>(large)</a>
-<a class="sourceLine" id="cb218-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb218-16" data-line-number="16"><span class="kw">head</span>(large)</a>
-<a class="sourceLine" id="cb218-17" data-line-number="17"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb218-18" data-line-number="18"><span class="co">#&gt; 1 2.140 26.0</span></a>
-<a class="sourceLine" id="cb218-19" data-line-number="19"><span class="co">#&gt; 2 3.730 17.3</span></a>
-<a class="sourceLine" id="cb218-20" data-line-number="20"><span class="co">#&gt; 3 1.935 27.3</span></a>
-<a class="sourceLine" id="cb218-21" data-line-number="21"><span class="co">#&gt; 4 2.780 21.4</span></a>
-<a class="sourceLine" id="cb218-22" data-line-number="22"><span class="co">#&gt; 5 2.320 22.8</span></a>
-<a class="sourceLine" id="cb218-23" data-line-number="23"><span class="co">#&gt; 6 2.780 21.4</span></a>
-<a class="sourceLine" id="cb218-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb218-25" data-line-number="25"><span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></a></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">cached</span>())</a>
+<a class="sourceLine" id="cb217-2" data-line-number="2"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
+<a class="sourceLine" id="cb217-3" data-line-number="3"><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></a>
+<a class="sourceLine" id="cb217-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb217-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">readd</span>(small))</a>
+<a class="sourceLine" id="cb217-6" data-line-number="6"><span class="co">#&gt;       x    y</span></a>
+<a class="sourceLine" id="cb217-7" data-line-number="7"><span class="co">#&gt; 1 3.780 15.2</span></a>
+<a class="sourceLine" id="cb217-8" data-line-number="8"><span class="co">#&gt; 2 3.440 17.8</span></a>
+<a class="sourceLine" id="cb217-9" data-line-number="9"><span class="co">#&gt; 3 3.215 21.4</span></a>
+<a class="sourceLine" id="cb217-10" data-line-number="10"><span class="co">#&gt; 4 3.440 19.2</span></a>
+<a class="sourceLine" id="cb217-11" data-line-number="11"><span class="co">#&gt; 5 2.770 19.7</span></a>
+<a class="sourceLine" id="cb217-12" data-line-number="12"><span class="co">#&gt; 6 2.465 21.5</span></a>
+<a class="sourceLine" id="cb217-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb217-14" data-line-number="14"><span class="kw">loadd</span>(large)</a>
+<a class="sourceLine" id="cb217-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb217-16" data-line-number="16"><span class="kw">head</span>(large)</a>
+<a class="sourceLine" id="cb217-17" data-line-number="17"><span class="co">#&gt;       x    y</span></a>
+<a class="sourceLine" id="cb217-18" data-line-number="18"><span class="co">#&gt; 1 2.140 26.0</span></a>
+<a class="sourceLine" id="cb217-19" data-line-number="19"><span class="co">#&gt; 2 3.730 17.3</span></a>
+<a class="sourceLine" id="cb217-20" data-line-number="20"><span class="co">#&gt; 3 1.935 27.3</span></a>
+<a class="sourceLine" id="cb217-21" data-line-number="21"><span class="co">#&gt; 4 2.780 21.4</span></a>
+<a class="sourceLine" id="cb217-22" data-line-number="22"><span class="co">#&gt; 5 2.320 22.8</span></a>
+<a class="sourceLine" id="cb217-23" data-line-number="23"><span class="co">#&gt; 6 2.780 21.4</span></a>
+<a class="sourceLine" id="cb217-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb217-25" data-line-number="25"><span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></a></code></pre></div>
 <p>Functions <code>drake_cache()</code>, <code>storr::storr_rds()</code>, and <code>new_cache()</code> recover and create caches. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb219-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</a>
-<a class="sourceLine" id="cb219-2" data-line-number="2">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb219-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/RtmpXE38bb/file125342d259e3/.drake&quot;</span></a>
-<a class="sourceLine" id="cb219-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb219-5" data-line-number="5">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></a>
-<a class="sourceLine" id="cb219-6" data-line-number="6">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb219-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/RtmpXE38bb/file125342d259e3/.drake&quot;</span></a>
-<a class="sourceLine" id="cb219-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb219-9" data-line-number="9">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)</a>
-<a class="sourceLine" id="cb219-10" data-line-number="10">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb219-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/RtmpXE38bb/file125342d259e3/.drake&quot;</span></a>
-<a class="sourceLine" id="cb219-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb219-13" data-line-number="13">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)</a>
-<a class="sourceLine" id="cb219-14" data-line-number="14">cache2<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb219-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/RtmpXE38bb/file125342d259e3/my_new_cache&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb218-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</a>
+<a class="sourceLine" id="cb218-2" data-line-number="2">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
+<a class="sourceLine" id="cb218-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/Rtmp2zN585/file32d36dfe2dfb/.drake&quot;</span></a>
+<a class="sourceLine" id="cb218-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb218-5" data-line-number="5">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></a>
+<a class="sourceLine" id="cb218-6" data-line-number="6">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
+<a class="sourceLine" id="cb218-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/Rtmp2zN585/file32d36dfe2dfb/.drake&quot;</span></a>
+<a class="sourceLine" id="cb218-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb218-9" data-line-number="9">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_rds</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>)</a>
+<a class="sourceLine" id="cb218-10" data-line-number="10">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
+<a class="sourceLine" id="cb218-11" data-line-number="11"><span class="co">#&gt; [1] &quot;/tmp/Rtmp2zN585/file32d36dfe2dfb/.drake&quot;</span></a>
+<a class="sourceLine" id="cb218-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb218-13" data-line-number="13">cache2 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;my_new_cache&quot;</span>)</a>
+<a class="sourceLine" id="cb218-14" data-line-number="14">cache2<span class="op">$</span>driver<span class="op">$</span>path</a>
+<a class="sourceLine" id="cb218-15" data-line-number="15"><span class="co">#&gt; [1] &quot;/tmp/Rtmp2zN585/file32d36dfe2dfb/my_new_cache&quot;</span></a></code></pre></div>
 <p>You can supply your own cache to <code>make()</code> and similar functions.</p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" data-line-number="1">cache2<span class="op">$</span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb220-2" data-line-number="2"><span class="co">#&gt; character(0)</span></a>
-<a class="sourceLine" id="cb220-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb220-4" data-line-number="4">plan2 &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">sqrt</span>(x))</a>
-<a class="sourceLine" id="cb220-5" data-line-number="5"><span class="kw">make</span>(plan2, <span class="dt">cache =</span> cache2)</a>
-<a class="sourceLine" id="cb220-6" data-line-number="6"><span class="co">#&gt; target x</span></a>
-<a class="sourceLine" id="cb220-7" data-line-number="7"><span class="co">#&gt; target y</span></a>
-<a class="sourceLine" id="cb220-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb220-9" data-line-number="9">cache2<span class="op">$</span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb220-10" data-line-number="10"><span class="co">#&gt; [1] &quot;x&quot; &quot;y&quot;</span></a>
-<a class="sourceLine" id="cb220-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb220-12" data-line-number="12">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> plan2, <span class="dt">cache =</span> cache2)</a>
-<a class="sourceLine" id="cb220-13" data-line-number="13"><span class="kw">vis_drake_graph</span>(config)</a>
-<a class="sourceLine" id="cb220-14" data-line-number="14"><span class="co">#&gt; Warning: argument config is deprecated. Use ... to supply make() arguments such</span></a>
-<a class="sourceLine" id="cb220-15" data-line-number="15"><span class="co">#&gt; as the plan instead.</span></a></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb219-1" data-line-number="1">cache2<span class="op">$</span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb219-2" data-line-number="2"><span class="co">#&gt; character(0)</span></a>
+<a class="sourceLine" id="cb219-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb219-4" data-line-number="4">plan2 &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">sqrt</span>(x))</a>
+<a class="sourceLine" id="cb219-5" data-line-number="5"><span class="kw">make</span>(plan2, <span class="dt">cache =</span> cache2)</a>
+<a class="sourceLine" id="cb219-6" data-line-number="6"><span class="co">#&gt; target x</span></a>
+<a class="sourceLine" id="cb219-7" data-line-number="7"><span class="co">#&gt; target y</span></a>
+<a class="sourceLine" id="cb219-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb219-9" data-line-number="9">cache2<span class="op">$</span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb219-10" data-line-number="10"><span class="co">#&gt; [1] &quot;x&quot; &quot;y&quot;</span></a>
+<a class="sourceLine" id="cb219-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb219-12" data-line-number="12">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(<span class="dt">plan =</span> plan2, <span class="dt">cache =</span> cache2)</a>
+<a class="sourceLine" id="cb219-13" data-line-number="13"><span class="kw">vis_drake_graph</span>(config)</a>
+<a class="sourceLine" id="cb219-14" data-line-number="14"><span class="co">#&gt; Warning: argument config is deprecated. Use ... to supply make() arguments such</span></a>
+<a class="sourceLine" id="cb219-15" data-line-number="15"><span class="co">#&gt; as the plan instead.</span></a></code></pre></div>
 <div id="htmlwidget-10e806ada270798b8ea0" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-10e806ada270798b8ea0">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.006s","y\n0.005s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-10e806ada270798b8ea0">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.004s","y\n0.004s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,7]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Destroy caches to remove them from your file system.</p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb221-1" data-line-number="1">cache<span class="op">$</span><span class="kw">destroy</span>()</a>
-<a class="sourceLine" id="cb221-2" data-line-number="2">cache2<span class="op">$</span><span class="kw">destroy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" data-line-number="1">cache<span class="op">$</span><span class="kw">destroy</span>()</a>
+<a class="sourceLine" id="cb220-2" data-line-number="2">cache2<span class="op">$</span><span class="kw">destroy</span>()</a></code></pre></div>
 </div>
 <div id="cache-formats" class="section level2">
 <h2><span class="header-section-number">15.3</span> Cache formats</h2>
 <div id="rds-caches" class="section level3">
 <h3><span class="header-section-number">15.3.1</span> RDS caches</h3>
 <p>By default, <code>drake</code> uses <code>storr_rds()</code> caches because they allow <code>make(jobs = 4)</code> to safely store multiple targets in parallel. To achieve this thread safety, however, <a href="https://github.com/richfitz/storr"><code>storr</code></a> splits up the data into a pool of tiny cryptically-named files.</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb222-1" data-line-number="1"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a>
-<a class="sourceLine" id="cb222-2" data-line-number="2"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))</a>
-<a class="sourceLine" id="cb222-3" data-line-number="3"><span class="co">#&gt; [1] &quot;05b03f5a39161e1f.rds&quot; &quot;072e0155f3507d66.rds&quot; &quot;0a06455394e21270.rds&quot;</span></a>
-<a class="sourceLine" id="cb222-4" data-line-number="4"><span class="co">#&gt; [4] &quot;15590502cae6a8f0.rds&quot; &quot;16fcaeb213c410d7.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot;</span></a>
-<a class="sourceLine" id="cb222-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))</a>
-<a class="sourceLine" id="cb222-6" data-line-number="6"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
-<a class="sourceLine" id="cb222-7" data-line-number="7"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
-<a class="sourceLine" id="cb222-8" data-line-number="8"><span class="co">#&gt; [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb221-1" data-line-number="1"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a>
+<a class="sourceLine" id="cb221-2" data-line-number="2"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/data&quot;</span>))</a>
+<a class="sourceLine" id="cb221-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0648bfb3d31ef596.rds&quot; &quot;0e9226d9e112eea7.rds&quot; &quot;1a0869b7fe7a1e57.rds&quot;</span></a>
+<a class="sourceLine" id="cb221-4" data-line-number="4"><span class="co">#&gt; [4] &quot;1a32abfec8447dab.rds&quot; &quot;1c2b2e563f067248.rds&quot; &quot;1de8d470eebc4cea.rds&quot;</span></a>
+<a class="sourceLine" id="cb221-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">list.files</span>(<span class="st">&quot;.drake/keys/objects&quot;</span>))</a>
+<a class="sourceLine" id="cb221-6" data-line-number="6"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot;       &quot;coef_regression1_small&quot;      </span></a>
+<a class="sourceLine" id="cb221-7" data-line-number="7"><span class="co">#&gt; [3] &quot;coef_regression2_large&quot;       &quot;coef_regression2_small&quot;      </span></a>
+<a class="sourceLine" id="cb221-8" data-line-number="8"><span class="co">#&gt; [5] &quot;large&quot;                        &quot;n-MRQXIYLTMV2HGOR2NV2GGYLSOM&quot;</span></a></code></pre></div>
 <p>This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to work with database cashes as the next section describes.</p>
 <p>Alternatively, you can track changes in a cache log with fingerprints of all your targets.</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb223-1" data-line-number="1"><span class="kw">drake_cache_log</span>()</a>
-<a class="sourceLine" id="cb223-2" data-line-number="2"><span class="co">#&gt; # A tibble: 22 x 3</span></a>
-<a class="sourceLine" id="cb223-3" data-line-number="3"><span class="co">#&gt;    hash             type   name                  </span></a>
-<a class="sourceLine" id="cb223-4" data-line-number="4"><span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span></a>
-<a class="sourceLine" id="cb223-5" data-line-number="5"><span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb223-6" data-line-number="6"><span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb223-7" data-line-number="7"><span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span></a>
-<a class="sourceLine" id="cb223-8" data-line-number="8"><span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span></a>
-<a class="sourceLine" id="cb223-9" data-line-number="9"><span class="co">#&gt;  5 d87293dd4d012762 target large                 </span></a>
-<a class="sourceLine" id="cb223-10" data-line-number="10"><span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span></a>
-<a class="sourceLine" id="cb223-11" data-line-number="11"><span class="co">#&gt;  7 1a0869b7fe7a1e57 import file report.Rmd       </span></a>
-<a class="sourceLine" id="cb223-12" data-line-number="12"><span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span></a>
-<a class="sourceLine" id="cb223-13" data-line-number="13"><span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span></a>
-<a class="sourceLine" id="cb223-14" data-line-number="14"><span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span></a>
-<a class="sourceLine" id="cb223-15" data-line-number="15"><span class="co">#&gt; # … with 12 more rows</span></a>
-<a class="sourceLine" id="cb223-16" data-line-number="16"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L, <span class="dt">cache_log_file =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb223-17" data-line-number="17"><span class="kw">read_csv</span>(<span class="st">&quot;drake_cache.csv&quot;</span>, <span class="dt">col_types =</span> <span class="kw">cols</span>())</a>
-<a class="sourceLine" id="cb223-18" data-line-number="18"><span class="co">#&gt; # A tibble: 22 x 3</span></a>
-<a class="sourceLine" id="cb223-19" data-line-number="19"><span class="co">#&gt;    hash             type   name                  </span></a>
-<a class="sourceLine" id="cb223-20" data-line-number="20"><span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span></a>
-<a class="sourceLine" id="cb223-21" data-line-number="21"><span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb223-22" data-line-number="22"><span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb223-23" data-line-number="23"><span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span></a>
-<a class="sourceLine" id="cb223-24" data-line-number="24"><span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span></a>
-<a class="sourceLine" id="cb223-25" data-line-number="25"><span class="co">#&gt;  5 d87293dd4d012762 target large                 </span></a>
-<a class="sourceLine" id="cb223-26" data-line-number="26"><span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span></a>
-<a class="sourceLine" id="cb223-27" data-line-number="27"><span class="co">#&gt;  7 1a0869b7fe7a1e57 import file report.Rmd       </span></a>
-<a class="sourceLine" id="cb223-28" data-line-number="28"><span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span></a>
-<a class="sourceLine" id="cb223-29" data-line-number="29"><span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span></a>
-<a class="sourceLine" id="cb223-30" data-line-number="30"><span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span></a>
-<a class="sourceLine" id="cb223-31" data-line-number="31"><span class="co">#&gt; # … with 12 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb222-1" data-line-number="1"><span class="kw">drake_cache_log</span>()</a>
+<a class="sourceLine" id="cb222-2" data-line-number="2"><span class="co">#&gt; # A tibble: 22 x 3</span></a>
+<a class="sourceLine" id="cb222-3" data-line-number="3"><span class="co">#&gt;    hash             type   name                  </span></a>
+<a class="sourceLine" id="cb222-4" data-line-number="4"><span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span></a>
+<a class="sourceLine" id="cb222-5" data-line-number="5"><span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb222-6" data-line-number="6"><span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb222-7" data-line-number="7"><span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span></a>
+<a class="sourceLine" id="cb222-8" data-line-number="8"><span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span></a>
+<a class="sourceLine" id="cb222-9" data-line-number="9"><span class="co">#&gt;  5 d87293dd4d012762 target large                 </span></a>
+<a class="sourceLine" id="cb222-10" data-line-number="10"><span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span></a>
+<a class="sourceLine" id="cb222-11" data-line-number="11"><span class="co">#&gt;  7 1a0869b7fe7a1e57 import file report.Rmd       </span></a>
+<a class="sourceLine" id="cb222-12" data-line-number="12"><span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span></a>
+<a class="sourceLine" id="cb222-13" data-line-number="13"><span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span></a>
+<a class="sourceLine" id="cb222-14" data-line-number="14"><span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span></a>
+<a class="sourceLine" id="cb222-15" data-line-number="15"><span class="co">#&gt; # … with 12 more rows</span></a>
+<a class="sourceLine" id="cb222-16" data-line-number="16"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L, <span class="dt">cache_log_file =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb222-17" data-line-number="17"><span class="kw">read_csv</span>(<span class="st">&quot;drake_cache.csv&quot;</span>, <span class="dt">col_types =</span> <span class="kw">cols</span>())</a>
+<a class="sourceLine" id="cb222-18" data-line-number="18"><span class="co">#&gt; # A tibble: 22 x 3</span></a>
+<a class="sourceLine" id="cb222-19" data-line-number="19"><span class="co">#&gt;    hash             type   name                  </span></a>
+<a class="sourceLine" id="cb222-20" data-line-number="20"><span class="co">#&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;                 </span></a>
+<a class="sourceLine" id="cb222-21" data-line-number="21"><span class="co">#&gt;  1 ecb4739b594986b9 target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb222-22" data-line-number="22"><span class="co">#&gt;  2 599bea898e306775 target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb222-23" data-line-number="23"><span class="co">#&gt;  3 44bfee4c258a76d7 target coef_regression2_large</span></a>
+<a class="sourceLine" id="cb222-24" data-line-number="24"><span class="co">#&gt;  4 b5502b9c62933484 target coef_regression2_small</span></a>
+<a class="sourceLine" id="cb222-25" data-line-number="25"><span class="co">#&gt;  5 d87293dd4d012762 target large                 </span></a>
+<a class="sourceLine" id="cb222-26" data-line-number="26"><span class="co">#&gt;  6 f4b89e63bc92af79 import datasets::mtcars      </span></a>
+<a class="sourceLine" id="cb222-27" data-line-number="27"><span class="co">#&gt;  7 1a0869b7fe7a1e57 import file report.Rmd       </span></a>
+<a class="sourceLine" id="cb222-28" data-line-number="28"><span class="co">#&gt;  8 6153acbb3f1070de target file report.md        </span></a>
+<a class="sourceLine" id="cb222-29" data-line-number="29"><span class="co">#&gt;  9 db84c9f752635a13 import random_rows           </span></a>
+<a class="sourceLine" id="cb222-30" data-line-number="30"><span class="co">#&gt; 10 21935c86f12692e2 import reg1                  </span></a>
+<a class="sourceLine" id="cb222-31" data-line-number="31"><span class="co">#&gt; # … with 12 more rows</span></a></code></pre></div>
 <p>Use the <code>cache_log_file</code> argument of <code>make()</code> to refresh the cache log file every time you run <code>make()</code>. Then, if you put this file under version control (e.g. with git/GitHub) then the commit history will tell you how your data objects change over time.</p>
 </div>
 <div id="database-caches" class="section level3">
 <h3><span class="header-section-number">15.3.2</span> Database caches</h3>
 <p>It is possible use a single SQLite database file as the cache.</p>
-<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb224-1" data-line-number="1">mydb &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), <span class="st">&quot;database-file.sqlite&quot;</span>)</a>
-<a class="sourceLine" id="cb224-2" data-line-number="2">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_dbi</span>(<span class="st">&quot;datatable&quot;</span>, <span class="st">&quot;keystable&quot;</span>, mydb)</a>
-<a class="sourceLine" id="cb224-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache, <span class="dt">verbose =</span> 0L)</a>
-<a class="sourceLine" id="cb224-4" data-line-number="4"><span class="kw">loadd</span>(small, <span class="dt">cache =</span> cache)</a>
-<a class="sourceLine" id="cb224-5" data-line-number="5"><span class="kw">head</span>(small)</a>
-<a class="sourceLine" id="cb224-6" data-line-number="6"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb224-7" data-line-number="7"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb224-8" data-line-number="8"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb224-9" data-line-number="9"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb224-10" data-line-number="10"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb224-11" data-line-number="11"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb224-12" data-line-number="12"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb223-1" data-line-number="1">mydb &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), <span class="st">&quot;database-file.sqlite&quot;</span>)</a>
+<a class="sourceLine" id="cb223-2" data-line-number="2">cache &lt;-<span class="st"> </span>storr<span class="op">::</span><span class="kw">storr_dbi</span>(<span class="st">&quot;datatable&quot;</span>, <span class="st">&quot;keystable&quot;</span>, mydb)</a>
+<a class="sourceLine" id="cb223-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache, <span class="dt">verbose =</span> 0L)</a>
+<a class="sourceLine" id="cb223-4" data-line-number="4"><span class="kw">loadd</span>(small, <span class="dt">cache =</span> cache)</a>
+<a class="sourceLine" id="cb223-5" data-line-number="5"><span class="kw">head</span>(small)</a>
+<a class="sourceLine" id="cb223-6" data-line-number="6"><span class="co">#&gt;       x    y</span></a>
+<a class="sourceLine" id="cb223-7" data-line-number="7"><span class="co">#&gt; 1 3.780 15.2</span></a>
+<a class="sourceLine" id="cb223-8" data-line-number="8"><span class="co">#&gt; 2 3.440 17.8</span></a>
+<a class="sourceLine" id="cb223-9" data-line-number="9"><span class="co">#&gt; 3 3.215 21.4</span></a>
+<a class="sourceLine" id="cb223-10" data-line-number="10"><span class="co">#&gt; 4 3.440 19.2</span></a>
+<a class="sourceLine" id="cb223-11" data-line-number="11"><span class="co">#&gt; 5 2.770 19.7</span></a>
+<a class="sourceLine" id="cb223-12" data-line-number="12"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
 <p>But be careful: for safe parallel computing (<code>jobs</code> &gt; 1) there are additional requirements for <code>make()</code>:</p>
 <ol style="list-style-type: decimal">
 <li>Select either <code>parallelism = &quot;clustermq&quot;</code> or <code>parallelism = &quot;future&quot;</code>.</li>
@@ -629,37 +629,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="environment-caches" class="section level3">
 <h3><span class="header-section-number">15.3.3</span> Environment caches</h3>
 <p>Environment caches live in computer memory, not your file system, so they are a nice way to run small and fast experiments. However, unless you save the cache manually, all your data will be lost when you quit your R session. And for large projects, you may not be able to fit all your data in memory anyway.</p>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">storr_environment</span>()</a>
-<a class="sourceLine" id="cb225-2" data-line-number="2"><span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache)</a></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb224-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">storr_environment</span>()</a>
+<a class="sourceLine" id="cb224-2" data-line-number="2"><span class="kw">make</span>(my_plan, <span class="dt">cache =</span> cache)</a></code></pre></div>
 </div>
 </div>
 <div id="hash-algorithms" class="section level2">
 <h2><span class="header-section-number">15.4</span> Hash algorithms</h2>
 <p><a href="https://github.com/richfitz/storr">storr</a> caches use <a href="https://en.wikipedia.org/wiki/Hash_function">hash functions</a> to keep track of stored objects. A hash function is just a way to fingerprint data. The idea is to represent an arbitrary chunks of data using (nearly) unique strings of fixed size.</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1"><span class="kw">library</span>(digest) <span class="co"># package for hashing objects and files</span></a>
-<a class="sourceLine" id="cb226-2" data-line-number="2">smaller_data &lt;-<span class="st"> </span><span class="dv">12</span></a>
-<a class="sourceLine" id="cb226-3" data-line-number="3">larger_data &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1000</span>)</a>
-<a class="sourceLine" id="cb226-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb226-5" data-line-number="5"><span class="kw">digest</span>(smaller_data) <span class="co"># compute the hash</span></a>
-<a class="sourceLine" id="cb226-6" data-line-number="6"><span class="co">#&gt; [1] &quot;23c80a31c0713176016e6e18d76a5f31&quot;</span></a>
-<a class="sourceLine" id="cb226-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb226-8" data-line-number="8"><span class="kw">digest</span>(larger_data)</a>
-<a class="sourceLine" id="cb226-9" data-line-number="9"><span class="co">#&gt; [1] &quot;b03c1a142bc71a1b8afed7d23ce60f9f&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1"><span class="kw">library</span>(digest) <span class="co"># package for hashing objects and files</span></a>
+<a class="sourceLine" id="cb225-2" data-line-number="2">smaller_data &lt;-<span class="st"> </span><span class="dv">12</span></a>
+<a class="sourceLine" id="cb225-3" data-line-number="3">larger_data &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb225-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb225-5" data-line-number="5"><span class="kw">digest</span>(smaller_data) <span class="co"># compute the hash</span></a>
+<a class="sourceLine" id="cb225-6" data-line-number="6"><span class="co">#&gt; [1] &quot;23c80a31c0713176016e6e18d76a5f31&quot;</span></a>
+<a class="sourceLine" id="cb225-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb225-8" data-line-number="8"><span class="kw">digest</span>(larger_data)</a>
+<a class="sourceLine" id="cb225-9" data-line-number="9"><span class="co">#&gt; [1] &quot;b03c1a142bc71a1b8afed7d23ce60f9f&quot;</span></a></code></pre></div>
 <p>The <code>digest</code> package (used by both <code>drake</code> and <code>storr</code>) supports a wide variety of hash functions. Some generate larger hash keys, some are slower to compute, and others are more prone to “collisions” (where two different data objects are given the same hash key). The <code>digest</code> package supports a variety of hash algorithms.</p>
-<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb227-1" data-line-number="1"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;sha512&quot;</span>)</a>
-<a class="sourceLine" id="cb227-2" data-line-number="2"><span class="co">#&gt; [1] &quot;cca91831466b966d82ae4440dea3be3a1b5555f6189563eb3d8b1a83c8c70d68daae9a35f62a00a96fefa241a26ce5c183a7f8a8d584bbbe023acb4b254080e9&quot;</span></a>
-<a class="sourceLine" id="cb227-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb227-4" data-line-number="4"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;md5&quot;</span>)</a>
-<a class="sourceLine" id="cb227-5" data-line-number="5"><span class="co">#&gt; [1] &quot;b03c1a142bc71a1b8afed7d23ce60f9f&quot;</span></a>
-<a class="sourceLine" id="cb227-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb227-7" data-line-number="7"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;xxhash64&quot;</span>)</a>
-<a class="sourceLine" id="cb227-8" data-line-number="8"><span class="co">#&gt; [1] &quot;ec927d1d9050ae96&quot;</span></a>
-<a class="sourceLine" id="cb227-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb227-10" data-line-number="10"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;murmur32&quot;</span>)</a>
-<a class="sourceLine" id="cb227-11" data-line-number="11"><span class="co">#&gt; [1] &quot;6faecd4e&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;sha512&quot;</span>)</a>
+<a class="sourceLine" id="cb226-2" data-line-number="2"><span class="co">#&gt; [1] &quot;cca91831466b966d82ae4440dea3be3a1b5555f6189563eb3d8b1a83c8c70d68daae9a35f62a00a96fefa241a26ce5c183a7f8a8d584bbbe023acb4b254080e9&quot;</span></a>
+<a class="sourceLine" id="cb226-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb226-4" data-line-number="4"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;md5&quot;</span>)</a>
+<a class="sourceLine" id="cb226-5" data-line-number="5"><span class="co">#&gt; [1] &quot;b03c1a142bc71a1b8afed7d23ce60f9f&quot;</span></a>
+<a class="sourceLine" id="cb226-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb226-7" data-line-number="7"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;xxhash64&quot;</span>)</a>
+<a class="sourceLine" id="cb226-8" data-line-number="8"><span class="co">#&gt; [1] &quot;ec927d1d9050ae96&quot;</span></a>
+<a class="sourceLine" id="cb226-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb226-10" data-line-number="10"><span class="kw">digest</span>(larger_data, <span class="dt">algo =</span> <span class="st">&quot;murmur32&quot;</span>)</a>
+<a class="sourceLine" id="cb226-11" data-line-number="11"><span class="co">#&gt; [1] &quot;6faecd4e&quot;</span></a></code></pre></div>
 <p>For <code>drake</code>, the default hash algorithm is <code>xxhash64</code>. You can choose different hash functions with the <code>hash_algorithm</code> argument to <code>new_cache()</code>, <code>storr_rds()</code>, and similar functions. (For <code>drake</code> version 6.2.1 and earlier, see the <code>long_hash_algo</code> and <code>short_hash_algo</code> arguments.)</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1">cache3 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;cache_3_path&quot;</span>, <span class="dt">hash_algorithm =</span> <span class="st">&quot;murmur32&quot;</span>)</a>
-<a class="sourceLine" id="cb228-2" data-line-number="2">cache4 &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;cache_4_path&quot;</span>, <span class="dt">hash_algorithm =</span> <span class="st">&quot;crc32&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb227-1" data-line-number="1">cache3 &lt;-<span class="st"> </span><span class="kw">new_cache</span>(<span class="st">&quot;cache_3_path&quot;</span>, <span class="dt">hash_algorithm =</span> <span class="st">&quot;murmur32&quot;</span>)</a>
+<a class="sourceLine" id="cb227-2" data-line-number="2">cache4 &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;cache_4_path&quot;</span>, <span class="dt">hash_algorithm =</span> <span class="st">&quot;crc32&quot;</span>)</a></code></pre></div>
 
 </div>
 </div>
