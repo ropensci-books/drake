@@ -21,7 +21,7 @@ tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
 
 Static branching helps us write large plans compactly. Instead of typing out every single target by hand, we use a special shorthand to declare entire batches of similar targets. To practice static branching in a controlled setting, try the interactive exercises at <https://wlandau.shinyapps.io/learndrakeplans> (from the workshop at <https://github.com/wlandau/learndrake>).
 
-Without static branching, plans like this one become cumbersome.
+Without static branching, plans like this one become too cumbersome to type by hand.
 
 ```{r, eval = FALSE}
 # Without static branching:
@@ -83,7 +83,7 @@ drake_plan(
 )
 ```
 
-Static branching makes the plan easier to write and understand. To activate static branching, use the `transform` argument of `target()`.
+Static branching makes it easier to write and understand plans. To activate static branching, use the `transform` argument of `target()`.
 
 ```{r}
 # With static branching:
@@ -159,30 +159,93 @@ plot(plan)
 
 ## Grouping variables and the trace
 
-*Grouping variables* are the custom arguments to `map()` and `cross()` that govern which targets to create. To better understand how grouping variables work in your plan, set the `trace` argument of `drake_plan()` to `TRUE`. That way, the plan gets special columns to keep track of the `tuning_setting`, `mean_value`, and `analysis` associated with each target.
+A *grouping variable* contains iterated values for a single instance of `map()` or `cross()`. `mean_value` and `tuning_par` are grouping variables below.
+
+```{r}
+drake_plan(
+  data = get_data(),
+  model = target(
+    fit_model(data, mean_value, tuning_par),
+    transform = cross(
+      mean_value = c(1, 2),
+      tuning_par = c("fast", "slow")
+    )
+  )
+)
+```
+
+Each model has its own `mean_value` and `tuning_par`. To see this correspondence, set `trace = TRUE`.
 
 ```{r}
 drake_plan(
   trace = TRUE,
   data = get_data(),
-  analysis = target(
-    fit_model(data, mean = mean_value, tuning = tuning_setting),
+  model = target(
+    fit_model(data, mean_value, tuning_par),
     transform = cross(
-      tuning_setting = c("fast", "slow"),
-      mean_value = c(1, 2)
+      mean_value = c(1, 2),
+      tuning_par = c("fast", "slow")
     )
-  ),
-  summary = target(
-    summarize_model(analysis),
-    transform = map(analysis)
-  ),
-  summary_by_tuning = target(
-    dplyr::bind_rows(summary),
-    transform = combine(summary, .by = tuning_setting)
   )
 )
 ```
 
+If we summarize those models, each *summary* has its own `mean_value` and `tuning_par`. In other words, grouping variables have a natural nesting, and they propagate forward so we can use them in downstream targets. Notice how `mean_value` and `tuning_par` appear in `summarize_model()` and `combine()` below.
+
+```{r}
+plan <- drake_plan(
+  trace = TRUE,
+  data = get_data(),
+  model = target(
+    fit_model(data, mean_value, tuning_par),
+    transform = cross(
+      mean_value = c(1, 2),
+      tuning_par = c("fast", "slow")
+    )
+  ),
+  summary = target(
+    # mean_value and tuning_par are old grouping variables from the models
+    summarize_model(model, mean_value, tuning_par),
+    transform = map(model)
+  ),
+  summary_by_tuning = target(
+    dplyr::bind_rows(summary),
+    # tuning_par is an old grouping variable from the models.
+    transform = combine(summary, .by = tuning_par)
+  )
+)
+
+plot(plan)
+```
+
+
+### Unnested grouping variables
+
+The forward propagation of grouping variables is powerful, but it requires each grouping variable to be strictly nested inside a *single* group of targets (e.g. a *single* call to `map()` or `cross()`). The following plan disrupts this nesting, so `drake` does not know how to generate `c1`.
+
+```{r}
+drake_plan(
+  b1 = target(1, transform = map(a1 = 1, a2 = 1, .id = FALSE)),
+  b2 = target(1, transform = map(a1 = 1, a3 = 1, .id = FALSE)),
+  b3 = target(1, transform = map(a2 = 1, a3 = 1, .id = FALSE)),
+  c1 = target(1, transform = map(a1, a2, a3, .id = FALSE)),
+  trace = TRUE
+)
+```
+
+But if you reinstantiate grouping variables `a1`, `a2`, and `a3` just for `c1`, then `drake` produces the expected `c1`.
+
+```{r}
+drake_plan(
+  b1 = target(1, transform = map(a1 = 1, a2 = 1, .id = FALSE)),
+  b2 = target(1, transform = map(a1 = 1, a3 = 1, .id = FALSE)),
+  b3 = target(1, transform = map(a2 = 1, a3 = 1, .id = FALSE)),
+  c1 = target(1, transform = map(a1 = 1, a2 = 1, a3 = 1, .id = FALSE)),
+  trace = TRUE
+)
+```
+
+Other workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, there is no substitute for checking and visualizing plans as described earlier.
 
 ## Tidy evaluation
 
