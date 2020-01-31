@@ -246,13 +246,34 @@ build_times(type = "build")
 
 There are several formats, each with their own system requirements. These system requirements, such as the `fst` R package for the `"fst"` format, do not come pre-installed with `drake`. You will need to install them manually.
 
-- `"fst"`: for `data.frame` targets. The `"fst"` package must be installed, and the return value should be a `data.frame` (or at least coercible to one) and all non-data-frame attributes are discarded.
-- `"fst_tbl"`: like `"fst"` format, but for `tibble` objects. Unsupported in `drake` version 7.9.0 and below. The `tibble` package must be installed, and all non-data-frame non-`tibble` attributes are discarded.
-- `"fst_dt"`: like `"fst"`, but for [`data.table`](https://github.com/Rdatatable/data.table) objects.
-- `"diskframe"`: for larger-than-memory targets. Uses the [`disk.frame`](https://github.com/xiaodaigh/disk.frame) package.
-- `"keras"`: for [`keras`](https://github.com/rstudio/keras) models. See [these slides](https://wlandau.github.io/learndrake) for an example.
-- `"qs"`: any R object. Uses functions `qsave()` and `qread()` from the [`qs`](https://github.com/traversc/qs) package (with the default arguments from version 0.20.2).
-- `"rds"`: for any target compatible with `saveRDS()`. Uses `gzip` compression and thus likely to be slower than `"qs"`.
+- `"fst"`: save big data frames fast. Requires the `fst` package.
+  Note: this format strips non-data-frame attributes such as the
+- `"fst_tbl"`: Like `"fst"`, but for `tibble` objects.
+  Requires the `fst` and `tibble` packages.
+  Strips away non-data-frame non-tibble attributes.
+- `"fst_dt"`: Like `"fst"` format, but for `data.table` objects.
+  Requires the `fst` and `data.table` packages.
+  Strips away non-data-frame non-data-table attributes.
+- `"diskframe"`:
+  Stores `disk.frame` objects, which could potentially be
+  larger than memory. Requires the `fst` and `disk.frame` packages.
+  Coerces objects to `disk.frame`s.
+  Note: `disk.frame` objects get moved to the `drake` cache
+  (a subfolder of `.drake/` for most workflows).
+  To ensure this data transfer is fast, it is best to
+  save your `disk.frame` objects to the same physical storage
+  drive as the `drake` cache,
+  `as.disk.frame(your_dataset, outdir = drake_tempfile())`.
+- `"keras"`: save Keras models as HDF5 files.
+  Requires the `keras` package.
+- `"qs"`: save any R object that can be properly serialized
+  with the `qs` package. Requires the `qs` package.
+  Uses `qsave()` and `qread()`.
+  Uses the default settings in `qs` version 0.20.2.
+- `"rds"`: save any R object that can be properly serialized.
+  Requires R version >= 3.5.0 due to ALTREP.
+  Note: the `"rds"` format uses gzip compression, which is slow.
+  `"qs"` is a superior format.
 
 ## Special columns
 
