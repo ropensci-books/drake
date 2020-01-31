@@ -221,7 +221,7 @@ good_plan <- drake_plan(
 
 ## Special data formats for targets
 
-`drake` supports custom formats for large unwiedly targets. For example, the `"fst"` and `"fst_tbl"` formats use the [`fst`](https://github.com/fstpackage/fst) package to save `data.frame` and `tibble` targets faster. Simply enclose the command and the format together with the `target()` function.
+`drake` supports custom formats for saving and loading large objects and highly specialized objects. For example, the `"fst"` and `"fst_tbl"` formats use the [`fst`](https://github.com/fstpackage/fst) package to save `data.frame` and `tibble` targets faster. Simply enclose the command and the format together with the `target()` function.
 
 ```{r, eval = FALSE}
 library(drake)
@@ -244,8 +244,7 @@ build_times(type = "build")
 #> 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s
 ```
 
-Formats:
-
+There are several formats, each with their own system requirements. These system requirements, such as the `fst` R package for the `"fst"` format, do not come pre-installed with `drake`. You will need to install them manually.
 
 - `"fst"`: for `data.frame` targets. The `"fst"` package must be installed, and the return value should be a `data.frame` (or at least coercible to one) and all non-data-frame attributes are discarded.
 - `"fst_tbl"`: like `"fst"` format, but for `tibble` objects. Unsupported in `drake` version 7.9.0 and below. The `tibble` package must be installed, and all non-data-frame non-`tibble` attributes are discarded.
