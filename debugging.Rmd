@@ -5,7 +5,6 @@ knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  error = TRUE,
   warning = TRUE
 )
 ```
@@ -15,257 +14,212 @@ library(drake)
 library(tidyverse)
 ```
 
-This chapter is a guide to debugging and testing `drake` projects.
+This chapter aims to help users detect and diagnose problems with large complex workflows.
 
-### Start small
+## Debugging failed targets
 
-If your workflow is large, consider running a downsized version to debug and test things first. That way, you can find the bugs early on without wasting as much time. Create a test plan with `drake_plan(max_expand = SMALL_NUMBER)` before scaling up to the full set of targets. See [this section on plans](https://books.ropensci.org/drake/plans.html#start-small) for details.
+### Diagnosing errors
 
-## Dependencies
+When a target fails, `drake` tries to tell you.
 
-`drake` automatically detects dependency relationships among your targets and imports. While this is convenient most of the time, it can lead to some pitfalls. This section describes techniques to understand you project's dependency structure and diagnose and debug issues.
+```{r, error = TRUE}
+large_dataset <- function() {
+  data.frame(x = rnorm(1e6), y = rnorm(1e6))
+}
 
-### Visualize your dependency graph.
+expensive_analysis <- function(data) {
+  # More operations go here.
+  tricky_operation(data)
+}
 
-To avoid frustration early on, please use [`drake`'s dependency graph visualizations](#visuals) to see how the steps of your workflow fit together. `drake` resolves the dependency relationships in the graph by analyzing the code in your commands and the functions in your environment.
+tricky_operation <- function(data) {
+  # Expensive code here.
+  stop("there is a bug somewhere.")
+}
 
-```{r}
-load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
-config <- drake_config(my_plan)
-# Hover, click, drag, zoom, and pan. See args 'from' and 'to'.
-vis_drake_graph(config, width = "100%", height = "500px")
+plan <- drake_plan(
+  data = large_dataset(),
+  analysis = expensive_analysis(data)
+)
+
+make(plan)
 ```
 
-### Check specific dependency information.
-
-With the `deps_code()` function, you can see for yourself how `drake` detects first-order dependencies from code.
+`diagnose()` recovers the metadata on targets. For failed targets, this includes an error object.
 
 ```{r}
-print(simulate)
+error <- diagnose(analysis)$error
+error
 
-deps_code(simulate)
-
-# knitr_in() makes sure your target depends on `report.Rmd`
-# and any dependencies loaded with loadd() and readd()
-# in the report's active code chunks.
-my_plan$command[[1]]
-
-deps_code(my_plan$command[[1]])
-
-my_plan$command[[nrow(my_plan)]]
-
-deps_code(my_plan$command[[nrow(my_plan)]])
+names(error)
 ```
 
-With `deps_target()`, you can see the dependencies that `drake` has already detected for your targets and imports.
+Using the call stack, you can trace back the location of the error. Once you know roughly where to find the bug, you can troubleshoot interactively.
 
 ```{r}
-deps_target("simulate", config)
-
-deps_target("small", config)
-
-deps_target("report", config)
+invisible(lapply(tail(error$calls, 3), print))
 ```
 
-And with `tracked()`, you can list all the reproducibly tracked objects and files.
+### Interactive debugging
 
-```{r}
-tracked(config)
+The clues from `diagnose()` help us go back and inspect the failing code. `debug()` is an interactive debugging tool which helps you verify exactly what is going wrong. Below, `make(plan)` pauses execution and turn interactive control over to you inside `tricky_operation()`.
+
+```{r, eval = FALSE}
+debug(tricky_operation)
+make(plan) # Pauses at tricky_operation(data).
+undebug(tricky_operation) # Undoes debug().
 ```
 
-### Outdated targets and missing dependencies
+`drake`'s own `drake_debug()` function is nearly equivalent.
 
-`missed()` shows any imports missing from your environment
-
-```{r}
-missed(config) # Nothing is missing right now.
+```{r, eval = FALSE}
+drake_debug(analysis, plan) # Pauses at the command expensive_analysis(data).
 ```
 
-`outdated()` reports any targets that are outdated.
+`browser()` is similar, but it affords you finer control over to pause execution
+
+```{r, eval = FALSE}
+tricky_operation <- function(data) {
+  # Expensive code here.
+  browser() # Pauses right here to give you control.
+  stop("there is a bug somewhere.")
+}
+
+make(plan)
+```
+
+### Efficient trial and error
+
+If you are using `drake`, then chances are your targets are computationally expensive and the long runtimes make debugging difficult. To speed up trial and error, run the plan on a small dataset when you debug and repair things.
+
+```{r, eval = FALSE}
+plan <- drake_plan(
+  data = head(large_dataset()),       # Just work with the first few rows.
+  analysis = expensive_analysis(data) # Runs faster now.
+)
+```
+
+```{r, eval = FALSE}
+tricky_operation <- ... # Try to fix the function.
+
+debug(tricky_operation) #  Set up to debug interactively.
+
+make(plan) # Try to run the workflow.
+```
+
+After a lot of quick trial and error, we finally fix the function and run it on the small data.
 
 ```{r}
-outdated(config)
+tricky_operation <- function(data) {
+  # Good code goes here.
+}
+
+make(plan)
+```
+
+Now, that the code works, it is time to scale back up to the large data. Use `make(plan, recover = TRUE)` to salvage old targets from before the debugging process.
+
+```{r}
+plan <- drake_plan(
+  data = large_dataset(),             # Use the large data again.
+  analysis = expensive_analysis(data) # Should be repaired now.
+)
+
+make(plan, recover = TRUE)
+```
+
+
+## Why do my targets keep rerunning?
+
+Consider the following completed workflow.
+
+```{r}
+load_mtcars_example()
+make(my_plan)
+```
+
+At this point, if you change the `reg1()` function, then `make()` will automatically detect and rerun downstream targets such as `regression1_large`.
+
+```{r}
+reg1 <- function (d) {
+  lm(y ~ 1 + x, data = d)
+}
 
 make(my_plan)
-
-outdated(config)
 ```
 
-### But *why* are my targets out of date?
-
-`drake` has the option to produce a cache log with the fingerprint of every target and import.
-
-```{r}
-drake_cache_log()
-```
-
-```{r}
-filter(drake_cache_log(), type == "import")
-```
-
-We highly recommend that you automatically produce a cache log file on every `make()` and put it under [version control](https://github.com) with the rest of your project.
-
-```{r}
-make(my_plan, cache_log_file = "cache_log.csv")
-```
-
-Suppose we go back and add input checking to one of our functions.
-
-```{r}
-print(random_rows)
-
-random_rows <- function(data, n){
-  stopifnot(n > 0)
-  data[sample.int(n = nrow(data), size = n, replace = TRUE), ]
+```{r, echo = FALSE}
+reg1 <- function (d) {
+  lm(y ~ 2 + x, data = d)
 }
 ```
 
-Then, we forget to run `make()` again, and we leave the the project for several months. When we come back, all our targets are suddenly out of date.
+
+In general, targets are "outdated" or "invalidated" they are out of sync with their dependencies. If a target is outdated, the next `make()` automatically detects discrepancies and rebuild the affected targets. Usually, this automation adds convenience, saves time, and ensures reproducibility in the face of long runtimes.
+
+However, it can be frustrating when `drake` detects outdated targets when you think everything is up to date. If this happens, it is important to understand
+
+1. How your workflow fits together.
+2. Which targets are outdated.
+3. Why your targets are outdated.
+4. Strategies to prevent unexpected changes in the future.
+
+`drake`'s utility functions offer clues to guide you.
+
+### How your workflow fits together
+
+`drake` automatically analyzes your plan and functions to understand how your targets depend on each other. It assembles this information in a directed acyclic graph (DAG) which you can visualize and explore.
 
 ```{r}
-outdated(config)
+vis_drake_graph(my_plan)
 ```
 
-At first, we may not know why all our targets are outdated. But we can generate another cache log and check any hashes that changed. Our call to `outdated()` already re-cached the imports, so any changed imports will show up in the new cache log.
+To get a more localized version of the graph, use `deps_target()`. Unlike `vis_drake_graph()`, `deps_target()` gives you a more granular view of the dependencies of an individual target.
 
 ```{r}
-read_csv("cache_log.csv", col_types = cols()) %>%
-  left_join(drake_cache_log(), by = "name") %>%
-  filter(hash.x != hash.y) %>%
-  select(name, hash.x, hash.y, -type.x, -type.y)
+deps_target(regression1_large, my_plan)
+
+deps_target(report, my_plan)
 ```
 
-Now, we see that `random_rows()` has changed since last time, and we have a new dependency `stopifnot()`. `simulate()` shows up in the changes too because `random_rows()` is nested in the body of `simulate()`. If we revert `random_rows()` to its original state, all our targets are up to date again.
+To understand how `drake` detects dependencies in the first place, use `deps_code()`. This is what `drake` first sees when it reads your plan and functions to understand the dependencies.
 
 ```{r}
-random_rows <- function(data, n){
-  data[sample.int(n = nrow(data), size = n, replace = TRUE), ]
-}
+deps_code(quote(
+  suppressWarnings(summary(regression1_large$residuals))
+))
 
-print(outdated(config))
-
-read_csv("cache_log.csv", col_types = cols()) %>%
-  left_join(drake_cache_log(), by = "name") %>%
-  filter(hash.x != hash.y) %>%
-  select(name, hash.x, hash.y, -type.x, -type.y)
+deps_code(quote(
+  knit(knitr_in("report.Rmd"), file_out("report.md"), quiet = TRUE)
+))
 ```
 
 
-## Diagnose failures.
+If `drake` detects new dependencies you were unaware of, that could be a reason why your targets are out of date.
 
-`drake` records diagnostic metadata on all your targets, including the latest errors, warnings, messages, and other bits of context.
+### Which targets are outdated
+
+Graphing utilities like `vis_drake_graph()` label the outdated targets, but sometimes it is helpful to get a more programmatic view. 
 
 ```{r}
-f <- function(x){
-  if (x < 0){
-    stop("`x` cannot be negative.")
-  }
-  x
-}
-bad_plan <- drake_plan(
-  a = 12,
-  b = -a,
-  my_target = f(b)
-)
-
-bad_plan
-
-withr::with_message_sink(
-  new = stdout(),
-  make(bad_plan)
-)
-
-failed(verbose = 0L) # from the last make() only
-
-# See also warnings and messages.
-error <- diagnose(my_target, verbose = 0L)$error
-
-error$message
-
-error$call
-
-str(error$calls) # View the traceback.
+outdated(my_plan)
 ```
 
-To figure out what went wrong, you could try to build the failed target interactively. To do that, simply call `drake_build()` or `drake_debug()`. These functions first call `loadd(deps = TRUE)` to load any missing dependencies (see the `replace` argument here) and then build your target. `drake_build()` simply runs the command, and `drake_debug()` runs the command in debug mode using `debugonce()`.
+### Why your targets are outdated
+
+The `deps_profile()` function offers clues.
 
 ```{r}
-# Pretend we just opened a new R session.
-library(drake)
-
-# Unloads target `b`.
-config <- drake_config(plan = bad_plan)
-
-# my_target depends on b.
-"b" %in% ls()
-
-# Try to build my_target until the error is fixed.
-# Skip all that pesky work checking dependencies.
-drake_build(my_target, config = config) # See also drake_debug().
-
-# The target failed, but the dependency was loaded.
-"b" %in% ls()
-
-# What was `b` again?
-b
-
-# How was `b` used?
-diagnose(my_target)$message
-
-diagnose(my_target)$call
-
-f
-
-# Aha! The error was in f(). Let's fix it and try again.
-f <- function(x){
-  x <- abs(x)
-  if (x < 0){
-    stop("`x` cannot be negative.")
-  }
-  x
-}
-
-# Now it works!
-# Since you called make() previously, `config` is read from the cache
-# if you do not supply it.
-drake_build(my_target, config) # See also drake_debug().
-
-readd(my_target)
+deps_profile(regression1_small, my_plan)
 ```
 
-## Timeouts and retries
+From the data frame above, `regression1_small` is outdated because an R object dependency changed since the last `make()`. `drake` does not hold on to enough information to tell you precisely which object is the culprit, but functions like `vis_drake_graph()`, `deps_target()`, and `deps_code()` can help narrow down the possibilities.
 
-See the `elapsed`, `cpu`, and `retries` argument to `make()`.
 
-```{r}
-clean(verbose = 0L)
-f <- function(...){
-  Sys.sleep(1)
-}
-debug_plan <- drake_plan(x = 1, y = f(x))
-debug_plan
+### Strategies to prevent unexpected changes in the future
 
-withr::with_message_sink(
-  stdout(),
-  make(debug_plan, elapsed = 1e-3, retries = 2)
-)
-```
-
-To tailor these settings to each individual target, create new `elapsed`, `cpu`, or `retries` columns in your `drake` plan. These columns override the analogous arguments to `make()`.
-
-```{r, message = FALSE, warning = FALSE, timeoutretry2}
-clean(verbose = 0L)
-debug_plan$elapsed <- c(1e-3, 2e-3)
-debug_plan$retries <- 1:2
-
-debug_plan
-
-withr::with_message_sink(
-  new = stdout(),
-  make(debug_plan, elapsed = Inf, retries = 0)
-)
-```
+`drake` is sensitive to changing functions in your global environment, and this sensitivity can invalidate targets unexpectedly. Whenever you plan to run `make()`, it is always best to restart your R session and load your packages and functions into a fresh clean workspace. [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html) does all this cleaning and prep work for you automatically, and it is more robust and dependable  (and childproofed) than ordinary `r_make()`. To read more, visit <https://books.ropensci.org/drake/projects#safer-interactivity>.
 
 ## More help
 
-The [GitHub issue tracker](https://github.com/ropensci/drake/issues) is the best place to request help with your use case. Please search both open and closed ones before posting a new issue. Don't be afraid to open a new issue, just please take 30 seconds to search for existing threads that could solve your problem.
+The [GitHub issue tracker](https://github.com/ropensci/drake/issues) is the best place to request help with your specific use case.
