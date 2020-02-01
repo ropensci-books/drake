@@ -36,20 +36,19 @@ Powered by [`visNetwork`](http://datastorm-open.github.io/visNetwork/). Colors r
 - The content of an imported text file.
 
 ```{r}
-config <- drake_config(my_plan)
-vis_drake_graph(config)
+vis_drake_graph(my_plan)
 ```
 
 To save this interactive widget for later, just supply the name of an HTML file.
 
 ```{r, eval = FALSE}
-vis_drake_graph(config, file = "graph.html")
+vis_drake_graph(my_plan, file = "graph.html")
 ```
 
 To save a static image file, supply a file name that ends in `".png"`, `".pdf"`, `".jpeg"`, or `".jpg"`.
 
 ```{r, eval = FALSE}
-vis_drake_graph(config, file = "graph.png")
+vis_drake_graph(my_plan, file = "graph.png")
 ```
 
 ### `sankey_drake_graph()`
@@ -57,14 +56,14 @@ vis_drake_graph(config, file = "graph.png")
 These interactive [`networkD3`](https://github.com/christophergandrud/networkD3) [Sankey diagrams](https://en.wikipedia.org/wiki/Sankey_diagram) have more nuance: the height of each node is proportional to its number of connections. Nodes with many incoming connnections tend to fall out of date more often, and nodes with many outgoing connections can invalidate bigger chunks of the downstream pipeline.
 
 ```{r}
-sankey_drake_graph(config)
+sankey_drake_graph(my_plan)
 ```
 
 Saving the graphs is the same as before.
 
 ```{r, eval = FALSE}
-sankey_drake_graph(config, file = "graph.html") # Interactive HTML widget
-sankey_drake_graph(config, file = "graph.png")  # Static image file
+sankey_drake_graph(my_plan, file = "graph.html") # Interactive HTML widget
+sankey_drake_graph(my_plan, file = "graph.png")  # Static image file
 ```
 
 Unfortunately, a legend is [not yet available for Sankey diagrams](https://github.com/ropensci/drake/pull/467), but `drake` exposes a separate legend for the colors and shapes.
@@ -80,7 +79,7 @@ visNetwork(nodes = legend_nodes())
 `drake_ggraph()` can handle larger workflows than the other graphing functions. If your project has thousands of targets and `vis_drake_graph()`/`sankey_drake_graph()` does not render properly, consider `drake_ggraph()`. Powered by [`ggraph`](https://github.com/thomasp85/ggraph), `drake_ggraph()`s are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`.
 
 ```{r}
-drake_ggraph(config)
+drake_ggraph(my_plan)
 ```
 
 ### `text_drake_graph()`
@@ -90,7 +89,7 @@ If you are running R in a terminal without [X Window](https://en.wikipedia.org/w
 ```{r}
 # Use nchar = 0 or nchar = 1 for better results.
 # The color display is better in your own terminal.
-text_drake_graph(config, nchar = 3)
+text_drake_graph(my_plan, nchar = 3)
 ```
 
 
@@ -99,7 +98,7 @@ text_drake_graph(config, nchar = 3)
 `drake_graph_info()` is used behind the scenes in `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` to get the graph information ready for rendering. To save time, you can call `drake_graph_info()` to get these internals and then call `render_drake_graph()`, `render_sankey_drake_graph()`, or  `render_drake_ggraph()`.
 
 ```{r}
-str(drake_graph_info(config))
+str(drake_graph_info(my_plan))
 ```
 
 ## Visualizing target status
@@ -108,9 +107,9 @@ str(drake_graph_info(config))
 
 ```{r}
 make(my_plan, verbose = 0L)
-config <- drake_config(my_plan, jobs = 2, verbose = 0L)
-outdated(config)
-sankey_drake_graph(config)
+outdated(my_plan)
+
+sankey_drake_graph(my_plan)
 ```
 
 When you change a dependency, some targets fall out of date (black nodes).
@@ -120,7 +119,7 @@ reg2 <- function(d){
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
 }
-sankey_drake_graph(config)
+sankey_drake_graph(my_plan)
 ```
 
 ## Subgraphs
@@ -129,7 +128,7 @@ Graphs can grow enormous for serious projects, so there are multiple ways to foc
 
 ```{r}
 vis_drake_graph(
-  config,
+  my_plan,
   subset = c("regression2_small", "large")
 )
 ```
@@ -137,25 +136,25 @@ vis_drake_graph(
 The rest of the subgraph functionality preserves connectedness. Use `targets_only` to ignore the imports.
 
 ```{r}
-vis_drake_graph(config, targets_only = TRUE)
+vis_drake_graph(my_plan, targets_only = TRUE)
 ```
 
 Similarly, you can just show downstream nodes.
 
 ```{r}
-vis_drake_graph(config, from = c("regression2_small", "regression2_large"))
+vis_drake_graph(my_plan, from = c("regression2_small", "regression2_large"))
 ```
 
 Or upstream ones.
 
 ```{r}
-vis_drake_graph(config, from = "small", mode = "in")
+vis_drake_graph(my_plan, from = "small", mode = "in")
 ```
 
 In fact, let us just take a small neighborhood around a target in both directions. For the graph below, given order is 1, but all the custom `file_out()` output files of the neighborhood's targets appear as well. This ensures consistent behavior between `show_output_files = TRUE` and `show_output_files = FALSE` (more on that later).
 
 ```{r}
-vis_drake_graph(config, from = "small", mode = "all", order = 1)
+vis_drake_graph(my_plan, from = "small", mode = "all", order = 1)
 ```
 
 ## Control the `vis_drake_graph()` legend.
@@ -163,13 +162,13 @@ vis_drake_graph(config, from = "small", mode = "all", order = 1)
 Some arguments to `vis_drake_graph()` control the legend.
 
 ```{r}
-vis_drake_graph(config, full_legend = TRUE, ncol_legend = 2)
+vis_drake_graph(my_plan, full_legend = TRUE, ncol_legend = 2)
 ```
 
 To remove the legend altogether, set the `ncol_legend` argument to `0`.
 
 ```{r}
-vis_drake_graph(config, ncol_legend = 0)
+vis_drake_graph(my_plan, ncol_legend = 0)
 ```
 
 ## Clusters
@@ -208,32 +207,29 @@ check_credit_hours <- check_students <- check_graduations <-
 ```
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
-For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument to the graphing functions, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(config)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
+For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument to the graphing functions, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(my_plan)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config,
+vis_drake_graph(plan,
   group = "school",
   clusters = c("school_1", "school_2", "school_3")
 )
 ```
 
-As previously mentioned, you can group on any column in `drake_graph_info(config)$nodes`. Let's return to the `mtcars` project for demonstration.
+As previously mentioned, you can group on any column in `drake_graph_info(my_plan)$nodes`. Let's return to the `mtcars` project for demonstration.
 
 ```{r}
-config <- drake_config(my_plan)
-vis_drake_graph(config)
+vis_drake_graph(my_plan)
 ```
 
 Let's condense all the imports into one node and all the up-to-date targets into another. That way, the outdated targets stand out.
 
 ```{r}
 vis_drake_graph(
-  config,
+  my_plan,
   group = "status",
   clusters = c("imported", "up to date")
 )
@@ -258,15 +254,15 @@ plan <- drake_plan(
 writeLines("in1", "in1.txt")
 writeLines("in2", "in2.txt")
 make(plan)
-config <- drake_config(plan)
+
 writeLines("abcdefg", "out3.txt")
-vis_drake_graph(config, targets_only = TRUE)
+vis_drake_graph(plan, targets_only = TRUE)
 ```
 
 If your graph is too busy, you can hide the output files with `show_output_files = FALSE`.
 
 ```{r}
-vis_drake_graph(config, show_output_files = FALSE, targets_only = TRUE)
+vis_drake_graph(plan, show_output_files = FALSE, targets_only = TRUE)
 ```
 
 
@@ -301,8 +297,8 @@ plan <- drake_plan(
   trace = TRUE
 )
 ```
+
 ```{r}
-config <- drake_config(plan)
 unique_stems <- unique(plan$cluster_id)
 ```
 
@@ -314,7 +310,7 @@ treats the values in the column named `"my_column"` as hyperlinks.
 
 ```{r}
 vis_drake_graph(
-  config,
+  my_plan,
   clusters = unique_stems,
   group = "cluster_id",
   on_select_col = "link",
@@ -335,7 +331,7 @@ This is the default behaviour.
 
 ```{r}
 vis_drake_graph(
-  config,
+  my_plan,
   clusters = unique_stems,
   group = "cluster_id",
   on_select_col = "link",
@@ -359,7 +355,7 @@ alert_behaviour <- function(){
 }
 
 vis_drake_graph(
-  config,
+  my_plan,
   on_select_col = "link",
   on_select = alert_behaviour()
 )

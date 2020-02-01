@@ -126,8 +126,7 @@ create_plot <- function(data) {
 `drake` automatically understands the relationships among targets in the plan. It knows `data` depends on `raw_data` because the symbol `raw_data` is mentioned in the command for `data`. `drake` represents this dependency relationship with an arrow from `raw_data` to `data` in the graph.
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 We can write the targets in any order and `drake` still understands the dependency relationships.
@@ -146,8 +145,7 @@ plan <- drake_plan(
   raw_data = readxl::read_excel(file_in("raw_data.xlsx"))
 )
 
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 The `make()` function runs the correct targets in the correct order and stores the results in a hidden cache.
@@ -174,7 +172,7 @@ create_plot <- function(data) {
     theme_gray(20)
 }
 
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 
@@ -300,7 +298,7 @@ The following columns have special meanings, and `make()` reads and interprets t
     - "worker": tell the HPC worker to store the target in the cache.
     - NA: default to the `caching` argument of `make()`.
 - `retries`: number of times to retry building a target in the event of an error.
-- `seed`: pseudo-random number generator (RNG) seed for each target. `drake` usually computes its own unique reproducible target-specific seeds using the target name and the global seed (the `seed` argument of `make()` and `drake_config()`). Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
+- `seed`: pseudo-random number generator (RNG) seed for each target. `drake` usually computes its own unique reproducible target-specific seeds using the target name and the global seed (the `seed` argument of `make()`). Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
 
 ## External files and directories
 
@@ -331,7 +329,7 @@ cat(readLines("report.Rmd"), sep = "\n")
 That is why we have an arrow from `hist` to `report` in the graph.
 
 ```{r}
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 ### URLs
@@ -356,8 +354,7 @@ bad_plan <- drake_plan(
   data = read_csv(file_in(file))
 )
 
-bad_config <- drake_config(bad_plan)
-vis_drake_graph(bad_config)
+vis_drake_graph(bad_plan)
 ```
 
 Instead, write this:
@@ -367,8 +364,7 @@ good_plan <- drake_plan(
   file = read_csv(file_in("my_data.csv"))
 )
 
-good_config <- drake_config(good_plan)
-vis_drake_graph(good_config)
+vis_drake_graph(good_plan)
 ```
 
 #### Database connections

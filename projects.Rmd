@@ -107,8 +107,7 @@ interactive()
 source("R/packages.R")
 source("R/functions.R")
 source("R/plan.R")
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 ## Safer interactivity
@@ -151,29 +150,29 @@ Here is what happens when you call `r_make()`.
 2. Run the configuration script (e.g. `_drake.R`) to
     a. Load the packages, functions, global options, `drake` plan, etc. into the session's environnment, and
     b. Run the call to `drake_config()`and store the results in a variable called `config`.
-3. Execute `make(config = config)`
+3. Execute `make_impl(config = config)`, an internal `drake` function.
 
 The purpose of `drake_config()` is to collect and sanitize all the parameters and settings that `make()` needs to do its job. In fact, if you do not set the `config` argument explicitly, then `make()` invokes `drake_config()` behind the scenes. `make(plan, parallelism = "clustermq", jobs = 2, verbose = 6)` is equivalent to
 
 ```{r, eval = FALSE}
 config <- drake_config(plan, verbose = 2)
-make(config = config)
+make_impl(config = config)
 ```
 
 There are many more `r_*()` functions besides `r_make()`, each of which launches a fresh session and runs an inner `drake` function on the `config` object from `_drake.R`.
 
 Outer function call | Inner function call
 --- | ---
-`r_make()` | `make(config = config)`
-`r_drake_build(...)` | `drake_build(config, ...)`
-`r_outdated(...)` | `outdated(config, ...)`
-`r_missed(...)` | `missed(config, ...)`
-`r_vis_drake_graph(...)` | `vis_drake_graph(config, ...)`
-`r_sankey_drake_graph(...)` | `sankey_drake_graph(config, ...)`
-`r_drake_ggraph(...)` | `drake_ggraph(config, ...)`
-`r_drake_graph_info(...)` | `drake_graph_info(config, ...)`
-`r_predict_runtime(...)` | `predict_runtime(config, ...)`
-`r_predict_workers(...)` | `predict_workers(config, ...)`
+`r_make()` | `make_impl(config = config)`
+`r_drake_build(...)` | `drake_build_impl(config, ...)`
+`r_outdated(...)` | `outdated_impl(config, ...)`
+`r_missed(...)` | `missed_impl(config, ...)`
+`r_vis_drake_graph(...)` | `vis_drake_graph_impl(config, ...)`
+`r_sankey_drake_graph(...)` | `sankey_drake_graph_impl(config, ...)`
+`r_drake_ggraph(...)` | `drake_ggraph_impl(config, ...)`
+`r_drake_graph_info(...)` | `drake_graph_info_impl(config, ...)`
+`r_predict_runtime(...)` | `predict_runtime_impl(config, ...)`
+`r_predict_workers(...)` | `predict_workers_impl(config, ...)`
 
 
 ```{r}
@@ -202,8 +201,8 @@ bad_plan <- drake_plan(
   my_analysis = source(file_in("analyze_data.R")),
   my_summaries = source(file_in("summarize_data.R"))
 )
-bad_config <- drake_config(bad_plan)
-vis_drake_graph(bad_config, targets_only = TRUE)
+
+vis_drake_graph(bad_plan, targets_only = TRUE)
 ```
 
 When it comes to plans, use *functions* instead.
@@ -215,8 +214,8 @@ good_plan <- drake_plan(
   my_analysis = analyze_data(my_data),
   my_summaries = summarize_results(my_data, my_analysis)
 )
-good_config <- drake_config(good_plan)
-vis_drake_graph(good_config, targets_only = TRUE)
+
+vis_drake_graph(good_plan, targets_only = TRUE)
 ```
 
 In `drake` >= 7.6.2.9000, code_to_function() leverages existing imperative scripts for use in a `drake` plan.
@@ -232,8 +231,7 @@ good_plan <- drake_plan(
   my_summaries = do_summary(my_data, my_analysis)
 )
 
-good_config <- drake_config(good_plan)
-vis_drake_graph(good_config, targets_only = TRUE)
+vis_drake_graph(good_plan, targets_only = TRUE)
 
 ```
 
@@ -243,8 +241,8 @@ good_plan <- drake_plan(
   my_analysis = analyze_data(my_data),
   my_summaries = summarize_results(my_data, my_analysis)
 )
-good_config <- drake_config(good_plan)
-vis_drake_graph(good_config, targets_only = TRUE)
+
+vis_drake_graph(good_plan, targets_only = TRUE)
 ```
 
 

@@ -33,8 +33,7 @@ build_times(starts_with("coef"), digits = 8)
 `drake` uses these times to predict the runtime of the next `make()`. At this moment, everything is up to date in the current example, so the next `make()` should ideally take no time at all (except for preprocessing overhead).
 
 ```{r}
-config <- drake_config(my_plan, verbose = 0L)
-predict_runtime(config)
+predict_runtime(my_plan)
 ```
 
 Suppose we change a dependency to make some targets out of date. Now, the next `make()` should take longer since some targets are out of date.
@@ -45,13 +44,13 @@ reg2 <- function(d){
   lm(y ~ x3, data = d)
 }
 
-predict_runtime(config)
+predict_runtime(my_plan)
 ```
 
 And what if you plan to delete the cache and build all the targets from scratch?
 
 ```{r}
-predict_runtime(config, from_scratch = TRUE)
+predict_runtime(my_plan, from_scratch = TRUE)
 ```
 
 ## Strategize your high-performance computing
@@ -71,7 +70,7 @@ How many parallel jobs should you use in the next `make()`? The `predict_runtime
 time <- c()
 for (jobs in 1:12){
   time[jobs] <- predict_runtime(
-    config,
+    my_plan,
     jobs = jobs,
     from_scratch = TRUE,
     known_times = known_times
