@@ -404,127 +404,127 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="time" class="section level1">
 <h1><span class="header-section-number">Chapter 13</span> Time: logging, prediction, and strategy</h1>
 <p>Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a>, <code>drake</code> records how long it takes to build each target. For large projects that take hours or days to run, this feature becomes important for planning and execution.</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb196-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb196-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></a>
-<a class="sourceLine" id="cb196-3" data-line-number="3"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb196-4" data-line-number="4"><span class="co">#&gt; target large</span></a>
-<a class="sourceLine" id="cb196-5" data-line-number="5"><span class="co">#&gt; target small</span></a>
-<a class="sourceLine" id="cb196-6" data-line-number="6"><span class="co">#&gt; target regression1_large</span></a>
-<a class="sourceLine" id="cb196-7" data-line-number="7"><span class="co">#&gt; target regression2_large</span></a>
-<a class="sourceLine" id="cb196-8" data-line-number="8"><span class="co">#&gt; target regression2_small</span></a>
-<a class="sourceLine" id="cb196-9" data-line-number="9"><span class="co">#&gt; target regression1_small</span></a>
-<a class="sourceLine" id="cb196-10" data-line-number="10"><span class="co">#&gt; target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb196-11" data-line-number="11"><span class="co">#&gt; target summ_regression1_large</span></a>
-<a class="sourceLine" id="cb196-12" data-line-number="12"><span class="co">#&gt; target coef_regression2_large</span></a>
-<a class="sourceLine" id="cb196-13" data-line-number="13"><span class="co">#&gt; target summ_regression2_large</span></a>
-<a class="sourceLine" id="cb196-14" data-line-number="14"><span class="co">#&gt; target coef_regression2_small</span></a>
-<a class="sourceLine" id="cb196-15" data-line-number="15"><span class="co">#&gt; target summ_regression2_small</span></a>
-<a class="sourceLine" id="cb196-16" data-line-number="16"><span class="co">#&gt; target summ_regression1_small</span></a>
-<a class="sourceLine" id="cb196-17" data-line-number="17"><span class="co">#&gt; target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb196-18" data-line-number="18"><span class="co">#&gt; target report</span></a>
-<a class="sourceLine" id="cb196-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb196-20" data-line-number="20"><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span></a>
-<a class="sourceLine" id="cb196-21" data-line-number="21"><span class="co">#&gt; # A tibble: 15 x 4</span></a>
-<a class="sourceLine" id="cb196-22" data-line-number="22"><span class="co">#&gt;    target                 elapsed    user       system    </span></a>
-<a class="sourceLine" id="cb196-23" data-line-number="23"><span class="co">#&gt;    &lt;chr&gt;                  &lt;Duration&gt; &lt;Duration&gt; &lt;Duration&gt;</span></a>
-<a class="sourceLine" id="cb196-24" data-line-number="24"><span class="co">#&gt;  1 coef_regression1_large 0.005s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-25" data-line-number="25"><span class="co">#&gt;  2 coef_regression1_small 0.003s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-26" data-line-number="26"><span class="co">#&gt;  3 coef_regression2_large 0.004s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-27" data-line-number="27"><span class="co">#&gt;  4 coef_regression2_small 0.003s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-28" data-line-number="28"><span class="co">#&gt;  5 large                  0.005s     0.005s     0s        </span></a>
-<a class="sourceLine" id="cb196-29" data-line-number="29"><span class="co">#&gt;  6 regression1_large      0.005s     0.005s     0s        </span></a>
-<a class="sourceLine" id="cb196-30" data-line-number="30"><span class="co">#&gt;  7 regression1_small      0.006s     0.007s     0s        </span></a>
-<a class="sourceLine" id="cb196-31" data-line-number="31"><span class="co">#&gt;  8 regression2_large      0.005s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-32" data-line-number="32"><span class="co">#&gt;  9 regression2_small      0.008s     0.008s     0s        </span></a>
-<a class="sourceLine" id="cb196-33" data-line-number="33"><span class="co">#&gt; 10 report                 0.049s     0.044s     0.004s    </span></a>
-<a class="sourceLine" id="cb196-34" data-line-number="34"><span class="co">#&gt; 11 small                  0.009s     0.009s     0s        </span></a>
-<a class="sourceLine" id="cb196-35" data-line-number="35"><span class="co">#&gt; 12 summ_regression1_large 0.004s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-36" data-line-number="36"><span class="co">#&gt; 13 summ_regression1_small 0.004s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-37" data-line-number="37"><span class="co">#&gt; 14 summ_regression2_large 0.003s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-38" data-line-number="38"><span class="co">#&gt; 15 summ_regression2_small 0.003s     0.003s     0s</span></a>
-<a class="sourceLine" id="cb196-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb196-40" data-line-number="40">## `dplyr`-style `tidyselect` commands</a>
-<a class="sourceLine" id="cb196-41" data-line-number="41"><span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)</a>
-<a class="sourceLine" id="cb196-42" data-line-number="42"><span class="co">#&gt; # A tibble: 4 x 4</span></a>
-<a class="sourceLine" id="cb196-43" data-line-number="43"><span class="co">#&gt;   target                 elapsed    user       system    </span></a>
-<a class="sourceLine" id="cb196-44" data-line-number="44"><span class="co">#&gt;   &lt;chr&gt;                  &lt;Duration&gt; &lt;Duration&gt; &lt;Duration&gt;</span></a>
-<a class="sourceLine" id="cb196-45" data-line-number="45"><span class="co">#&gt; 1 coef_regression1_large 0.005s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-46" data-line-number="46"><span class="co">#&gt; 2 coef_regression1_small 0.003s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-47" data-line-number="47"><span class="co">#&gt; 3 coef_regression2_large 0.004s     0.004s     0s        </span></a>
-<a class="sourceLine" id="cb196-48" data-line-number="48"><span class="co">#&gt; 4 coef_regression2_small 0.003s     0.004s     0s</span></a></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb197-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></a>
+<a class="sourceLine" id="cb197-3" data-line-number="3"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb197-4" data-line-number="4"><span class="co">#&gt; target large</span></a>
+<a class="sourceLine" id="cb197-5" data-line-number="5"><span class="co">#&gt; target small</span></a>
+<a class="sourceLine" id="cb197-6" data-line-number="6"><span class="co">#&gt; target regression1_large</span></a>
+<a class="sourceLine" id="cb197-7" data-line-number="7"><span class="co">#&gt; target regression2_large</span></a>
+<a class="sourceLine" id="cb197-8" data-line-number="8"><span class="co">#&gt; target regression2_small</span></a>
+<a class="sourceLine" id="cb197-9" data-line-number="9"><span class="co">#&gt; target regression1_small</span></a>
+<a class="sourceLine" id="cb197-10" data-line-number="10"><span class="co">#&gt; target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb197-11" data-line-number="11"><span class="co">#&gt; target summ_regression1_large</span></a>
+<a class="sourceLine" id="cb197-12" data-line-number="12"><span class="co">#&gt; target coef_regression2_large</span></a>
+<a class="sourceLine" id="cb197-13" data-line-number="13"><span class="co">#&gt; target summ_regression2_large</span></a>
+<a class="sourceLine" id="cb197-14" data-line-number="14"><span class="co">#&gt; target coef_regression2_small</span></a>
+<a class="sourceLine" id="cb197-15" data-line-number="15"><span class="co">#&gt; target summ_regression2_small</span></a>
+<a class="sourceLine" id="cb197-16" data-line-number="16"><span class="co">#&gt; target summ_regression1_small</span></a>
+<a class="sourceLine" id="cb197-17" data-line-number="17"><span class="co">#&gt; target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb197-18" data-line-number="18"><span class="co">#&gt; target report</span></a>
+<a class="sourceLine" id="cb197-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb197-20" data-line-number="20"><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span></a>
+<a class="sourceLine" id="cb197-21" data-line-number="21"><span class="co">#&gt; # A tibble: 15 x 4</span></a>
+<a class="sourceLine" id="cb197-22" data-line-number="22"><span class="co">#&gt;    target                 elapsed    user       system    </span></a>
+<a class="sourceLine" id="cb197-23" data-line-number="23"><span class="co">#&gt;    &lt;chr&gt;                  &lt;Duration&gt; &lt;Duration&gt; &lt;Duration&gt;</span></a>
+<a class="sourceLine" id="cb197-24" data-line-number="24"><span class="co">#&gt;  1 coef_regression1_large 0.005s     0.004s     0s        </span></a>
+<a class="sourceLine" id="cb197-25" data-line-number="25"><span class="co">#&gt;  2 coef_regression1_small 0.004s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-26" data-line-number="26"><span class="co">#&gt;  3 coef_regression2_large 0.004s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-27" data-line-number="27"><span class="co">#&gt;  4 coef_regression2_small 0.005s     0.004s     0s        </span></a>
+<a class="sourceLine" id="cb197-28" data-line-number="28"><span class="co">#&gt;  5 large                  0.005s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-29" data-line-number="29"><span class="co">#&gt;  6 regression1_large      0.006s     0.006s     0s        </span></a>
+<a class="sourceLine" id="cb197-30" data-line-number="30"><span class="co">#&gt;  7 regression1_small      0.008s     0.007s     0s        </span></a>
+<a class="sourceLine" id="cb197-31" data-line-number="31"><span class="co">#&gt;  8 regression2_large      0.006s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-32" data-line-number="32"><span class="co">#&gt;  9 regression2_small      0.009s     0.008s     0s        </span></a>
+<a class="sourceLine" id="cb197-33" data-line-number="33"><span class="co">#&gt; 10 report                 0.049s     0.045s     0.004s    </span></a>
+<a class="sourceLine" id="cb197-34" data-line-number="34"><span class="co">#&gt; 11 small                  0.011s     0.01s      0s        </span></a>
+<a class="sourceLine" id="cb197-35" data-line-number="35"><span class="co">#&gt; 12 summ_regression1_large 0.005s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-36" data-line-number="36"><span class="co">#&gt; 13 summ_regression1_small 0.004s     0.004s     0s        </span></a>
+<a class="sourceLine" id="cb197-37" data-line-number="37"><span class="co">#&gt; 14 summ_regression2_large 0.004s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-38" data-line-number="38"><span class="co">#&gt; 15 summ_regression2_small 0.004s     0.004s     0s</span></a>
+<a class="sourceLine" id="cb197-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb197-40" data-line-number="40">## `dplyr`-style `tidyselect` commands</a>
+<a class="sourceLine" id="cb197-41" data-line-number="41"><span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb197-42" data-line-number="42"><span class="co">#&gt; # A tibble: 4 x 4</span></a>
+<a class="sourceLine" id="cb197-43" data-line-number="43"><span class="co">#&gt;   target                 elapsed    user       system    </span></a>
+<a class="sourceLine" id="cb197-44" data-line-number="44"><span class="co">#&gt;   &lt;chr&gt;                  &lt;Duration&gt; &lt;Duration&gt; &lt;Duration&gt;</span></a>
+<a class="sourceLine" id="cb197-45" data-line-number="45"><span class="co">#&gt; 1 coef_regression1_large 0.005s     0.004s     0s        </span></a>
+<a class="sourceLine" id="cb197-46" data-line-number="46"><span class="co">#&gt; 2 coef_regression1_small 0.004s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-47" data-line-number="47"><span class="co">#&gt; 3 coef_regression2_large 0.004s     0.005s     0s        </span></a>
+<a class="sourceLine" id="cb197-48" data-line-number="48"><span class="co">#&gt; 4 coef_regression2_small 0.005s     0.004s     0s</span></a></code></pre></div>
 <div id="predict-total-runtime" class="section level2">
 <h2><span class="header-section-number">13.1</span> Predict total runtime</h2>
 <p><code>drake</code> uses these times to predict the runtime of the next <code>make()</code>. At this moment, everything is up to date in the current example, so the next <code>make()</code> should ideally take no time at all (except for preprocessing overhead).</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1"><span class="kw">predict_runtime</span>(my_plan)</a>
-<a class="sourceLine" id="cb197-2" data-line-number="2"><span class="co">#&gt; [1] &quot;0s&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb198-1" data-line-number="1"><span class="kw">predict_runtime</span>(my_plan)</a>
+<a class="sourceLine" id="cb198-2" data-line-number="2"><span class="co">#&gt; [1] &quot;0s&quot;</span></a></code></pre></div>
 <p>Suppose we change a dependency to make some targets out of date. Now, the next <code>make()</code> should take longer since some targets are out of date.</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb198-1" data-line-number="1">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){</a>
-<a class="sourceLine" id="cb198-2" data-line-number="2">  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb198-3" data-line-number="3">  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)</a>
-<a class="sourceLine" id="cb198-4" data-line-number="4">}</a>
-<a class="sourceLine" id="cb198-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb198-6" data-line-number="6"><span class="kw">predict_runtime</span>(my_plan)</a>
-<a class="sourceLine" id="cb198-7" data-line-number="7"><span class="co">#&gt; [1] &quot;0.075s&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1">reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){</a>
+<a class="sourceLine" id="cb199-2" data-line-number="2">  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb199-3" data-line-number="3">  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb199-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb199-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb199-6" data-line-number="6"><span class="kw">predict_runtime</span>(my_plan)</a>
+<a class="sourceLine" id="cb199-7" data-line-number="7"><span class="co">#&gt; [1] &quot;0.081s&quot;</span></a></code></pre></div>
 <p>And what if you plan to delete the cache and build all the targets from scratch?</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1"><span class="kw">predict_runtime</span>(my_plan, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb199-2" data-line-number="2"><span class="co">#&gt; [1] &quot;0.116s&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb200-1" data-line-number="1"><span class="kw">predict_runtime</span>(my_plan, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb200-2" data-line-number="2"><span class="co">#&gt; [1] &quot;0.129s&quot;</span></a></code></pre></div>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2">
 <h2><span class="header-section-number">13.2</span> Strategize your high-performance computing</h2>
 <p>Let’s say you are scaling up your workflow. You just put bigger data and heavier computation in your custom code, and the next time you run <code>make()</code>, your targets will take much longer to build. In fact, you estimate that every target except for your R Markdown report will take two hours to complete. Let’s write down these known times in seconds.</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb200-1" data-line-number="1">known_times &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan))</a>
-<a class="sourceLine" id="cb200-2" data-line-number="2"><span class="kw">names</span>(known_times) &lt;-<span class="st"> </span>my_plan<span class="op">$</span>target</a>
-<a class="sourceLine" id="cb200-3" data-line-number="3">known_times[<span class="st">&quot;report&quot;</span>] &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb200-4" data-line-number="4">known_times</a>
-<a class="sourceLine" id="cb200-5" data-line-number="5"><span class="co">#&gt;                 report                  small                  large </span></a>
-<a class="sourceLine" id="cb200-6" data-line-number="6"><span class="co">#&gt;                      5                   7200                   7200 </span></a>
-<a class="sourceLine" id="cb200-7" data-line-number="7"><span class="co">#&gt;      regression1_small      regression1_large      regression2_small </span></a>
-<a class="sourceLine" id="cb200-8" data-line-number="8"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
-<a class="sourceLine" id="cb200-9" data-line-number="9"><span class="co">#&gt;      regression2_large summ_regression1_small summ_regression1_large </span></a>
-<a class="sourceLine" id="cb200-10" data-line-number="10"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
-<a class="sourceLine" id="cb200-11" data-line-number="11"><span class="co">#&gt; summ_regression2_small summ_regression2_large coef_regression1_small </span></a>
-<a class="sourceLine" id="cb200-12" data-line-number="12"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
-<a class="sourceLine" id="cb200-13" data-line-number="13"><span class="co">#&gt; coef_regression1_large coef_regression2_small coef_regression2_large </span></a>
-<a class="sourceLine" id="cb200-14" data-line-number="14"><span class="co">#&gt;                   7200                   7200                   7200</span></a></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1">known_times &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan))</a>
+<a class="sourceLine" id="cb201-2" data-line-number="2"><span class="kw">names</span>(known_times) &lt;-<span class="st"> </span>my_plan<span class="op">$</span>target</a>
+<a class="sourceLine" id="cb201-3" data-line-number="3">known_times[<span class="st">&quot;report&quot;</span>] &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb201-4" data-line-number="4">known_times</a>
+<a class="sourceLine" id="cb201-5" data-line-number="5"><span class="co">#&gt;                 report                  small                  large </span></a>
+<a class="sourceLine" id="cb201-6" data-line-number="6"><span class="co">#&gt;                      5                   7200                   7200 </span></a>
+<a class="sourceLine" id="cb201-7" data-line-number="7"><span class="co">#&gt;      regression1_small      regression1_large      regression2_small </span></a>
+<a class="sourceLine" id="cb201-8" data-line-number="8"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
+<a class="sourceLine" id="cb201-9" data-line-number="9"><span class="co">#&gt;      regression2_large summ_regression1_small summ_regression1_large </span></a>
+<a class="sourceLine" id="cb201-10" data-line-number="10"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
+<a class="sourceLine" id="cb201-11" data-line-number="11"><span class="co">#&gt; summ_regression2_small summ_regression2_large coef_regression1_small </span></a>
+<a class="sourceLine" id="cb201-12" data-line-number="12"><span class="co">#&gt;                   7200                   7200                   7200 </span></a>
+<a class="sourceLine" id="cb201-13" data-line-number="13"><span class="co">#&gt; coef_regression1_large coef_regression2_small coef_regression2_large </span></a>
+<a class="sourceLine" id="cb201-14" data-line-number="14"><span class="co">#&gt;                   7200                   7200                   7200</span></a></code></pre></div>
 <p>How many parallel jobs should you use in the next <code>make()</code>? The <code>predict_runtime()</code> function can help you decide. <code>predict_runtime(jobs = n)</code> simulates persistent parallel workers and reports the estimated total runtime of <code>make(jobs = n)</code>. (See also <code>predict_workers()</code>.)</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1">time &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb201-2" data-line-number="2"><span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){</a>
-<a class="sourceLine" id="cb201-3" data-line-number="3">  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(</a>
-<a class="sourceLine" id="cb201-4" data-line-number="4">    my_plan,</a>
-<a class="sourceLine" id="cb201-5" data-line-number="5">    <span class="dt">jobs =</span> jobs,</a>
-<a class="sourceLine" id="cb201-6" data-line-number="6">    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb201-7" data-line-number="7">    <span class="dt">known_times =</span> known_times</a>
-<a class="sourceLine" id="cb201-8" data-line-number="8">  )</a>
-<a class="sourceLine" id="cb201-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb201-10" data-line-number="10"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb201-12" data-line-number="12"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb201-14" data-line-number="14"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb201-16" data-line-number="16"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb201-18" data-line-number="18"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb201-20" data-line-number="20"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb201-22" data-line-number="22"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb201-24" data-line-number="24"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb201-26" data-line-number="26"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb201-28" data-line-number="28"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb201-30" data-line-number="30"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
-<a class="sourceLine" id="cb201-31" data-line-number="31"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb201-32" data-line-number="32"><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-33" data-line-number="33"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-34" data-line-number="34"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-35" data-line-number="35"><span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-36" data-line-number="36"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-37" data-line-number="37"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</a></code></pre></div>
-<p><img src="drake-manual_files/figure-html/unnamed-chunk-212-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb202-1" data-line-number="1">time &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb202-2" data-line-number="2"><span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){</a>
+<a class="sourceLine" id="cb202-3" data-line-number="3">  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(</a>
+<a class="sourceLine" id="cb202-4" data-line-number="4">    my_plan,</a>
+<a class="sourceLine" id="cb202-5" data-line-number="5">    <span class="dt">jobs =</span> jobs,</a>
+<a class="sourceLine" id="cb202-6" data-line-number="6">    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb202-7" data-line-number="7">    <span class="dt">known_times =</span> known_times</a>
+<a class="sourceLine" id="cb202-8" data-line-number="8">  )</a>
+<a class="sourceLine" id="cb202-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb202-10" data-line-number="10"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb202-12" data-line-number="12"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb202-14" data-line-number="14"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb202-16" data-line-number="16"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb202-18" data-line-number="18"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb202-20" data-line-number="20"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb202-22" data-line-number="22"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb202-24" data-line-number="24"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb202-26" data-line-number="26"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-27" data-line-number="27"></a>
+<a class="sourceLine" id="cb202-28" data-line-number="28"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb202-30" data-line-number="30"><span class="co">#&gt; Warning: In make(), `parallelism` should not be &quot;loop&quot; if `jobs` &gt; 1</span></a>
+<a class="sourceLine" id="cb202-31" data-line-number="31"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb202-32" data-line-number="32"><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb202-33" data-line-number="33"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb202-34" data-line-number="34"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb202-35" data-line-number="35"><span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb202-36" data-line-number="36"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb202-37" data-line-number="37"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</a></code></pre></div>
+<p><img src="drake-manual_files/figure-html/unnamed-chunk-213-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of <code>jobs</code> for <code>make()</code> ultimately depends on the runtime you can tolerate and the computing resources at your disposal.</p>
 <p>A final note on predicting runtime: the output of <code>predict_runtime()</code> and <code>predict_workers()</code> also depends the optional <code>workers</code> column of your <code>drake_plan()</code>. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the <a href="hpc.html#hpc">high-performance computing guide</a> for more.</p>
 
