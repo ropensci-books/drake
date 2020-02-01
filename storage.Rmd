@@ -10,9 +10,36 @@ library(drake)
 library(tidyverse)
 ```
 
-## Special data formats for targets
+## `drake`'s cache
 
-`drake` supports custom formats for large unwiedly targets. For example, the `"fst"` format uses the [`fst`](https://github.com/fstpackage/fst) package to save targets faster. Simply enclose the command and the format together with the `target()` function.
+When you run `make()`, `drake` stores your targets in a hidden storage cache.
+
+```{r}
+library(drake)
+load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
+make(my_plan, verbose = 0L)
+```
+
+The default cache is a hidden `.drake` folder. 
+
+```{r, eval = FALSE}
+find_cache()
+### [1] "/home/you/project/.drake"
+```
+
+`drake`'s `loadd()` and `readd()` functions load targets into memory.
+
+```{r}
+loadd(large)
+head(large)
+
+head(readd(small))
+```
+
+
+## Efficient target storage
+
+`drake` supports custom formats for large and specialized targets. For example, the `"fst"` format uses the [`fst`](https://github.com/fstpackage/fst) package to save data frames faster. Simply enclose the command and the format together with the `target()` function.
 
 ```{r, eval = FALSE}
 library(drake)
@@ -35,30 +62,38 @@ build_times(type = "build")
 #> 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s
 ```
 
-Other available formats:
-
-- `"fst_dt"`: like `"fst"`, but for [`data.table`](https://github.com/Rdatatable/data.table) objects.
-- `"diskframe"`: for larger-than-memory targets. Uses the [`disk.frame`](https://github.com/xiaodaigh/disk.frame) package.
-- `"keras"`: for [`keras`](https://github.com/rstudio/keras) models. See [these slides](https://wlandau.github.io/learndrake) for an example.
-- `"rds"`: for any target compatible with `saveRDS()`. This format is basically the same as `drake`'s default format except that it consumes less memory during the storage process.
+For more details and a complete list of formats, see <https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets>.
 
 
-## Cache management
+## Why is my cache so big?
 
-When you run `make()`, `drake` stores your targets in a cache.
+### Old targets
+
+By default, `drake` holds on to all your targets from all your runs of `make()`. Even if you run `clean()`, the data stays in the cache in case you need to recover it.
 
 ```{r}
-library(drake)
-load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
-make(my_plan, verbose = 0L)
+clean()
+
+make(my_plan, recover = TRUE)
 ```
 
-The default cache is a hidden `.drake` folder. 
+If you really want to remove old historical values of targets, run `drake_gc()` or  `drake_cache()$gc()`.
 
-```{r, eval = FALSE}
-find_cache()
-### [1] "/home/you/project/.drake"
+```{r}
+drake_gc()
 ```
+
+`clean()` also has a `garbage_collection` argument for this purpose. Here is a slick way to remove historical targets and targets no longer in your plan.
+
+```{r}
+clean(list = cached_unplanned(plan), garbage_collection = TRUE)
+```
+
+### Garbage from interrupted builds
+
+If `make()` crashes or gets interrupted, old files can accumulate in `.drake/scratch/` and `.drake/drake/tmp/`. As long as `make()` is no longer running, can safely remove the files in those folders (but keep the folders themselves).
+
+## Interfaces to the cache
 
 `drake` uses the [storr](https://github.com/richfitz/storr) package to create and modify caches.
 
@@ -101,7 +136,7 @@ cache2 <- new_cache("my_new_cache")
 cache2$driver$path
 ```
 
-You can supply your own cache to `make()` and similar functions.
+You can supply your own cache to `make()` and friends (including specialized `storr` caches like [`storr_dbi()`](http://richfitz.github.io/storr/reference/storr_dbi.html)).
 
 ```{r}
 cache2$list()
@@ -121,91 +156,3 @@ cache$destroy()
 cache2$destroy()
 ```
 
-## Cache formats
-
-### RDS caches
-
-By default, `drake` uses `storr_rds()` caches because they allow `make(jobs = 4)` to safely store multiple targets in parallel. To achieve this thread safety, however, [`storr`](https://github.com/richfitz/storr) splits up the data into a pool of tiny cryptically-named files.
-
-```{r}
-make(my_plan, verbose = 0L)
-head(list.files(".drake/data"))
-head(list.files(".drake/keys/objects"))
-```
-
-This makes RDS caches difficult to share with collaborators and put under version control. For the sake of portability, you may wish to work with database cashes as the next section describes.
-
-Alternatively, you can track changes in a cache log with fingerprints of all your targets.
-
-```{r}
-drake_cache_log()
-make(my_plan, verbose = 0L, cache_log_file = TRUE)
-read_csv("drake_cache.csv", col_types = cols())
-```
-
-Use the `cache_log_file` argument of `make()` to refresh the cache log file every time you run `make()`. Then, if you put this file under version control (e.g. with git/GitHub) then the commit history will tell you how your data objects change over time.
-
-### Database caches
-
-It is possible use a single SQLite database file as the cache.
-
-```{r}
-mydb <- DBI::dbConnect(RSQLite::SQLite(), "database-file.sqlite")
-cache <- storr::storr_dbi("datatable", "keystable", mydb)
-make(my_plan, cache = cache, verbose = 0L)
-loadd(small, cache = cache)
-head(small)
-```
-
-```{r, echo = FALSE}
-cache$destroy()
-```
-
-But be careful: for safe parallel computing (`jobs` > 1) there are additional requirements for `make()`:
-
-1. Select either `parallelism = "clustermq"` or `parallelism = "future"`.
-2. Select `caching = "master"` to ensure that only the master process touches the cache.
-
-For a more complete demonstration, please see [this example code](https://github.com/wlandau/drake-examples/tree/master/dbi), which you can download with `drake_example("dbi")`.
-
-### Environment caches
-
-Environment caches live in computer memory, not your file system, so they are a nice way to run small and fast experiments. However, unless you save the cache manually, all your data will be lost when you quit your R session. And for large projects, you may not be able to fit all your data in memory anyway.
-
-```{r, eval = FALSE}
-cache <- storr_environment()
-make(my_plan, cache = cache)
-```
-
-## Hash algorithms
-
-[storr](https://github.com/richfitz/storr) caches use [hash functions ](https://en.wikipedia.org/wiki/Hash_function) to keep track of stored objects. A hash function is just a way to fingerprint data. The idea is to represent an arbitrary chunks of data using (nearly) unique strings of fixed size.
-
-```{r}
-library(digest) # package for hashing objects and files
-smaller_data <- 12
-larger_data <- rnorm(1000)
-
-digest(smaller_data) # compute the hash
-
-digest(larger_data)
-```
-
-The `digest` package (used by both `drake` and `storr`) supports a wide variety of hash functions. Some generate larger hash keys, some are slower to compute, and others are more prone to "collisions" (where two different data objects are given the same hash key). The `digest` package supports a variety of hash algorithms.
-
-```{r}
-digest(larger_data, algo = "sha512")
-
-digest(larger_data, algo = "md5")
-
-digest(larger_data, algo = "xxhash64")
-
-digest(larger_data, algo = "murmur32")
-```
-
-For `drake`, the default hash algorithm is `xxhash64`. You can choose different hash functions with the `hash_algorithm` argument to `new_cache()`, `storr_rds()`, and similar functions. (For `drake` version 6.2.1 and earlier, see the `long_hash_algo` and `short_hash_algo` arguments.)
-
-```{r, eval = FALSE}
-cache3 <- new_cache("cache_3_path", hash_algorithm = "murmur32")
-cache4 <- storr_rds("cache_4_path", hash_algorithm = "crc32")
-```
