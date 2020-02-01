@@ -360,16 +360,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a><ul>
-<li class="chapter" data-level="17.0.1" data-path="debugging.html"><a href="debugging.html#start-small-1"><i class="fa fa-check"></i><b>17.0.1</b> Start small</a></li>
-<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#dependencies-1"><i class="fa fa-check"></i><b>17.1</b> Dependencies</a><ul>
-<li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#visualize-your-dependency-graph."><i class="fa fa-check"></i><b>17.1.1</b> Visualize your dependency graph.</a></li>
-<li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#check-specific-dependency-information."><i class="fa fa-check"></i><b>17.1.2</b> Check specific dependency information.</a></li>
-<li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#outdated-targets-and-missing-dependencies"><i class="fa fa-check"></i><b>17.1.3</b> Outdated targets and missing dependencies</a></li>
-<li class="chapter" data-level="17.1.4" data-path="debugging.html"><a href="debugging.html#but-why-are-my-targets-out-of-date"><i class="fa fa-check"></i><b>17.1.4</b> But <em>why</em> are my targets out of date?</a></li>
+<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a><ul>
+<li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#diagnosing-errors"><i class="fa fa-check"></i><b>17.1.1</b> Diagnosing errors</a></li>
+<li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#interactive-debugging"><i class="fa fa-check"></i><b>17.1.2</b> Interactive debugging</a></li>
+<li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#efficient-trial-and-error"><i class="fa fa-check"></i><b>17.1.3</b> Efficient trial and error</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#diagnose-failures."><i class="fa fa-check"></i><b>17.2</b> Diagnose failures.</a></li>
-<li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#timeouts-and-retries"><i class="fa fa-check"></i><b>17.3</b> Timeouts and retries</a></li>
-<li class="chapter" data-level="17.4" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.4</b> More help</a></li>
+<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="debugging.html"><a href="debugging.html#how-your-workflow-fits-together"><i class="fa fa-check"></i><b>17.2.1</b> How your workflow fits together</a></li>
+<li class="chapter" data-level="17.2.2" data-path="debugging.html"><a href="debugging.html#which-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.2</b> Which targets are outdated</a></li>
+<li class="chapter" data-level="17.2.3" data-path="debugging.html"><a href="debugging.html#why-your-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.3</b> Why your targets are outdated</a></li>
+<li class="chapter" data-level="17.2.4" data-path="debugging.html"><a href="debugging.html#strategies-to-prevent-unexpected-changes-in-the-future"><i class="fa fa-check"></i><b>17.2.4</b> Strategies to prevent unexpected changes in the future</a></li>
+</ul></li>
+<li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.3</b> More help</a></li>
 </ul></li>
 <li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a><ul>
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
@@ -464,8 +466,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">outdated</span>(config)</a></code></pre></div>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">outdated</span>(plan)</a></code></pre></div>
 <p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
 </div>
 <div id="ease" class="section level4">
@@ -583,7 +584,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>drake_history()</code>: show what you built, when you built it, and the function arguments you used.</li>
 <li><code>loadd()</code>: load one or more built targets into your R session.</li>
 <li><code>readd()</code>: read and return a built target.</li>
-<li><code>drake_config()</code>: create a master configuration list for other user-side functions.</li>
 <li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
 <li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
 <li><code>deps()</code>: check the dependencies of a command or function.</li>

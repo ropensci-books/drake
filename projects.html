@@ -360,16 +360,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a><ul>
-<li class="chapter" data-level="17.0.1" data-path="debugging.html"><a href="debugging.html#start-small-1"><i class="fa fa-check"></i><b>17.0.1</b> Start small</a></li>
-<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#dependencies-1"><i class="fa fa-check"></i><b>17.1</b> Dependencies</a><ul>
-<li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#visualize-your-dependency-graph."><i class="fa fa-check"></i><b>17.1.1</b> Visualize your dependency graph.</a></li>
-<li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#check-specific-dependency-information."><i class="fa fa-check"></i><b>17.1.2</b> Check specific dependency information.</a></li>
-<li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#outdated-targets-and-missing-dependencies"><i class="fa fa-check"></i><b>17.1.3</b> Outdated targets and missing dependencies</a></li>
-<li class="chapter" data-level="17.1.4" data-path="debugging.html"><a href="debugging.html#but-why-are-my-targets-out-of-date"><i class="fa fa-check"></i><b>17.1.4</b> But <em>why</em> are my targets out of date?</a></li>
+<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a><ul>
+<li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#diagnosing-errors"><i class="fa fa-check"></i><b>17.1.1</b> Diagnosing errors</a></li>
+<li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#interactive-debugging"><i class="fa fa-check"></i><b>17.1.2</b> Interactive debugging</a></li>
+<li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#efficient-trial-and-error"><i class="fa fa-check"></i><b>17.1.3</b> Efficient trial and error</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#diagnose-failures."><i class="fa fa-check"></i><b>17.2</b> Diagnose failures.</a></li>
-<li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#timeouts-and-retries"><i class="fa fa-check"></i><b>17.3</b> Timeouts and retries</a></li>
-<li class="chapter" data-level="17.4" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.4</b> More help</a></li>
+<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="debugging.html"><a href="debugging.html#how-your-workflow-fits-together"><i class="fa fa-check"></i><b>17.2.1</b> How your workflow fits together</a></li>
+<li class="chapter" data-level="17.2.2" data-path="debugging.html"><a href="debugging.html#which-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.2</b> Which targets are outdated</a></li>
+<li class="chapter" data-level="17.2.3" data-path="debugging.html"><a href="debugging.html#why-your-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.3</b> Why your targets are outdated</a></li>
+<li class="chapter" data-level="17.2.4" data-path="debugging.html"><a href="debugging.html#strategies-to-prevent-unexpected-changes-in-the-future"><i class="fa fa-check"></i><b>17.2.4</b> Strategies to prevent unexpected changes in the future</a></li>
+</ul></li>
+<li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.3</b> More help</a></li>
 </ul></li>
 <li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a><ul>
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
@@ -462,8 +464,7 @@ R/
 <a class="sourceLine" id="cb102-4" data-line-number="4"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
 <a class="sourceLine" id="cb102-5" data-line-number="5"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
 <a class="sourceLine" id="cb102-6" data-line-number="6"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
-<a class="sourceLine" id="cb102-7" data-line-number="7">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan)</a>
-<a class="sourceLine" id="cb102-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(config)</a></code></pre></div>
+<a class="sourceLine" id="cb102-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
 </div>
 <div id="safer-interactivity" class="section level2">
 <h2><span class="header-section-number">7.2</span> Safer interactivity</h2>
@@ -496,11 +497,11 @@ R/
 <li>Load the packages, functions, global options, <code>drake</code> plan, etc. into the session’s environnment, and</li>
 <li>Run the call to <code>drake_config()</code>and store the results in a variable called <code>config</code>.</li>
 </ol></li>
-<li>Execute <code>make(config = config)</code></li>
+<li>Execute <code>make_impl(config = config)</code>, an internal <code>drake</code> function.</li>
 </ol>
 <p>The purpose of <code>drake_config()</code> is to collect and sanitize all the parameters and settings that <code>make()</code> needs to do its job. In fact, if you do not set the <code>config</code> argument explicitly, then <code>make()</code> invokes <code>drake_config()</code> behind the scenes. <code>make(plan, parallelism = &quot;clustermq&quot;, jobs = 2, verbose = 6)</code> is equivalent to</p>
 <div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="kw">make</span>(<span class="dt">config =</span> config)</a></code></pre></div>
+<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="kw">make_impl</span>(<span class="dt">config =</span> config)</a></code></pre></div>
 <p>There are many more <code>r_*()</code> functions besides <code>r_make()</code>, each of which launches a fresh session and runs an inner <code>drake</code> function on the <code>config</code> object from <code>_drake.R</code>.</p>
 <table>
 <thead>
@@ -512,43 +513,43 @@ R/
 <tbody>
 <tr class="odd">
 <td><code>r_make()</code></td>
-<td><code>make(config = config)</code></td>
+<td><code>make_impl(config = config)</code></td>
 </tr>
 <tr class="even">
 <td><code>r_drake_build(...)</code></td>
-<td><code>drake_build(config, ...)</code></td>
+<td><code>drake_build_impl(config, ...)</code></td>
 </tr>
 <tr class="odd">
 <td><code>r_outdated(...)</code></td>
-<td><code>outdated(config, ...)</code></td>
+<td><code>outdated_impl(config, ...)</code></td>
 </tr>
 <tr class="even">
 <td><code>r_missed(...)</code></td>
-<td><code>missed(config, ...)</code></td>
+<td><code>missed_impl(config, ...)</code></td>
 </tr>
 <tr class="odd">
 <td><code>r_vis_drake_graph(...)</code></td>
-<td><code>vis_drake_graph(config, ...)</code></td>
+<td><code>vis_drake_graph_impl(config, ...)</code></td>
 </tr>
 <tr class="even">
 <td><code>r_sankey_drake_graph(...)</code></td>
-<td><code>sankey_drake_graph(config, ...)</code></td>
+<td><code>sankey_drake_graph_impl(config, ...)</code></td>
 </tr>
 <tr class="odd">
 <td><code>r_drake_ggraph(...)</code></td>
-<td><code>drake_ggraph(config, ...)</code></td>
+<td><code>drake_ggraph_impl(config, ...)</code></td>
 </tr>
 <tr class="even">
 <td><code>r_drake_graph_info(...)</code></td>
-<td><code>drake_graph_info(config, ...)</code></td>
+<td><code>drake_graph_info_impl(config, ...)</code></td>
 </tr>
 <tr class="odd">
 <td><code>r_predict_runtime(...)</code></td>
-<td><code>predict_runtime(config, ...)</code></td>
+<td><code>predict_runtime_impl(config, ...)</code></td>
 </tr>
 <tr class="even">
 <td><code>r_predict_workers(...)</code></td>
-<td><code>predict_workers(config, ...)</code></td>
+<td><code>predict_workers_impl(config, ...)</code></td>
 </tr>
 </tbody>
 </table>
@@ -580,7 +581,7 @@ R/
 <a class="sourceLine" id="cb106-26" data-line-number="26"></a>
 <a class="sourceLine" id="cb106-27" data-line-number="27"><span class="kw">r_vis_drake_graph</span>(<span class="dt">targets_only =</span> <span class="ot">TRUE</span>, <span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a></code></pre></div>
 <div id="htmlwidget-05518fdb4a90a0243a52" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-05518fdb4a90a0243a52">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.025s","data\n0.005s","fit\n0.007s","hist\n0.026s","report\n0.637s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-05518fdb4a90a0243a52">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.026s","data\n0.005s","fit\n0.008s","hist\n0.027s","report\n0.664s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Remarks:</p>
 <ul>
 <li>You can run <code>r_make()</code> in an interactive session, but the transient process it launches will not be interactive. Thus, any <code>browser()</code> statements in the commands in your <code>drake</code> plan will be ignored.</li>
@@ -597,12 +598,10 @@ R/
 <a class="sourceLine" id="cb107-3" data-line-number="3">  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),</a>
 <a class="sourceLine" id="cb107-4" data-line-number="4">  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))</a>
 <a class="sourceLine" id="cb107-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb107-6" data-line-number="6">bad_config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(bad_plan)</a>
-<a class="sourceLine" id="cb107-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(bad_config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb107-8" data-line-number="8"><span class="co">#&gt; Warning: argument config is deprecated. Use ... to supply make() arguments such</span></a>
-<a class="sourceLine" id="cb107-9" data-line-number="9"><span class="co">#&gt; as the plan instead.</span></a></code></pre></div>
+<a class="sourceLine" id="cb107-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb107-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(bad_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div id="htmlwidget-aa0f842c976f36455530" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-aa0f842c976f36455530">{"x":{"nodes":{"id":["my_summaries","my_data","my_analysis"],"imported":[false,false,false],"label":["my_summaries","my_data","my_analysis"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,1],"x":[0,0,0],"y":[-1,0,1]},"edges":{"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-aa0f842c976f36455530">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,1],"x":[0,0,0],"y":[-1,0,1]},"edges":{"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>When it comes to plans, use <em>functions</em> instead.</p>
 <div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>) <span class="co"># defines get_data(), analyze_data(), etc.</span></a>
 <a class="sourceLine" id="cb108-2" data-line-number="2">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
@@ -610,8 +609,8 @@ R/
 <a class="sourceLine" id="cb108-4" data-line-number="4">  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),</a>
 <a class="sourceLine" id="cb108-5" data-line-number="5">  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)</a>
 <a class="sourceLine" id="cb108-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb108-7" data-line-number="7">good_config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(good_plan)</a>
-<a class="sourceLine" id="cb108-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(good_config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb108-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb108-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>In <code>drake</code> &gt;= 7.6.2.9000, code_to_function() leverages existing imperative scripts for use in a <code>drake</code> plan.</p>
 <div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">get_data &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;get_data.R&quot;</span>)</a>
 <a class="sourceLine" id="cb109-2" data-line-number="2">do_analysis &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;analyze_data.R&quot;</span>)</a>
@@ -623,10 +622,7 @@ R/
 <a class="sourceLine" id="cb109-8" data-line-number="8">  <span class="dt">my_summaries =</span> <span class="kw">do_summary</span>(my_data, my_analysis)</a>
 <a class="sourceLine" id="cb109-9" data-line-number="9">)</a>
 <a class="sourceLine" id="cb109-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb109-11" data-line-number="11">good_config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(good_plan)</a>
-<a class="sourceLine" id="cb109-12" data-line-number="12"><span class="kw">vis_drake_graph</span>(good_config, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>#&gt; Warning: argument config is deprecated. Use ... to supply make() arguments such
-#&gt; as the plan instead.</code></pre>
+<a class="sourceLine" id="cb109-11" data-line-number="11"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div id="htmlwidget-37f98c2b191a9c8f336e" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-37f98c2b191a9c8f336e">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,2,3],"x":[-1,0,1],"y":[0,0,0]},"edges":{"from":["my_data","my_data","my_analysis"],"to":["my_analysis","my_summaries","my_summaries"],"arrows":["to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
