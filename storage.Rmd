@@ -86,7 +86,7 @@ drake_gc()
 `clean()` also has a `garbage_collection` argument for this purpose. Here is a slick way to remove historical targets and targets no longer in your plan.
 
 ```{r}
-clean(list = cached_unplanned(plan), garbage_collection = TRUE)
+clean(list = cached_unplanned(my_plan), garbage_collection = TRUE)
 ```
 
 ### Garbage from interrupted builds
@@ -120,7 +120,7 @@ head(large)
 rm(large) # Does not remove `large` from the cache.
 ```
 
-Functions `drake_cache()`, `storr::storr_rds()`, and `new_cache()` recover and create caches. (`drake_cache()` is only supported in `drake` version 7.4.0 and above.)
+`new_cache()` create caches and `drake_cache()` recovers existing ones. (`drake_cache()` is only supported in `drake` version 7.4.0 and above.)
 
 ```{r}
 cache <- drake_cache()
@@ -128,31 +128,21 @@ cache$driver$path
 
 cache <- drake_cache(path = ".drake") # File path to drake's cache.
 cache$driver$path
-
-cache <- storr::storr_rds(path = ".drake")
-cache$driver$path
-
-cache2 <- new_cache("my_new_cache")
-cache2$driver$path
 ```
 
 You can supply your own cache to `make()` and friends (including specialized `storr` caches like [`storr_dbi()`](http://richfitz.github.io/storr/reference/storr_dbi.html)).
 
 ```{r}
-cache2$list()
+plan <- drake_plan(x = 1, y = sqrt(x))
+make(plan, cache = cache)
 
-plan2 <- drake_plan(x = 1, y = sqrt(x))
-make(plan2, cache = cache2)
-
-cache2$list()
-
-vis_drake_graph(plan2, cache = cache2)
+vis_drake_graph(plan, cache = cache)
 ```
 
 Destroy caches to remove them from your file system.
 
 ```{r}
 cache$destroy()
-cache2$destroy()
-```
 
+file.exists(".drake")
+```
