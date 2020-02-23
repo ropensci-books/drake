@@ -1,0 +1,27 @@
+# Design {#design}
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+library(drake)
+library(tidyverse)
+```
+
+This chapter explains `drake`'s internal design and architecture. Goals:
+
+1. Help developers and enthusiastic users contribute to the [code base](https://github.com/ropensci/drake).
+2. [Invite discussion](https://github.com/ropensci/drake/issues) about [design patterns](https://www.amazon.com/dp/0201633612/ref=cm_sw_r_cp_apa_i_IBelDbPRFQ5PE), programming techniques, and algorithms that could prove useful.
+
+## Functions first
+
+From a user's point of view, `drake` is an [opinionated style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). This style harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
+
+## Simple data
+
+Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)) caches some targets, and then drops its state when it terminates. A `drake` workflow has no need for a persistent in-memory state or an overarching user-side object-oriented interface.
+
+Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and natural, and they abstract away only the lowest-level operations. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), the [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and logger [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and task-specific. The [S3 system](http://adv-r.had.co.nz/S3.html) system appears far more often, but primarily as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow and encapsulate patterns of execution.
+
