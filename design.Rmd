@@ -13,17 +13,54 @@ library(tidyverse)
 This chapter explains `drake`'s internal design and architecture. Goals:
 
 1. Help developers and enthusiastic users contribute to the [code base](https://github.com/ropensci/drake).
-2. [Invite discussion](https://github.com/ropensci/drake/issues) about [design patterns](https://www.amazon.com/dp/0201633612/ref=cm_sw_r_cp_apa_i_IBelDbPRFQ5PE), programming techniques, and algorithms that could prove useful.
+2. [Invite discussion](https://github.com/ropensci/drake/issues) about potential improvements to the overall design.
 
-## Functions first
+## Principles
+
+### Functions first
 
 From a user's point of view, `drake` is an [opinionated style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). This style harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
 
-## Simple data
+### Specialized classes
 
 Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)) caches some targets, and then drops its state when it terminates. A `drake` workflow has no need for a persistent in-memory state or an overarching user-side object-oriented interface.
 
-Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and natural, and they abstract away only the lowest-level operations. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), the [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and logger [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and task-specific. The [S3 system](http://adv-r.had.co.nz/S3.html) system appears far more often, but primarily as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow and encapsulate patterns of execution.
+Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), the [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and logger [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) system appears far more often, but primarily as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow and encapsulate patterns of execution.
 
-In future development, small classes will arise as needed to encapsulate low-level patterns in natural abstractions. They will gradually make the code base more elegant while prioritizing runtime efficiency and minimizing overengineering.
+In future development, small classes will continue to arise as needed to encapsulate low-level patterns in natural abstractions. They will gradually make the code base more elegant while prioritizing runtime efficiency and minimizing overengineering.
 
+### Simple objects
+
+`drake` has a strong bias towards simple internal data. Either the data structures are complicated (e.g. object-oriented as above) or large, but not both.
+
+The large data structures in `drake` usually summarize a single type of information across all targets. Examples include the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R), the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), and the numerous hash tables in the [`drake_config()` object](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/make.R#L278-L286) and the [decorated `storr`](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/decorate_storr.R#L19-L24). These objects make it straightforward to analyze dependency relationships among targets, iterate over large collections of targets, and enhance runtime performance in general.
+
+### Sharing
+
+`drake` workflows are all about dependency relationships among targets and commands. Even as `drake` focuses on a single target to run, it needs to stay aware of all the other targets and how they relate to one another. This is true not only to construct the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R) and the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but especially for [dynamic branching](#dynamic), where `drake` needs to create new *sub-targets* while `make()` is running. This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
+
+## Objects
+
+### Config
+
+`make()`, `outdated()`, `vis_drake_graph()`, and related utilities use a [`drake_config()`](https://docs.ropensci.org/drake/reference/drake_config.html) object to represent the entire state of a workflow. (Users should [almost](https://docs.ropensci.org/drake/reference/r_make.html) never invoke `drake_config()` directly.) A `drake_config()` object is a list of class `"drake_config"`, and its only purpose is to carry around the other data objects. It gives internal functions the information they need while keeping the argument lists small.
+
+### Plan
+
+The `drake` plan is a simple data frame of class `"drake_plan"`, and it is `drake`'s version of a Makefile. The manual has a [whole chapter](#plans) devoted to plans.
+
+### Specification
+
+A `drake` plan is an *implicit* representation of dependency relationships among targets, functions, files, and other objects. Before `make()` really gets going, it needs to make this dependency structure *explicit* and machine-readable in a [workflow `specification`](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R). This specification (`config$spec`) an R environment with a workflow specification of each individual target and each imported object/function. Each item-specific specification is a list of class `"drake_spec"`, and it contains the things `drake` learned about it from the plan and the user's environment: the names of objects referenced from the command, files declared with `file_in()`, dependencies of the `condition` and `change` triggers, the item's role as a target or imported object, etc.
+
+### Graph
+
+Using the specification, `drake` [creates an `igraph` object](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R) to represent the order in which targets need to run. The purpose is to schedule targets. `make()` uses the graph to identify dependencies quickly and to run the correct targets in the correct order.
+
+### Priority queue
+
+In high-performance computing settings (e.g. `parallelism = "clustermq"` and `parallelism = "future"`) `drake` creates a [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R) to schedule targets so they run in parallel at the right times. For the sake of convenience, the underlying algorithms are different than that of a classical [priority queue](https://en.wikipedia.org/wiki/Priority_queue), but this does not seem to decrease performance in practice.
+
+### Metadata
+
+`config$meta` is an environment, and each element is a list of class `"drake_meta"`. Whereas the workflow specification identifies the *names* of dependencies, the `"drake_meta"` lists keep track of the *state* of each dependency and other metadata. The purpose is to compactly fingerprint each target so `drake` can quickly decide which targets are up to date and which are invalidated. `drake` stores the metadata of each target in a special `"meta"` namespace of the decorated `storr`.
