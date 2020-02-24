@@ -406,6 +406,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="B.2.4" data-path="design.html"><a href="design.html#graph"><i class="fa fa-check"></i><b>B.2.4</b> Graph</a></li>
 <li class="chapter" data-level="B.2.5" data-path="design.html"><a href="design.html#priority-queue"><i class="fa fa-check"></i><b>B.2.5</b> Priority queue</a></li>
 <li class="chapter" data-level="B.2.6" data-path="design.html"><a href="design.html#metadata"><i class="fa fa-check"></i><b>B.2.6</b> Metadata</a></li>
+<li class="chapter" data-level="B.2.7" data-path="design.html"><a href="design.html#cache"><i class="fa fa-check"></i><b>B.2.7</b> Cache</a></li>
+<li class="chapter" data-level="B.2.8" data-path="design.html"><a href="design.html#environments"><i class="fa fa-check"></i><b>B.2.8</b> Environments</a></li>
+<li class="chapter" data-level="B.2.9" data-path="design.html"><a href="design.html#hash-tables"><i class="fa fa-check"></i><b>B.2.9</b> Hash tables</a></li>
+<li class="chapter" data-level="B.2.10" data-path="design.html"><a href="design.html#logger"><i class="fa fa-check"></i><b>B.2.10</b> Logger</a></li>
 </ul></li>
 </ul></li>
 <li class="divider"></li>
@@ -461,7 +465,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">B.2</span> Objects</h2>
 <div id="config" class="section level3">
 <h3><span class="header-section-number">B.2.1</span> Config</h3>
-<p><code>make()</code>, <code>outdated()</code>, <code>vis_drake_graph()</code>, and related utilities use a <a href="https://docs.ropensci.org/drake/reference/drake_config.html"><code>drake_config()</code></a> object to represent the entire state of a workflow. (Users should <a href="https://docs.ropensci.org/drake/reference/r_make.html">almost</a> never invoke <code>drake_config()</code> directly.) A <code>drake_config()</code> object is a list of class <code>&quot;drake_config&quot;</code>, and its only purpose is to carry around the other data objects. It gives internal functions the information they need while keeping the argument lists small.</p>
+<p><code>make()</code>, <code>outdated()</code>, <code>vis_drake_graph()</code>, and related utilities use a <a href="https://docs.ropensci.org/drake/reference/drake_config.html"><code>drake_config()</code></a> object to represent the entire state of a workflow. (Users should <a href="https://docs.ropensci.org/drake/reference/r_make.html">almost</a> never invoke <code>drake_config()</code> directly.) A <code>drake_config()</code> object is a list of class <code>&quot;drake_config&quot;</code>, and its only purpose is to carry around the other data objects and operational parameters. It gives internal functions the information they need while keeping the argument lists small.</p>
 </div>
 <div id="plan-1" class="section level3">
 <h3><span class="header-section-number">B.2.2</span> Plan</h3>
@@ -482,6 +486,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="metadata" class="section level3">
 <h3><span class="header-section-number">B.2.6</span> Metadata</h3>
 <p><code>config$meta</code> is an environment, and each element is a list of class <code>&quot;drake_meta&quot;</code>. Whereas the workflow specification identifies the <em>names</em> of dependencies, the <code>&quot;drake_meta&quot;</code> lists keep track of the <em>state</em> of each dependency and other metadata. The purpose is to compactly fingerprint each target so <code>drake</code> can quickly decide which targets are up to date and which are invalidated. <code>drake</code> stores the metadata of each target in a special <code>&quot;meta&quot;</code> namespace of the decorated <code>storr</code>.</p>
+<p><code>config$meta_old</code> is similar to <code>config$meta</code> for old metadata from previous calls to <code>make()</code>.</p>
+</div>
+<div id="cache" class="section level3">
+<h3><span class="header-section-number">B.2.7</span> Cache</h3>
+<div id="api" class="section level4">
+<h4><span class="header-section-number">B.2.7.1</span> API</h4>
+<p><code>drake</code>’s cache API is a <a href="https://github.com/ropensci/drake/blob/master/R/decorate_storr.R">decorated <code>storr</code></a>, a reference class that wraps around a <a href="github.com/richfitz/storr"><code>storr</code></a> object. <code>drake</code> makes heavy use of <code>storr</code> namespaces. Most target values are stored in the default namespace, but there are other namespaces for metadata lists and keys to power data recovery. <code>drake</code>’s custom wrapper around the <code>storr</code> class (i.e. the “decorated” part) has extra methods that power history (a <a href="https://github.com/wlandau/txtq"><code>txtq</code></a>) and <a href="https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets">specialized data formats</a>, as well as hash tables that only the cache needs.</p>
+<p>The <code>new_cache()</code> and <code>drake_cache()</code> functions create and reload <code>drake</code> caches, respectively, and they are equivalent to <code>storr::storr_rds()</code> plus <code>drake:::decorate_storr()</code>.</p>
+</div>
+<div id="data-1" class="section level4">
+<h4><span class="header-section-number">B.2.7.2</span> Data</h4>
+<p>Usually, the persistent data values live in a hidden <code>.drake/</code> folder (). Most of the files are generated by <a href="http://richfitz.github.io/storr/reference/storr_rds.html"><code>storr_rds()</code></a> methods. Other files include the history <a href="https://github.com/wlandau/txtq"><code>txtq</code></a> and the values of targets with <a href="https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets">specialized data formats</a>. The files are structured so they can be used by either with <code>storr_rds()</code> or <code>drake::drake_cache()</code>.</p>
+<p>Other <code>storr</code> backends like <code>storr_environment()</code> and <code>storr_dbi()</code> are also compatible with this approach. In this case, <code>.drake/</code> does not contain the files of the inner <code>storr</code>, but it does have files supporting history and specialized target formats.</p>
+</div>
+</div>
+<div id="environments" class="section level3">
+<h3><span class="header-section-number">B.2.8</span> Environments</h3>
+</div>
+<div id="hash-tables" class="section level3">
+<h3><span class="header-section-number">B.2.9</span> Hash tables</h3>
+</div>
+<div id="logger" class="section level3">
+<h3><span class="header-section-number">B.2.10</span> Logger</h3>
 
 </div>
 </div>
