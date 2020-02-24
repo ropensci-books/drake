@@ -393,8 +393,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
 <li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a><ul>
-<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#functions-first"><i class="fa fa-check"></i><b>B.1</b> Functions first</a></li>
-<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#simple-data"><i class="fa fa-check"></i><b>B.2</b> Simple data</a></li>
+<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a><ul>
+<li class="chapter" data-level="B.1.1" data-path="design.html"><a href="design.html#functions-first"><i class="fa fa-check"></i><b>B.1.1</b> Functions first</a></li>
+<li class="chapter" data-level="B.1.2" data-path="design.html"><a href="design.html#specialized-classes"><i class="fa fa-check"></i><b>B.1.2</b> Specialized classes</a></li>
+<li class="chapter" data-level="B.1.3" data-path="design.html"><a href="design.html#simple-objects"><i class="fa fa-check"></i><b>B.1.3</b> Simple objects</a></li>
+<li class="chapter" data-level="B.1.4" data-path="design.html"><a href="design.html#sharing"><i class="fa fa-check"></i><b>B.1.4</b> Sharing</a></li>
+</ul></li>
+<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#objects"><i class="fa fa-check"></i><b>B.2</b> Objects</a><ul>
+<li class="chapter" data-level="B.2.1" data-path="design.html"><a href="design.html#config"><i class="fa fa-check"></i><b>B.2.1</b> Config</a></li>
+<li class="chapter" data-level="B.2.2" data-path="design.html"><a href="design.html#plan-1"><i class="fa fa-check"></i><b>B.2.2</b> Plan</a></li>
+<li class="chapter" data-level="B.2.3" data-path="design.html"><a href="design.html#specification"><i class="fa fa-check"></i><b>B.2.3</b> Specification</a></li>
+<li class="chapter" data-level="B.2.4" data-path="design.html"><a href="design.html#graph"><i class="fa fa-check"></i><b>B.2.4</b> Graph</a></li>
+<li class="chapter" data-level="B.2.5" data-path="design.html"><a href="design.html#priority-queue"><i class="fa fa-check"></i><b>B.2.5</b> Priority queue</a></li>
+<li class="chapter" data-level="B.2.6" data-path="design.html"><a href="design.html#metadata"><i class="fa fa-check"></i><b>B.2.6</b> Metadata</a></li>
+</ul></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -421,18 +433,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This chapter explains <code>drake</code>’s internal design and architecture. Goals:</p>
 <ol style="list-style-type: decimal">
 <li>Help developers and enthusiastic users contribute to the <a href="https://github.com/ropensci/drake">code base</a>.</li>
-<li><a href="https://github.com/ropensci/drake/issues">Invite discussion</a> about <a href="https://www.amazon.com/dp/0201633612/ref=cm_sw_r_cp_apa_i_IBelDbPRFQ5PE">design patterns</a>, programming techniques, and algorithms that could prove useful.</li>
+<li><a href="https://github.com/ropensci/drake/issues">Invite discussion</a> about potential improvements to the overall design.</li>
 </ol>
-<div id="functions-first" class="section level2">
-<h2><span class="header-section-number">B.1</span> Functions first</h2>
+<div id="principles" class="section level2">
+<h2><span class="header-section-number">B.1</span> Principles</h2>
+<div id="functions-first" class="section level3">
+<h3><span class="header-section-number">B.1.1</span> Functions first</h3>
 <p>From a user’s point of view, <code>drake</code> is an <a href="https://books.ropensci.org/drake/plans.html#intro-to-plans">opinionated style of programming</a> in its own right, and that style is <a href="https://books.ropensci.org/drake/plans.html#functions">zealously and irrevocably function-oriented</a>. This style harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in <code>drake</code>, and they dominate the design at the highest levels.</p>
 </div>
-<div id="simple-data" class="section level2">
-<h2><span class="header-section-number">B.2</span> Simple data</h2>
+<div id="specialized-classes" class="section level3">
+<h3><span class="header-section-number">B.1.2</span> Specialized classes</h3>
 <p>Most of a <code>drake</code> workflow happens inside the <code>make()</code> function. <code>make()</code> accepts a data frame of function calls (the <a href="plans.html#plans"><code>drake</code> plan</a>) caches some targets, and then drops its state when it terminates. A <code>drake</code> workflow has no need for a persistent in-memory state or an overarching user-side object-oriented interface.</p>
-<p>Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and natural, and they abstract away only the lowest-level operations. For example, the <a href="https://github.com/ropensci/drake/blob/master/R/decorate_storr.R">decorated <code>storr</code></a>, the <a href="https://github.com/ropensci/drake/blob/master/R/priority_queue.R">priority queue</a>, and logger <a href="http://adv-r.had.co.nz/R5.html">reference classes</a> are narrowly defined and task-specific. The <a href="http://adv-r.had.co.nz/S3.html">S3 system</a> system appears far more often, but primarily as a mechanism of <a href="https://en.wikipedia.org/wiki/Function_overloading">function overloading</a> to streamline control flow and encapsulate patterns of execution.</p>
-<p>In future development, small classes will arise as needed to encapsulate low-level patterns in natural abstractions. They will gradually make the code base more elegant while prioritizing runtime efficiency and minimizing overengineering.</p>
+<p>Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and extremely specialized. For example, the <a href="https://github.com/ropensci/drake/blob/master/R/decorate_storr.R">decorated <code>storr</code></a>, the <a href="https://github.com/ropensci/drake/blob/master/R/priority_queue.R">priority queue</a>, and logger <a href="http://adv-r.had.co.nz/R5.html">reference classes</a> are narrowly defined and fit for purpose. The <a href="http://adv-r.had.co.nz/S3.html">S3 system</a> system appears far more often, but primarily as a mechanism of <a href="https://en.wikipedia.org/wiki/Function_overloading">function overloading</a> to streamline control flow and encapsulate patterns of execution.</p>
+<p>In future development, small classes will continue to arise as needed to encapsulate low-level patterns in natural abstractions. They will gradually make the code base more elegant while prioritizing runtime efficiency and minimizing overengineering.</p>
+</div>
+<div id="simple-objects" class="section level3">
+<h3><span class="header-section-number">B.1.3</span> Simple objects</h3>
+<p><code>drake</code> has a strong bias towards simple internal data. Either the data structures are complicated (e.g. object-oriented as above) or large, but not both.</p>
+<p>The large data structures in <code>drake</code> usually summarize a single type of information across all targets. Examples include the <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R">workflow specification</a>, the <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R">dependency graph</a>, and the numerous hash tables in the <a href="https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/make.R#L278-L286"><code>drake_config()</code> object</a> and the <a href="https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/decorate_storr.R#L19-L24">decorated <code>storr</code></a>. These objects make it straightforward to analyze dependency relationships among targets, iterate over large collections of targets, and enhance runtime performance in general.</p>
+</div>
+<div id="sharing" class="section level3">
+<h3><span class="header-section-number">B.1.4</span> Sharing</h3>
+<p><code>drake</code> workflows are all about dependency relationships among targets and commands. Even as <code>drake</code> focuses on a single target to run, it needs to stay aware of all the other targets and how they relate to one another. This is true not only to construct the <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R">workflow specification</a> and the <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R">dependency graph</a>, but especially for <a href="dynamic.html#dynamic">dynamic branching</a>, where <code>drake</code> needs to create new <em>sub-targets</em> while <code>make()</code> is running. This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.</p>
+</div>
+</div>
+<div id="objects" class="section level2">
+<h2><span class="header-section-number">B.2</span> Objects</h2>
+<div id="config" class="section level3">
+<h3><span class="header-section-number">B.2.1</span> Config</h3>
+<p><code>make()</code>, <code>outdated()</code>, <code>vis_drake_graph()</code>, and related utilities use a <a href="https://docs.ropensci.org/drake/reference/drake_config.html"><code>drake_config()</code></a> object to represent the entire state of a workflow. (Users should <a href="https://docs.ropensci.org/drake/reference/r_make.html">almost</a> never invoke <code>drake_config()</code> directly.) A <code>drake_config()</code> object is a list of class <code>&quot;drake_config&quot;</code>, and its only purpose is to carry around the other data objects. It gives internal functions the information they need while keeping the argument lists small.</p>
+</div>
+<div id="plan-1" class="section level3">
+<h3><span class="header-section-number">B.2.2</span> Plan</h3>
+<p>The <code>drake</code> plan is a simple data frame of class <code>&quot;drake_plan&quot;</code>, and it is <code>drake</code>’s version of a Makefile. The manual has a <a href="plans.html#plans">whole chapter</a> devoted to plans.</p>
+</div>
+<div id="specification" class="section level3">
+<h3><span class="header-section-number">B.2.3</span> Specification</h3>
+<p>A <code>drake</code> plan is an <em>implicit</em> representation of dependency relationships among targets, functions, files, and other objects. Before <code>make()</code> really gets going, it needs to make this dependency structure <em>explicit</em> and machine-readable in a <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R">workflow <code>specification</code></a>. This specification (<code>config$spec</code>) an R environment with a workflow specification of each individual target and each imported object/function. Each item-specific specification is a list of class <code>&quot;drake_spec&quot;</code>, and it contains the things <code>drake</code> learned about it from the plan and the user’s environment: the names of objects referenced from the command, files declared with <code>file_in()</code>, dependencies of the <code>condition</code> and <code>change</code> triggers, the item’s role as a target or imported object, etc.</p>
+</div>
+<div id="graph" class="section level3">
+<h3><span class="header-section-number">B.2.4</span> Graph</h3>
+<p>Using the specification, <code>drake</code> <a href="https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R">creates an <code>igraph</code> object</a> to represent the order in which targets need to run. The purpose is to schedule targets. <code>make()</code> uses the graph to identify dependencies quickly and to run the correct targets in the correct order.</p>
+</div>
+<div id="priority-queue" class="section level3">
+<h3><span class="header-section-number">B.2.5</span> Priority queue</h3>
+<p>In high-performance computing settings (e.g. <code>parallelism = &quot;clustermq&quot;</code> and <code>parallelism = &quot;future&quot;</code>) <code>drake</code> creates a <a href="https://github.com/ropensci/drake/blob/master/R/priority_queue.R">priority queue</a> to schedule targets so they run in parallel at the right times. For the sake of convenience, the underlying algorithms are different than that of a classical <a href="https://en.wikipedia.org/wiki/Priority_queue">priority queue</a>, but this does not seem to decrease performance in practice.</p>
+</div>
+<div id="metadata" class="section level3">
+<h3><span class="header-section-number">B.2.6</span> Metadata</h3>
+<p><code>config$meta</code> is an environment, and each element is a list of class <code>&quot;drake_meta&quot;</code>. Whereas the workflow specification identifies the <em>names</em> of dependencies, the <code>&quot;drake_meta&quot;</code> lists keep track of the <em>state</em> of each dependency and other metadata. The purpose is to compactly fingerprint each target so <code>drake</code> can quickly decide which targets are up to date and which are invalidated. <code>drake</code> stores the metadata of each target in a special <code>&quot;meta&quot;</code> namespace of the decorated <code>storr</code>.</p>
 
+</div>
 </div>
 </div>
 
