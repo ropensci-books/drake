@@ -13,21 +13,21 @@ library(tidyverse)
 This chapter explains `drake`'s internal design and architecture. Goals:
 
 1. Help developers and enthusiastic users contribute to the [code base](https://github.com/ropensci/drake).
-2. [Invite discussion](https://github.com/ropensci/drake/issues) about potential improvements to the overall design.
+2. [Invite discussion](https://github.com/ropensci/drake/issues) about potential improvements to the overall design, including appropriate design patterns and algorithms.
 
 ## Principles
 
 ### Functions first
 
-From a user's point of view, `drake` is an [opinionated style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). This style harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
+From the user's point of view, `drake` is a [style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). It harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
 
 ### Specialized classes
 
-Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)) caches some targets, and then drops its state when it terminates. A `drake` workflow has no need for a persistent in-memory state or an overarching user-side object-oriented interface.
+Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)), caches some targets, and then drops its internal state when it terminates. The state does not need to persist, and the user does not need to interact with it. This is part of why object-oriented programming plays such a small, supporting role.
 
-Instead, object-oriented programming serves a supporting role. Classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), the [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and logger [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) system appears far more often, but primarily as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow and encapsulate patterns of execution.
+In `drake`, classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and logger [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) system appears far more often, but chiefly as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow.
 
-In future development, small classes will continue to arise as needed to encapsulate low-level patterns in natural abstractions. They will gradually make the code base more elegant while prioritizing runtime efficiency and minimizing overengineering.
+In future development, small classes will continue to arise as needed to encapsulate low-level patterns into natural abstractions. However, `drake`'s design places greater importance on maximizing runtime efficiency and minimizing overengineering.
 
 ### Simple objects
 
