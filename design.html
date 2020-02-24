@@ -503,6 +503,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="environments" class="section level3">
 <h3><span class="header-section-number">B.2.8</span> Environments</h3>
+<p><code>drake</code> has <a href="memory.html#memory">memory management strategies</a> to make sure a target’s dependencies are in memory when <code>make()</code> runs its command. Internally, it <a href="https://github.com/ropensci/drake/blob/master/R/manage_memory.R">manages in-memory objects</a> with a layered system of environments. This system helps <code>make()</code> protect the user’s calling environment and perform dynamic branching without the need for static code analysis or metaprogramming.</p>
+<ol style="list-style-type: decimal">
+<li><code>config$envir</code>: the calling environment of <code>make()</code>, which contains the user’s functions and other imported objects. <code>make()</code> tries to leave this environment alone (and temporarily locks it when <code>lock_envir</code> is <code>TRUE</code>).</li>
+<li><code>config$envir_targets</code>: contains static targets. Its parent is <code>config$envir</code>.</li>
+<li><code>config$dynamic</code>: contains entire aggregated dynamic targets when <code>drake</code> needs them. Its parent is <code>config$envir_targets</code>.</li>
+<li><code>config$envir_subtargets</code>: contains individual sub-targets. Its parent is <code>config$envir_dynamic</code>.</li>
+</ol>
+<p>In addition, <code>config$envir_loaded</code> keeps track of which targets are loaded in (2), (3), and (4) above.</p>
 </div>
 <div id="hash-tables" class="section level3">
 <h3><span class="header-section-number">B.2.9</span> Hash tables</h3>
