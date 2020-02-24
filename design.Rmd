@@ -83,6 +83,15 @@ Other `storr` backends like `storr_environment()` and `storr_dbi()` are also com
 
 ### Environments
 
+`drake` has [memory management strategies](#memory) to make sure a target's dependencies are in memory when `make()` runs its command. Internally, it [manages in-memory objects](https://github.com/ropensci/drake/blob/master/R/manage_memory.R) with a layered system of environments. This system helps `make()` protect the user's calling environment and perform dynamic branching without the need for static code analysis or metaprogramming.
+
+1. `config$envir`: the calling environment of `make()`, which contains the user's functions and other imported objects. `make()` tries to leave this environment alone (and temporarily locks it when `lock_envir` is `TRUE`).
+2. `config$envir_targets`: contains static targets. Its parent is `config$envir`.
+3. `config$dynamic`: contains entire aggregated dynamic targets when `drake` needs them. Its parent is `config$envir_targets`.
+4. `config$envir_subtargets`: contains individual sub-targets. Its parent is `config$envir_dynamic`.
+
+In addition, `config$envir_loaded` keeps track of which targets are loaded in (2), (3), and (4) above.
+
 ### Hash tables
 
 ### Logger
