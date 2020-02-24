@@ -94,6 +94,21 @@ In addition, `config$envir_loaded` keeps track of which targets are loaded in (2
 
 ### Hash tables
 
+The `drake_config()` object and decorated `storr` keep track of multiple hash tables to cache data in memory and boost speed while iterating over large collections of targets. They are simply R environments with `hash = TRUE`, and `drake` has [internal interface functions](https://github.com/ropensci/drake/blob/master/R/hash_tables.R) for working with them. Examples in `drake_config()` objects:
+
+* `ht_is_dynamic`: keeps track of names of dynamic targets. Makes `is_dynamic()` faster.
+* `ht_is_subtarget`: same as above, but for `is_subtarget()`.
+* `ht_dynamic_deps`: names of dynamic dependencies of dynamic targets. Powers `is_dynamic_dep()`.
+* `ht_target_exists`: tracks targets that already exist at the beginning of `make()`.
+* `ht_subtarget_parents`: keeps track of the parent of each sub-target.
+
+Examples in the decorated `storr`:
+
+* `ht_encode_path` and `ht_decode_path`: `drake` uses Base32 encoding to store references to static file paths. These hash tables avoid redundant encoding/decoding operations and increases performance for large collections of targets.
+* `ht_encode_namespaced` and `ht_decode_namespaced`: same for imported namespaced functions.
+* `ht_hash`: powers `memo_hash()`, which helps us avoid redundant calls to `input_file_hash()`, `output_file_hash()`, `static_dependency_hash()`, and `dynamic_dependency_hash()`. 
+
+
 ### Logger
 
 The [logger](https://github.com/ropensci/drake/blob/master/R/logger.R) (`config$logger`) is a reference class that controls messages to the console and a custom log file) if applicable). Logging messages help users informally monitor the progress of `make()`.
