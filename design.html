@@ -514,6 +514,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="hash-tables" class="section level3">
 <h3><span class="header-section-number">B.2.9</span> Hash tables</h3>
+<p>The <code>drake_config()</code> object and decorated <code>storr</code> keep track of multiple hash tables to cache data in memory and boost speed while iterating over large collections of targets. They are simply R environments with <code>hash = TRUE</code>, and <code>drake</code> has <a href="https://github.com/ropensci/drake/blob/master/R/hash_tables.R">internal interface functions</a> for working with them. Examples in <code>drake_config()</code> objects:</p>
+<ul>
+<li><code>ht_is_dynamic</code>: keeps track of names of dynamic targets. Makes <code>is_dynamic()</code> faster.</li>
+<li><code>ht_is_subtarget</code>: same as above, but for <code>is_subtarget()</code>.</li>
+<li><code>ht_dynamic_deps</code>: names of dynamic dependencies of dynamic targets. Powers <code>is_dynamic_dep()</code>.</li>
+<li><code>ht_target_exists</code>: tracks targets that already exist at the beginning of <code>make()</code>.</li>
+<li><code>ht_subtarget_parents</code>: keeps track of the parent of each sub-target.</li>
+</ul>
+<p>Examples in the decorated <code>storr</code>:</p>
+<ul>
+<li><code>ht_encode_path</code> and <code>ht_decode_path</code>: <code>drake</code> uses Base32 encoding to store references to static file paths. These hash tables avoid redundant encoding/decoding operations and increases performance for large collections of targets.</li>
+<li><code>ht_encode_namespaced</code> and <code>ht_decode_namespaced</code>: same for imported namespaced functions.</li>
+<li><code>ht_hash</code>: powers <code>memo_hash()</code>, which helps us avoid redundant calls to <code>input_file_hash()</code>, <code>output_file_hash()</code>, <code>static_dependency_hash()</code>, and <code>dynamic_dependency_hash()</code>.</li>
+</ul>
 </div>
 <div id="logger" class="section level3">
 <h3><span class="header-section-number">B.2.10</span> Logger</h3>
