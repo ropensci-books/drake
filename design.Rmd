@@ -19,7 +19,7 @@ This chapter explains `drake`'s internal design and architecture. Goals:
 
 ### Functions first
 
-From the user's point of view, `drake` is a [style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). It harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R langauge. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
+From the user's point of view, `drake` is a [style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). It harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R language. Functions are first-class citizens in `drake`, and they dominate the design at the highest levels.
 
 ### Specialized classes
 
@@ -31,61 +31,61 @@ In future development, small classes will continue to arise as needed to encapsu
 
 ### Simple objects
 
-`drake` has a strong bias towards simple internal data. Either the data structures are complicated (e.g. object-oriented as above) or large, but not both.
+`drake` tries to keep its internal data simple. Either the data structures are intricate (e.g. object-oriented as above) or large, but not both.
 
-The large data structures in `drake` usually summarize a single type of information across all targets. Examples include the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R), the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), and the numerous hash tables in the [`drake_config()` object](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/make.R#L278-L286) and the [decorated `storr`](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/decorate_storr.R#L19-L24). These objects make it straightforward to analyze dependency relationships among targets, iterate over large collections of targets, and enhance runtime performance in general.
+The large data structures in `drake` usually summarize a single type of information across all targets. Examples include the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R), the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), and the numerous hash tables in the [`drake_config()` object](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/make.R#L278-L286) and the [decorated `storr`](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/decorate_storr.R#L19-L24). These objects make it straightforward to analyze dependency relationships, iterate over targets, and improve performance.
 
-### Sharing
+### Access
 
-`drake` workflows are all about dependency relationships among targets and commands. Even as `drake` focuses on a single target to run, it needs to stay aware of all the other targets and how they relate to one another. This is true not only to construct the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R) and the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but especially for [dynamic branching](#dynamic), where `drake` needs to create new *sub-targets* while `make()` is running. This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
+`drake` aggressively analyzes dependency relationships among targets. Even while `make()` builds a single target, it needs to stay aware of the others, not only to build the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but also for other tasks like [dynamic branching](#dynamic). This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
 
 ## Objects
 
-This section has high-level descriptions of the primary internal data objects. It is not exhaustive, but it does cover most of the architecture.
+This section describes `drake`'s primary internal data objects at a high level. It is not exhaustive, but it does cover most of the architecture.
 
 ### Config
 
-`make()`, `outdated()`, `vis_drake_graph()`, and related utilities use a [`drake_config()`](https://docs.ropensci.org/drake/reference/drake_config.html) object to represent the entire state of a workflow. (Users should [almost](https://docs.ropensci.org/drake/reference/r_make.html) never invoke `drake_config()` directly.) A `drake_config()` object is a list of class `"drake_config"`, and its only purpose is to carry around the other data objects and operational parameters. It gives internal functions the information they need while keeping the argument lists small.
+`make()`, `outdated()`, `vis_drake_graph()`, and related utilities keep track of a [`drake_config()`](https://docs.ropensci.org/drake/reference/drake_config.html) object. A `drake_config()` object is a list of class `"drake_config"`, and its only purpose is to carry around all the other data objects and operational parameters. It gives internal functions the information they need and helps keep argument lists small.
 
 ### Plan
 
-The `drake` plan is a simple data frame of class `"drake_plan"`, and it is `drake`'s version of a Makefile. The manual has a [whole chapter](#plans) devoted to plans.
+The `drake` plan is a simple data frame of class `"drake_plan"`, and it is `drake`'s version of a Makefile. The manual has a [whole chapter](#plans) on plans.
 
 ### Specification
 
-A `drake` plan is an *implicit* representation of dependency relationships among targets, functions, files, and other objects. Before `make()` really gets going, it needs to make this dependency structure *explicit* and machine-readable in a [workflow `specification`](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R). This specification (`config$spec`) an R environment with a workflow specification of each individual target and each imported object/function. Each item-specific specification is a list of class `"drake_spec"`, and it contains the things `drake` learned about it from the plan and the user's environment: the names of objects referenced from the command, files declared with `file_in()`, dependencies of the `condition` and `change` triggers, the item's role as a target or imported object, etc.
+A `drake` plan is an *implicit* representation of targets and their immediate dependencies. Before `make()` starts to build targets, `drake` makes all these local dependency structures *explicit* and machine-readable in a [workflow `specification`](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R). The overall specification (`config$spec`) an R environment with the local specification of each individual target and each imported object/function. Each local specification is a list of class `"drake_spec"`, and it contains the names of objects referenced from the command, the files declared with `file_in()` and friends, the dependencies of the `condition` and `change` triggers, etc.
 
 ### Graph
 
-Using the specification, `drake` [creates an `igraph` object](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R) to represent the order in which targets need to run. The purpose is to schedule targets. `make()` uses the graph to identify dependencies quickly and to run the correct targets in the correct order.
+Whereas the specification tracks the *local* dependency structures, the graph (an `igraph` object) represents the *global* dependency structure of the whole workflow. It is less granular than the specification, and `make()` uses it to run the correct targets in the correct order.
 
 ### Priority queue
 
-In high-performance computing settings (e.g. `parallelism = "clustermq"` and `parallelism = "future"`) `drake` creates a [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R) to schedule targets so they run in parallel at the right times. For the sake of convenience, the underlying algorithms are different than that of a classical [priority queue](https://en.wikipedia.org/wiki/Priority_queue), but this does not seem to decrease performance in practice.
+In high-performance computing settings (e.g. `parallelism = "clustermq"` and `parallelism = "future"`) `drake` creates a [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R) to schedule targets. For the sake of convenience, the underlying algorithms are different than that of a classical [priority queue](https://en.wikipedia.org/wiki/Priority_queue), but this does not seem to decrease performance in practice.
 
 ### Metadata
 
-`config$meta` is an environment, and each element is a list of class `"drake_meta"`. Whereas the workflow specification identifies the *names* of dependencies, the `"drake_meta"` lists keep track of the *state* of each dependency and other metadata. The purpose is to compactly fingerprint each target so `drake` can quickly decide which targets are up to date and which are invalidated. `drake` stores the metadata of each target in a special `"meta"` namespace of the decorated `storr`.
+`config$meta` is an environment, and each element is a list of class `"drake_meta"`. Whereas the workflow specification identifies the *names* of dependencies, the `"drake_meta"` contains *hashes* (and supporting information). `drake` uses the hashes decide if the target is up to date. Metadata lists are stored in the `"meta"` namespace of the decorated `storr`.
 
-`config$meta_old` is similar to `config$meta` for old metadata from previous calls to `make()`.
+`config$meta_old` is similar to `config$meta` and exists for performance purposes.
 
 ### Cache
 
 #### API
 
-`drake`'s cache API is a [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), a reference class that wraps around a [`storr`](github.com/richfitz/storr) object. `drake` makes heavy use of `storr` namespaces. Most target values are stored in the default namespace, but there are other namespaces for metadata lists and keys to power data recovery. `drake`'s custom wrapper around the `storr` class (i.e. the "decorated" part) has extra methods that power history (a [`txtq`](https://github.com/wlandau/txtq)) and [specialized data formats](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets), as well as hash tables that only the cache needs.
+`drake`'s cache API is a [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), a reference class that wraps around a [`storr`](github.com/richfitz/storr) object. `drake` relies heavily on `storr` namespaces (e.g. for metadata and recovery keys). `drake`'s custom wrapper around the `storr` class (i.e. the "decorated" part) has extra methods that power history (a [`txtq`](https://github.com/wlandau/txtq)) and [specialized data formats](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets), as well as hash tables that only the cache needs.
 
 The `new_cache()` and `drake_cache()` functions create and reload `drake` caches, respectively, and they are equivalent to `storr::storr_rds()` plus `drake:::decorate_storr()`.
 
 #### Data
 
-Usually, the persistent data values live in a hidden `.drake/` folder (). Most of the files are generated by  [`storr_rds()`](http://richfitz.github.io/storr/reference/storr_rds.html) methods. Other files include the history [`txtq`](https://github.com/wlandau/txtq) and the values of targets with [specialized data formats](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets). The files are structured so they can be used by either with `storr_rds()` or `drake::drake_cache()`.
+Usually, the persistent data values live in a hidden `.drake/` folder. Most of the files come from [`storr_rds()`](http://richfitz.github.io/storr/reference/storr_rds.html) methods. Other files include the history [`txtq`](https://github.com/wlandau/txtq) and the values of targets with [specialized data formats](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets). The files are structured so they can be used by either with `storr::storr_rds()` or `drake::drake_cache()`.
 
-Other `storr` backends like `storr_environment()` and `storr_dbi()` are also compatible with this approach. In this case, `.drake/` does not contain the files of the inner `storr`, but it does have files supporting history and specialized target formats. 
+Other `storr` backends like `storr_environment()` and `storr_dbi()` are also compatible with this approach. In these non-standard cases, `.drake/` does not contain the files of the inner `storr`, but it still has files supporting history and specialized target formats. 
 
 ### Environments
 
-`drake` has [memory management strategies](#memory) to make sure a target's dependencies are in memory when `make()` runs its command. Internally, it [manages in-memory objects](https://github.com/ropensci/drake/blob/master/R/manage_memory.R) with a layered system of environments. This system helps `make()` protect the user's calling environment and perform dynamic branching without the need for static code analysis or metaprogramming.
+`drake` has [memory management strategies](#memory) to make sure a target's dependencies are loaded when `make()` runs its command. Internally, [memory management](https://github.com/ropensci/drake/blob/master/R/manage_memory.R) works with a layered system of environments. This system helps `make()` protect the user's calling environment and perform dynamic branching without the need for static code analysis or metaprogramming.
 
 1. `config$envir`: the calling environment of `make()`, which contains the user's functions and other imported objects. `make()` tries to leave this environment alone (and temporarily locks it when `lock_envir` is `TRUE`).
 2. `config$envir_targets`: contains static targets. Its parent is `config$envir`.
@@ -109,7 +109,7 @@ Examples in the decorated `storr`:
 * `ht_encode_path` and `ht_decode_path`: `drake` uses Base32 encoding to store references to static file paths. These hash tables avoid redundant encoding/decoding operations and increases performance for large collections of targets.
 * `ht_encode_namespaced` and `ht_decode_namespaced`: same for imported namespaced functions.
 * `ht_hash`: powers `memo_hash()`, which helps us avoid redundant calls to `input_file_hash()`, `output_file_hash()`, `static_dependency_hash()`, and `dynamic_dependency_hash()`. 
-* `ht_keys`: a small hash table that poweres the `set_progress` method. This progress information is stored in the cache by default, and the user can retrieve it with `progress()`.
+* `ht_keys`: a small hash table that powers the `set_progress` method. This progress information is stored in the cache by default, and the user can retrieve it with `progress()`.
 
 ### Logger
 
