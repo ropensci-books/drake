@@ -46,15 +46,14 @@ print(plan)
 ```
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 If you call `make(plan)` with no additional arguments, `drake` will try to load all the datasets into the same R session. Each dataset from `generate_large_data(n = 1e8)` occupies about 2.4 GB of memory, and most machines cannot handle all the data at once. We should use memory more wisely.
 
 ## Garbage collection and custom files
 
-`make()` and `drake_config()` have a `garbage_collection` argument, which tells `drake` to periodically unload data objects that no longer belong to variables. You can also run garbage collection manually with the `gc()` function. For more on garbage collection, please refer to the [memory usage chapter of Advanced R](http://adv-r.had.co.nz/memory.html#gc).
+`make()` has a `garbage_collection` argument, which tells `drake` to periodically unload data objects that no longer belong to variables. You can also run garbage collection manually with the `gc()` function. For more on garbage collection, please refer to the [memory usage chapter of Advanced R](http://adv-r.had.co.nz/memory.html#gc).
 
 Let's reduce the memory consumption of our example workflow:
 
@@ -94,8 +93,7 @@ print(plan)
 ```
 
 ```{r}
-config <- drake_config(plan)
-vis_drake_graph(config)
+vis_drake_graph(plan)
 ```
 
 ```{r, eval = FALSE}
@@ -104,7 +102,7 @@ make(plan, garbage_collection = TRUE)
 
 ## Memory strategies
 
-`make()` and `drake_config()` have a `memory_strategy` argument to customize how `drake` loads and unloads targets. With the right memory strategy, you can rely on `drake`'s built-in caching system without having to bother with messy `file_out()` files.
+`make()` has a `memory_strategy` argument to customize how `drake` loads and unloads targets. With the right memory strategy, you can rely on `drake`'s built-in caching system without having to bother with messy `file_out()` files.
 
 Each memory strategy follows three stages for each target:
 
@@ -172,7 +170,7 @@ Now, we can build our targets.
 make(plan, memory_strategy = "none", garbage_collection = TRUE)
 ```
 
-But there is a snag: we needed to manually load `means` in the command for `summ` (notice the call to `loadd()`). This is annoying, especially because `means` is quite small. Fortunately, `drake` lets you define different memory strategies for different targets in the plan. The target-specific memory strategies override the global one (i.e. the `memory_strategy` argument of `make()` and `drake_config()`).
+But there is a snag: we needed to manually load `means` in the command for `summ` (notice the call to `loadd()`). This is annoying, especially because `means` is quite small. Fortunately, `drake` lets you define different memory strategies for different targets in the plan. The target-specific memory strategies override the global one (i.e. the `memory_strategy` argument of `make()`).
 
 ```{r}
 plan <- drake_plan(

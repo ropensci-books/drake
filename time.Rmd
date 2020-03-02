@@ -1,4 +1,4 @@
-# Time: logging, prediction, and strategy {#time}
+# Time: speed, time logging, prediction, and strategy {#time}
 
 ```{r, message = FALSE, warning = FALSE, echo = FALSE}
 knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
@@ -10,6 +10,39 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 ```
+
+## Why is `drake` so slow?
+
+### Help us find out!
+
+If you encounter slowness, please report it to <https://github.com/ropensci/drake/issues> and we will do our best to speed up `drake` for your use case. Please include a [reproducible example](https://github.com/tidyverse/reprex) and tell us about your operating system and version of R. In addition, flame graphs from the [`proffer`](https://github.com/r-prof/proffer) package really help us identify bottlenecks.
+
+### Too many targets?
+
+`make()` and friends tend to slow down if you have a huge number of targets. There are unavoidable overhead costs from storing each single target and checking if it is up to date, so please read [this advice on choosing good targets](https://books.ropensci.org/drake/plans.html#how-to-choose-good-targets) and consider dividing your work into a manageably small number of meaningful targets. [Dynamic branching](#dynamic) can also help in many cases.
+
+### Big data?
+
+`drake` saves the return value of each target to [on disk storage](#storage). So in addition to [dividing your work into a smaller number of targets](https://books.ropensci.org/drake/plans.html#how-to-choose-good-targets), [specialized storage formats](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets) can help speed things up. It may also be worth reflecting on how much data you really need to store. And if the cache is too big, the [storage chapter](#storage) has advice for downsizing it.
+
+### Aggressive shortcuts
+
+If your plan *still* needs tens of thousands of targets, you can take aggressive shortcuts to make things run faster.
+
+```{r, eval = FALSE}
+make(
+  plan,
+  verbose = 0L, # Console messages can pile up runtime.
+  log_progress = FALSE, # progress() will be useless.
+  log_build_times = FALSE, # build_times() will be useless.
+  recoverable = FALSE, # make(recover = TRUE) cannot be used later.
+  history = FALSE, # drake_history() cannot be used later.
+  session_info = FALSE, # drake_get_session_info() cannot be used later.
+  lock_envir = FALSE, # See https://docs.ropensci.org/drake/reference/make.html#self-invalidation.
+)
+```
+
+## Time logging
 
 ```{r, message = FALSE, warning = FALSE, echo = FALSE}
 library(drake)
@@ -33,8 +66,7 @@ build_times(starts_with("coef"), digits = 8)
 `drake` uses these times to predict the runtime of the next `make()`. At this moment, everything is up to date in the current example, so the next `make()` should ideally take no time at all (except for preprocessing overhead).
 
 ```{r}
-config <- drake_config(my_plan, verbose = 0L)
-predict_runtime(config)
+predict_runtime(my_plan)
 ```
 
 Suppose we change a dependency to make some targets out of date. Now, the next `make()` should take longer since some targets are out of date.
@@ -45,13 +77,13 @@ reg2 <- function(d){
   lm(y ~ x3, data = d)
 }
 
-predict_runtime(config)
+predict_runtime(my_plan)
 ```
 
 And what if you plan to delete the cache and build all the targets from scratch?
 
 ```{r}
-predict_runtime(config, from_scratch = TRUE)
+predict_runtime(my_plan, from_scratch = TRUE)
 ```
 
 ## Strategize your high-performance computing
@@ -71,7 +103,7 @@ How many parallel jobs should you use in the next `make()`? The `predict_runtime
 time <- c()
 for (jobs in 1:12){
   time[jobs] <- predict_runtime(
-    config,
+    my_plan,
     jobs = jobs,
     from_scratch = TRUE,
     known_times = known_times

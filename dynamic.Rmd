@@ -58,17 +58,27 @@ plan <- drake_plan(
 make(plan)
 ```
 
-Thanks to [`vctrs`](https://vctrs.r-lib.org/), the data type of every sub-target is the same as the dynamic target it belongs to. In other words, `model` and `model_23022788` are both data frames. To understand how `drake` splits and aggregates dynamic targets, see functions [`vec_size()`](https://vctrs.r-lib.org/reference/vec_size.html),   [`vec_slice()`](https://vctrs.r-lib.org/reference/vec_slice.html), and [`vec_c()`](https://vctrs.r-lib.org/reference/vec_c.html).
+Thanks to [`vctrs`](https://vctrs.r-lib.org/), the data type of every sub-target is the same as the dynamic target it belongs to. In other words, `model` and `model_23022788` are both data frames. To understand how `drake` splits and concatenates dynamic targets, see functions [`vec_size()`](https://vctrs.r-lib.org/reference/vec_size.html),   [`vec_slice()`](https://vctrs.r-lib.org/reference/vec_slice.html), and [`vec_c()`](https://vctrs.r-lib.org/reference/vec_c.html).
 
 ```{r}
 readd(model)
 ```
 
+If automatic concatenation of sub-targets is confusing (e.g. if some sub-targets are `NULL`, as in <https://github.com/ropensci-books/drake/issues/142>) you can read the dynamic target as a named list (only in `drake` version 7.10.0 and above).
+
 ```{r}
+readd(model, subtarget_list = TRUE) # Requires drake >= 7.10.0.
+```
+
+Alternatively, you can work with the individual sub-targets.
+
+```{r}
+subtargets(model)
+
 readd(model_23022788) # equivalent: readd(model, subtargets = 1)
 ```
 
-Likewise, when we write `dynamic = map(continents)` in the plan, `drake` treats `continents` as a [vector](https://vctrs.r-lib.org/). In other words, `target(fit_model(continents), dynamic = map(continents))` is equivalent to commands `fit_model(continents[1])` through `fit_model(continents[5])`. Since `continents` is really a list of data frames, `continents[1]` through `continents[5]` are also lists of data frames, which is why we need the line `data <- continent_data[[1]]` in `fit_model()`. This may seem inconvenient at first, but it comes with extra type stability, and it allows us to reference a dynamic target and its sub-targets interchangeably.
+But automatic concatenation with `vctrs` is the default behavior, and it is how `drake` thinks about downstream targets. In our example, when we write `dynamic = map(continents)` in the plan, `drake` treats `continents` as a [vector](https://vctrs.r-lib.org/). In other words, `target(fit_model(continents), dynamic = map(continents))` is equivalent to commands `fit_model(continents[1])` through `fit_model(continents[5])`. Since `continents` is really a list of data frames, `continents[1]` through `continents[5]` are also lists of data frames, which is why we need the line `data <- continent_data[[1]]` in `fit_model()`. This may seem inconvenient at first, but it comes with extra type stability, and it allows us to reference a dynamic target and its sub-targets interchangeably.
 
 To post-process our models, we can work with either the individual sub-targets or the whole vector of all the models. Below, `year` uses the former and `intercept` uses the latter.
 

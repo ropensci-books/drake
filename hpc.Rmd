@@ -23,8 +23,7 @@ When it comes time to activate high-performance computing, `drake` launches its 
 
 ```{r}
 load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
-config <- drake_config(my_plan)
-vis_drake_graph(config)
+vis_drake_graph(my_plan)
 ```
 
 You do not need to not micromanage how targets are scheduled, and you do not need to run simultaneous instances of `make()`.
@@ -57,7 +56,7 @@ make(
 
 Then, we create a shell script (say, `run.sh`) to call `make.R`. This script may look different if you use a different scheduler such as [SLURM](https://slurm.schedmd.com).
 
-```{bash, hpcremotemaster2, eval = FALSE}
+```{bash, eval = FALSE}
 # run.sh
 #!/bin/bash
 #$ -j y       # combine stdout/error in one file
@@ -70,7 +69,7 @@ R --no-save CMD BATCH make.R
 
 Finally, to run the whole workflow, we call `qsub`.
 
-```{bash, hpcremotemaster3, eval = FALSE}
+```{bash, eval = FALSE}
 qsub run.sh
 ```
 
@@ -138,7 +137,7 @@ Set the [`clustermq`](https://github.com/mschubert/clustermq) global options to 
 options(clustermq.scheduler = "slurm", clustermq.template = "slurm_clustermq.tmpl")
 ```
 
-Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/master/inst/hpc_template_files) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
+Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/master/inst/templates/hpc) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
 
 ```{r, eval = FALSE}
 drake_hpc_template_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.

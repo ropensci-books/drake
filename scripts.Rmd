@@ -116,8 +116,7 @@ simple_plan <- drake_plan(
 It's a start, but right now, `drake` has no idea which targets to run first and which need to wait for dependencies! In the following graph, there are no edges (arrows) connecting the targets!
 
 ```{r}
-simple_config <- drake_config(simple_plan)
-vis_drake_graph(simple_config)
+vis_drake_graph(simple_plan)
 ```
 
 
@@ -141,8 +140,7 @@ script_based_plan <- drake_plan(
 ```
 
 ```{r}
-script_based_config <- drake_config(script_based_plan)
-vis_drake_graph(script_based_config)
+vis_drake_graph(script_based_plan)
 ```
 
 ## Run the workflow
@@ -190,9 +188,9 @@ Targets `hist` and `report` depend on the code we modified, so `drake` marks
 those targets as outdated.
 
 ```{r message = FALSE}
-outdated(script_based_config)
+outdated(script_based_plan)
 
-vis_drake_graph(script_based_config, targets_only = TRUE)
+vis_drake_graph(script_based_plan, targets_only = TRUE)
 ```
 
 When you call `make()`, `drake` runs `make_histogram()` because the underlying 
@@ -206,7 +204,7 @@ make(script_based_plan)
 All the targets are now up to date!
 
 ```{r}
-vis_drake_graph(script_based_config, targets_only = TRUE)
+vis_drake_graph(script_based_plan, targets_only = TRUE)
 ```
 
 ## Final thoughts
