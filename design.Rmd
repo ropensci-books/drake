@@ -25,25 +25,25 @@ From the user's point of view, `drake` is a [style of programming](https://books
 
 Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)), caches some targets, and then drops its internal state when it terminates. The state does not need to persist, and the user does not need to interact with it. This is a major reason why traditional object-oriented programming plays such a small, supporting role.
 
-In `drake`, classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and [logger](https://github.com/ropensci/drake/blob/master/R/logger.R) [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) appears far more often, but chiefly as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow.
+In `drake`, full OOP classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and [logger](https://github.com/ropensci/drake/blob/master/R/logger.R) [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) appears far more often, often as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow, and also as a means of adding structure and validation to small target-specific objects optimized for performance.
 
-In future development, small classes will continue to arise as needed to encapsulate low-level patterns into natural abstractions. However, `drake`'s design places greater importance on maximizing runtime efficiency and minimizing overengineering.
+In future development, tactical reference classes will arise as needed to encapsulate low-level patterns into natural abstractions. However, `drake`'s design places greater importance on maximizing runtime efficiency.
 
 ### High-performant small objects
 
-`drake` maintains several small list-like objects for each target, such as the local spec, the target data, triggers, and the code analysis results. `drake` workflows with thousands of targets have thousands of these objects, and as profiling studies have shown, we need these objects to perform as efficiently as possible. Instantiation and field access need to be fast, and the memory footprint needs to be low. For these reasons, we choose simple lists with S3 classes, which outclass S4 and reference classes when it comes to instantiation speed.
+`drake` maintains several small list-like objects for each target, such as the local spec, the target data, triggers, and the code analysis results. `drake` workflows with thousands of targets have thousands of these objects, and as [profiling](https://github.com/r-prof/proffer) studies have shown, we need these objects to perform as efficiently as possible. Instantiation and field access need to be fast, and the memory footprint needs to be low. For these reasons, we choose simple lists with S3 class attributes, which outclass S4 and reference classes when it comes to instantiation speed.
 
-### Fast aggregates
+### Fast iteration along aggregated data
 
-The large data structures aggregate a single type of information across all targets to help `drake` run fast. Examples include the [whole workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R) (`config$spec`) and the in-memory target metadata cache (`config$meta`). These objects are hash-table-powered environments to make field access as fast as possible.
+Each of the large data structures aggregates a single type of information across all targets to help `drake` run fast. Examples include the [whole workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R) (`config$spec`) and the in-memory target metadata cache (`config$meta`). These objects are hash-table-powered environments to make field access as fast as possible.
 
 ### Access to information across targets
 
-`drake` aggressively analyzes dependency relationships among targets. Even while `make()` builds a single target, it needs to stay aware of the other targets, not only to build the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but also for other tasks like [dynamic branching](#dynamic). This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
+`drake` aggressively analyzes dependency relationships among targets. Even while `make()` builds a single target, it needs to stay aware of the other targets, not only to build the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but also for other tasks like [dynamic branching](#dynamic). This is a major reason why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
 
 ## Specific classes
 
-This section describes `drake`'s primary internal data objects at a high level. It is not exhaustive, but it does cover most of the architecture.
+This section describes `drake`'s primary internal data structures at a high level. It is not exhaustive, but it does cover most of the architecture.
 
 ### Config
 
