@@ -221,10 +221,10 @@ plot(plan)
 
 ### Limitations of grouping variables
 
-The forward propagation of grouping variables is powerful, but it can easily go wrong. You should 
+The forward propagation of grouping variables is powerful, but it can easily go wrong. Rules:
 
-1. Define each grouping variable only once, and
-2. Propagate the grouping variable in a direct linear downstream path.
+1. Define each grouping variable only once.
+2. Explicitly inherit grouping variables from targets that use them.
 
 In the following plan, we violate both (1) and (2). We violate (1) because we define `a1` twice: once for `b1` and again for `b2`. And we violate (2) because we bypass `b1` and` b2` when we propagate `a1` to `c1`. `a2` and `a3` have the same problems, and when we put it all together, `drake` does not know how to plan `c1`.
 
@@ -238,7 +238,7 @@ drake_plan(
 )
 ```
 
-Workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, you must still check, inspect, and visualize plans before running them.
+Workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, always check your plans before you run them.
 
 ## Tidy evaluation
 
