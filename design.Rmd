@@ -21,25 +21,27 @@ This chapter explains `drake`'s internal design and architecture. Goals:
 
 From the user's point of view, `drake` is a [style of programming](https://books.ropensci.org/drake/plans.html#intro-to-plans) in its own right, and that style is [zealously and irrevocably function-oriented](https://books.ropensci.org/drake/plans.html#functions). It harmonizes with statistics and data science, where most methodology naturally takes the form of data transformations, and it embraces the natively function-oriented design of the R language. Functions are first-class citizens in `drake`, and they dominate the internal design at the highest levels.
 
-### Specialized classes
+### Light use of traditional OOP
 
-Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)), caches some targets, and then drops its internal state when it terminates. The state does not need to persist, and the user does not need to interact with it. This is a major reason why object-oriented programming plays such a small, supporting role.
+Most of a `drake` workflow happens inside the `make()` function. `make()` accepts a data frame of function calls (the [`drake` plan](#plans)), caches some targets, and then drops its internal state when it terminates. The state does not need to persist, and the user does not need to interact with it. This is a major reason why traditional object-oriented programming plays such a small, supporting role.
 
 In `drake`, classes and objects are small, simple, and extremely specialized. For example, the [decorated `storr`](https://github.com/ropensci/drake/blob/master/R/decorate_storr.R), [priority queue](https://github.com/ropensci/drake/blob/master/R/priority_queue.R), and [logger](https://github.com/ropensci/drake/blob/master/R/logger.R) [reference classes](http://adv-r.had.co.nz/R5.html) are narrowly defined and fit for purpose. The [S3 system](http://adv-r.had.co.nz/S3.html) appears far more often, but chiefly as a mechanism of [function overloading](https://en.wikipedia.org/wiki/Function_overloading) to streamline control flow.
 
 In future development, small classes will continue to arise as needed to encapsulate low-level patterns into natural abstractions. However, `drake`'s design places greater importance on maximizing runtime efficiency and minimizing overengineering.
 
-### Simple objects
+### High-performant small objects
 
-`drake` tries to keep its internal data simple. Either the data structures are intricate (e.g. object-oriented as above) or large, but not both.
+`drake` maintains several small list-like objects for each target, such as the local spec, the target data, triggers, and the code analysis results. `drake` workflows with thousands of targets have thousands of these objects, and as profiling studies have shown, we need these objects to perform as efficiently as possible. Instantiation and field access need to be fast, and the memory footprint needs to be low. For these reasons, we choose simple lists with S3 classes, which outclass S4 and reference classes when it comes to instantiation speed.
 
-The large data structures in `drake` usually aggregate a single type of information across all targets. Examples include the [workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R), the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), and the numerous hash tables in the [`drake_config()` object](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/make.R#L278-L286) and the [decorated `storr`](https://github.com/ropensci/drake/blob/9bb212ee0512771e04a4bcbb9e9d8577458b27b9/R/decorate_storr.R#L19-L24). These objects make it straightforward to analyze dependency relationships, iterate over targets, and improve performance.
+### Iteration-friendly aggregates
 
-### Access
+The large data structures aggregate a single type of information across all targets to help `drake` run fast. Examples include the [whole workflow specification](https://github.com/ropensci/drake/blob/master/R/create_drake_spec.R) (`config$spec`) and the in-memory target metadata cache (`config$meta`). These objects are hash-table-powered environments to make field access as fast as possible.
+
+### Access to information across targets
 
 `drake` aggressively analyzes dependency relationships among targets. Even while `make()` builds a single target, it needs to stay aware of the other targets, not only to build the [dependency graph](https://github.com/ropensci/drake/blob/master/R/create_drake_graph.R), but also for other tasks like [dynamic branching](#dynamic). This is why the workflow specification, dependency graph, priority queue, and metadata are all stored in environments that most functions can reach.
 
-## Objects
+## Specific classes
 
 This section describes `drake`'s primary internal data objects at a high level. It is not exhaustive, but it does cover most of the architecture.
 
