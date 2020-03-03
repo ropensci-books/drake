@@ -221,7 +221,7 @@ plot(plan)
 
 ### Limitations of grouping variables
 
-Targets can reuse grouping variables defined in dependencies upstream, and this forward propagation is powerful. However, it can easily go wrong when the same grouping variable is defined in multiple places. In the plan below, there are multiple conflicting definitions of `a1`, `a2`, and `a3`, and `drake` does not know which one to use.
+Each grouping variable must be defined only once. In the plan below, there are multiple conflicting definitions of `a1`, `a2`, and `a3`, and `drake` does not know which one to use.
 
 ```{r}
 drake_plan(
@@ -233,7 +233,7 @@ drake_plan(
 )
 ```
 
-Workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic). Regardless, always check your plans before you run them.
+Other workarounds include `bind_plans()` (on separate sub-plans) and [dynamic branching](#dynamic).Always check your plans (`vis_drake_graph()` etc.) before you run them.
 
 ## Tidy evaluation
 
