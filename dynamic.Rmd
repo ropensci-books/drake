@@ -64,27 +64,28 @@ The data type of every sub-target is the same as the dynamic target it belongs t
 readd(model)
 ```
 
-This behavior is powered by the [`vctrs`](https://vctrs.r-lib.org/). A dynamic target like `model` above is really a "`vctr`" of sub-targets. Under the hood, the aggregated value of `model` is what you get from calling `vec_c()` on all the `model_*` sub-targets. And when you dynamically `map()` over an object, you are taking single-element slices with `vec_slice()`.
+This behavior is powered by the [`vctrs`](https://vctrs.r-lib.org/). A dynamic target like `model` above is really a "`vctr`" of sub-targets. Under the hood, the aggregated value of `model` is what you get from calling `vec_c()` on all the `model_*` sub-targets. When you dynamically `map()` over a non-dynamic object, you are taking slices with `vec_slice()`. (When you `map()` over a dynamic target, each element is a sub-target and `vec_slice()` is not necessary.)
 
 ```{r}
 library(vctrs)
 
 # same as readd(model)
+s <- subtargets(model)
 vec_c(
-  readd(model_c56e5407),
-  readd(model_706a1529),
-  readd(model_da843806),
-  readd(model_862f8003),
-  readd(model_ebb41f51)
+  readd(s[1], character_only = TRUE),
+  readd(s[2], character_only = TRUE),
+  readd(s[3], character_only = TRUE),
+  readd(s[4], character_only = TRUE),
+  readd(s[5], character_only = TRUE)
 )
 
 loadd(model)
 
-# first sub-target
-vec_slice(model, seq_len(1))
+# Second slice if you were to map() over mtcars.
+vec_slice(mtcars, 2)
 
-# second sub-target
-vec_slice(model, seq_len(1))
+# Fifth slice if you were to map() over letters.
+vec_slice(letters, 5)
 ```
 
 You can use `vec_c()` and `vec_slice()` to anticipate edge cases in dynamic branching.
@@ -103,7 +104,7 @@ subtarget2 <- c(3, 4)
 vec_c(subtarget1, subtarget2)
 ```
 
-In the plan, `target(fit_model(continents), dynamic = map(continents))` is equivalent to commands `fit_model(continents[1])` through `fit_model(continents[5])`. Since `continents` is really a list of data frames, `continents[1]` through `continents[5]` are also lists of data frames, which is why we need the line `data <- continent_data[[1]]` in `fit_model()`.
+Back in our plan, `target(fit_model(continents), dynamic = map(continents))` is equivalent to commands `fit_model(continents[1])` through `fit_model(continents[5])`. Since `continents` is really a list of data frames, `continents[1]` through `continents[5]` are also lists of data frames, which is why we need the line `data <- continent_data[[1]]` in `fit_model()`.
 
 To post-process our models, we can work with either the individual sub-targets or the whole vector of all the models. Below, `year` uses the former and `intercept` uses the latter.
 
@@ -140,7 +141,7 @@ Alternatively, you can work with the individual sub-targets.
 ```{r}
 subtargets(model)
 
-readd(model_23022788) # equivalent: readd(model, subtargets = 1)
+readd(model_c56e5407) # equivalent: readd(model, subtargets = 1)
 ```
 
 
