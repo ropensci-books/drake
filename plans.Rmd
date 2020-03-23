@@ -351,23 +351,76 @@ drake_plan(
 `file_in()`, `file_out()`, and `knitr_in()` require you to mention file and directory names *explicitly*. You cannot use a variable containing the name of a file.
 
 ```{r}
+prefix <- "eco_"
 bad_plan <- drake_plan(
-  file = "my_data.csv",
-  data = read_csv(file_in(file))
+  data = read_csv(file_in(paste0(prefix, "data.csv")))
 )
 
 vis_drake_graph(bad_plan)
+```
+
+```{r, include = FALSE}
+file.create("eco_data.csv")
 ```
 
 Instead, write this:
 
 ```{r}
 good_plan <- drake_plan(
-  file = read_csv(file_in("my_data.csv"))
+  file = read_csv(file_in("eco_data.csv"))
 )
 
 vis_drake_graph(good_plan)
 ```
+
+Or even the one below, which uses the `!!` ("bang-bang") tidy evaluation unquoting operator.
+
+```{r}
+prefix <- "eco_"
+drake_plan(
+  file = read_csv(file_in(!!paste0(prefix, "data.csv")))
+)
+```
+
+#### Do not use inside functions
+
+`file_out()` and `knitr_in()` should not be used inside imported functions because `drake` does not know how to deal with functions that depend on targets. Instead of this:
+
+```{r, eval = FALSE}
+f <- function() {
+  render(knitr_in("report.Rmd"), output_file = file_out("report.html"))
+}
+
+plan <- drake_plan(
+  y = f()
+)
+```
+
+Write this:
+
+```{r, eval = FALSE}
+plan <- drake_plan(
+  y = render(knitr_in("report.Rmd"), output_file = file_out("report.html"))
+)
+```
+
+Or this:
+
+```{r, eval = FALSE}
+f <- function(input, output) {
+  render(input, output_file = output)
+}
+
+plan <- drake_plan(
+  y = f(input = knitr_in("report.Rmd"), output = file_out("report.html"))
+)
+```
+
+`file_in()` can be used inside functions, but only for files that exist before you call `make()`.
+
+#### Incompatible with dynamic branching
+
+`file_out()` and `knitr_in()` deal with static output files, so they must not be used with [dynamic branching](#dynamic). As an alternative, consider dynamic files (described below). You can still use `file_in()`, but only for files that *all* the dynamic sub-targets depend on. (Changing a static input file dependency will invalidate all the sub-targets.)
 
 #### Database connections
 
