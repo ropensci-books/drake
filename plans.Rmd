@@ -348,7 +348,7 @@ drake_plan(
 
 #### Paths must be literal strings
 
-`file_in()`, `file_out()`, and `knitr_in()` require you to mention file and directory names *explicitly*. You cannot use a variable containing the name of a file.
+`file_in()`, `file_out()`, and `knitr_in()` require you to mention file and directory names *explicitly*. You cannot use a variable containing the name of a file. The reason is that `drake` detects dependency relationships with [static code analysis](http://adv-r.had.co.nz/Expressions.html#ast-funs). In other words, `drake` needs to know the names of all your files ahead of time (before we start building targets in `make()`). Here is an example of a bad plan.
 
 ```{r}
 prefix <- "eco_"
