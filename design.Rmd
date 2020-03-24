@@ -47,7 +47,11 @@ This section describes `drake`'s primary internal data structures at a high leve
 
 ### Config
 
-`make()`, `outdated()`, `vis_drake_graph()`, and related utilities keep track of a [`drake_config()`](https://docs.ropensci.org/drake/reference/drake_config.html) object. A `drake_config()` object is a list of class `"drake_config"`, and its only purpose is to carry around all the other data objects and operational parameters. It gives internal functions the information they need and helps keep argument lists small.
+`make()`, `outdated()`, `vis_drake_graph()`, and related utilities keep track of a [`drake_config()`](https://docs.ropensci.org/drake/reference/drake_config.html) object. A `drake_config()` object is a list of class `"drake_config"`. Its purpose is to keep track of the state of a `drake` workflow and avoid long parameter lists in functions. Future development will focus on refactoring and formalizing `drake_config()` objects.
+
+### Settings
+
+Static runtime parameters such as `keep_going` and `log_build_times` live in a list of class `drake_settings`, which is part of each `drake_config` object.
 
 ### Plan
 
@@ -85,6 +89,10 @@ Usually, the persistent data values live in a hidden `.drake/` folder. Most of t
 
 Other `storr` backends like `storr_environment()` and `storr_dbi()` are also compatible with this approach. In these non-standard cases, `.drake/` does not contain the files of the inner `storr`, but it still has files supporting history and specialized target formats. 
 
+### Code analysis lists
+
+`drake` performs static code analysis on functions and commands in order to resolve the dependency structure of a workflow. Lists of class `drake_deps` and `drake_deps_ht` store the results of static code analysis on a single code chunk. Each element of a `drake_deps` list is a character vector of static dependencies of a certain type (e.g. global variables or `file_in()` files). The elements of `drake_deps_ht` lists are hash tables (which increase performance when the static code analysis is running).
+
 ### Environments
 
 `drake` has [memory management strategies](#memory) to make sure a target's dependencies are loaded when `make()` runs its command. Internally, [memory management](https://github.com/ropensci/drake/blob/master/R/manage_memory.R) works with a layered system of environments. This system helps `make()` protect the user's calling environment and perform dynamic branching without the need for static code analysis or metaprogramming.
@@ -95,6 +103,8 @@ Other `storr` backends like `storr_environment()` and `storr_dbi()` are also com
 4. `config$envir_subtargets`: contains individual sub-targets. Its parent is `config$envir_dynamic`.
 
 In addition, `config$envir_loaded` keeps track of which targets are loaded in (2), (3), and (4) above.
+
+These environments form a known [data clump](https://refactoring.guru/smells/data-clumps), and future development will encapsulate them.
 
 ### Hash tables
 

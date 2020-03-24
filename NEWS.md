@@ -1,3 +1,5 @@
+## Version 7.11.0.9000
+
 ## Version 7.7.0.9002
 
 - Add a chapter called `scripts` describing `drake`'s approach to script-based workflows and using `code_to_function()`.(#41, @thebioengineer) 
