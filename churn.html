@@ -227,10 +227,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
 <li class="chapter" data-level="5.4.4" data-path="static.html"><a href="static.html#combine"><i class="fa fa-check"></i><b>5.4.4</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.4.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.4.5</b> Target names</a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5.1</b> Target names</a></li>
-</ul></li>
+<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
@@ -439,322 +438,322 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="packages" class="section level2">
 <h2><span class="header-section-number">9.1</span> Packages</h2>
 <p>First, we load our packages into a fresh R session.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb136-2" data-line-number="2"><span class="kw">library</span>(keras)</a>
-<a class="sourceLine" id="cb136-3" data-line-number="3"><span class="kw">library</span>(tidyverse)</a>
-<a class="sourceLine" id="cb136-4" data-line-number="4"><span class="kw">library</span>(rsample)</a>
-<a class="sourceLine" id="cb136-5" data-line-number="5"><span class="kw">library</span>(recipes)</a>
-<a class="sourceLine" id="cb136-6" data-line-number="6"><span class="kw">library</span>(yardstick)</a></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb137-2" data-line-number="2"><span class="kw">library</span>(keras)</a>
+<a class="sourceLine" id="cb137-3" data-line-number="3"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb137-4" data-line-number="4"><span class="kw">library</span>(rsample)</a>
+<a class="sourceLine" id="cb137-5" data-line-number="5"><span class="kw">library</span>(recipes)</a>
+<a class="sourceLine" id="cb137-6" data-line-number="6"><span class="kw">library</span>(yardstick)</a></code></pre></div>
 </div>
 <div id="functions-1" class="section level2">
 <h2><span class="header-section-number">9.2</span> Functions</h2>
 <p><a href="https://github.com/ropensci/drake"><code>drake</code></a> is R-focused and function-oriented. We create functions to <a href="https://github.com/tidymodels/recipes">preprocess the data</a>,</p>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1">prepare_recipe &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb137-2" data-line-number="2">  data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-3" data-line-number="3"><span class="st">    </span><span class="kw">training</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-4" data-line-number="4"><span class="st">    </span><span class="kw">recipe</span>(Churn <span class="op">~</span><span class="st"> </span>.) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-5" data-line-number="5"><span class="st">    </span><span class="kw">step_rm</span>(customerID) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-6" data-line-number="6"><span class="st">    </span><span class="kw">step_naomit</span>(<span class="kw">all_outcomes</span>(), <span class="kw">all_predictors</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-7" data-line-number="7"><span class="st">    </span><span class="kw">step_discretize</span>(tenure, <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">cuts =</span> <span class="dv">6</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-8" data-line-number="8"><span class="st">    </span><span class="kw">step_log</span>(TotalCharges) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-9" data-line-number="9"><span class="st">    </span><span class="kw">step_mutate</span>(<span class="dt">Churn =</span> <span class="kw">ifelse</span>(Churn <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-10" data-line-number="10"><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-11" data-line-number="11"><span class="st">    </span><span class="kw">step_center</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-12" data-line-number="12"><span class="st">    </span><span class="kw">step_scale</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb137-13" data-line-number="13"><span class="st">    </span><span class="kw">prep</span>()</a>
-<a class="sourceLine" id="cb137-14" data-line-number="14">}</a></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">prepare_recipe &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb138-2" data-line-number="2">  data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-3" data-line-number="3"><span class="st">    </span><span class="kw">training</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-4" data-line-number="4"><span class="st">    </span><span class="kw">recipe</span>(Churn <span class="op">~</span><span class="st"> </span>.) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-5" data-line-number="5"><span class="st">    </span><span class="kw">step_rm</span>(customerID) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-6" data-line-number="6"><span class="st">    </span><span class="kw">step_naomit</span>(<span class="kw">all_outcomes</span>(), <span class="kw">all_predictors</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-7" data-line-number="7"><span class="st">    </span><span class="kw">step_discretize</span>(tenure, <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">cuts =</span> <span class="dv">6</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-8" data-line-number="8"><span class="st">    </span><span class="kw">step_log</span>(TotalCharges) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-9" data-line-number="9"><span class="st">    </span><span class="kw">step_mutate</span>(<span class="dt">Churn =</span> <span class="kw">ifelse</span>(Churn <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-10" data-line-number="10"><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-11" data-line-number="11"><span class="st">    </span><span class="kw">step_center</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-12" data-line-number="12"><span class="st">    </span><span class="kw">step_scale</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb138-13" data-line-number="13"><span class="st">    </span><span class="kw">prep</span>()</a>
+<a class="sourceLine" id="cb138-14" data-line-number="14">}</a></code></pre></div>
 <p>define a <a href="https://github.com/rstudio/keras"><code>keras</code></a> model, exposing arguments to set the dimensionality and activation functions of the layers,</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</a>
-<a class="sourceLine" id="cb138-2" data-line-number="2">  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</a>
-<a class="sourceLine" id="cb138-3" data-line-number="3">    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</a>
-<a class="sourceLine" id="cb138-4" data-line-number="4">  )</a>
-<a class="sourceLine" id="cb138-5" data-line-number="5">  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-6" data-line-number="6"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb138-7" data-line-number="7">      <span class="dt">units =</span> units1,</a>
-<a class="sourceLine" id="cb138-8" data-line-number="8">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb138-9" data-line-number="9">      <span class="dt">activation =</span> act1,</a>
-<a class="sourceLine" id="cb138-10" data-line-number="10">      <span class="dt">input_shape =</span> input_shape</a>
-<a class="sourceLine" id="cb138-11" data-line-number="11">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-12" data-line-number="12"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-13" data-line-number="13"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb138-14" data-line-number="14">      <span class="dt">units =</span> units2,</a>
-<a class="sourceLine" id="cb138-15" data-line-number="15">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb138-16" data-line-number="16">      <span class="dt">activation =</span> act2</a>
-<a class="sourceLine" id="cb138-17" data-line-number="17">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-18" data-line-number="18"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-19" data-line-number="19"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb138-20" data-line-number="20">      <span class="dt">units =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb138-21" data-line-number="21">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb138-22" data-line-number="22">      <span class="dt">activation =</span> act3</a>
-<a class="sourceLine" id="cb138-23" data-line-number="23">    )</a>
-<a class="sourceLine" id="cb138-24" data-line-number="24">}</a></code></pre></div>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</a>
+<a class="sourceLine" id="cb139-2" data-line-number="2">  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</a>
+<a class="sourceLine" id="cb139-3" data-line-number="3">    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</a>
+<a class="sourceLine" id="cb139-4" data-line-number="4">  )</a>
+<a class="sourceLine" id="cb139-5" data-line-number="5">  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb139-6" data-line-number="6"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb139-7" data-line-number="7">      <span class="dt">units =</span> units1,</a>
+<a class="sourceLine" id="cb139-8" data-line-number="8">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb139-9" data-line-number="9">      <span class="dt">activation =</span> act1,</a>
+<a class="sourceLine" id="cb139-10" data-line-number="10">      <span class="dt">input_shape =</span> input_shape</a>
+<a class="sourceLine" id="cb139-11" data-line-number="11">    ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb139-12" data-line-number="12"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb139-13" data-line-number="13"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb139-14" data-line-number="14">      <span class="dt">units =</span> units2,</a>
+<a class="sourceLine" id="cb139-15" data-line-number="15">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb139-16" data-line-number="16">      <span class="dt">activation =</span> act2</a>
+<a class="sourceLine" id="cb139-17" data-line-number="17">    ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb139-18" data-line-number="18"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb139-19" data-line-number="19"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb139-20" data-line-number="20">      <span class="dt">units =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb139-21" data-line-number="21">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb139-22" data-line-number="22">      <span class="dt">activation =</span> act3</a>
+<a class="sourceLine" id="cb139-23" data-line-number="23">    )</a>
+<a class="sourceLine" id="cb139-24" data-line-number="24">}</a></code></pre></div>
 <p>train a model,</p>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1">train_model &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb139-2" data-line-number="2">  rec,</a>
-<a class="sourceLine" id="cb139-3" data-line-number="3">  <span class="dt">units1 =</span> <span class="dv">16</span>,</a>
-<a class="sourceLine" id="cb139-4" data-line-number="4">  <span class="dt">units2 =</span> <span class="dv">16</span>,</a>
-<a class="sourceLine" id="cb139-5" data-line-number="5">  <span class="dt">act1 =</span> <span class="st">&quot;relu&quot;</span>,</a>
-<a class="sourceLine" id="cb139-6" data-line-number="6">  <span class="dt">act2 =</span> <span class="st">&quot;relu&quot;</span>,</a>
-<a class="sourceLine" id="cb139-7" data-line-number="7">  <span class="dt">act3 =</span> <span class="st">&quot;sigmoid&quot;</span></a>
-<a class="sourceLine" id="cb139-8" data-line-number="8">) {</a>
-<a class="sourceLine" id="cb139-9" data-line-number="9">  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(</a>
-<a class="sourceLine" id="cb139-10" data-line-number="10">    <span class="dt">rec =</span> rec,</a>
-<a class="sourceLine" id="cb139-11" data-line-number="11">    <span class="dt">units1 =</span> units1,</a>
-<a class="sourceLine" id="cb139-12" data-line-number="12">    <span class="dt">units2 =</span> units2,</a>
-<a class="sourceLine" id="cb139-13" data-line-number="13">    <span class="dt">act1 =</span> act1,</a>
-<a class="sourceLine" id="cb139-14" data-line-number="14">    <span class="dt">act2 =</span> act2,</a>
-<a class="sourceLine" id="cb139-15" data-line-number="15">    <span class="dt">act3 =</span> act3</a>
-<a class="sourceLine" id="cb139-16" data-line-number="16">  )</a>
-<a class="sourceLine" id="cb139-17" data-line-number="17">  <span class="kw">compile</span>(</a>
-<a class="sourceLine" id="cb139-18" data-line-number="18">    model,</a>
-<a class="sourceLine" id="cb139-19" data-line-number="19">    <span class="dt">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</a>
-<a class="sourceLine" id="cb139-20" data-line-number="20">    <span class="dt">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</a>
-<a class="sourceLine" id="cb139-21" data-line-number="21">    <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>)</a>
-<a class="sourceLine" id="cb139-22" data-line-number="22">  )</a>
-<a class="sourceLine" id="cb139-23" data-line-number="23">  x_train_tbl &lt;-<span class="st"> </span><span class="kw">juice</span>(</a>
-<a class="sourceLine" id="cb139-24" data-line-number="24">    rec,</a>
-<a class="sourceLine" id="cb139-25" data-line-number="25">    <span class="kw">all_predictors</span>(),</a>
-<a class="sourceLine" id="cb139-26" data-line-number="26">    <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span></a>
-<a class="sourceLine" id="cb139-27" data-line-number="27">  )</a>
-<a class="sourceLine" id="cb139-28" data-line-number="28">  y_train_vec &lt;-<span class="st"> </span><span class="kw">juice</span>(rec, <span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb139-29" data-line-number="29"><span class="st">    </span><span class="kw">pull</span>()</a>
-<a class="sourceLine" id="cb139-30" data-line-number="30">  <span class="kw">fit</span>(</a>
-<a class="sourceLine" id="cb139-31" data-line-number="31">    <span class="dt">object =</span> model,</a>
-<a class="sourceLine" id="cb139-32" data-line-number="32">    <span class="dt">x =</span> x_train_tbl,</a>
-<a class="sourceLine" id="cb139-33" data-line-number="33">    <span class="dt">y =</span> y_train_vec,</a>
-<a class="sourceLine" id="cb139-34" data-line-number="34">    <span class="dt">batch_size =</span> <span class="dv">32</span>,</a>
-<a class="sourceLine" id="cb139-35" data-line-number="35">    <span class="dt">epochs =</span> <span class="dv">32</span>,</a>
-<a class="sourceLine" id="cb139-36" data-line-number="36">    <span class="dt">validation_split =</span> <span class="fl">0.3</span>,</a>
-<a class="sourceLine" id="cb139-37" data-line-number="37">    <span class="dt">verbose =</span> <span class="dv">0</span></a>
-<a class="sourceLine" id="cb139-38" data-line-number="38">  )</a>
-<a class="sourceLine" id="cb139-39" data-line-number="39">  model</a>
-<a class="sourceLine" id="cb139-40" data-line-number="40">}</a></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1">train_model &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb140-2" data-line-number="2">  rec,</a>
+<a class="sourceLine" id="cb140-3" data-line-number="3">  <span class="dt">units1 =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb140-4" data-line-number="4">  <span class="dt">units2 =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb140-5" data-line-number="5">  <span class="dt">act1 =</span> <span class="st">&quot;relu&quot;</span>,</a>
+<a class="sourceLine" id="cb140-6" data-line-number="6">  <span class="dt">act2 =</span> <span class="st">&quot;relu&quot;</span>,</a>
+<a class="sourceLine" id="cb140-7" data-line-number="7">  <span class="dt">act3 =</span> <span class="st">&quot;sigmoid&quot;</span></a>
+<a class="sourceLine" id="cb140-8" data-line-number="8">) {</a>
+<a class="sourceLine" id="cb140-9" data-line-number="9">  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(</a>
+<a class="sourceLine" id="cb140-10" data-line-number="10">    <span class="dt">rec =</span> rec,</a>
+<a class="sourceLine" id="cb140-11" data-line-number="11">    <span class="dt">units1 =</span> units1,</a>
+<a class="sourceLine" id="cb140-12" data-line-number="12">    <span class="dt">units2 =</span> units2,</a>
+<a class="sourceLine" id="cb140-13" data-line-number="13">    <span class="dt">act1 =</span> act1,</a>
+<a class="sourceLine" id="cb140-14" data-line-number="14">    <span class="dt">act2 =</span> act2,</a>
+<a class="sourceLine" id="cb140-15" data-line-number="15">    <span class="dt">act3 =</span> act3</a>
+<a class="sourceLine" id="cb140-16" data-line-number="16">  )</a>
+<a class="sourceLine" id="cb140-17" data-line-number="17">  <span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb140-18" data-line-number="18">    model,</a>
+<a class="sourceLine" id="cb140-19" data-line-number="19">    <span class="dt">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</a>
+<a class="sourceLine" id="cb140-20" data-line-number="20">    <span class="dt">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</a>
+<a class="sourceLine" id="cb140-21" data-line-number="21">    <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>)</a>
+<a class="sourceLine" id="cb140-22" data-line-number="22">  )</a>
+<a class="sourceLine" id="cb140-23" data-line-number="23">  x_train_tbl &lt;-<span class="st"> </span><span class="kw">juice</span>(</a>
+<a class="sourceLine" id="cb140-24" data-line-number="24">    rec,</a>
+<a class="sourceLine" id="cb140-25" data-line-number="25">    <span class="kw">all_predictors</span>(),</a>
+<a class="sourceLine" id="cb140-26" data-line-number="26">    <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span></a>
+<a class="sourceLine" id="cb140-27" data-line-number="27">  )</a>
+<a class="sourceLine" id="cb140-28" data-line-number="28">  y_train_vec &lt;-<span class="st"> </span><span class="kw">juice</span>(rec, <span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb140-29" data-line-number="29"><span class="st">    </span><span class="kw">pull</span>()</a>
+<a class="sourceLine" id="cb140-30" data-line-number="30">  <span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb140-31" data-line-number="31">    <span class="dt">object =</span> model,</a>
+<a class="sourceLine" id="cb140-32" data-line-number="32">    <span class="dt">x =</span> x_train_tbl,</a>
+<a class="sourceLine" id="cb140-33" data-line-number="33">    <span class="dt">y =</span> y_train_vec,</a>
+<a class="sourceLine" id="cb140-34" data-line-number="34">    <span class="dt">batch_size =</span> <span class="dv">32</span>,</a>
+<a class="sourceLine" id="cb140-35" data-line-number="35">    <span class="dt">epochs =</span> <span class="dv">32</span>,</a>
+<a class="sourceLine" id="cb140-36" data-line-number="36">    <span class="dt">validation_split =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb140-37" data-line-number="37">    <span class="dt">verbose =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb140-38" data-line-number="38">  )</a>
+<a class="sourceLine" id="cb140-39" data-line-number="39">  model</a>
+<a class="sourceLine" id="cb140-40" data-line-number="40">}</a></code></pre></div>
 <p>compare predictions against reality,</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1">confusion_matrix &lt;-<span class="st"> </span><span class="cf">function</span>(data, rec, model) {</a>
-<a class="sourceLine" id="cb140-2" data-line-number="2">  testing_data &lt;-<span class="st"> </span><span class="kw">bake</span>(rec, <span class="kw">testing</span>(data))</a>
-<a class="sourceLine" id="cb140-3" data-line-number="3">  x_test_tbl &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-4" data-line-number="4"><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>Churn) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-5" data-line-number="5"><span class="st">    </span><span class="kw">as.matrix</span>()</a>
-<a class="sourceLine" id="cb140-6" data-line-number="6">  y_test_vec &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-7" data-line-number="7"><span class="st">    </span><span class="kw">select</span>(Churn) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-8" data-line-number="8"><span class="st">    </span><span class="kw">pull</span>()</a>
-<a class="sourceLine" id="cb140-9" data-line-number="9">  yhat_keras_class_vec &lt;-<span class="st"> </span>model <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-10" data-line-number="10"><span class="st">    </span><span class="kw">predict_classes</span>(x_test_tbl) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-11" data-line-number="11"><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-12" data-line-number="12"><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</a>
-<a class="sourceLine" id="cb140-13" data-line-number="13">  yhat_keras_prob_vec &lt;-</a>
-<a class="sourceLine" id="cb140-14" data-line-number="14"><span class="st">    </span>model <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-15" data-line-number="15"><span class="st">    </span><span class="kw">predict_proba</span>(x_test_tbl) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-16" data-line-number="16"><span class="st">    </span><span class="kw">as.vector</span>()</a>
-<a class="sourceLine" id="cb140-17" data-line-number="17">  test_truth &lt;-<span class="st"> </span>y_test_vec <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-18" data-line-number="18"><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-19" data-line-number="19"><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</a>
-<a class="sourceLine" id="cb140-20" data-line-number="20">  estimates_keras_tbl &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb140-21" data-line-number="21">    <span class="dt">truth =</span> test_truth,</a>
-<a class="sourceLine" id="cb140-22" data-line-number="22">    <span class="dt">estimate =</span> yhat_keras_class_vec,</a>
-<a class="sourceLine" id="cb140-23" data-line-number="23">    <span class="dt">class_prob =</span> yhat_keras_prob_vec</a>
-<a class="sourceLine" id="cb140-24" data-line-number="24">  )</a>
-<a class="sourceLine" id="cb140-25" data-line-number="25">  estimates_keras_tbl <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb140-26" data-line-number="26"><span class="st">    </span><span class="kw">conf_mat</span>(truth, estimate)</a>
-<a class="sourceLine" id="cb140-27" data-line-number="27">}</a></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb141-1" data-line-number="1">confusion_matrix &lt;-<span class="st"> </span><span class="cf">function</span>(data, rec, model) {</a>
+<a class="sourceLine" id="cb141-2" data-line-number="2">  testing_data &lt;-<span class="st"> </span><span class="kw">bake</span>(rec, <span class="kw">testing</span>(data))</a>
+<a class="sourceLine" id="cb141-3" data-line-number="3">  x_test_tbl &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-4" data-line-number="4"><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>Churn) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-5" data-line-number="5"><span class="st">    </span><span class="kw">as.matrix</span>()</a>
+<a class="sourceLine" id="cb141-6" data-line-number="6">  y_test_vec &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-7" data-line-number="7"><span class="st">    </span><span class="kw">select</span>(Churn) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-8" data-line-number="8"><span class="st">    </span><span class="kw">pull</span>()</a>
+<a class="sourceLine" id="cb141-9" data-line-number="9">  yhat_keras_class_vec &lt;-<span class="st"> </span>model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-10" data-line-number="10"><span class="st">    </span><span class="kw">predict_classes</span>(x_test_tbl) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-11" data-line-number="11"><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-12" data-line-number="12"><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</a>
+<a class="sourceLine" id="cb141-13" data-line-number="13">  yhat_keras_prob_vec &lt;-</a>
+<a class="sourceLine" id="cb141-14" data-line-number="14"><span class="st">    </span>model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-15" data-line-number="15"><span class="st">    </span><span class="kw">predict_proba</span>(x_test_tbl) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-16" data-line-number="16"><span class="st">    </span><span class="kw">as.vector</span>()</a>
+<a class="sourceLine" id="cb141-17" data-line-number="17">  test_truth &lt;-<span class="st"> </span>y_test_vec <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-18" data-line-number="18"><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-19" data-line-number="19"><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</a>
+<a class="sourceLine" id="cb141-20" data-line-number="20">  estimates_keras_tbl &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb141-21" data-line-number="21">    <span class="dt">truth =</span> test_truth,</a>
+<a class="sourceLine" id="cb141-22" data-line-number="22">    <span class="dt">estimate =</span> yhat_keras_class_vec,</a>
+<a class="sourceLine" id="cb141-23" data-line-number="23">    <span class="dt">class_prob =</span> yhat_keras_prob_vec</a>
+<a class="sourceLine" id="cb141-24" data-line-number="24">  )</a>
+<a class="sourceLine" id="cb141-25" data-line-number="25">  estimates_keras_tbl <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb141-26" data-line-number="26"><span class="st">    </span><span class="kw">conf_mat</span>(truth, estimate)</a>
+<a class="sourceLine" id="cb141-27" data-line-number="27">}</a></code></pre></div>
 <p>and compare the performance of multiple models.</p>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb141-1" data-line-number="1">compare_models &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</a>
-<a class="sourceLine" id="cb141-2" data-line-number="2">  name &lt;-<span class="st"> </span><span class="kw">match.call</span>()[<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb141-3" data-line-number="3"><span class="st">    </span><span class="kw">as.character</span>()</a>
-<a class="sourceLine" id="cb141-4" data-line-number="4">  df &lt;-<span class="st"> </span><span class="kw">map_df</span>(<span class="kw">list</span>(...), summary) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb141-5" data-line-number="5"><span class="st">    </span><span class="kw">filter</span>(.metric <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>, <span class="st">&quot;sens&quot;</span>, <span class="st">&quot;spec&quot;</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb141-6" data-line-number="6"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">name =</span> <span class="kw">rep</span>(name, <span class="dt">each =</span> <span class="kw">n</span>() <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(name))) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb141-7" data-line-number="7"><span class="st">    </span><span class="kw">rename</span>(<span class="dt">metric =</span> .metric, <span class="dt">estimate =</span> .estimate)</a>
-<a class="sourceLine" id="cb141-8" data-line-number="8">  <span class="kw">ggplot</span>(df) <span class="op">+</span></a>
-<a class="sourceLine" id="cb141-9" data-line-number="9"><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> metric, <span class="dt">y =</span> estimate, <span class="dt">color =</span> name, <span class="dt">group =</span> name)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb141-10" data-line-number="10"><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</a>
-<a class="sourceLine" id="cb141-11" data-line-number="11">}</a></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1">compare_models &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</a>
+<a class="sourceLine" id="cb142-2" data-line-number="2">  name &lt;-<span class="st"> </span><span class="kw">match.call</span>()[<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb142-3" data-line-number="3"><span class="st">    </span><span class="kw">as.character</span>()</a>
+<a class="sourceLine" id="cb142-4" data-line-number="4">  df &lt;-<span class="st"> </span><span class="kw">map_df</span>(<span class="kw">list</span>(...), summary) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb142-5" data-line-number="5"><span class="st">    </span><span class="kw">filter</span>(.metric <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>, <span class="st">&quot;sens&quot;</span>, <span class="st">&quot;spec&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb142-6" data-line-number="6"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">name =</span> <span class="kw">rep</span>(name, <span class="dt">each =</span> <span class="kw">n</span>() <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(name))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb142-7" data-line-number="7"><span class="st">    </span><span class="kw">rename</span>(<span class="dt">metric =</span> .metric, <span class="dt">estimate =</span> .estimate)</a>
+<a class="sourceLine" id="cb142-8" data-line-number="8">  <span class="kw">ggplot</span>(df) <span class="op">+</span></a>
+<a class="sourceLine" id="cb142-9" data-line-number="9"><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> metric, <span class="dt">y =</span> estimate, <span class="dt">color =</span> name, <span class="dt">group =</span> name)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb142-10" data-line-number="10"><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</a>
+<a class="sourceLine" id="cb142-11" data-line-number="11">}</a></code></pre></div>
 </div>
 <div id="plan" class="section level2">
 <h2><span class="header-section-number">9.3</span> Plan</h2>
 <p>Next, we define our workflow in a <a href="https://books.ropensci.org/drake/plans.html"><code>drake</code> plan</a>. We will prepare the data, train different models with different activation functions, and compare the models in terms of performance.</p>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>)</a>
-<a class="sourceLine" id="cb142-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb142-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb142-4" data-line-number="4">  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb142-5" data-line-number="5"><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</a>
-<a class="sourceLine" id="cb142-6" data-line-number="6">  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</a>
-<a class="sourceLine" id="cb142-7" data-line-number="7">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb142-8" data-line-number="8">    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</a>
-<a class="sourceLine" id="cb142-9" data-line-number="9">    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></a>
-<a class="sourceLine" id="cb142-10" data-line-number="10">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</a>
-<a class="sourceLine" id="cb142-11" data-line-number="11">  ),</a>
-<a class="sourceLine" id="cb142-12" data-line-number="12">  <span class="dt">conf =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb142-13" data-line-number="13">    <span class="kw">confusion_matrix</span>(data, rec, model),</a>
-<a class="sourceLine" id="cb142-14" data-line-number="14">    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</a>
-<a class="sourceLine" id="cb142-15" data-line-number="15">  ),</a>
-<a class="sourceLine" id="cb142-16" data-line-number="16">  <span class="dt">metrics =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb142-17" data-line-number="17">    <span class="kw">compare_models</span>(conf),</a>
-<a class="sourceLine" id="cb142-18" data-line-number="18">    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</a>
-<a class="sourceLine" id="cb142-19" data-line-number="19">  )</a>
-<a class="sourceLine" id="cb142-20" data-line-number="20">)</a></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>)</a>
+<a class="sourceLine" id="cb143-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb143-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb143-4" data-line-number="4">  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb143-5" data-line-number="5"><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</a>
+<a class="sourceLine" id="cb143-6" data-line-number="6">  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</a>
+<a class="sourceLine" id="cb143-7" data-line-number="7">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb143-8" data-line-number="8">    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</a>
+<a class="sourceLine" id="cb143-9" data-line-number="9">    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></a>
+<a class="sourceLine" id="cb143-10" data-line-number="10">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</a>
+<a class="sourceLine" id="cb143-11" data-line-number="11">  ),</a>
+<a class="sourceLine" id="cb143-12" data-line-number="12">  <span class="dt">conf =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb143-13" data-line-number="13">    <span class="kw">confusion_matrix</span>(data, rec, model),</a>
+<a class="sourceLine" id="cb143-14" data-line-number="14">    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</a>
+<a class="sourceLine" id="cb143-15" data-line-number="15">  ),</a>
+<a class="sourceLine" id="cb143-16" data-line-number="16">  <span class="dt">metrics =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb143-17" data-line-number="17">    <span class="kw">compare_models</span>(conf),</a>
+<a class="sourceLine" id="cb143-18" data-line-number="18">    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</a>
+<a class="sourceLine" id="cb143-19" data-line-number="19">  )</a>
+<a class="sourceLine" id="cb143-20" data-line-number="20">)</a></code></pre></div>
 <p>The plan is a data frame with the steps we are going to do.</p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1">plan</a>
-<a class="sourceLine" id="cb143-2" data-line-number="2"><span class="co">#&gt; # A tibble: 7 x 3</span></a>
-<a class="sourceLine" id="cb143-3" data-line-number="3"><span class="co">#&gt;   target       command                                                    format</span></a>
-<a class="sourceLine" id="cb143-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;        &lt;expr&gt;                                                     &lt;chr&gt; </span></a>
-<a class="sourceLine" id="cb143-5" data-line-number="5"><span class="co">#&gt; 1 conf_relu    confusion_matrix(data, rec, model_relu)                  … &lt;NA&gt;  </span></a>
-<a class="sourceLine" id="cb143-6" data-line-number="6"><span class="co">#&gt; 2 conf_sigmoid confusion_matrix(data, rec, model_sigmoid)               … &lt;NA&gt;  </span></a>
-<a class="sourceLine" id="cb143-7" data-line-number="7"><span class="co">#&gt; 3 data         read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols(… &lt;NA&gt;  </span></a>
-<a class="sourceLine" id="cb143-8" data-line-number="8"><span class="co">#&gt; 4 metrics      compare_models(conf_relu, conf_sigmoid)                  … &lt;NA&gt;  </span></a>
-<a class="sourceLine" id="cb143-9" data-line-number="9"><span class="co">#&gt; 5 model_relu   train_model(rec, act1 = &quot;relu&quot;)                          … keras </span></a>
-<a class="sourceLine" id="cb143-10" data-line-number="10"><span class="co">#&gt; 6 model_sigmo… train_model(rec, act1 = &quot;sigmoid&quot;)                       … keras </span></a>
-<a class="sourceLine" id="cb143-11" data-line-number="11"><span class="co">#&gt; 7 rec          prepare_recipe(data)                                     … &lt;NA&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1">plan</a>
+<a class="sourceLine" id="cb144-2" data-line-number="2"><span class="co">#&gt; # A tibble: 7 x 3</span></a>
+<a class="sourceLine" id="cb144-3" data-line-number="3"><span class="co">#&gt;   target       command                                                    format</span></a>
+<a class="sourceLine" id="cb144-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;        &lt;expr&gt;                                                     &lt;chr&gt; </span></a>
+<a class="sourceLine" id="cb144-5" data-line-number="5"><span class="co">#&gt; 1 conf_relu    confusion_matrix(data, rec, model_relu)                  … &lt;NA&gt;  </span></a>
+<a class="sourceLine" id="cb144-6" data-line-number="6"><span class="co">#&gt; 2 conf_sigmoid confusion_matrix(data, rec, model_sigmoid)               … &lt;NA&gt;  </span></a>
+<a class="sourceLine" id="cb144-7" data-line-number="7"><span class="co">#&gt; 3 data         read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols(… &lt;NA&gt;  </span></a>
+<a class="sourceLine" id="cb144-8" data-line-number="8"><span class="co">#&gt; 4 metrics      compare_models(conf_relu, conf_sigmoid)                  … &lt;NA&gt;  </span></a>
+<a class="sourceLine" id="cb144-9" data-line-number="9"><span class="co">#&gt; 5 model_relu   train_model(rec, act1 = &quot;relu&quot;)                          … keras </span></a>
+<a class="sourceLine" id="cb144-10" data-line-number="10"><span class="co">#&gt; 6 model_sigmo… train_model(rec, act1 = &quot;sigmoid&quot;)                       … keras </span></a>
+<a class="sourceLine" id="cb144-11" data-line-number="11"><span class="co">#&gt; 7 rec          prepare_recipe(data)                                     … &lt;NA&gt;</span></a></code></pre></div>
 </div>
 <div id="dependency-graph" class="section level2">
 <h2><span class="header-section-number">9.4</span> Dependency graph</h2>
 <p>The graph visualizes the dependency relationships among the steps of the workflow.</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
-<div id="htmlwidget-20c2a440fe0be7195138" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-20c2a440fe0be7195138">{"x":{"nodes":{"id":["compare_models","confusion_matrix","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","prepare_recipe","define_model","data","train_model","rec","model_sigmoid","model_relu","conf_sigmoid","conf_relu","metrics"],"imported":[true,true,true,true,true,false,true,false,false,false,false,false,false],"label":["compare_models","confusion_matrix","file customer_churn.csv","prepare_recipe","define_model","data","train_model","rec","model_sigmoid","model_relu","conf_sigmoid","conf_relu","metrics"],"status":["imported","imported","imported","imported","imported","outdated","imported","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","file","function","function","object","function","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","square","triangle","triangle","dot","triangle","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["compare_models","train_model","train_model","rec","rec","rec","rec","confusion_matrix","confusion_matrix","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","prepare_recipe","define_model","conf_sigmoid","conf_relu","model_sigmoid","data","data","data","model_relu"],"to":["metrics","model_sigmoid","model_relu","conf_sigmoid","conf_relu","model_sigmoid","model_relu","conf_sigmoid","conf_relu","data","rec","train_model","metrics","metrics","conf_sigmoid","rec","conf_sigmoid","conf_relu","conf_relu"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
+<div id="htmlwidget-e15977b2f6f059b8356a" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e15977b2f6f059b8356a">{"x":{"nodes":{"id":["confusion_matrix","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","prepare_recipe","compare_models","define_model","data","train_model","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,false,true,false,false,false,false,false,false],"label":["confusion_matrix","file customer_churn.csv","prepare_recipe","compare_models","define_model","data","train_model","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"status":["imported","imported","imported","imported","imported","outdated","imported","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","file","function","function","function","object","function","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","square","triangle","triangle","triangle","dot","triangle","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["model_relu","rec","rec","rec","rec","confusion_matrix","confusion_matrix","data","data","data","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","train_model","prepare_recipe","compare_models","define_model","model_sigmoid","conf_sigmoid","conf_relu"],"to":["conf_relu","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_sigmoid","conf_relu","rec","conf_sigmoid","conf_relu","data","model_relu","model_sigmoid","rec","metrics","train_model","conf_sigmoid","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="run-the-models" class="section level2">
 <h2><span class="header-section-number">9.5</span> Run the models</h2>
 <p>Call <a href="https://docs.ropensci.org/drake/reference/make.html"><code>make()</code></a> to actually run the workflow.</p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb145-2" data-line-number="2"><span class="co">#&gt; ▶ target data</span></a>
-<a class="sourceLine" id="cb145-3" data-line-number="3"><span class="co">#&gt; ▶ target rec</span></a>
-<a class="sourceLine" id="cb145-4" data-line-number="4"><span class="co">#&gt; ▶ target model_sigmoid</span></a>
-<a class="sourceLine" id="cb145-5" data-line-number="5"><span class="co">#&gt; ▶ target model_relu</span></a>
-<a class="sourceLine" id="cb145-6" data-line-number="6"><span class="co">#&gt; ▶ target conf_sigmoid</span></a>
-<a class="sourceLine" id="cb145-7" data-line-number="7"><span class="co">#&gt; ▶ target conf_relu</span></a>
-<a class="sourceLine" id="cb145-8" data-line-number="8"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb146-2" data-line-number="2"><span class="co">#&gt; ▶ target data</span></a>
+<a class="sourceLine" id="cb146-3" data-line-number="3"><span class="co">#&gt; ▶ target rec</span></a>
+<a class="sourceLine" id="cb146-4" data-line-number="4"><span class="co">#&gt; ▶ target model_relu</span></a>
+<a class="sourceLine" id="cb146-5" data-line-number="5"><span class="co">#&gt; ▶ target model_sigmoid</span></a>
+<a class="sourceLine" id="cb146-6" data-line-number="6"><span class="co">#&gt; ▶ target conf_relu</span></a>
+<a class="sourceLine" id="cb146-7" data-line-number="7"><span class="co">#&gt; ▶ target conf_sigmoid</span></a>
+<a class="sourceLine" id="cb146-8" data-line-number="8"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
 </div>
 <div id="inspect-the-results" class="section level2">
 <h2><span class="header-section-number">9.6</span> Inspect the results</h2>
 <p>The two models performed about the same.</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></a></code></pre></div>
-<p><img src="drake-manual_files/figure-html/unnamed-chunk-152-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" data-line-number="1"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></a></code></pre></div>
+<p><img src="drake-manual_files/figure-html/unnamed-chunk-153-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="add-models" class="section level2">
 <h2><span class="header-section-number">9.7</span> Add models</h2>
 <p>Let’s try the softmax activation function.</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" data-line-number="1">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)</a>
-<a class="sourceLine" id="cb147-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb147-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb147-4" data-line-number="4">  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb147-5" data-line-number="5"><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</a>
-<a class="sourceLine" id="cb147-6" data-line-number="6">  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</a>
-<a class="sourceLine" id="cb147-7" data-line-number="7">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb147-8" data-line-number="8">    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</a>
-<a class="sourceLine" id="cb147-9" data-line-number="9">    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></a>
-<a class="sourceLine" id="cb147-10" data-line-number="10">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</a>
-<a class="sourceLine" id="cb147-11" data-line-number="11">  ),</a>
-<a class="sourceLine" id="cb147-12" data-line-number="12">  <span class="dt">conf =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb147-13" data-line-number="13">    <span class="kw">confusion_matrix</span>(data, rec, model),</a>
-<a class="sourceLine" id="cb147-14" data-line-number="14">    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</a>
-<a class="sourceLine" id="cb147-15" data-line-number="15">  ),</a>
-<a class="sourceLine" id="cb147-16" data-line-number="16">  <span class="dt">metrics =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb147-17" data-line-number="17">    <span class="kw">compare_models</span>(conf),</a>
-<a class="sourceLine" id="cb147-18" data-line-number="18">    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</a>
-<a class="sourceLine" id="cb147-19" data-line-number="19">  )</a>
-<a class="sourceLine" id="cb147-20" data-line-number="20">)</a></code></pre></div>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(plan) <span class="co"># see also outdated() and predict_runtime()</span></a></code></pre></div>
-<div id="htmlwidget-e15977b2f6f059b8356a" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e15977b2f6f059b8356a">{"x":{"nodes":{"id":["prepare_recipe","compare_models","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","train_model","data","rec","model_relu","model_softmax","model_sigmoid","conf_relu","conf_softmax","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false],"label":["prepare_recipe","compare_models","confusion_matrix","define_model","file customer_churn.csv","train_model","data\n0.147s","rec\n0.353s","model_relu\n4.267s","model_softmax","model_sigmoid\n6.1s","conf_relu\n0.67s","conf_softmax","conf_sigmoid\n0.418s","metrics\n0.04s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","up to date","outdated","up to date","up to date","outdated","up to date","outdated"],"type":["function","function","function","function","file","function","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#228B22","#000000"],"shape":["triangle","triangle","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","prepare_recipe","data","data","data","data","conf_sigmoid","compare_models","conf_relu","conf_softmax","model_relu","confusion_matrix","confusion_matrix","confusion_matrix","define_model","model_softmax","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","model_sigmoid"],"to":["model_relu","model_softmax","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","model_relu","model_softmax","model_sigmoid","rec","rec","conf_sigmoid","conf_relu","conf_softmax","metrics","metrics","metrics","metrics","conf_relu","conf_sigmoid","conf_relu","conf_softmax","train_model","conf_softmax","data","conf_sigmoid"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1">activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)</a>
+<a class="sourceLine" id="cb148-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb148-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb148-4" data-line-number="4">  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb148-5" data-line-number="5"><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</a>
+<a class="sourceLine" id="cb148-6" data-line-number="6">  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</a>
+<a class="sourceLine" id="cb148-7" data-line-number="7">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb148-8" data-line-number="8">    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</a>
+<a class="sourceLine" id="cb148-9" data-line-number="9">    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></a>
+<a class="sourceLine" id="cb148-10" data-line-number="10">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</a>
+<a class="sourceLine" id="cb148-11" data-line-number="11">  ),</a>
+<a class="sourceLine" id="cb148-12" data-line-number="12">  <span class="dt">conf =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb148-13" data-line-number="13">    <span class="kw">confusion_matrix</span>(data, rec, model),</a>
+<a class="sourceLine" id="cb148-14" data-line-number="14">    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</a>
+<a class="sourceLine" id="cb148-15" data-line-number="15">  ),</a>
+<a class="sourceLine" id="cb148-16" data-line-number="16">  <span class="dt">metrics =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb148-17" data-line-number="17">    <span class="kw">compare_models</span>(conf),</a>
+<a class="sourceLine" id="cb148-18" data-line-number="18">    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</a>
+<a class="sourceLine" id="cb148-19" data-line-number="19">  )</a>
+<a class="sourceLine" id="cb148-20" data-line-number="20">)</a></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(plan) <span class="co"># see also outdated() and predict_runtime()</span></a></code></pre></div>
+<div id="htmlwidget-9b396443c45fd2b7b367" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9b396443c45fd2b7b367">{"x":{"nodes":{"id":["prepare_recipe","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","compare_models","train_model","data","rec","model_relu","model_softmax","model_sigmoid","conf_relu","conf_softmax","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false],"label":["prepare_recipe","confusion_matrix","define_model","file customer_churn.csv","compare_models","train_model","data\n0.144s","rec\n0.411s","model_relu\n5.647s","model_softmax","model_sigmoid\n4.183s","conf_relu\n0.427s","conf_softmax","conf_sigmoid\n0.405s","metrics\n0.063s"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","up to date","outdated","up to date","up to date","outdated","up to date","outdated"],"type":["function","function","function","file","function","function","object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#228B22","#000000"],"shape":["triangle","triangle","triangle","square","triangle","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["prepare_recipe","data","data","data","data","train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","model_relu","confusion_matrix","confusion_matrix","confusion_matrix","define_model","model_softmax","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","model_sigmoid","conf_sigmoid","compare_models","conf_relu","conf_softmax"],"to":["rec","rec","conf_sigmoid","conf_relu","conf_softmax","model_relu","model_softmax","model_sigmoid","model_relu","model_softmax","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","conf_relu","conf_sigmoid","conf_relu","conf_softmax","train_model","conf_softmax","data","conf_sigmoid","metrics","metrics","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
 <p><a href="https://docs.ropensci.org/drake/reference/make.html"><code>make()</code></a> skips the relu and sigmoid models because they are already up to date. (Their dependencies did not change.) Only the softmax model needs to run.</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb149-2" data-line-number="2"><span class="co">#&gt; ▶ target model_softmax</span></a>
-<a class="sourceLine" id="cb149-3" data-line-number="3"><span class="co">#&gt; ▶ target conf_softmax</span></a>
-<a class="sourceLine" id="cb149-4" data-line-number="4"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb150-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb150-2" data-line-number="2"><span class="co">#&gt; ▶ target model_softmax</span></a>
+<a class="sourceLine" id="cb150-3" data-line-number="3"><span class="co">#&gt; ▶ target conf_softmax</span></a>
+<a class="sourceLine" id="cb150-4" data-line-number="4"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
 </div>
 <div id="inspect-the-results-again" class="section level2">
 <h2><span class="header-section-number">9.8</span> Inspect the results again</h2>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb150-1" data-line-number="1"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></a></code></pre></div>
-<p><img src="drake-manual_files/figure-html/unnamed-chunk-156-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" data-line-number="1"><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></a></code></pre></div>
+<p><img src="drake-manual_files/figure-html/unnamed-chunk-157-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="update-your-code" class="section level2">
 <h2><span class="header-section-number">9.9</span> Update your code</h2>
 <p>If you change upstream functions, even nested ones, <code>drake</code> automatically refits the affected models. Let’s increase dropout in both layers.</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" data-line-number="1">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</a>
-<a class="sourceLine" id="cb151-2" data-line-number="2">  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</a>
-<a class="sourceLine" id="cb151-3" data-line-number="3">    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</a>
-<a class="sourceLine" id="cb151-4" data-line-number="4">  )</a>
-<a class="sourceLine" id="cb151-5" data-line-number="5">  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb151-6" data-line-number="6"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb151-7" data-line-number="7">      <span class="dt">units =</span> units1,</a>
-<a class="sourceLine" id="cb151-8" data-line-number="8">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb151-9" data-line-number="9">      <span class="dt">activation =</span> act1,</a>
-<a class="sourceLine" id="cb151-10" data-line-number="10">      <span class="dt">input_shape =</span> input_shape</a>
-<a class="sourceLine" id="cb151-11" data-line-number="11">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb151-12" data-line-number="12"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></a>
-<a class="sourceLine" id="cb151-13" data-line-number="13"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb151-14" data-line-number="14">      <span class="dt">units =</span> units2,</a>
-<a class="sourceLine" id="cb151-15" data-line-number="15">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb151-16" data-line-number="16">      <span class="dt">activation =</span> act2</a>
-<a class="sourceLine" id="cb151-17" data-line-number="17">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb151-18" data-line-number="18"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></a>
-<a class="sourceLine" id="cb151-19" data-line-number="19"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
-<a class="sourceLine" id="cb151-20" data-line-number="20">      <span class="dt">units =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb151-21" data-line-number="21">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
-<a class="sourceLine" id="cb151-22" data-line-number="22">      <span class="dt">activation =</span> act3</a>
-<a class="sourceLine" id="cb151-23" data-line-number="23">    )</a>
-<a class="sourceLine" id="cb151-24" data-line-number="24">}</a></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1">define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</a>
+<a class="sourceLine" id="cb152-2" data-line-number="2">  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</a>
+<a class="sourceLine" id="cb152-3" data-line-number="3">    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</a>
+<a class="sourceLine" id="cb152-4" data-line-number="4">  )</a>
+<a class="sourceLine" id="cb152-5" data-line-number="5">  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb152-6" data-line-number="6"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb152-7" data-line-number="7">      <span class="dt">units =</span> units1,</a>
+<a class="sourceLine" id="cb152-8" data-line-number="8">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb152-9" data-line-number="9">      <span class="dt">activation =</span> act1,</a>
+<a class="sourceLine" id="cb152-10" data-line-number="10">      <span class="dt">input_shape =</span> input_shape</a>
+<a class="sourceLine" id="cb152-11" data-line-number="11">    ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb152-12" data-line-number="12"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></a>
+<a class="sourceLine" id="cb152-13" data-line-number="13"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb152-14" data-line-number="14">      <span class="dt">units =</span> units2,</a>
+<a class="sourceLine" id="cb152-15" data-line-number="15">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb152-16" data-line-number="16">      <span class="dt">activation =</span> act2</a>
+<a class="sourceLine" id="cb152-17" data-line-number="17">    ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb152-18" data-line-number="18"><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></a>
+<a class="sourceLine" id="cb152-19" data-line-number="19"><span class="st">    </span><span class="kw">layer_dense</span>(</a>
+<a class="sourceLine" id="cb152-20" data-line-number="20">      <span class="dt">units =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb152-21" data-line-number="21">      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</a>
+<a class="sourceLine" id="cb152-22" data-line-number="22">      <span class="dt">activation =</span> act3</a>
+<a class="sourceLine" id="cb152-23" data-line-number="23">    )</a>
+<a class="sourceLine" id="cb152-24" data-line-number="24">}</a></code></pre></div>
 <p>All the models and downstream results are affected.</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb152-2" data-line-number="2"><span class="co">#&gt; ▶ target model_relu</span></a>
-<a class="sourceLine" id="cb152-3" data-line-number="3"><span class="co">#&gt; ▶ target model_softmax</span></a>
-<a class="sourceLine" id="cb152-4" data-line-number="4"><span class="co">#&gt; ▶ target model_sigmoid</span></a>
-<a class="sourceLine" id="cb152-5" data-line-number="5"><span class="co">#&gt; ▶ target conf_relu</span></a>
-<a class="sourceLine" id="cb152-6" data-line-number="6"><span class="co">#&gt; ▶ target conf_softmax</span></a>
-<a class="sourceLine" id="cb152-7" data-line-number="7"><span class="co">#&gt; ▶ target conf_sigmoid</span></a>
-<a class="sourceLine" id="cb152-8" data-line-number="8"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" data-line-number="1"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb153-2" data-line-number="2"><span class="co">#&gt; ▶ target model_relu</span></a>
+<a class="sourceLine" id="cb153-3" data-line-number="3"><span class="co">#&gt; ▶ target model_softmax</span></a>
+<a class="sourceLine" id="cb153-4" data-line-number="4"><span class="co">#&gt; ▶ target model_sigmoid</span></a>
+<a class="sourceLine" id="cb153-5" data-line-number="5"><span class="co">#&gt; ▶ target conf_relu</span></a>
+<a class="sourceLine" id="cb153-6" data-line-number="6"><span class="co">#&gt; ▶ target conf_softmax</span></a>
+<a class="sourceLine" id="cb153-7" data-line-number="7"><span class="co">#&gt; ▶ target conf_sigmoid</span></a>
+<a class="sourceLine" id="cb153-8" data-line-number="8"><span class="co">#&gt; ▶ target metrics</span></a></code></pre></div>
 </div>
 <div id="history-and-provenance-1" class="section level2">
 <h2><span class="header-section-number">9.10</span> History and provenance</h2>
 <p><code>drake</code> version 7.5.0 and above tracks history and provenance. You can see which models you ran, when you ran them, how long they took, and which settings you tried (i.e. named arguments to function calls in your commands).</p>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw">drake_history</span>()</a>
-<a class="sourceLine" id="cb153-2" data-line-number="2">history</a>
-<a class="sourceLine" id="cb153-3" data-line-number="3"><span class="co">#&gt; # A tibble: 17 x 10</span></a>
-<a class="sourceLine" id="cb153-4" data-line-number="4"><span class="co">#&gt;    target  current built    exists hash  command        seed runtime  prop act1 </span></a>
-<a class="sourceLine" id="cb153-5" data-line-number="5"><span class="co">#&gt;    &lt;chr&gt;   &lt;lgl&gt;   &lt;chr&gt;    &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;         &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;</span></a>
-<a class="sourceLine" id="cb153-6" data-line-number="6"><span class="co">#&gt;  1 conf_r… FALSE   2020-03… TRUE   bd1d… &quot;confusion_… 4.05e8  0.665   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-7" data-line-number="7"><span class="co">#&gt;  2 conf_r… TRUE    2020-03… TRUE   8412… &quot;confusion_… 4.05e8  0.409   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-8" data-line-number="8"><span class="co">#&gt;  3 conf_s… FALSE   2020-03… TRUE   7cf0… &quot;confusion_… 1.93e9  0.415   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-9" data-line-number="9"><span class="co">#&gt;  4 conf_s… TRUE    2020-03… TRUE   a205… &quot;confusion_… 1.93e9  0.407   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-10" data-line-number="10"><span class="co">#&gt;  5 conf_s… FALSE   2020-03… TRUE   701d… &quot;confusion_… 1.80e9  0.404   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-11" data-line-number="11"><span class="co">#&gt;  6 conf_s… TRUE    2020-03… TRUE   94c2… &quot;confusion_… 1.80e9  0.422   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-12" data-line-number="12"><span class="co">#&gt;  7 data    TRUE    2020-03… TRUE   ca84… &quot;read_csv(f… 1.29e9  0.0950   0.3 &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-13" data-line-number="13"><span class="co">#&gt;  8 metrics FALSE   2020-03… TRUE   5bdd… &quot;compare_mo… 1.21e9  0.0230  NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-14" data-line-number="14"><span class="co">#&gt;  9 metrics FALSE   2020-03… TRUE   ca9c… &quot;compare_mo… 1.21e9  0.041   NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-15" data-line-number="15"><span class="co">#&gt; 10 metrics TRUE    2020-03… TRUE   f22d… &quot;compare_mo… 1.21e9  0.0230  NA   &lt;NA&gt; </span></a>
-<a class="sourceLine" id="cb153-16" data-line-number="16"><span class="co">#&gt; 11 model_… FALSE   2020-03… TRUE   1feb… &quot;train_mode… 1.47e9  4.25    NA   relu </span></a>
-<a class="sourceLine" id="cb153-17" data-line-number="17"><span class="co">#&gt; 12 model_… TRUE    2020-03… TRUE   7a41… &quot;train_mode… 1.47e9  4.19    NA   relu </span></a>
-<a class="sourceLine" id="cb153-18" data-line-number="18"><span class="co">#&gt; 13 model_… FALSE   2020-03… TRUE   c95f… &quot;train_mode… 1.26e9  6.08    NA   sigm…</span></a>
-<a class="sourceLine" id="cb153-19" data-line-number="19"><span class="co">#&gt; 14 model_… TRUE    2020-03… TRUE   e3f0… &quot;train_mode… 1.26e9  4.21    NA   sigm…</span></a>
-<a class="sourceLine" id="cb153-20" data-line-number="20"><span class="co">#&gt; 15 model_… FALSE   2020-03… TRUE   fbe6… &quot;train_mode… 8.05e8  4.17    NA   soft…</span></a>
-<a class="sourceLine" id="cb153-21" data-line-number="21"><span class="co">#&gt; 16 model_… TRUE    2020-03… TRUE   cfa0… &quot;train_mode… 8.05e8  4.16    NA   soft…</span></a>
-<a class="sourceLine" id="cb153-22" data-line-number="22"><span class="co">#&gt; 17 rec     TRUE    2020-03… TRUE   c769… &quot;prepare_re… 6.29e8  0.176   NA   &lt;NA&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw">drake_history</span>()</a>
+<a class="sourceLine" id="cb154-2" data-line-number="2">history</a>
+<a class="sourceLine" id="cb154-3" data-line-number="3"><span class="co">#&gt; # A tibble: 17 x 10</span></a>
+<a class="sourceLine" id="cb154-4" data-line-number="4"><span class="co">#&gt;    target  current built    exists hash  command        seed runtime  prop act1 </span></a>
+<a class="sourceLine" id="cb154-5" data-line-number="5"><span class="co">#&gt;    &lt;chr&gt;   &lt;lgl&gt;   &lt;chr&gt;    &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;         &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;</span></a>
+<a class="sourceLine" id="cb154-6" data-line-number="6"><span class="co">#&gt;  1 conf_r… FALSE   2020-04… TRUE   9ad9… &quot;confusion_… 4.05e8  0.424   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-7" data-line-number="7"><span class="co">#&gt;  2 conf_r… TRUE    2020-04… TRUE   ea9e… &quot;confusion_… 4.05e8  0.396   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-8" data-line-number="8"><span class="co">#&gt;  3 conf_s… FALSE   2020-04… TRUE   a97a… &quot;confusion_… 1.93e9  0.400   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-9" data-line-number="9"><span class="co">#&gt;  4 conf_s… TRUE    2020-04… TRUE   4617… &quot;confusion_… 1.93e9  0.395   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-10" data-line-number="10"><span class="co">#&gt;  5 conf_s… FALSE   2020-04… TRUE   2d74… &quot;confusion_… 1.80e9  0.431   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-11" data-line-number="11"><span class="co">#&gt;  6 conf_s… TRUE    2020-04… TRUE   8c78… &quot;confusion_… 1.80e9  0.400   NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-12" data-line-number="12"><span class="co">#&gt;  7 data    TRUE    2020-04… TRUE   ca84… &quot;read_csv(f… 1.29e9  0.0940   0.3 &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-13" data-line-number="13"><span class="co">#&gt;  8 metrics FALSE   2020-04… TRUE   cbaf… &quot;compare_mo… 1.21e9  0.0460  NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-14" data-line-number="14"><span class="co">#&gt;  9 metrics FALSE   2020-04… TRUE   3583… &quot;compare_mo… 1.21e9  0.0560  NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-15" data-line-number="15"><span class="co">#&gt; 10 metrics TRUE    2020-04… TRUE   369b… &quot;compare_mo… 1.21e9  0.0420  NA   &lt;NA&gt; </span></a>
+<a class="sourceLine" id="cb154-16" data-line-number="16"><span class="co">#&gt; 11 model_… FALSE   2020-04… TRUE   e646… &quot;train_mode… 1.47e9  5.63    NA   relu </span></a>
+<a class="sourceLine" id="cb154-17" data-line-number="17"><span class="co">#&gt; 12 model_… TRUE    2020-04… TRUE   ad16… &quot;train_mode… 1.47e9  4.10    NA   relu </span></a>
+<a class="sourceLine" id="cb154-18" data-line-number="18"><span class="co">#&gt; 13 model_… FALSE   2020-04… TRUE   1d99… &quot;train_mode… 1.26e9  4.16    NA   sigm…</span></a>
+<a class="sourceLine" id="cb154-19" data-line-number="19"><span class="co">#&gt; 14 model_… TRUE    2020-04… TRUE   2513… &quot;train_mode… 1.26e9  4.10    NA   sigm…</span></a>
+<a class="sourceLine" id="cb154-20" data-line-number="20"><span class="co">#&gt; 15 model_… FALSE   2020-04… TRUE   8ea8… &quot;train_mode… 8.05e8  4.11    NA   soft…</span></a>
+<a class="sourceLine" id="cb154-21" data-line-number="21"><span class="co">#&gt; 16 model_… TRUE    2020-04… TRUE   1d11… &quot;train_mode… 8.05e8  4.08    NA   soft…</span></a>
+<a class="sourceLine" id="cb154-22" data-line-number="22"><span class="co">#&gt; 17 rec     TRUE    2020-04… TRUE   e9a4… &quot;prepare_re… 6.29e8  0.235   NA   &lt;NA&gt;</span></a></code></pre></div>
 <p>And as long as you did not run <code>clean(garbage_collection = TRUE)</code>, you can get the old data back. Let’s find the oldest run of the relu model.</p>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1">hash &lt;-<span class="st"> </span>history <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb154-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(act1 <span class="op">==</span><span class="st"> &quot;relu&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb154-3" data-line-number="3"><span class="st">  </span><span class="kw">pull</span>(hash) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb154-4" data-line-number="4"><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb154-5" data-line-number="5"><span class="kw">drake_cache</span>()<span class="op">$</span><span class="kw">get_value</span>(hash)</a>
-<a class="sourceLine" id="cb154-6" data-line-number="6"><span class="co">#&gt; Model</span></a>
-<a class="sourceLine" id="cb154-7" data-line-number="7"><span class="co">#&gt; Model: &quot;sequential_1&quot;</span></a>
-<a class="sourceLine" id="cb154-8" data-line-number="8"><span class="co">#&gt; ________________________________________________________________________________</span></a>
-<a class="sourceLine" id="cb154-9" data-line-number="9"><span class="co">#&gt; Layer (type)                        Output Shape                    Param #     </span></a>
-<a class="sourceLine" id="cb154-10" data-line-number="10"><span class="co">#&gt; ================================================================================</span></a>
-<a class="sourceLine" id="cb154-11" data-line-number="11"><span class="co">#&gt; dense_3 (Dense)                     (None, 16)                      576         </span></a>
-<a class="sourceLine" id="cb154-12" data-line-number="12"><span class="co">#&gt; ________________________________________________________________________________</span></a>
-<a class="sourceLine" id="cb154-13" data-line-number="13"><span class="co">#&gt; dropout_2 (Dropout)                 (None, 16)                      0           </span></a>
-<a class="sourceLine" id="cb154-14" data-line-number="14"><span class="co">#&gt; ________________________________________________________________________________</span></a>
-<a class="sourceLine" id="cb154-15" data-line-number="15"><span class="co">#&gt; dense_4 (Dense)                     (None, 16)                      272         </span></a>
-<a class="sourceLine" id="cb154-16" data-line-number="16"><span class="co">#&gt; ________________________________________________________________________________</span></a>
-<a class="sourceLine" id="cb154-17" data-line-number="17"><span class="co">#&gt; dropout_3 (Dropout)                 (None, 16)                      0           </span></a>
-<a class="sourceLine" id="cb154-18" data-line-number="18"><span class="co">#&gt; ________________________________________________________________________________</span></a>
-<a class="sourceLine" id="cb154-19" data-line-number="19"><span class="co">#&gt; dense_5 (Dense)                     (None, 1)                       17          </span></a>
-<a class="sourceLine" id="cb154-20" data-line-number="20"><span class="co">#&gt; ================================================================================</span></a>
-<a class="sourceLine" id="cb154-21" data-line-number="21"><span class="co">#&gt; Total params: 865</span></a>
-<a class="sourceLine" id="cb154-22" data-line-number="22"><span class="co">#&gt; Trainable params: 865</span></a>
-<a class="sourceLine" id="cb154-23" data-line-number="23"><span class="co">#&gt; Non-trainable params: 0</span></a>
-<a class="sourceLine" id="cb154-24" data-line-number="24"><span class="co">#&gt; ________________________________________________________________________________</span></a></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1">hash &lt;-<span class="st"> </span>history <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb155-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(act1 <span class="op">==</span><span class="st"> &quot;relu&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb155-3" data-line-number="3"><span class="st">  </span><span class="kw">pull</span>(hash) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb155-4" data-line-number="4"><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb155-5" data-line-number="5"><span class="kw">drake_cache</span>()<span class="op">$</span><span class="kw">get_value</span>(hash)</a>
+<a class="sourceLine" id="cb155-6" data-line-number="6"><span class="co">#&gt; Model</span></a>
+<a class="sourceLine" id="cb155-7" data-line-number="7"><span class="co">#&gt; Model: &quot;sequential&quot;</span></a>
+<a class="sourceLine" id="cb155-8" data-line-number="8"><span class="co">#&gt; ________________________________________________________________________________</span></a>
+<a class="sourceLine" id="cb155-9" data-line-number="9"><span class="co">#&gt; Layer (type)                        Output Shape                    Param #     </span></a>
+<a class="sourceLine" id="cb155-10" data-line-number="10"><span class="co">#&gt; ================================================================================</span></a>
+<a class="sourceLine" id="cb155-11" data-line-number="11"><span class="co">#&gt; dense (Dense)                       (None, 16)                      576         </span></a>
+<a class="sourceLine" id="cb155-12" data-line-number="12"><span class="co">#&gt; ________________________________________________________________________________</span></a>
+<a class="sourceLine" id="cb155-13" data-line-number="13"><span class="co">#&gt; dropout (Dropout)                   (None, 16)                      0           </span></a>
+<a class="sourceLine" id="cb155-14" data-line-number="14"><span class="co">#&gt; ________________________________________________________________________________</span></a>
+<a class="sourceLine" id="cb155-15" data-line-number="15"><span class="co">#&gt; dense_1 (Dense)                     (None, 16)                      272         </span></a>
+<a class="sourceLine" id="cb155-16" data-line-number="16"><span class="co">#&gt; ________________________________________________________________________________</span></a>
+<a class="sourceLine" id="cb155-17" data-line-number="17"><span class="co">#&gt; dropout_1 (Dropout)                 (None, 16)                      0           </span></a>
+<a class="sourceLine" id="cb155-18" data-line-number="18"><span class="co">#&gt; ________________________________________________________________________________</span></a>
+<a class="sourceLine" id="cb155-19" data-line-number="19"><span class="co">#&gt; dense_2 (Dense)                     (None, 1)                       17          </span></a>
+<a class="sourceLine" id="cb155-20" data-line-number="20"><span class="co">#&gt; ================================================================================</span></a>
+<a class="sourceLine" id="cb155-21" data-line-number="21"><span class="co">#&gt; Total params: 865</span></a>
+<a class="sourceLine" id="cb155-22" data-line-number="22"><span class="co">#&gt; Trainable params: 865</span></a>
+<a class="sourceLine" id="cb155-23" data-line-number="23"><span class="co">#&gt; Non-trainable params: 0</span></a>
+<a class="sourceLine" id="cb155-24" data-line-number="24"><span class="co">#&gt; ________________________________________________________________________________</span></a></code></pre></div>
 
 </div>
 </div>

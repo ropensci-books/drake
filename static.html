@@ -227,10 +227,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
 <li class="chapter" data-level="5.4.4" data-path="static.html"><a href="static.html#combine"><i class="fa fa-check"></i><b>5.4.4</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.4.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.4.5</b> Target names</a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5.1</b> Target names</a></li>
-</ul></li>
+<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
@@ -934,6 +933,151 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb73-35" data-line-number="35"><span class="co">#&gt;   data_2_4_6 = sim_data(mean = 2, sd = 4, skew = 6)</span></a>
 <a class="sourceLine" id="cb73-36" data-line-number="36"><span class="co">#&gt; )</span></a></code></pre></div>
 </div>
+<div id="target-names" class="section level3">
+<h3><span class="header-section-number">5.4.5</span> Target names</h3>
+<p><code>drake</code> releases after 7.12.0 let you define your own custom names with the optional <code>.names</code> argument of transformation.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
+<a class="sourceLine" id="cb74-2" data-line-number="2">analysis_names &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;experimental&quot;</span>, <span class="st">&quot;thorough&quot;</span>, <span class="st">&quot;minimal&quot;</span>, <span class="st">&quot;naive&quot;</span>)</a>
+<a class="sourceLine" id="cb74-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb74-4" data-line-number="4">  <span class="dt">dataset =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb74-5" data-line-number="5">    <span class="kw">get_dataset</span>(data_index),</a>
+<a class="sourceLine" id="cb74-6" data-line-number="6">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data_index =</span> <span class="op">!!</span><span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">.names =</span> <span class="kw">c</span>(<span class="st">&quot;new&quot;</span>, <span class="st">&quot;old&quot;</span>))</a>
+<a class="sourceLine" id="cb74-7" data-line-number="7">  ),</a>
+<a class="sourceLine" id="cb74-8" data-line-number="8">  <span class="dt">analysis =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb74-9" data-line-number="9">    <span class="kw">apply_method</span>(method_name, dataset),</a>
+<a class="sourceLine" id="cb74-10" data-line-number="10">    <span class="dt">transform =</span> <span class="kw">cross</span>(</a>
+<a class="sourceLine" id="cb74-11" data-line-number="11">      <span class="dt">method_name =</span> <span class="kw">c</span>(<span class="st">&quot;method1&quot;</span>, <span class="st">&quot;method2&quot;</span>),</a>
+<a class="sourceLine" id="cb74-12" data-line-number="12">      dataset,</a>
+<a class="sourceLine" id="cb74-13" data-line-number="13">      <span class="dt">.names =</span> <span class="op">!!</span>analysis_names</a>
+<a class="sourceLine" id="cb74-14" data-line-number="14">    )</a>
+<a class="sourceLine" id="cb74-15" data-line-number="15">  ),</a>
+<a class="sourceLine" id="cb74-16" data-line-number="16">  <span class="dt">summary =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb74-17" data-line-number="17">    <span class="kw">summarize</span>(analysis),</a>
+<a class="sourceLine" id="cb74-18" data-line-number="18">    <span class="dt">transform =</span> <span class="kw">combine</span>(analysis, <span class="dt">.by =</span> dataset, <span class="dt">.names =</span> <span class="kw">c</span>(<span class="st">&quot;table1&quot;</span>, <span class="st">&quot;table2&quot;</span>))</a>
+<a class="sourceLine" id="cb74-19" data-line-number="19">  )</a>
+<a class="sourceLine" id="cb74-20" data-line-number="20">)</a>
+<a class="sourceLine" id="cb74-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb74-22" data-line-number="22">plan</a>
+<a class="sourceLine" id="cb74-23" data-line-number="23"><span class="co">#&gt; # A tibble: 8 x 2</span></a>
+<a class="sourceLine" id="cb74-24" data-line-number="24"><span class="co">#&gt;   target       command                          </span></a>
+<a class="sourceLine" id="cb74-25" data-line-number="25"><span class="co">#&gt;   &lt;chr&gt;        &lt;expr&gt;                           </span></a>
+<a class="sourceLine" id="cb74-26" data-line-number="26"><span class="co">#&gt; 1 experimental apply_method(&quot;method1&quot;, new)     </span></a>
+<a class="sourceLine" id="cb74-27" data-line-number="27"><span class="co">#&gt; 2 thorough     apply_method(&quot;method2&quot;, new)     </span></a>
+<a class="sourceLine" id="cb74-28" data-line-number="28"><span class="co">#&gt; 3 minimal      apply_method(&quot;method1&quot;, old)     </span></a>
+<a class="sourceLine" id="cb74-29" data-line-number="29"><span class="co">#&gt; 4 naive        apply_method(&quot;method2&quot;, old)     </span></a>
+<a class="sourceLine" id="cb74-30" data-line-number="30"><span class="co">#&gt; 5 new          get_dataset(1L)                  </span></a>
+<a class="sourceLine" id="cb74-31" data-line-number="31"><span class="co">#&gt; 6 old          get_dataset(2L)                  </span></a>
+<a class="sourceLine" id="cb74-32" data-line-number="32"><span class="co">#&gt; 7 table1       summarize(experimental, thorough)</span></a>
+<a class="sourceLine" id="cb74-33" data-line-number="33"><span class="co">#&gt; 8 table2       summarize(minimal, naive)</span></a>
+<a class="sourceLine" id="cb74-34" data-line-number="34"></a>
+<a class="sourceLine" id="cb74-35" data-line-number="35"><span class="kw">plot</span>(plan)</a></code></pre></div>
+<div id="htmlwidget-aa0f842c976f36455530" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-aa0f842c976f36455530">{"x":{"nodes":{"id":["new","old","thorough","experimental","naive","minimal","table1","table2"],"imported":[false,false,false,false,false,false,false,false],"label":["new","old","thorough","experimental","naive","minimal","table1","table2"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,2,2,2,2,3,3],"x":[-1,-1,0,0,0,0,1,1],"y":[-0.555555555555556,0.555555555555555,-1,-0.333333333333333,0.333333333333333,1,-0.555555555555556,0.555555555555555]},"edges":{"from":["thorough","experimental","naive","minimal","new","new","old","old"],"to":["table1","table1","table2","table2","thorough","experimental","naive","minimal"],"arrows":["to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>The disadvantage of <code>.names</code> is you need to know in advance the number of targets a transformation will generate. As an alternative, all transformations have an optional <code>.id</code> argument to control the names of targets. Use it to select the grouping variables that go into the names, as well as the order they appear in the suffixes.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb75-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb75-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
+<a class="sourceLine" id="cb75-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
+<a class="sourceLine" id="cb75-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
+<a class="sourceLine" id="cb75-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb75-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
+<a class="sourceLine" id="cb75-8" data-line-number="8">      <span class="dt">.id =</span> param2</a>
+<a class="sourceLine" id="cb75-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb75-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb75-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb75-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb75-13" data-line-number="13"><span class="co">#&gt;   target command         </span></a>
+<a class="sourceLine" id="cb75-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;          </span></a>
+<a class="sourceLine" id="cb75-15" data-line-number="15"><span class="co">#&gt; 1 data_7 get_data(123, 7)</span></a>
+<a class="sourceLine" id="cb75-16" data-line-number="16"><span class="co">#&gt; 2 data_9 get_data(456, 9)</span></a></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb76-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb76-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
+<a class="sourceLine" id="cb76-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
+<a class="sourceLine" id="cb76-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb76-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
+<a class="sourceLine" id="cb76-8" data-line-number="8">      <span class="dt">.id =</span> <span class="kw">c</span>(param2, param1)</a>
+<a class="sourceLine" id="cb76-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb76-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb76-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb76-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb76-13" data-line-number="13"><span class="co">#&gt;   target     command         </span></a>
+<a class="sourceLine" id="cb76-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;          </span></a>
+<a class="sourceLine" id="cb76-15" data-line-number="15"><span class="co">#&gt; 1 data_7_123 get_data(123, 7)</span></a>
+<a class="sourceLine" id="cb76-16" data-line-number="16"><span class="co">#&gt; 2 data_9_456 get_data(456, 9)</span></a></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb77-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb77-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
+<a class="sourceLine" id="cb77-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
+<a class="sourceLine" id="cb77-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
+<a class="sourceLine" id="cb77-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb77-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
+<a class="sourceLine" id="cb77-8" data-line-number="8">      <span class="dt">.id =</span> <span class="kw">c</span>(param1, param2)</a>
+<a class="sourceLine" id="cb77-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb77-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb77-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb77-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb77-13" data-line-number="13"><span class="co">#&gt;   target     command         </span></a>
+<a class="sourceLine" id="cb77-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;          </span></a>
+<a class="sourceLine" id="cb77-15" data-line-number="15"><span class="co">#&gt; 1 data_123_7 get_data(123, 7)</span></a>
+<a class="sourceLine" id="cb77-16" data-line-number="16"><span class="co">#&gt; 2 data_456_9 get_data(456, 9)</span></a></code></pre></div>
+<p>Set <code>.id</code> to <code>FALSE</code> to ignore the grouping variables altogether.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb78-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb78-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
+<a class="sourceLine" id="cb78-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
+<a class="sourceLine" id="cb78-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
+<a class="sourceLine" id="cb78-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb78-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
+<a class="sourceLine" id="cb78-8" data-line-number="8">      <span class="dt">.id =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb78-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb78-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb78-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb78-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb78-13" data-line-number="13"><span class="co">#&gt;   target command         </span></a>
+<a class="sourceLine" id="cb78-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;          </span></a>
+<a class="sourceLine" id="cb78-15" data-line-number="15"><span class="co">#&gt; 1 data   get_data(123, 7)</span></a>
+<a class="sourceLine" id="cb78-16" data-line-number="16"><span class="co">#&gt; 2 data_2 get_data(456, 9)</span></a></code></pre></div>
+<p>Finally, <code>drake</code> supports a special <code>.id_chr</code> symbol in commands to let you refer to the name of the current target as a character string.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">as_chr &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb79-2" data-line-number="2">  <span class="kw">deparse</span>(<span class="kw">substitute</span>(x))</a>
+<a class="sourceLine" id="cb79-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb79-4" data-line-number="4">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb79-5" data-line-number="5">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb79-6" data-line-number="6">    <span class="kw">get_data</span>(param),</a>
+<a class="sourceLine" id="cb79-7" data-line-number="7">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">param =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>))</a>
+<a class="sourceLine" id="cb79-8" data-line-number="8">  ),</a>
+<a class="sourceLine" id="cb79-9" data-line-number="9">  <span class="dt">keras_model =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb79-10" data-line-number="10">    <span class="kw">save_model_hdf5</span>(<span class="kw">fit_model</span>(data), <span class="kw">file_out</span>(<span class="op">!!</span><span class="kw">sprintf</span>(<span class="st">&quot;%s.h5&quot;</span>, .id_chr))),</a>
+<a class="sourceLine" id="cb79-11" data-line-number="11">    <span class="dt">transform =</span> <span class="kw">map</span>(data, <span class="dt">.id =</span> param)</a>
+<a class="sourceLine" id="cb79-12" data-line-number="12">  ),</a>
+<a class="sourceLine" id="cb79-13" data-line-number="13">  <span class="dt">result =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb79-14" data-line-number="14">    <span class="kw">predict</span>(<span class="kw">load_model_hdf5</span>(<span class="kw">file_in</span>(<span class="op">!!</span><span class="kw">sprintf</span>(<span class="st">&quot;%s.h5&quot;</span>, <span class="kw">as_chr</span>(keras_model))))),</a>
+<a class="sourceLine" id="cb79-15" data-line-number="15">    <span class="dt">transform =</span> <span class="kw">map</span>(keras_model, <span class="dt">.id =</span> param)</a>
+<a class="sourceLine" id="cb79-16" data-line-number="16">  )</a>
+<a class="sourceLine" id="cb79-17" data-line-number="17">)</a>
+<a class="sourceLine" id="cb79-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb79-19" data-line-number="19">plan</a>
+<a class="sourceLine" id="cb79-20" data-line-number="20"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
+<a class="sourceLine" id="cb79-21" data-line-number="21"><span class="co">#&gt;   target          command                                                       </span></a>
+<a class="sourceLine" id="cb79-22" data-line-number="22"><span class="co">#&gt;   &lt;chr&gt;           &lt;expr&gt;                                                        </span></a>
+<a class="sourceLine" id="cb79-23" data-line-number="23"><span class="co">#&gt; 1 data_123        get_data(123)                                                …</span></a>
+<a class="sourceLine" id="cb79-24" data-line-number="24"><span class="co">#&gt; 2 data_456        get_data(456)                                                …</span></a>
+<a class="sourceLine" id="cb79-25" data-line-number="25"><span class="co">#&gt; 3 keras_model_123 save_model_hdf5(fit_model(data_123), file_out(&quot;keras_model_12…</span></a>
+<a class="sourceLine" id="cb79-26" data-line-number="26"><span class="co">#&gt; 4 keras_model_456 save_model_hdf5(fit_model(data_456), file_out(&quot;keras_model_45…</span></a>
+<a class="sourceLine" id="cb79-27" data-line-number="27"><span class="co">#&gt; 5 result_123      predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;)))      …</span></a>
+<a class="sourceLine" id="cb79-28" data-line-number="28"><span class="co">#&gt; 6 result_456      predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))      …</span></a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1"><span class="kw">drake_plan_source</span>(plan)</a>
+<a class="sourceLine" id="cb80-2" data-line-number="2"><span class="co">#&gt; drake_plan(</span></a>
+<a class="sourceLine" id="cb80-3" data-line-number="3"><span class="co">#&gt;   data_123 = get_data(123),</span></a>
+<a class="sourceLine" id="cb80-4" data-line-number="4"><span class="co">#&gt;   data_456 = get_data(456),</span></a>
+<a class="sourceLine" id="cb80-5" data-line-number="5"><span class="co">#&gt;   keras_model_123 = save_model_hdf5(fit_model(data_123), file_out(&quot;keras_model_123.h5&quot;)),</span></a>
+<a class="sourceLine" id="cb80-6" data-line-number="6"><span class="co">#&gt;   keras_model_456 = save_model_hdf5(fit_model(data_456), file_out(&quot;keras_model_456.h5&quot;)),</span></a>
+<a class="sourceLine" id="cb80-7" data-line-number="7"><span class="co">#&gt;   result_123 = predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;))),</span></a>
+<a class="sourceLine" id="cb80-8" data-line-number="8"><span class="co">#&gt;   result_456 = predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))</span></a>
+<a class="sourceLine" id="cb80-9" data-line-number="9"><span class="co">#&gt; )</span></a></code></pre></div>
+</div>
 </div>
 <div id="tags" class="section level2">
 <h2><span class="header-section-number">5.5</span> Tags</h2>
@@ -942,164 +1086,56 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>In-tags, which contain the target name you start with, and</li>
 <li>Out-tags, which contain the target names generated by the transformations.</li>
 </ol>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb74-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb74-3" data-line-number="3">    command,</a>
-<a class="sourceLine" id="cb74-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> from, <span class="dt">.tag_out =</span> <span class="kw">c</span>(to, out))</a>
-<a class="sourceLine" id="cb74-5" data-line-number="5">  ),</a>
-<a class="sourceLine" id="cb74-6" data-line-number="6">  <span class="dt">trace =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb74-7" data-line-number="7">)</a>
-<a class="sourceLine" id="cb74-8" data-line-number="8"><span class="co">#&gt; # A tibble: 2 x 7</span></a>
-<a class="sourceLine" id="cb74-9" data-line-number="9"><span class="co">#&gt;   target command y     x     from  to    out  </span></a>
-<a class="sourceLine" id="cb74-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></a>
-<a class="sourceLine" id="cb74-11" data-line-number="11"><span class="co">#&gt; 1 x_1    command 1     x_1   x     x_1   x_1  </span></a>
-<a class="sourceLine" id="cb74-12" data-line-number="12"><span class="co">#&gt; 2 x_2    command 2     x_2   x     x_2   x_2</span></a></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb81-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb81-3" data-line-number="3">    command,</a>
+<a class="sourceLine" id="cb81-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> from, <span class="dt">.tag_out =</span> <span class="kw">c</span>(to, out))</a>
+<a class="sourceLine" id="cb81-5" data-line-number="5">  ),</a>
+<a class="sourceLine" id="cb81-6" data-line-number="6">  <span class="dt">trace =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb81-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb81-8" data-line-number="8"><span class="co">#&gt; # A tibble: 2 x 7</span></a>
+<a class="sourceLine" id="cb81-9" data-line-number="9"><span class="co">#&gt;   target command y     x     from  to    out  </span></a>
+<a class="sourceLine" id="cb81-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></a>
+<a class="sourceLine" id="cb81-11" data-line-number="11"><span class="co">#&gt; 1 x_1    command 1     x_1   x     x_1   x_1  </span></a>
+<a class="sourceLine" id="cb81-12" data-line-number="12"><span class="co">#&gt; 2 x_2    command 2     x_2   x     x_2   x_2</span></a></code></pre></div>
 <p>Subsequent transformations can use tags as grouping variables and add to existing tags.</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb75-2" data-line-number="2">  <span class="dt">prep_work =</span> <span class="kw">do_prep_work</span>(),</a>
-<a class="sourceLine" id="cb75-3" data-line-number="3">  <span class="dt">local =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb75-4" data-line-number="4">    <span class="kw">get_local_data</span>(n, prep_work),</a>
-<a class="sourceLine" id="cb75-5" data-line-number="5">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)</a>
-<a class="sourceLine" id="cb75-6" data-line-number="6">  ),</a>
-<a class="sourceLine" id="cb75-7" data-line-number="7">  <span class="dt">online =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb75-8" data-line-number="8">    <span class="kw">get_online_data</span>(n, prep_work, <span class="dt">port =</span> <span class="st">&quot;8080&quot;</span>),</a>
-<a class="sourceLine" id="cb75-9" data-line-number="9">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)</a>
-<a class="sourceLine" id="cb75-10" data-line-number="10">  ),</a>
-<a class="sourceLine" id="cb75-11" data-line-number="11">  <span class="dt">summary =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb75-12" data-line-number="12">    <span class="kw">summarize</span>(<span class="kw">bind_rows</span>(data, <span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>)),</a>
-<a class="sourceLine" id="cb75-13" data-line-number="13">    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> data_source)</a>
-<a class="sourceLine" id="cb75-14" data-line-number="14">  ),</a>
-<a class="sourceLine" id="cb75-15" data-line-number="15">  <span class="dt">munged =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb75-16" data-line-number="16">    <span class="kw">munge</span>(<span class="kw">bind_rows</span>(data, <span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>)),</a>
-<a class="sourceLine" id="cb75-17" data-line-number="17">    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> n)</a>
-<a class="sourceLine" id="cb75-18" data-line-number="18">  )</a>
-<a class="sourceLine" id="cb75-19" data-line-number="19">)</a>
-<a class="sourceLine" id="cb75-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb75-21" data-line-number="21"><span class="kw">drake_plan_source</span>(plan)</a>
-<a class="sourceLine" id="cb75-22" data-line-number="22"><span class="co">#&gt; drake_plan(</span></a>
-<a class="sourceLine" id="cb75-23" data-line-number="23"><span class="co">#&gt;   local_1 = get_local_data(1, prep_work),</span></a>
-<a class="sourceLine" id="cb75-24" data-line-number="24"><span class="co">#&gt;   local_2 = get_local_data(2, prep_work),</span></a>
-<a class="sourceLine" id="cb75-25" data-line-number="25"><span class="co">#&gt;   munged_1 = munge(bind_rows(local_1, online_1, .id = &quot;data&quot;)),</span></a>
-<a class="sourceLine" id="cb75-26" data-line-number="26"><span class="co">#&gt;   munged_2 = munge(bind_rows(local_2, online_2, .id = &quot;data&quot;)),</span></a>
-<a class="sourceLine" id="cb75-27" data-line-number="27"><span class="co">#&gt;   online_1 = get_online_data(1, prep_work, port = &quot;8080&quot;),</span></a>
-<a class="sourceLine" id="cb75-28" data-line-number="28"><span class="co">#&gt;   online_2 = get_online_data(2, prep_work, port = &quot;8080&quot;),</span></a>
-<a class="sourceLine" id="cb75-29" data-line-number="29"><span class="co">#&gt;   prep_work = do_prep_work(),</span></a>
-<a class="sourceLine" id="cb75-30" data-line-number="30"><span class="co">#&gt;   summary_local = summarize(bind_rows(local_1, local_2, .id = &quot;data&quot;)),</span></a>
-<a class="sourceLine" id="cb75-31" data-line-number="31"><span class="co">#&gt;   summary_online = summarize(bind_rows(online_1, online_2, .id = &quot;data&quot;))</span></a>
-<a class="sourceLine" id="cb75-32" data-line-number="32"><span class="co">#&gt; )</span></a>
-<a class="sourceLine" id="cb75-33" data-line-number="33"></a>
-<a class="sourceLine" id="cb75-34" data-line-number="34"><span class="kw">plot</span>(plan)</a></code></pre></div>
-<div id="htmlwidget-aa0f842c976f36455530" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-aa0f842c976f36455530">{"x":{"nodes":{"id":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","munged_2","summary_online"],"imported":[false,false,false,false,false,false,false,false,false],"label":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","munged_2","summary_online"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,2,2,2,2,3,3,3,3],"x":[-1,0,0,0,0,1,1,1,1],"y":[-2.22044604925031e-16,-1,-0.333333333333333,0.333333333333333,1,-1,-0.333333333333333,0.333333333333333,1]},"edges":{"from":["local_1","local_1","local_2","local_2","prep_work","prep_work","prep_work","prep_work","online_1","online_1","online_2","online_2"],"to":["summary_local","munged_1","summary_local","munged_2","local_1","local_2","online_1","online_2","munged_1","summary_online","munged_2","summary_online"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
-<p><br></p>
-<div id="target-names" class="section level3">
-<h3><span class="header-section-number">5.5.1</span> Target names</h3>
-<p>All transformations have an optional <code>.id</code> argument to control the names of targets. Use it to select the grouping variables that go into the names, as well as the order they appear in the suffixes.</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb76-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb76-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
-<a class="sourceLine" id="cb76-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
-<a class="sourceLine" id="cb76-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
-<a class="sourceLine" id="cb76-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb76-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
-<a class="sourceLine" id="cb76-8" data-line-number="8">      <span class="dt">.id =</span> param2</a>
-<a class="sourceLine" id="cb76-9" data-line-number="9">    )</a>
-<a class="sourceLine" id="cb76-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb76-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb76-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb76-13" data-line-number="13"><span class="co">#&gt;   target command         </span></a>
-<a class="sourceLine" id="cb76-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;          </span></a>
-<a class="sourceLine" id="cb76-15" data-line-number="15"><span class="co">#&gt; 1 data_7 get_data(123, 7)</span></a>
-<a class="sourceLine" id="cb76-16" data-line-number="16"><span class="co">#&gt; 2 data_9 get_data(456, 9)</span></a></code></pre></div>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb77-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb77-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
-<a class="sourceLine" id="cb77-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
-<a class="sourceLine" id="cb77-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
-<a class="sourceLine" id="cb77-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb77-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
-<a class="sourceLine" id="cb77-8" data-line-number="8">      <span class="dt">.id =</span> <span class="kw">c</span>(param2, param1)</a>
-<a class="sourceLine" id="cb77-9" data-line-number="9">    )</a>
-<a class="sourceLine" id="cb77-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb77-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb77-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb77-13" data-line-number="13"><span class="co">#&gt;   target     command         </span></a>
-<a class="sourceLine" id="cb77-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;          </span></a>
-<a class="sourceLine" id="cb77-15" data-line-number="15"><span class="co">#&gt; 1 data_7_123 get_data(123, 7)</span></a>
-<a class="sourceLine" id="cb77-16" data-line-number="16"><span class="co">#&gt; 2 data_9_456 get_data(456, 9)</span></a></code></pre></div>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb78-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb78-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
-<a class="sourceLine" id="cb78-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
-<a class="sourceLine" id="cb78-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
-<a class="sourceLine" id="cb78-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb78-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
-<a class="sourceLine" id="cb78-8" data-line-number="8">      <span class="dt">.id =</span> <span class="kw">c</span>(param1, param2)</a>
-<a class="sourceLine" id="cb78-9" data-line-number="9">    )</a>
-<a class="sourceLine" id="cb78-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb78-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb78-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb78-13" data-line-number="13"><span class="co">#&gt;   target     command         </span></a>
-<a class="sourceLine" id="cb78-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;      &lt;expr&gt;          </span></a>
-<a class="sourceLine" id="cb78-15" data-line-number="15"><span class="co">#&gt; 1 data_123_7 get_data(123, 7)</span></a>
-<a class="sourceLine" id="cb78-16" data-line-number="16"><span class="co">#&gt; 2 data_456_9 get_data(456, 9)</span></a></code></pre></div>
-<p>Set <code>.id</code> to <code>FALSE</code> to ignore the grouping variables altogether.</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1"><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb79-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb79-3" data-line-number="3">    <span class="kw">get_data</span>(param1, param2),</a>
-<a class="sourceLine" id="cb79-4" data-line-number="4">    <span class="dt">transform =</span> <span class="kw">map</span>(</a>
-<a class="sourceLine" id="cb79-5" data-line-number="5">      <span class="dt">param1 =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>),</a>
-<a class="sourceLine" id="cb79-6" data-line-number="6">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb79-7" data-line-number="7">      <span class="dt">param2 =</span> <span class="kw">c</span>(<span class="st">&quot;abc&quot;</span>, <span class="st">&quot;xyz&quot;</span>),</a>
-<a class="sourceLine" id="cb79-8" data-line-number="8">      <span class="dt">.id =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb79-9" data-line-number="9">    )</a>
-<a class="sourceLine" id="cb79-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb79-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb79-12" data-line-number="12"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb79-13" data-line-number="13"><span class="co">#&gt;   target command         </span></a>
-<a class="sourceLine" id="cb79-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;  &lt;expr&gt;          </span></a>
-<a class="sourceLine" id="cb79-15" data-line-number="15"><span class="co">#&gt; 1 data   get_data(123, 7)</span></a>
-<a class="sourceLine" id="cb79-16" data-line-number="16"><span class="co">#&gt; 2 data_2 get_data(456, 9)</span></a></code></pre></div>
-<p>Finally, <code>drake</code> supports a special <code>.id_chr</code> symbol in commands to let you refer to the name of the current target as a character string.</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">as_chr &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb80-2" data-line-number="2">  <span class="kw">deparse</span>(<span class="kw">substitute</span>(x))</a>
-<a class="sourceLine" id="cb80-3" data-line-number="3">}</a>
-<a class="sourceLine" id="cb80-4" data-line-number="4">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb80-5" data-line-number="5">  <span class="dt">data =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb80-6" data-line-number="6">    <span class="kw">get_data</span>(param),</a>
-<a class="sourceLine" id="cb80-7" data-line-number="7">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">param =</span> <span class="kw">c</span>(<span class="dv">123</span>, <span class="dv">456</span>))</a>
-<a class="sourceLine" id="cb80-8" data-line-number="8">  ),</a>
-<a class="sourceLine" id="cb80-9" data-line-number="9">  <span class="dt">keras_model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb80-10" data-line-number="10">    <span class="kw">save_model_hdf5</span>(<span class="kw">fit_model</span>(data), <span class="kw">file_out</span>(<span class="op">!!</span><span class="kw">sprintf</span>(<span class="st">&quot;%s.h5&quot;</span>, .id_chr))),</a>
-<a class="sourceLine" id="cb80-11" data-line-number="11">    <span class="dt">transform =</span> <span class="kw">map</span>(data, <span class="dt">.id =</span> param)</a>
-<a class="sourceLine" id="cb80-12" data-line-number="12">  ),</a>
-<a class="sourceLine" id="cb80-13" data-line-number="13">  <span class="dt">result =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb80-14" data-line-number="14">    <span class="kw">predict</span>(<span class="kw">load_model_hdf5</span>(<span class="kw">file_in</span>(<span class="op">!!</span><span class="kw">sprintf</span>(<span class="st">&quot;%s.h5&quot;</span>, <span class="kw">as_chr</span>(keras_model))))),</a>
-<a class="sourceLine" id="cb80-15" data-line-number="15">    <span class="dt">transform =</span> <span class="kw">map</span>(keras_model, <span class="dt">.id =</span> param)</a>
-<a class="sourceLine" id="cb80-16" data-line-number="16">  )</a>
-<a class="sourceLine" id="cb80-17" data-line-number="17">)</a>
-<a class="sourceLine" id="cb80-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb80-19" data-line-number="19">plan</a>
-<a class="sourceLine" id="cb80-20" data-line-number="20"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
-<a class="sourceLine" id="cb80-21" data-line-number="21"><span class="co">#&gt;   target          command                                                       </span></a>
-<a class="sourceLine" id="cb80-22" data-line-number="22"><span class="co">#&gt;   &lt;chr&gt;           &lt;expr&gt;                                                        </span></a>
-<a class="sourceLine" id="cb80-23" data-line-number="23"><span class="co">#&gt; 1 data_123        get_data(123)                                                …</span></a>
-<a class="sourceLine" id="cb80-24" data-line-number="24"><span class="co">#&gt; 2 data_456        get_data(456)                                                …</span></a>
-<a class="sourceLine" id="cb80-25" data-line-number="25"><span class="co">#&gt; 3 keras_model_123 save_model_hdf5(fit_model(data_123), file_out(&quot;keras_model_12…</span></a>
-<a class="sourceLine" id="cb80-26" data-line-number="26"><span class="co">#&gt; 4 keras_model_456 save_model_hdf5(fit_model(data_456), file_out(&quot;keras_model_45…</span></a>
-<a class="sourceLine" id="cb80-27" data-line-number="27"><span class="co">#&gt; 5 result_123      predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;)))      …</span></a>
-<a class="sourceLine" id="cb80-28" data-line-number="28"><span class="co">#&gt; 6 result_456      predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))      …</span></a></code></pre></div>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1"><span class="kw">drake_plan_source</span>(plan)</a>
-<a class="sourceLine" id="cb81-2" data-line-number="2"><span class="co">#&gt; drake_plan(</span></a>
-<a class="sourceLine" id="cb81-3" data-line-number="3"><span class="co">#&gt;   data_123 = get_data(123),</span></a>
-<a class="sourceLine" id="cb81-4" data-line-number="4"><span class="co">#&gt;   data_456 = get_data(456),</span></a>
-<a class="sourceLine" id="cb81-5" data-line-number="5"><span class="co">#&gt;   keras_model_123 = save_model_hdf5(fit_model(data_123), file_out(&quot;keras_model_123.h5&quot;)),</span></a>
-<a class="sourceLine" id="cb81-6" data-line-number="6"><span class="co">#&gt;   keras_model_456 = save_model_hdf5(fit_model(data_456), file_out(&quot;keras_model_456.h5&quot;)),</span></a>
-<a class="sourceLine" id="cb81-7" data-line-number="7"><span class="co">#&gt;   result_123 = predict(load_model_hdf5(file_in(&quot;keras_model_123.h5&quot;))),</span></a>
-<a class="sourceLine" id="cb81-8" data-line-number="8"><span class="co">#&gt;   result_456 = predict(load_model_hdf5(file_in(&quot;keras_model_456.h5&quot;)))</span></a>
-<a class="sourceLine" id="cb81-9" data-line-number="9"><span class="co">#&gt; )</span></a></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb82-2" data-line-number="2">  <span class="dt">prep_work =</span> <span class="kw">do_prep_work</span>(),</a>
+<a class="sourceLine" id="cb82-3" data-line-number="3">  <span class="dt">local =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb82-4" data-line-number="4">    <span class="kw">get_local_data</span>(n, prep_work),</a>
+<a class="sourceLine" id="cb82-5" data-line-number="5">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)</a>
+<a class="sourceLine" id="cb82-6" data-line-number="6">  ),</a>
+<a class="sourceLine" id="cb82-7" data-line-number="7">  <span class="dt">online =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb82-8" data-line-number="8">    <span class="kw">get_online_data</span>(n, prep_work, <span class="dt">port =</span> <span class="st">&quot;8080&quot;</span>),</a>
+<a class="sourceLine" id="cb82-9" data-line-number="9">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">.tag_in =</span> data_source, <span class="dt">.tag_out =</span> data)</a>
+<a class="sourceLine" id="cb82-10" data-line-number="10">  ),</a>
+<a class="sourceLine" id="cb82-11" data-line-number="11">  <span class="dt">summary =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb82-12" data-line-number="12">    <span class="kw">summarize</span>(<span class="kw">bind_rows</span>(data, <span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>)),</a>
+<a class="sourceLine" id="cb82-13" data-line-number="13">    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> data_source)</a>
+<a class="sourceLine" id="cb82-14" data-line-number="14">  ),</a>
+<a class="sourceLine" id="cb82-15" data-line-number="15">  <span class="dt">munged =</span> <span class="kw">target</span>(</a>
+<a class="sourceLine" id="cb82-16" data-line-number="16">    <span class="kw">munge</span>(<span class="kw">bind_rows</span>(data, <span class="dt">.id =</span> <span class="st">&quot;data&quot;</span>)),</a>
+<a class="sourceLine" id="cb82-17" data-line-number="17">    <span class="dt">transform =</span> <span class="kw">combine</span>(data, <span class="dt">.by =</span> n)</a>
+<a class="sourceLine" id="cb82-18" data-line-number="18">  )</a>
+<a class="sourceLine" id="cb82-19" data-line-number="19">)</a>
+<a class="sourceLine" id="cb82-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb82-21" data-line-number="21"><span class="kw">drake_plan_source</span>(plan)</a>
+<a class="sourceLine" id="cb82-22" data-line-number="22"><span class="co">#&gt; drake_plan(</span></a>
+<a class="sourceLine" id="cb82-23" data-line-number="23"><span class="co">#&gt;   local_1 = get_local_data(1, prep_work),</span></a>
+<a class="sourceLine" id="cb82-24" data-line-number="24"><span class="co">#&gt;   local_2 = get_local_data(2, prep_work),</span></a>
+<a class="sourceLine" id="cb82-25" data-line-number="25"><span class="co">#&gt;   munged_1 = munge(bind_rows(local_1, online_1, .id = &quot;data&quot;)),</span></a>
+<a class="sourceLine" id="cb82-26" data-line-number="26"><span class="co">#&gt;   munged_2 = munge(bind_rows(local_2, online_2, .id = &quot;data&quot;)),</span></a>
+<a class="sourceLine" id="cb82-27" data-line-number="27"><span class="co">#&gt;   online_1 = get_online_data(1, prep_work, port = &quot;8080&quot;),</span></a>
+<a class="sourceLine" id="cb82-28" data-line-number="28"><span class="co">#&gt;   online_2 = get_online_data(2, prep_work, port = &quot;8080&quot;),</span></a>
+<a class="sourceLine" id="cb82-29" data-line-number="29"><span class="co">#&gt;   prep_work = do_prep_work(),</span></a>
+<a class="sourceLine" id="cb82-30" data-line-number="30"><span class="co">#&gt;   summary_local = summarize(bind_rows(local_1, local_2, .id = &quot;data&quot;)),</span></a>
+<a class="sourceLine" id="cb82-31" data-line-number="31"><span class="co">#&gt;   summary_online = summarize(bind_rows(online_1, online_2, .id = &quot;data&quot;))</span></a>
+<a class="sourceLine" id="cb82-32" data-line-number="32"><span class="co">#&gt; )</span></a>
+<a class="sourceLine" id="cb82-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb82-34" data-line-number="34"><span class="kw">plot</span>(plan)</a></code></pre></div>
+<div id="htmlwidget-37f98c2b191a9c8f336e" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-37f98c2b191a9c8f336e">{"x":{"nodes":{"id":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","munged_2","summary_online"],"imported":[false,false,false,false,false,false,false,false,false],"label":["prep_work","local_1","local_2","online_1","online_2","summary_local","munged_1","munged_2","summary_online"],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20],"color":["#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,2,2,2,2,3,3,3,3],"x":[-1,0,0,0,0,1,1,1,1],"y":[-2.22044604925031e-16,-1,-0.333333333333333,0.333333333333333,1,-1,-0.333333333333333,0.333333333333333,1]},"edges":{"from":["local_1","local_1","local_2","local_2","prep_work","prep_work","prep_work","prep_work","online_1","online_1","online_2","online_2"],"to":["summary_local","munged_1","summary_local","munged_2","local_1","local_2","online_1","online_2","munged_1","summary_online","munged_2","summary_online"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 
-</div>
 </div>
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">

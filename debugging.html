@@ -227,10 +227,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
 <li class="chapter" data-level="5.4.4" data-path="static.html"><a href="static.html#combine"><i class="fa fa-check"></i><b>5.4.4</b> <code>combine()</code></a></li>
+<li class="chapter" data-level="5.4.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.4.5</b> Target names</a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5.1</b> Target names</a></li>
-</ul></li>
+<li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.5</b> Tags</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
@@ -441,127 +440,127 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="diagnosing-errors" class="section level3">
 <h3><span class="header-section-number">17.1.1</span> Diagnosing errors</h3>
 <p>When a target fails, <code>drake</code> tries to tell you.</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb268-1" data-line-number="1">large_dataset &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
-<a class="sourceLine" id="cb268-2" data-line-number="2">  <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>))</a>
-<a class="sourceLine" id="cb268-3" data-line-number="3">}</a>
-<a class="sourceLine" id="cb268-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb268-5" data-line-number="5">expensive_analysis &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb268-6" data-line-number="6">  <span class="co"># More operations go here.</span></a>
-<a class="sourceLine" id="cb268-7" data-line-number="7">  <span class="kw">tricky_operation</span>(data)</a>
-<a class="sourceLine" id="cb268-8" data-line-number="8">}</a>
-<a class="sourceLine" id="cb268-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb268-10" data-line-number="10">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb268-11" data-line-number="11">  <span class="co"># Expensive code here.</span></a>
-<a class="sourceLine" id="cb268-12" data-line-number="12">  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</a>
-<a class="sourceLine" id="cb268-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb268-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb268-15" data-line-number="15">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb268-16" data-line-number="16">  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),</a>
-<a class="sourceLine" id="cb268-17" data-line-number="17">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data)</a>
-<a class="sourceLine" id="cb268-18" data-line-number="18">)</a>
-<a class="sourceLine" id="cb268-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb268-20" data-line-number="20"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb268-21" data-line-number="21"><span class="co">#&gt; ▶ target data</span></a>
-<a class="sourceLine" id="cb268-22" data-line-number="22"><span class="co">#&gt; ▶ target analysis</span></a>
-<a class="sourceLine" id="cb268-23" data-line-number="23"><span class="co">#&gt; ✖ fail analysis</span></a>
-<a class="sourceLine" id="cb268-24" data-line-number="24"><span class="co">#&gt; Error: target analysis failed.</span></a>
-<a class="sourceLine" id="cb268-25" data-line-number="25"><span class="co">#&gt; diagnose(analysis)error$message:</span></a>
-<a class="sourceLine" id="cb268-26" data-line-number="26"><span class="co">#&gt;   there is a bug somewhere.</span></a>
-<a class="sourceLine" id="cb268-27" data-line-number="27"><span class="co">#&gt; diagnose(analysis)error$calls:</span></a>
-<a class="sourceLine" id="cb268-28" data-line-number="28"><span class="co">#&gt;   1. └─global::expensive_analysis(data)</span></a>
-<a class="sourceLine" id="cb268-29" data-line-number="29"><span class="co">#&gt;   2.   └─global::tricky_operation(data)</span></a>
-<a class="sourceLine" id="cb268-30" data-line-number="30"><span class="co">#&gt;   3.     └─base::stop(&quot;there is a bug somewhere.&quot;)</span></a></code></pre></div>
-<p><code>diagnose()</code> recovers the metadata on targets. For failed targets, this includes an error object.</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb269-1" data-line-number="1">error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(analysis)<span class="op">$</span>error</a>
-<a class="sourceLine" id="cb269-2" data-line-number="2">error</a>
-<a class="sourceLine" id="cb269-3" data-line-number="3"><span class="co">#&gt; &lt;simpleError in tricky_operation(data): there is a bug somewhere.&gt;</span></a>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb269-1" data-line-number="1">large_dataset &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
+<a class="sourceLine" id="cb269-2" data-line-number="2">  <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>))</a>
+<a class="sourceLine" id="cb269-3" data-line-number="3">}</a>
 <a class="sourceLine" id="cb269-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb269-5" data-line-number="5"><span class="kw">names</span>(error)</a>
-<a class="sourceLine" id="cb269-6" data-line-number="6"><span class="co">#&gt; [1] &quot;message&quot; &quot;call&quot;    &quot;calls&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb269-5" data-line-number="5">expensive_analysis &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb269-6" data-line-number="6">  <span class="co"># More operations go here.</span></a>
+<a class="sourceLine" id="cb269-7" data-line-number="7">  <span class="kw">tricky_operation</span>(data)</a>
+<a class="sourceLine" id="cb269-8" data-line-number="8">}</a>
+<a class="sourceLine" id="cb269-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb269-10" data-line-number="10">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb269-11" data-line-number="11">  <span class="co"># Expensive code here.</span></a>
+<a class="sourceLine" id="cb269-12" data-line-number="12">  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</a>
+<a class="sourceLine" id="cb269-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb269-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb269-15" data-line-number="15">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb269-16" data-line-number="16">  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),</a>
+<a class="sourceLine" id="cb269-17" data-line-number="17">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data)</a>
+<a class="sourceLine" id="cb269-18" data-line-number="18">)</a>
+<a class="sourceLine" id="cb269-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb269-20" data-line-number="20"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb269-21" data-line-number="21"><span class="co">#&gt; ▶ target data</span></a>
+<a class="sourceLine" id="cb269-22" data-line-number="22"><span class="co">#&gt; ▶ target analysis</span></a>
+<a class="sourceLine" id="cb269-23" data-line-number="23"><span class="co">#&gt; ✖ fail analysis</span></a>
+<a class="sourceLine" id="cb269-24" data-line-number="24"><span class="co">#&gt; Error: target analysis failed.</span></a>
+<a class="sourceLine" id="cb269-25" data-line-number="25"><span class="co">#&gt; diagnose(analysis)error$message:</span></a>
+<a class="sourceLine" id="cb269-26" data-line-number="26"><span class="co">#&gt;   there is a bug somewhere.</span></a>
+<a class="sourceLine" id="cb269-27" data-line-number="27"><span class="co">#&gt; diagnose(analysis)error$calls:</span></a>
+<a class="sourceLine" id="cb269-28" data-line-number="28"><span class="co">#&gt;   1. └─global::expensive_analysis(data)</span></a>
+<a class="sourceLine" id="cb269-29" data-line-number="29"><span class="co">#&gt;   2.   └─global::tricky_operation(data)</span></a>
+<a class="sourceLine" id="cb269-30" data-line-number="30"><span class="co">#&gt;   3.     └─base::stop(&quot;there is a bug somewhere.&quot;)</span></a></code></pre></div>
+<p><code>diagnose()</code> recovers the metadata on targets. For failed targets, this includes an error object.</p>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb270-1" data-line-number="1">error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(analysis)<span class="op">$</span>error</a>
+<a class="sourceLine" id="cb270-2" data-line-number="2">error</a>
+<a class="sourceLine" id="cb270-3" data-line-number="3"><span class="co">#&gt; &lt;simpleError in tricky_operation(data): there is a bug somewhere.&gt;</span></a>
+<a class="sourceLine" id="cb270-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb270-5" data-line-number="5"><span class="kw">names</span>(error)</a>
+<a class="sourceLine" id="cb270-6" data-line-number="6"><span class="co">#&gt; [1] &quot;message&quot; &quot;call&quot;    &quot;calls&quot;</span></a></code></pre></div>
 <p>Using the call stack, you can trace back the location of the error. Once you know roughly where to find the bug, you can troubleshoot interactively.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb270-1" data-line-number="1"><span class="kw">invisible</span>(<span class="kw">lapply</span>(<span class="kw">tail</span>(error<span class="op">$</span>calls, <span class="dv">3</span>), print))</a>
-<a class="sourceLine" id="cb270-2" data-line-number="2"><span class="co">#&gt; [1] 0 1 2</span></a>
-<a class="sourceLine" id="cb270-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0xe4e29f8&quot; &quot;0xe4e2b48&quot; &quot;0xe4e2d40&quot;</span></a>
-<a class="sourceLine" id="cb270-4" data-line-number="4"><span class="co">#&gt; [1] 60 61 62</span></a></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1"><span class="kw">invisible</span>(<span class="kw">lapply</span>(<span class="kw">tail</span>(error<span class="op">$</span>calls, <span class="dv">3</span>), print))</a>
+<a class="sourceLine" id="cb271-2" data-line-number="2"><span class="co">#&gt; [1] 0 1 2</span></a>
+<a class="sourceLine" id="cb271-3" data-line-number="3"><span class="co">#&gt; [1] &quot;0x12f75d00&quot; &quot;0x12f75e50&quot; &quot;0x12f72218&quot;</span></a>
+<a class="sourceLine" id="cb271-4" data-line-number="4"><span class="co">#&gt; [1] 60 61 62</span></a></code></pre></div>
 </div>
 <div id="interactive-debugging" class="section level3">
 <h3><span class="header-section-number">17.1.2</span> Interactive debugging</h3>
 <p>The clues from <code>diagnose()</code> help us go back and inspect the failing code. <code>debug()</code> is an interactive debugging tool which helps you verify exactly what is going wrong. Below, <code>make(plan)</code> pauses execution and turn interactive control over to you inside <code>tricky_operation()</code>.</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1"><span class="kw">debug</span>(tricky_operation)</a>
-<a class="sourceLine" id="cb271-2" data-line-number="2"><span class="kw">make</span>(plan) <span class="co"># Pauses at tricky_operation(data).</span></a>
-<a class="sourceLine" id="cb271-3" data-line-number="3"><span class="kw">undebug</span>(tricky_operation) <span class="co"># Undoes debug().</span></a></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">debug</span>(tricky_operation)</a>
+<a class="sourceLine" id="cb272-2" data-line-number="2"><span class="kw">make</span>(plan) <span class="co"># Pauses at tricky_operation(data).</span></a>
+<a class="sourceLine" id="cb272-3" data-line-number="3"><span class="kw">undebug</span>(tricky_operation) <span class="co"># Undoes debug().</span></a></code></pre></div>
 <p><code>drake</code>’s own <code>drake_debug()</code> function is nearly equivalent.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">drake_debug</span>(analysis, plan) <span class="co"># Pauses at the command expensive_analysis(data).</span></a></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">drake_debug</span>(analysis, plan) <span class="co"># Pauses at the command expensive_analysis(data).</span></a></code></pre></div>
 <p><code>browser()</code> is similar, but it affords you finer control over to pause execution</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb273-2" data-line-number="2">  <span class="co"># Expensive code here.</span></a>
-<a class="sourceLine" id="cb273-3" data-line-number="3">  <span class="kw">browser</span>() <span class="co"># Pauses right here to give you control.</span></a>
-<a class="sourceLine" id="cb273-4" data-line-number="4">  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</a>
-<a class="sourceLine" id="cb273-5" data-line-number="5">}</a>
-<a class="sourceLine" id="cb273-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb273-7" data-line-number="7"><span class="kw">make</span>(plan)</a></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb274-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb274-2" data-line-number="2">  <span class="co"># Expensive code here.</span></a>
+<a class="sourceLine" id="cb274-3" data-line-number="3">  <span class="kw">browser</span>() <span class="co"># Pauses right here to give you control.</span></a>
+<a class="sourceLine" id="cb274-4" data-line-number="4">  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</a>
+<a class="sourceLine" id="cb274-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb274-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb274-7" data-line-number="7"><span class="kw">make</span>(plan)</a></code></pre></div>
 </div>
 <div id="efficient-trial-and-error" class="section level3">
 <h3><span class="header-section-number">17.1.3</span> Efficient trial and error</h3>
 <p>If you are using <code>drake</code>, then chances are your targets are computationally expensive and the long runtimes make debugging difficult. To speed up trial and error, run the plan on a small dataset when you debug and repair things.</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb274-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb274-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">head</span>(<span class="kw">large_dataset</span>()),       <span class="co"># Just work with the first few rows.</span></a>
-<a class="sourceLine" id="cb274-3" data-line-number="3">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Runs faster now.</span></a>
-<a class="sourceLine" id="cb274-4" data-line-number="4">)</a></code></pre></div>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span>... <span class="co"># Try to fix the function.</span></a>
-<a class="sourceLine" id="cb275-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb275-3" data-line-number="3"><span class="kw">debug</span>(tricky_operation) <span class="co">#  Set up to debug interactively.</span></a>
-<a class="sourceLine" id="cb275-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb275-5" data-line-number="5"><span class="kw">make</span>(plan) <span class="co"># Try to run the workflow.</span></a></code></pre></div>
-<p>After a lot of quick trial and error, we finally fix the function and run it on the small data.</p>
-<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb276-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb276-2" data-line-number="2">  <span class="co"># Good code goes here.</span></a>
-<a class="sourceLine" id="cb276-3" data-line-number="3">}</a>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb275-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">head</span>(<span class="kw">large_dataset</span>()),       <span class="co"># Just work with the first few rows.</span></a>
+<a class="sourceLine" id="cb275-3" data-line-number="3">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Runs faster now.</span></a>
+<a class="sourceLine" id="cb275-4" data-line-number="4">)</a></code></pre></div>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb276-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span>... <span class="co"># Try to fix the function.</span></a>
+<a class="sourceLine" id="cb276-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb276-3" data-line-number="3"><span class="kw">debug</span>(tricky_operation) <span class="co">#  Set up to debug interactively.</span></a>
 <a class="sourceLine" id="cb276-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb276-5" data-line-number="5"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb276-6" data-line-number="6"><span class="co">#&gt; ▶ target analysis</span></a></code></pre></div>
+<a class="sourceLine" id="cb276-5" data-line-number="5"><span class="kw">make</span>(plan) <span class="co"># Try to run the workflow.</span></a></code></pre></div>
+<p>After a lot of quick trial and error, we finally fix the function and run it on the small data.</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1">tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb277-2" data-line-number="2">  <span class="co"># Good code goes here.</span></a>
+<a class="sourceLine" id="cb277-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb277-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb277-5" data-line-number="5"><span class="kw">make</span>(plan)</a>
+<a class="sourceLine" id="cb277-6" data-line-number="6"><span class="co">#&gt; ▶ target analysis</span></a></code></pre></div>
 <p>Now, that the code works, it is time to scale back up to the large data. Use <code>make(plan, recover = TRUE)</code> to salvage old targets from before the debugging process.</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb277-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),             <span class="co"># Use the large data again.</span></a>
-<a class="sourceLine" id="cb277-3" data-line-number="3">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Should be repaired now.</span></a>
-<a class="sourceLine" id="cb277-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb277-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb277-6" data-line-number="6"><span class="kw">make</span>(plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb277-7" data-line-number="7"><span class="co">#&gt; ✔ All targets are already up to date.</span></a></code></pre></div>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb278-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb278-2" data-line-number="2">  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),             <span class="co"># Use the large data again.</span></a>
+<a class="sourceLine" id="cb278-3" data-line-number="3">  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Should be repaired now.</span></a>
+<a class="sourceLine" id="cb278-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb278-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb278-6" data-line-number="6"><span class="kw">make</span>(plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb278-7" data-line-number="7"><span class="co">#&gt; ✔ All targets are already up to date.</span></a></code></pre></div>
 </div>
 </div>
 <div id="why-do-my-targets-keep-rerunning" class="section level2">
 <h2><span class="header-section-number">17.2</span> Why do my targets keep rerunning?</h2>
 <p>Consider the following completed workflow.</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb278-1" data-line-number="1"><span class="kw">load_mtcars_example</span>()</a>
-<a class="sourceLine" id="cb278-2" data-line-number="2"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb278-3" data-line-number="3"><span class="co">#&gt; ▶ target small</span></a>
-<a class="sourceLine" id="cb278-4" data-line-number="4"><span class="co">#&gt; ▶ target large</span></a>
-<a class="sourceLine" id="cb278-5" data-line-number="5"><span class="co">#&gt; ▶ target regression1_small</span></a>
-<a class="sourceLine" id="cb278-6" data-line-number="6"><span class="co">#&gt; ▶ target regression2_small</span></a>
-<a class="sourceLine" id="cb278-7" data-line-number="7"><span class="co">#&gt; ▶ target regression1_large</span></a>
-<a class="sourceLine" id="cb278-8" data-line-number="8"><span class="co">#&gt; ▶ target regression2_large</span></a>
-<a class="sourceLine" id="cb278-9" data-line-number="9"><span class="co">#&gt; ▶ target summ_regression1_small</span></a>
-<a class="sourceLine" id="cb278-10" data-line-number="10"><span class="co">#&gt; ▶ target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb278-11" data-line-number="11"><span class="co">#&gt; ▶ target coef_regression2_small</span></a>
-<a class="sourceLine" id="cb278-12" data-line-number="12"><span class="co">#&gt; ▶ target summ_regression2_small</span></a>
-<a class="sourceLine" id="cb278-13" data-line-number="13"><span class="co">#&gt; ▶ target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb278-14" data-line-number="14"><span class="co">#&gt; ▶ target summ_regression1_large</span></a>
-<a class="sourceLine" id="cb278-15" data-line-number="15"><span class="co">#&gt; ▶ target coef_regression2_large</span></a>
-<a class="sourceLine" id="cb278-16" data-line-number="16"><span class="co">#&gt; ▶ target summ_regression2_large</span></a>
-<a class="sourceLine" id="cb278-17" data-line-number="17"><span class="co">#&gt; ▶ target report</span></a></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1"><span class="kw">load_mtcars_example</span>()</a>
+<a class="sourceLine" id="cb279-2" data-line-number="2"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb279-3" data-line-number="3"><span class="co">#&gt; ▶ target large</span></a>
+<a class="sourceLine" id="cb279-4" data-line-number="4"><span class="co">#&gt; ▶ target small</span></a>
+<a class="sourceLine" id="cb279-5" data-line-number="5"><span class="co">#&gt; ▶ target regression1_large</span></a>
+<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt; ▶ target regression2_large</span></a>
+<a class="sourceLine" id="cb279-7" data-line-number="7"><span class="co">#&gt; ▶ target regression1_small</span></a>
+<a class="sourceLine" id="cb279-8" data-line-number="8"><span class="co">#&gt; ▶ target regression2_small</span></a>
+<a class="sourceLine" id="cb279-9" data-line-number="9"><span class="co">#&gt; ▶ target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb279-10" data-line-number="10"><span class="co">#&gt; ▶ target summ_regression1_large</span></a>
+<a class="sourceLine" id="cb279-11" data-line-number="11"><span class="co">#&gt; ▶ target coef_regression2_large</span></a>
+<a class="sourceLine" id="cb279-12" data-line-number="12"><span class="co">#&gt; ▶ target summ_regression2_large</span></a>
+<a class="sourceLine" id="cb279-13" data-line-number="13"><span class="co">#&gt; ▶ target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb279-14" data-line-number="14"><span class="co">#&gt; ▶ target summ_regression1_small</span></a>
+<a class="sourceLine" id="cb279-15" data-line-number="15"><span class="co">#&gt; ▶ target coef_regression2_small</span></a>
+<a class="sourceLine" id="cb279-16" data-line-number="16"><span class="co">#&gt; ▶ target summ_regression2_small</span></a>
+<a class="sourceLine" id="cb279-17" data-line-number="17"><span class="co">#&gt; ▶ target report</span></a></code></pre></div>
 <p>At this point, if you change the <code>reg1()</code> function, then <code>make()</code> will automatically detect and rerun downstream targets such as <code>regression1_large</code>.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">reg1 &lt;-<span class="st"> </span><span class="cf">function</span> (d) {</a>
-<a class="sourceLine" id="cb279-2" data-line-number="2">  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x, <span class="dt">data =</span> d)</a>
-<a class="sourceLine" id="cb279-3" data-line-number="3">}</a>
-<a class="sourceLine" id="cb279-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb279-5" data-line-number="5"><span class="kw">make</span>(my_plan)</a>
-<a class="sourceLine" id="cb279-6" data-line-number="6"><span class="co">#&gt; ▶ target regression1_small</span></a>
-<a class="sourceLine" id="cb279-7" data-line-number="7"><span class="co">#&gt; ▶ target regression1_large</span></a>
-<a class="sourceLine" id="cb279-8" data-line-number="8"><span class="co">#&gt; ▶ target summ_regression1_small</span></a>
-<a class="sourceLine" id="cb279-9" data-line-number="9"><span class="co">#&gt; ▶ target coef_regression1_small</span></a>
-<a class="sourceLine" id="cb279-10" data-line-number="10"><span class="co">#&gt; ▶ target coef_regression1_large</span></a>
-<a class="sourceLine" id="cb279-11" data-line-number="11"><span class="co">#&gt; ▶ target summ_regression1_large</span></a></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1">reg1 &lt;-<span class="st"> </span><span class="cf">function</span> (d) {</a>
+<a class="sourceLine" id="cb280-2" data-line-number="2">  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb280-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb280-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb280-5" data-line-number="5"><span class="kw">make</span>(my_plan)</a>
+<a class="sourceLine" id="cb280-6" data-line-number="6"><span class="co">#&gt; ▶ target regression1_small</span></a>
+<a class="sourceLine" id="cb280-7" data-line-number="7"><span class="co">#&gt; ▶ target regression1_large</span></a>
+<a class="sourceLine" id="cb280-8" data-line-number="8"><span class="co">#&gt; ▶ target coef_regression1_small</span></a>
+<a class="sourceLine" id="cb280-9" data-line-number="9"><span class="co">#&gt; ▶ target summ_regression1_small</span></a>
+<a class="sourceLine" id="cb280-10" data-line-number="10"><span class="co">#&gt; ▶ target coef_regression1_large</span></a>
+<a class="sourceLine" id="cb280-11" data-line-number="11"><span class="co">#&gt; ▶ target summ_regression1_large</span></a></code></pre></div>
 <p>In general, targets are “outdated” or “invalidated” they are out of sync with their dependencies. If a target is outdated, the next <code>make()</code> automatically detects discrepancies and rebuild the affected targets. Usually, this automation adds convenience, saves time, and ensures reproducibility in the face of long runtimes.</p>
 <p>However, it can be frustrating when <code>drake</code> detects outdated targets when you think everything is up to date. If this happens, it is important to understand</p>
 <ol style="list-style-type: decimal">
@@ -574,70 +573,70 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="how-your-workflow-fits-together" class="section level3">
 <h3><span class="header-section-number">17.2.1</span> How your workflow fits together</h3>
 <p><code>drake</code> automatically analyzes your plan and functions to understand how your targets depend on each other. It assembles this information in a directed acyclic graph (DAG) which you can visualize and explore.</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(my_plan)</a></code></pre></div>
-<div id="htmlwidget-bcd3875ae205e6d170c5" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bcd3875ae205e6d170c5">{"x":{"nodes":{"id":["reg1","reg2","random_rows","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","p-OJSXA33SOQXFE3LE","simulate","small","large","regression1_small","regression2_small","regression1_large","regression2_large","summ_regression1_small","coef_regression1_small","coef_regression2_small","summ_regression2_small","coef_regression1_large","summ_regression1_large","coef_regression2_large","summ_regression2_large","report","p-OJSXA33SOQXG2ZA"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"label":["reg1","reg2","random_rows","datasets::mtcars","file report.Rmd","simulate","small\n0.005s","large\n0.004s","regression1_small\n0.028s","regression2_small\n0.005s","regression1_large\n0.035s","regression2_large\n0.004s","summ_regression1_small\n0.005s","coef_regression1_small\n0.004s","coef_regression2_small\n0.004s","summ_regression2_small\n0.004s","coef_regression1_large\n0.004s","summ_regression1_large\n0.004s","coef_regression2_large\n0.003s","summ_regression2_large\n0.003s","report\n0.047s","file report.md"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","outdated","up to date","outdated","up to date","outdated","outdated","up to date","up to date","outdated","outdated","up to date","up to date","up to date","up to date"],"type":["function","function","function","object","file","function","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#000000","#228B22","#000000","#228B22","#000000","#000000","#228B22","#228B22","#000000","#000000","#228B22","#228B22","#228B22","#228B22"],"shape":["triangle","triangle","triangle","dot","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","square"],"level":[1,1,1,1,1,2,3,3,4,4,4,4,5,5,5,5,5,5,5,5,6,7],"x":[-1,-1,-1,-1,-1,-0.666666666666667,-0.333333333333333,-0.333333333333333,0,0,0,0,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,1],"y":[-0.857142857142857,-0.428571428571428,2.22044604925031e-16,0.428571428571429,0.857142857142857,2.22044604925031e-16,-0.428571428571428,0.428571428571429,-0.771428571428571,-0.257142857142857,0.257142857142858,0.771428571428572,-1,-0.714285714285714,-0.428571428571428,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["small","small","small","reg1","reg1","regression1_small","regression1_small","large","large","large","reg2","reg2","random_rows","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","regression1_large","regression1_large","coef_regression2_small","p-OJSXA33SOQXFE3LE","report","simulate","simulate","regression2_small","regression2_small","regression2_large","regression2_large"],"to":["regression1_small","report","regression2_small","regression1_small","regression1_large","summ_regression1_small","coef_regression1_small","regression1_large","report","regression2_large","regression2_small","regression2_large","simulate","simulate","coef_regression1_large","summ_regression1_large","report","report","p-OJSXA33SOQXG2ZA","small","large","coef_regression2_small","summ_regression2_small","coef_regression2_large","summ_regression2_large"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(my_plan)</a></code></pre></div>
+<div id="htmlwidget-adfadc421940f5392ee8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-adfadc421940f5392ee8">{"x":{"nodes":{"id":["random_rows","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","reg1","reg2","p-OJSXA33SOQXFE3LE","simulate","large","small","regression1_large","regression2_large","regression1_small","regression2_small","coef_regression1_large","summ_regression1_large","coef_regression2_large","summ_regression2_large","coef_regression1_small","summ_regression1_small","coef_regression2_small","summ_regression2_small","report","p-OJSXA33SOQXG2ZA"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"label":["random_rows","datasets::mtcars","reg1","reg2","file report.Rmd","simulate","large\n0.004s","small\n0.003s","regression1_large\n0.03s","regression2_large\n0.004s","regression1_small\n0.025s","regression2_small\n0.004s","coef_regression1_large\n0.004s","summ_regression1_large\n0.003s","coef_regression2_large\n0.003s","summ_regression2_large\n0.003s","coef_regression1_small\n0.003s","summ_regression1_small\n0.004s","coef_regression2_small\n0.003s","summ_regression2_small\n0.003s","report\n0.056s","file report.md"],"status":["imported","imported","imported","imported","imported","imported","up to date","up to date","outdated","up to date","outdated","up to date","outdated","outdated","up to date","up to date","outdated","outdated","up to date","up to date","up to date","up to date"],"type":["function","object","function","function","file","function","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#228B22","#000000","#228B22","#000000","#228B22","#000000","#000000","#228B22","#228B22","#000000","#000000","#228B22","#228B22","#228B22","#228B22"],"shape":["triangle","dot","triangle","triangle","square","triangle","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","square"],"level":[1,1,1,1,1,2,3,3,4,4,4,4,5,5,5,5,5,5,5,5,6,7],"x":[-1,-1,-1,-1,-1,-0.666666666666667,-0.333333333333333,-0.333333333333333,0,0,0,0,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,1],"y":[-0.857142857142857,-0.428571428571428,2.22044604925031e-16,0.428571428571429,0.857142857142857,2.22044604925031e-16,-0.428571428571428,0.428571428571429,-0.771428571428571,-0.257142857142857,0.257142857142858,0.771428571428572,-1,-0.714285714285714,-0.428571428571428,-0.142857142857143,0.142857142857143,0.428571428571429,0.714285714285714,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["simulate","simulate","random_rows","n-MRQXIYLTMV2HGOR2NV2GGYLSOM","large","large","large","reg1","reg1","regression1_small","regression1_small","reg2","reg2","regression2_small","regression2_small","regression1_large","regression1_large","regression2_large","regression2_large","small","small","small","coef_regression2_small","p-OJSXA33SOQXFE3LE","report"],"to":["large","small","simulate","simulate","regression1_large","regression2_large","report","regression1_small","regression1_large","coef_regression1_small","summ_regression1_small","regression2_small","regression2_large","coef_regression2_small","summ_regression2_small","coef_regression1_large","summ_regression1_large","coef_regression2_large","summ_regression2_large","regression1_small","regression2_small","report","report","report","p-OJSXA33SOQXG2ZA"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
 <p>To get a more localized version of the graph, use <code>deps_target()</code>. Unlike <code>vis_drake_graph()</code>, <code>deps_target()</code> gives you a more granular view of the dependencies of an individual target.</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1"><span class="kw">deps_target</span>(regression1_large, my_plan)</a>
-<a class="sourceLine" id="cb281-2" data-line-number="2"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
-<a class="sourceLine" id="cb281-3" data-line-number="3"><span class="co">#&gt;   name  type    hash            </span></a>
-<a class="sourceLine" id="cb281-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;           </span></a>
-<a class="sourceLine" id="cb281-5" data-line-number="5"><span class="co">#&gt; 1 large globals d87293dd4d012762</span></a>
-<a class="sourceLine" id="cb281-6" data-line-number="6"><span class="co">#&gt; 2 reg1  globals 7d6ad46722ffc91b</span></a>
-<a class="sourceLine" id="cb281-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb281-8" data-line-number="8"><span class="kw">deps_target</span>(report, my_plan)</a>
-<a class="sourceLine" id="cb281-9" data-line-number="9"><span class="co">#&gt; # A tibble: 5 x 3</span></a>
-<a class="sourceLine" id="cb281-10" data-line-number="10"><span class="co">#&gt;   name                   type     hash            </span></a>
-<a class="sourceLine" id="cb281-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;    &lt;chr&gt;           </span></a>
-<a class="sourceLine" id="cb281-12" data-line-number="12"><span class="co">#&gt; 1 large                  loadd    d87293dd4d012762</span></a>
-<a class="sourceLine" id="cb281-13" data-line-number="13"><span class="co">#&gt; 2 small                  readd    b588209b7f4f5b0a</span></a>
-<a class="sourceLine" id="cb281-14" data-line-number="14"><span class="co">#&gt; 3 coef_regression2_small readd    b5502b9c62933484</span></a>
-<a class="sourceLine" id="cb281-15" data-line-number="15"><span class="co">#&gt; 4 report.md              file_out &lt;NA&gt;            </span></a>
-<a class="sourceLine" id="cb281-16" data-line-number="16"><span class="co">#&gt; 5 report.Rmd             knitr_in &lt;NA&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1"><span class="kw">deps_target</span>(regression1_large, my_plan)</a>
+<a class="sourceLine" id="cb282-2" data-line-number="2"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
+<a class="sourceLine" id="cb282-3" data-line-number="3"><span class="co">#&gt;   name  type    hash            </span></a>
+<a class="sourceLine" id="cb282-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;           </span></a>
+<a class="sourceLine" id="cb282-5" data-line-number="5"><span class="co">#&gt; 1 large globals d87293dd4d012762</span></a>
+<a class="sourceLine" id="cb282-6" data-line-number="6"><span class="co">#&gt; 2 reg1  globals 7d6ad46722ffc91b</span></a>
+<a class="sourceLine" id="cb282-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb282-8" data-line-number="8"><span class="kw">deps_target</span>(report, my_plan)</a>
+<a class="sourceLine" id="cb282-9" data-line-number="9"><span class="co">#&gt; # A tibble: 5 x 3</span></a>
+<a class="sourceLine" id="cb282-10" data-line-number="10"><span class="co">#&gt;   name                   type     hash            </span></a>
+<a class="sourceLine" id="cb282-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;    &lt;chr&gt;           </span></a>
+<a class="sourceLine" id="cb282-12" data-line-number="12"><span class="co">#&gt; 1 large                  loadd    d87293dd4d012762</span></a>
+<a class="sourceLine" id="cb282-13" data-line-number="13"><span class="co">#&gt; 2 small                  readd    b588209b7f4f5b0a</span></a>
+<a class="sourceLine" id="cb282-14" data-line-number="14"><span class="co">#&gt; 3 coef_regression2_small readd    b5502b9c62933484</span></a>
+<a class="sourceLine" id="cb282-15" data-line-number="15"><span class="co">#&gt; 4 report.md              file_out &lt;NA&gt;            </span></a>
+<a class="sourceLine" id="cb282-16" data-line-number="16"><span class="co">#&gt; 5 report.Rmd             knitr_in &lt;NA&gt;</span></a></code></pre></div>
 <p>To understand how <code>drake</code> detects dependencies in the first place, use <code>deps_code()</code>. This is what <code>drake</code> first sees when it reads your plan and functions to understand the dependencies.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1"><span class="kw">deps_code</span>(<span class="kw">quote</span>(</a>
-<a class="sourceLine" id="cb282-2" data-line-number="2">  <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(regression1_large<span class="op">$</span>residuals))</a>
-<a class="sourceLine" id="cb282-3" data-line-number="3">))</a>
-<a class="sourceLine" id="cb282-4" data-line-number="4"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
-<a class="sourceLine" id="cb282-5" data-line-number="5"><span class="co">#&gt;   name              type   </span></a>
-<a class="sourceLine" id="cb282-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;  </span></a>
-<a class="sourceLine" id="cb282-7" data-line-number="7"><span class="co">#&gt; 1 regression1_large globals</span></a>
-<a class="sourceLine" id="cb282-8" data-line-number="8"><span class="co">#&gt; 2 summary           globals</span></a>
-<a class="sourceLine" id="cb282-9" data-line-number="9"><span class="co">#&gt; 3 suppressWarnings  globals</span></a>
-<a class="sourceLine" id="cb282-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb282-11" data-line-number="11"><span class="kw">deps_code</span>(<span class="kw">quote</span>(</a>
-<a class="sourceLine" id="cb282-12" data-line-number="12">  <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb282-13" data-line-number="13">))</a>
-<a class="sourceLine" id="cb282-14" data-line-number="14"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
-<a class="sourceLine" id="cb282-15" data-line-number="15"><span class="co">#&gt;   name                   type    </span></a>
-<a class="sourceLine" id="cb282-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span></a>
-<a class="sourceLine" id="cb282-17" data-line-number="17"><span class="co">#&gt; 1 knit                   globals </span></a>
-<a class="sourceLine" id="cb282-18" data-line-number="18"><span class="co">#&gt; 2 large                  loadd   </span></a>
-<a class="sourceLine" id="cb282-19" data-line-number="19"><span class="co">#&gt; 3 small                  readd   </span></a>
-<a class="sourceLine" id="cb282-20" data-line-number="20"><span class="co">#&gt; 4 coef_regression2_small readd   </span></a>
-<a class="sourceLine" id="cb282-21" data-line-number="21"><span class="co">#&gt; 5 report.md              file_out</span></a>
-<a class="sourceLine" id="cb282-22" data-line-number="22"><span class="co">#&gt; 6 report.Rmd             knitr_in</span></a></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="kw">deps_code</span>(<span class="kw">quote</span>(</a>
+<a class="sourceLine" id="cb283-2" data-line-number="2">  <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(regression1_large<span class="op">$</span>residuals))</a>
+<a class="sourceLine" id="cb283-3" data-line-number="3">))</a>
+<a class="sourceLine" id="cb283-4" data-line-number="4"><span class="co">#&gt; # A tibble: 3 x 2</span></a>
+<a class="sourceLine" id="cb283-5" data-line-number="5"><span class="co">#&gt;   name              type   </span></a>
+<a class="sourceLine" id="cb283-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;  </span></a>
+<a class="sourceLine" id="cb283-7" data-line-number="7"><span class="co">#&gt; 1 regression1_large globals</span></a>
+<a class="sourceLine" id="cb283-8" data-line-number="8"><span class="co">#&gt; 2 summary           globals</span></a>
+<a class="sourceLine" id="cb283-9" data-line-number="9"><span class="co">#&gt; 3 suppressWarnings  globals</span></a>
+<a class="sourceLine" id="cb283-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb283-11" data-line-number="11"><span class="kw">deps_code</span>(<span class="kw">quote</span>(</a>
+<a class="sourceLine" id="cb283-12" data-line-number="12">  <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb283-13" data-line-number="13">))</a>
+<a class="sourceLine" id="cb283-14" data-line-number="14"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
+<a class="sourceLine" id="cb283-15" data-line-number="15"><span class="co">#&gt;   name                   type    </span></a>
+<a class="sourceLine" id="cb283-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;                  &lt;chr&gt;   </span></a>
+<a class="sourceLine" id="cb283-17" data-line-number="17"><span class="co">#&gt; 1 knit                   globals </span></a>
+<a class="sourceLine" id="cb283-18" data-line-number="18"><span class="co">#&gt; 2 large                  loadd   </span></a>
+<a class="sourceLine" id="cb283-19" data-line-number="19"><span class="co">#&gt; 3 small                  readd   </span></a>
+<a class="sourceLine" id="cb283-20" data-line-number="20"><span class="co">#&gt; 4 coef_regression2_small readd   </span></a>
+<a class="sourceLine" id="cb283-21" data-line-number="21"><span class="co">#&gt; 5 report.md              file_out</span></a>
+<a class="sourceLine" id="cb283-22" data-line-number="22"><span class="co">#&gt; 6 report.Rmd             knitr_in</span></a></code></pre></div>
 <p>If <code>drake</code> detects new dependencies you were unaware of, that could be a reason why your targets are out of date.</p>
 </div>
 <div id="which-targets-are-outdated" class="section level3">
 <h3><span class="header-section-number">17.2.2</span> Which targets are outdated</h3>
 <p>Graphing utilities like <code>vis_drake_graph()</code> label the outdated targets, but sometimes it is helpful to get a more programmatic view.</p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="kw">outdated</span>(my_plan)</a>
-<a class="sourceLine" id="cb283-2" data-line-number="2"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;regression1_large&quot;     </span></a>
-<a class="sourceLine" id="cb283-3" data-line-number="3"><span class="co">#&gt; [4] &quot;regression1_small&quot;      &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">outdated</span>(my_plan)</a>
+<a class="sourceLine" id="cb284-2" data-line-number="2"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;regression1_large&quot;     </span></a>
+<a class="sourceLine" id="cb284-3" data-line-number="3"><span class="co">#&gt; [4] &quot;regression1_small&quot;      &quot;summ_regression1_large&quot; &quot;summ_regression1_small&quot;</span></a></code></pre></div>
 </div>
 <div id="why-your-targets-are-outdated" class="section level3">
 <h3><span class="header-section-number">17.2.3</span> Why your targets are outdated</h3>
 <p>The <code>deps_profile()</code> function offers clues.</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">deps_profile</span>(regression1_small, my_plan)</a>
-<a class="sourceLine" id="cb284-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 4</span></a>
-<a class="sourceLine" id="cb284-3" data-line-number="3"><span class="co">#&gt;   name     changed old                new               </span></a>
-<a class="sourceLine" id="cb284-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;    &lt;lgl&gt;   &lt;chr&gt;              &lt;chr&gt;             </span></a>
-<a class="sourceLine" id="cb284-5" data-line-number="5"><span class="co">#&gt; 1 command  FALSE   &quot;c4d2a1810ff71195&quot; &quot;c4d2a1810ff71195&quot;</span></a>
-<a class="sourceLine" id="cb284-6" data-line-number="6"><span class="co">#&gt; 2 depend   TRUE    &quot;80aea64bc1193d2c&quot; &quot;6588e8c7a6761937&quot;</span></a>
-<a class="sourceLine" id="cb284-7" data-line-number="7"><span class="co">#&gt; 3 file_in  FALSE   &quot;&quot;                 &quot;&quot;                </span></a>
-<a class="sourceLine" id="cb284-8" data-line-number="8"><span class="co">#&gt; 4 file_out FALSE   &quot;&quot;                 &quot;&quot;                </span></a>
-<a class="sourceLine" id="cb284-9" data-line-number="9"><span class="co">#&gt; 5 seed     FALSE   &quot;1186782247&quot;       &quot;1186782247&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="kw">deps_profile</span>(regression1_small, my_plan)</a>
+<a class="sourceLine" id="cb285-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 4</span></a>
+<a class="sourceLine" id="cb285-3" data-line-number="3"><span class="co">#&gt;   name     changed old                new               </span></a>
+<a class="sourceLine" id="cb285-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;    &lt;lgl&gt;   &lt;chr&gt;              &lt;chr&gt;             </span></a>
+<a class="sourceLine" id="cb285-5" data-line-number="5"><span class="co">#&gt; 1 command  FALSE   &quot;c4d2a1810ff71195&quot; &quot;c4d2a1810ff71195&quot;</span></a>
+<a class="sourceLine" id="cb285-6" data-line-number="6"><span class="co">#&gt; 2 depend   TRUE    &quot;80aea64bc1193d2c&quot; &quot;6588e8c7a6761937&quot;</span></a>
+<a class="sourceLine" id="cb285-7" data-line-number="7"><span class="co">#&gt; 3 file_in  FALSE   &quot;&quot;                 &quot;&quot;                </span></a>
+<a class="sourceLine" id="cb285-8" data-line-number="8"><span class="co">#&gt; 4 file_out FALSE   &quot;&quot;                 &quot;&quot;                </span></a>
+<a class="sourceLine" id="cb285-9" data-line-number="9"><span class="co">#&gt; 5 seed     FALSE   &quot;1186782247&quot;       &quot;1186782247&quot;</span></a></code></pre></div>
 <p>From the data frame above, <code>regression1_small</code> is outdated because an R object dependency changed since the last <code>make()</code>. <code>drake</code> does not hold on to enough information to tell you precisely which object is the culprit, but functions like <code>vis_drake_graph()</code>, <code>deps_target()</code>, and <code>deps_code()</code> can help narrow down the possibilities.</p>
 </div>
 <div id="strategies-to-prevent-unexpected-changes-in-the-future" class="section level3">
