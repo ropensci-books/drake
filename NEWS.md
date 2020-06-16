@@ -1,4 +1,6 @@
-## Version 7.11.0.9000
+## Version 7.12.2.9000
+
+* Replace the `iris` dataset with the `airquality` dataset.
 
 ## Version 7.7.0.9002
 
