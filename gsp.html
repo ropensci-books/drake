@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 11 Finding the best model of gross state product | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 11 Finding the best model of gross state product | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -33,6 +33,7 @@
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="packages.html"/>
 <link rel="next" href="hpc.html"/>
+<script src="libs/header-attrs-2.2/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -57,6 +58,7 @@
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
+  
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150843595-1"></script>
 <script>
@@ -69,27 +71,26 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -98,9 +99,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -149,18 +150,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">The drake R Package User Manual</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#short-version"><i class="fa fa-check"></i><b>1.1</b> Short version</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#long-version"><i class="fa fa-check"></i><b>1.2</b> Long version</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.3</b> The drake R package</a></li>
 <li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.4</b> Installation</a></li>
-<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a>
+<ul>
 <li class="chapter" data-level="1.5.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.5.1</b> What gets done stays done.</a></li>
 <li class="chapter" data-level="1.5.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.5.2</b> Reproducibility with confidence</a></li>
 <li class="chapter" data-level="1.5.3" data-path="index.html"><a href="index.html#scale-up-and-out."><i class="fa fa-check"></i><b>1.5.3</b> Scale up and out.</a></li>
 </ul></li>
 <li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#with-docker"><i class="fa fa-check"></i><b>1.6</b> With Docker</a></li>
-<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a><ul>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a>
+<ul>
 <li class="chapter" data-level="1.7.1" data-path="index.html"><a href="index.html#core-concepts"><i class="fa fa-check"></i><b>1.7.1</b> Core concepts</a></li>
 <li class="chapter" data-level="1.7.2" data-path="index.html"><a href="index.html#in-practice"><i class="fa fa-check"></i><b>1.7.2</b> In practice</a></li>
 <li class="chapter" data-level="1.7.3" data-path="index.html"><a href="index.html#use-cases"><i class="fa fa-check"></i><b>1.7.3</b> Use cases</a></li>
@@ -175,15 +179,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="1.8" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.8</b> Help and troubleshooting</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a><ul>
-<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a><ul>
+<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="similar-work.html"><a href="similar-work.html#gnu-make"><i class="fa fa-check"></i><b>2.1.1</b> GNU Make</a></li>
 <li class="chapter" data-level="2.1.2" data-path="similar-work.html"><a href="similar-work.html#remake"><i class="fa fa-check"></i><b>2.1.2</b> Remake</a></li>
 <li class="chapter" data-level="2.1.3" data-path="similar-work.html"><a href="similar-work.html#factuals-drake"><i class="fa fa-check"></i><b>2.1.3</b> Factual’s Drake</a></li>
 <li class="chapter" data-level="2.1.4" data-path="similar-work.html"><a href="similar-work.html#other-pipeline-tools"><i class="fa fa-check"></i><b>2.1.4</b> Other pipeline tools</a></li>
 </ul></li>
 <li class="chapter" data-level="2.2" data-path="similar-work.html"><a href="similar-work.html#memoization"><i class="fa fa-check"></i><b>2.2</b> Memoization</a></li>
-<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a><ul>
+<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a>
+<ul>
 <li class="chapter" data-level="2.3.1" data-path="similar-work.html"><a href="similar-work.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>2.3.1</b> knitr and R Markdown</a></li>
 <li class="chapter" data-level="2.3.2" data-path="similar-work.html"><a href="similar-work.html#version-control"><i class="fa fa-check"></i><b>2.3.2</b> Version control</a></li>
 <li class="chapter" data-level="2.3.3" data-path="similar-work.html"><a href="similar-work.html#containerization-and-r-package-environments"><i class="fa fa-check"></i><b>2.3.3</b> Containerization and R package environments</a></li>
@@ -192,42 +199,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.4" data-path="similar-work.html"><a href="similar-work.html#acknowledgements"><i class="fa fa-check"></i><b>2.4</b> Acknowledgements</a></li>
 </ul></li>
 <li class="part"><span><b>I Getting started</b></span></li>
-<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a><ul>
+<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a>
+<ul>
 <li class="chapter" data-level="3.1" data-path="walkthrough.html"><a href="walkthrough.html#set-the-stage."><i class="fa fa-check"></i><b>3.1</b> Set the stage.</a></li>
 <li class="chapter" data-level="3.2" data-path="walkthrough.html"><a href="walkthrough.html#make-your-results."><i class="fa fa-check"></i><b>3.2</b> Make your results.</a></li>
 <li class="chapter" data-level="3.3" data-path="walkthrough.html"><a href="walkthrough.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>3.3</b> Go back and fix things.</a></li>
 <li class="chapter" data-level="3.4" data-path="walkthrough.html"><a href="walkthrough.html#history-and-provenance"><i class="fa fa-check"></i><b>3.4</b> History and provenance</a></li>
-<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a><ul>
+<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a>
+<ul>
 <li class="chapter" data-level="3.5.1" data-path="walkthrough.html"><a href="walkthrough.html#undoing-clean"><i class="fa fa-check"></i><b>3.5.1</b> Undoing <code>clean()</code></a></li>
 <li class="chapter" data-level="3.5.2" data-path="walkthrough.html"><a href="walkthrough.html#renaming"><i class="fa fa-check"></i><b>3.5.2</b> Renaming</a></li>
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="walkthrough.html"><a href="walkthrough.html#try-the-code-yourself"><i class="fa fa-check"></i><b>3.6</b> Try the code yourself!</a></li>
 <li class="chapter" data-level="3.7" data-path="walkthrough.html"><a href="walkthrough.html#thanks"><i class="fa fa-check"></i><b>3.7</b> Thanks</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a><ul>
+<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="plans.html"><a href="plans.html#functions"><i class="fa fa-check"></i><b>4.1</b> Functions</a></li>
 <li class="chapter" data-level="4.2" data-path="plans.html"><a href="plans.html#intro-to-plans"><i class="fa fa-check"></i><b>4.2</b> Intro to plans</a></li>
 <li class="chapter" data-level="4.3" data-path="plans.html"><a href="plans.html#how-to-choose-good-targets"><i class="fa fa-check"></i><b>4.3</b> How to choose good targets</a></li>
 <li class="chapter" data-level="4.4" data-path="plans.html"><a href="plans.html#special-data-formats-for-targets"><i class="fa fa-check"></i><b>4.4</b> Special data formats for targets</a></li>
 <li class="chapter" data-level="4.5" data-path="plans.html"><a href="plans.html#special-columns"><i class="fa fa-check"></i><b>4.5</b> Special columns</a></li>
-<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a><ul>
+<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a>
+<ul>
 <li class="chapter" data-level="4.6.1" data-path="plans.html"><a href="plans.html#urls"><i class="fa fa-check"></i><b>4.6.1</b> URLs</a></li>
 <li class="chapter" data-level="4.6.2" data-path="plans.html"><a href="plans.html#limitations-of-static-files"><i class="fa fa-check"></i><b>4.6.2</b> Limitations of static files</a></li>
 </ul></li>
-<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a><ul>
+<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a>
+<ul>
 <li class="chapter" data-level="4.7.1" data-path="plans.html"><a href="plans.html#how-to-use-dynamic-files"><i class="fa fa-check"></i><b>4.7.1</b> How to use dynamic files</a></li>
 <li class="chapter" data-level="4.7.2" data-path="plans.html"><a href="plans.html#example-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.2</b> Example of dynamic files</a></li>
 <li class="chapter" data-level="4.7.3" data-path="plans.html"><a href="plans.html#limitations-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.3</b> Limitations of dynamic files</a></li>
 </ul></li>
 <li class="chapter" data-level="4.8" data-path="plans.html"><a href="plans.html#large-plans"><i class="fa fa-check"></i><b>4.8</b> Large plans</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a><ul>
+<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a>
+<ul>
 <li class="chapter" data-level="5.1" data-path="static.html"><a href="static.html#why-static-branching"><i class="fa fa-check"></i><b>5.1</b> Why static branching?</a></li>
-<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a><ul>
+<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a>
+<ul>
 <li class="chapter" data-level="5.2.1" data-path="static.html"><a href="static.html#limitations-of-grouping-variables"><i class="fa fa-check"></i><b>5.2.1</b> Limitations of grouping variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="static.html"><a href="static.html#tidy-evaluation"><i class="fa fa-check"></i><b>5.3</b> Tidy evaluation</a></li>
-<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a><ul>
+<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a>
+<ul>
 <li class="chapter" data-level="5.4.1" data-path="static.html"><a href="static.html#map"><i class="fa fa-check"></i><b>5.4.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
@@ -236,12 +251,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5</b> Target names</a></li>
 <li class="chapter" data-level="5.6" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.6</b> Tags</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
+<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
 <li class="chapter" data-level="6.2" data-path="dynamic.html"><a href="dynamic.html#motivation"><i class="fa fa-check"></i><b>6.2</b> Motivation</a></li>
 <li class="chapter" data-level="6.3" data-path="dynamic.html"><a href="dynamic.html#which-kind-of-branching-should-i-use"><i class="fa fa-check"></i><b>6.3</b> Which kind of branching should I use?</a></li>
 <li class="chapter" data-level="6.4" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>6.4</b> Dynamic targets</a></li>
-<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a><ul>
+<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a>
+<ul>
 <li class="chapter" data-level="6.5.1" data-path="dynamic.html"><a href="dynamic.html#map-1"><i class="fa fa-check"></i><b>6.5.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="6.5.2" data-path="dynamic.html"><a href="dynamic.html#cross-1"><i class="fa fa-check"></i><b>6.5.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="6.5.3" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>6.5.3</b> <code>group()</code></a></li>
@@ -249,10 +266,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.6" data-path="dynamic.html"><a href="dynamic.html#trace"><i class="fa fa-check"></i><b>6.6</b> Trace</a></li>
 <li class="chapter" data-level="6.7" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>6.7</b> <code>max_expand</code></a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a><ul>
+<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="projects.html"><a href="projects.html#external-resources"><i class="fa fa-check"></i><b>7.1</b> External resources</a></li>
 <li class="chapter" data-level="7.2" data-path="projects.html"><a href="projects.html#code-files"><i class="fa fa-check"></i><b>7.2</b> Code files</a></li>
-<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a><ul>
+<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a>
+<ul>
 <li class="chapter" data-level="7.3.1" data-path="projects.html"><a href="projects.html#motivation-1"><i class="fa fa-check"></i><b>7.3.1</b> Motivation</a></li>
 <li class="chapter" data-level="7.3.2" data-path="projects.html"><a href="projects.html#usage"><i class="fa fa-check"></i><b>7.3.2</b> Usage</a></li>
 </ul></li>
@@ -260,7 +279,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.5" data-path="projects.html"><a href="projects.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.5</b> Workflows as R packages</a></li>
 <li class="chapter" data-level="7.6" data-path="projects.html"><a href="projects.html#other-tools"><i class="fa fa-check"></i><b>7.6</b> Other tools</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a><ul>
+<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="scripts.html"><a href="scripts.html#function-oriented-workflows"><i class="fa fa-check"></i><b>8.1</b> Function-oriented workflows</a></li>
 <li class="chapter" data-level="8.2" data-path="scripts.html"><a href="scripts.html#traditional-and-legacy-workflows"><i class="fa fa-check"></i><b>8.2</b> Traditional and legacy workflows</a></li>
 <li class="chapter" data-level="8.3" data-path="scripts.html"><a href="scripts.html#overcoming-technical-debt"><i class="fa fa-check"></i><b>8.3</b> Overcoming Technical Debt</a></li>
@@ -271,7 +291,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.8" data-path="scripts.html"><a href="scripts.html#final-thoughts"><i class="fa fa-check"></i><b>8.8</b> Final thoughts</a></li>
 </ul></li>
 <li class="part"><span><b>II Examples</b></span></li>
-<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a><ul>
+<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a>
+<ul>
 <li class="chapter" data-level="9.1" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>9.1</b> Packages</a></li>
 <li class="chapter" data-level="9.2" data-path="churn.html"><a href="churn.html#functions-1"><i class="fa fa-check"></i><b>9.2</b> Functions</a></li>
 <li class="chapter" data-level="9.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>9.3</b> Plan</a></li>
@@ -283,13 +304,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.9" data-path="churn.html"><a href="churn.html#update-your-code"><i class="fa fa-check"></i><b>9.9</b> Update your code</a></li>
 <li class="chapter" data-level="9.10" data-path="churn.html"><a href="churn.html#history-and-provenance-1"><i class="fa fa-check"></i><b>9.10</b> History and provenance</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a><ul>
+<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a>
+<ul>
 <li class="chapter" data-level="10.1" data-path="packages.html"><a href="packages.html"><i class="fa fa-check"></i><b>10.1</b> Get the code.</a></li>
 <li class="chapter" data-level="10.2" data-path="packages.html"><a href="packages.html#overview"><i class="fa fa-check"></i><b>10.2</b> Overview</a></li>
 <li class="chapter" data-level="10.3" data-path="packages.html"><a href="packages.html#analysis"><i class="fa fa-check"></i><b>10.3</b> Analysis</a></li>
 <li class="chapter" data-level="10.4" data-path="packages.html"><a href="packages.html#other-ways-to-trigger-downloads"><i class="fa fa-check"></i><b>10.4</b> Other ways to trigger downloads</a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a><ul>
+<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a>
+<ul>
 <li class="chapter" data-level="11.1" data-path="gsp.html"><a href="gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>11.1</b> Get the code.</a></li>
 <li class="chapter" data-level="11.2" data-path="gsp.html"><a href="gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>11.2</b> Objective and methods</a></li>
 <li class="chapter" data-level="11.3" data-path="gsp.html"><a href="gsp.html#data"><i class="fa fa-check"></i><b>11.3</b> Data</a></li>
@@ -299,27 +322,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>11.7</b> References</a></li>
 </ul></li>
 <li class="part"><span><b>III Resource management</b></span></li>
-<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a><ul>
+<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a>
+<ul>
 <li class="chapter" data-level="12.1" data-path="hpc.html"><a href="hpc.html#start-small"><i class="fa fa-check"></i><b>12.1</b> Start small</a></li>
 <li class="chapter" data-level="12.2" data-path="hpc.html"><a href="hpc.html#let-make-schedule-your-targets."><i class="fa fa-check"></i><b>12.2</b> Let <code>make()</code> schedule your targets.</a></li>
-<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a><ul>
+<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a>
+<ul>
 <li class="chapter" data-level="12.3.1" data-path="hpc.html"><a href="hpc.html#master-on-a-cluster"><i class="fa fa-check"></i><b>12.3.1</b> Master on a cluster</a></li>
 <li class="chapter" data-level="12.3.2" data-path="hpc.html"><a href="hpc.html#local-master"><i class="fa fa-check"></i><b>12.3.2</b> Local master</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>12.4</b> Parallel backends</a></li>
-<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a><ul>
+<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.5.1" data-path="hpc.html"><a href="hpc.html#persistent-workers"><i class="fa fa-check"></i><b>12.5.1</b> Persistent workers</a></li>
 <li class="chapter" data-level="12.5.2" data-path="hpc.html"><a href="hpc.html#installation-1"><i class="fa fa-check"></i><b>12.5.2</b> Installation</a></li>
 <li class="chapter" data-level="12.5.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine"><i class="fa fa-check"></i><b>12.5.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.5.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster"><i class="fa fa-check"></i><b>12.5.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a><ul>
+<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.6.1" data-path="hpc.html"><a href="hpc.html#transient-workers"><i class="fa fa-check"></i><b>12.6.1</b> Transient workers</a></li>
 <li class="chapter" data-level="12.6.2" data-path="hpc.html"><a href="hpc.html#installation-2"><i class="fa fa-check"></i><b>12.6.2</b> Installation</a></li>
 <li class="chapter" data-level="12.6.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine-1"><i class="fa fa-check"></i><b>12.6.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.6.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster-1"><i class="fa fa-check"></i><b>12.6.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a><ul>
+<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a>
+<ul>
 <li class="chapter" data-level="12.7.1" data-path="hpc.html"><a href="hpc.html#selectivity"><i class="fa fa-check"></i><b>12.7.1</b> Selectivity</a></li>
 <li class="chapter" data-level="12.7.2" data-path="hpc.html"><a href="hpc.html#memory-options"><i class="fa fa-check"></i><b>12.7.2</b> Memory options</a></li>
 <li class="chapter" data-level="12.7.3" data-path="hpc.html"><a href="hpc.html#storage-options"><i class="fa fa-check"></i><b>12.7.3</b> Storage options</a></li>
@@ -328,8 +356,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.7.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>12.7.6</b> Parallel computing <em>within</em> targets</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a><ul>
-<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a><ul>
+<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="time.html"><a href="time.html#help-us-find-out"><i class="fa fa-check"></i><b>13.1.1</b> Help us find out!</a></li>
 <li class="chapter" data-level="13.1.2" data-path="time.html"><a href="time.html#too-many-targets"><i class="fa fa-check"></i><b>13.1.2</b> Too many targets?</a></li>
 <li class="chapter" data-level="13.1.3" data-path="time.html"><a href="time.html#big-data"><i class="fa fa-check"></i><b>13.1.3</b> Big data?</a></li>
@@ -339,23 +369,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.3" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>13.3</b> Predict total runtime</a></li>
 <li class="chapter" data-level="13.4" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>13.4</b> Strategize your high-performance computing</a></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a><ul>
+<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a>
+<ul>
 <li class="chapter" data-level="14.1" data-path="memory.html"><a href="memory.html#garbage-collection-and-custom-files"><i class="fa fa-check"></i><b>14.1</b> Garbage collection and custom files</a></li>
 <li class="chapter" data-level="14.2" data-path="memory.html"><a href="memory.html#memory-strategies"><i class="fa fa-check"></i><b>14.2</b> Memory strategies</a></li>
 <li class="chapter" data-level="14.3" data-path="memory.html"><a href="memory.html#data-splitting"><i class="fa fa-check"></i><b>14.3</b> Data splitting</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a><ul>
+<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="storage.html"><a href="storage.html#drakes-cache"><i class="fa fa-check"></i><b>15.1</b> <code>drake</code>’s cache</a></li>
 <li class="chapter" data-level="15.2" data-path="storage.html"><a href="storage.html#efficient-target-storage"><i class="fa fa-check"></i><b>15.2</b> Efficient target storage</a></li>
-<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a><ul>
+<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a>
+<ul>
 <li class="chapter" data-level="15.3.1" data-path="storage.html"><a href="storage.html#old-targets"><i class="fa fa-check"></i><b>15.3.1</b> Old targets</a></li>
 <li class="chapter" data-level="15.3.2" data-path="storage.html"><a href="storage.html#garbage-from-interrupted-builds"><i class="fa fa-check"></i><b>15.3.2</b> Garbage from interrupted builds</a></li>
 </ul></li>
 <li class="chapter" data-level="15.4" data-path="storage.html"><a href="storage.html#interfaces-to-the-cache"><i class="fa fa-check"></i><b>15.4</b> Interfaces to the cache</a></li>
 </ul></li>
 <li class="part"><span><b>IV Extra features</b></span></li>
-<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a><ul>
-<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a><ul>
+<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a>
+<ul>
 <li class="chapter" data-level="16.1.1" data-path="visuals.html"><a href="visuals.html#vis_drake_graph"><i class="fa fa-check"></i><b>16.1.1</b> <code>vis_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.2" data-path="visuals.html"><a href="visuals.html#sankey_drake_graph"><i class="fa fa-check"></i><b>16.1.2</b> <code>sankey_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.3" data-path="visuals.html"><a href="visuals.html#drake_ggraph"><i class="fa fa-check"></i><b>16.1.3</b> <code>drake_ggraph()</code></a></li>
@@ -367,19 +402,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="16.5" data-path="visuals.html"><a href="visuals.html#control-the-vis_drake_graph-legend."><i class="fa fa-check"></i><b>16.5</b> Control the <code>vis_drake_graph()</code> legend.</a></li>
 <li class="chapter" data-level="16.6" data-path="visuals.html"><a href="visuals.html#clusters"><i class="fa fa-check"></i><b>16.6</b> Clusters</a></li>
 <li class="chapter" data-level="16.7" data-path="visuals.html"><a href="visuals.html#output-files"><i class="fa fa-check"></i><b>16.7</b> Output files</a></li>
-<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a><ul>
+<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a>
+<ul>
 <li class="chapter" data-level="16.8.1" data-path="visuals.html"><a href="visuals.html#perform-the-default-action-on-select"><i class="fa fa-check"></i><b>16.8.1</b> Perform the default action on select</a></li>
 <li class="chapter" data-level="16.8.2" data-path="visuals.html"><a href="visuals.html#perform-no-action-on-select"><i class="fa fa-check"></i><b>16.8.2</b> Perform no action on select</a></li>
 <li class="chapter" data-level="16.8.3" data-path="visuals.html"><a href="visuals.html#customize-the-onselect-event-behaviour"><i class="fa fa-check"></i><b>16.8.3</b> Customize the onSelect event behaviour</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a><ul>
-<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a><ul>
+<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a>
+<ul>
 <li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#diagnosing-errors"><i class="fa fa-check"></i><b>17.1.1</b> Diagnosing errors</a></li>
 <li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#interactive-debugging"><i class="fa fa-check"></i><b>17.1.2</b> Interactive debugging</a></li>
 <li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#efficient-trial-and-error"><i class="fa fa-check"></i><b>17.1.3</b> Efficient trial and error</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a><ul>
+<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a>
+<ul>
 <li class="chapter" data-level="17.2.1" data-path="debugging.html"><a href="debugging.html#how-your-workflow-fits-together"><i class="fa fa-check"></i><b>17.2.1</b> How your workflow fits together</a></li>
 <li class="chapter" data-level="17.2.2" data-path="debugging.html"><a href="debugging.html#which-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.2</b> Which targets are outdated</a></li>
 <li class="chapter" data-level="17.2.3" data-path="debugging.html"><a href="debugging.html#why-your-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.3</b> Why your targets are outdated</a></li>
@@ -387,7 +426,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.3</b> More help</a></li>
 </ul></li>
-<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a><ul>
+<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a>
+<ul>
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="18.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>18.2</b> Customization</a></li>
 <li class="chapter" data-level="18.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>18.3</b> Alternative trigger modes</a></li>
@@ -395,15 +435,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a><ul>
-<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a><ul>
+<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a>
+<ul>
 <li class="chapter" data-level="B.1.1" data-path="design.html"><a href="design.html#functions-first"><i class="fa fa-check"></i><b>B.1.1</b> Functions first</a></li>
 <li class="chapter" data-level="B.1.2" data-path="design.html"><a href="design.html#light-use-of-traditional-oop"><i class="fa fa-check"></i><b>B.1.2</b> Light use of traditional OOP</a></li>
 <li class="chapter" data-level="B.1.3" data-path="design.html"><a href="design.html#high-performant-small-objects"><i class="fa fa-check"></i><b>B.1.3</b> High-performant small objects</a></li>
 <li class="chapter" data-level="B.1.4" data-path="design.html"><a href="design.html#fast-iteration-along-aggregated-data"><i class="fa fa-check"></i><b>B.1.4</b> Fast iteration along aggregated data</a></li>
 <li class="chapter" data-level="B.1.5" data-path="design.html"><a href="design.html#access-to-information-across-targets"><i class="fa fa-check"></i><b>B.1.5</b> Access to information across targets</a></li>
 </ul></li>
-<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a><ul>
+<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a>
+<ul>
 <li class="chapter" data-level="B.2.1" data-path="design.html"><a href="design.html#config"><i class="fa fa-check"></i><b>B.2.1</b> Config</a></li>
 <li class="chapter" data-level="B.2.2" data-path="design.html"><a href="design.html#settings"><i class="fa fa-check"></i><b>B.2.2</b> Settings</a></li>
 <li class="chapter" data-level="B.2.3" data-path="design.html"><a href="design.html#plan-1"><i class="fa fa-check"></i><b>B.2.3</b> Plan</a></li>
@@ -438,16 +481,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="gsp" class="section level1">
+<div id="gsp" class="section level1" number="11">
 <h1><span class="header-section-number">Chapter 11</span> Finding the best model of gross state product</h1>
 <p>The following data analysis workflow shows off <code>drake</code>’s ability to generate lots of reproducibly-tracked tasks with ease. The same technique would be cumbersome, even intractable, with <a href="https://www.gnu.org/software/make/">GNU Make</a>.</p>
-<div id="get-the-code.-1" class="section level2">
+<div id="get-the-code.-1" class="section level2" number="11.1">
 <h2><span class="header-section-number">11.1</span> Get the code.</h2>
 <p>Write the code files to your workspace.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="gsp.html#cb171-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span></code></pre></div>
 <p>The new <code>gsp</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/wlandau/drake-examples/tree/master/gsp">online here</a>.</p>
 </div>
-<div id="objective-and-methods" class="section level2">
+<div id="objective-and-methods" class="section level2" number="11.2">
 <h2><span class="header-section-number">11.2</span> Objective and methods</h2>
 <p>The goal is to search for factors closely associated with the productivity of states in the USA around the 1970s and 1980s. For the sake of simplicity, we use gross state product as a metric of productivity, and we restrict ourselves to multiple linear regression models with three variables. For each of the 84 possible models, we fit the data and then evaluate the root mean squared prediction error (RMSPE).</p>
 <p><span class="math display">\[
@@ -457,7 +500,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \]</span>
 Here, <span class="math inline">\(y\)</span> is the vector of observed gross state products in the data, and <span class="math inline">\(\widehat{y}\)</span> is the vector of predicted gross state products under one of the models. We take the best variables to be the triplet in the model with the lowest RMSPE.</p>
 </div>
-<div id="data" class="section level2">
+<div id="data" class="section level2" number="11.3">
 <h2><span class="header-section-number">11.3</span> Data</h2>
 <p>The <code>Produc</code> dataset from the <a href="https://cran.r-project.org/package=Ecdat">Ecdat package</a> contains data on the Gross State Product from 1970 to 1986. Each row is a single observation on a single state for a single year. The dataset has the following variables as columns. See the references later in this report for more details.</p>
 <ul>
@@ -472,138 +515,138 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <li><code>emp</code>: labor input measured by the employment in non-agricultural payrolls.</li>
 <li><code>unemp</code>: state unemployment rate.</li>
 </ul>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1"><span class="kw">library</span>(Ecdat)</a>
-<a class="sourceLine" id="cb172-2" data-line-number="2"><span class="kw">data</span>(Produc)</a>
-<a class="sourceLine" id="cb172-3" data-line-number="3"><span class="kw">head</span>(Produc)</a>
-<a class="sourceLine" id="cb172-4" data-line-number="4"><span class="co">#&gt;     state year     pcap     hwy   water    util       pc   gsp    emp unemp</span></a>
-<a class="sourceLine" id="cb172-5" data-line-number="5"><span class="co">#&gt; 1 ALABAMA 1970 15032.67 7325.80 1655.68 6051.20 35793.80 28418 1010.5   4.7</span></a>
-<a class="sourceLine" id="cb172-6" data-line-number="6"><span class="co">#&gt; 2 ALABAMA 1971 15501.94 7525.94 1721.02 6254.98 37299.91 29375 1021.9   5.2</span></a>
-<a class="sourceLine" id="cb172-7" data-line-number="7"><span class="co">#&gt; 3 ALABAMA 1972 15972.41 7765.42 1764.75 6442.23 38670.30 31303 1072.3   4.7</span></a>
-<a class="sourceLine" id="cb172-8" data-line-number="8"><span class="co">#&gt; 4 ALABAMA 1973 16406.26 7907.66 1742.41 6756.19 40084.01 33430 1135.5   3.9</span></a>
-<a class="sourceLine" id="cb172-9" data-line-number="9"><span class="co">#&gt; 5 ALABAMA 1974 16762.67 8025.52 1734.85 7002.29 42057.31 33749 1169.8   5.5</span></a>
-<a class="sourceLine" id="cb172-10" data-line-number="10"><span class="co">#&gt; 6 ALABAMA 1975 17316.26 8158.23 1752.27 7405.76 43971.71 33604 1155.4   7.7</span></a></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="gsp.html#cb172-1"></a><span class="kw">library</span>(Ecdat)</span>
+<span id="cb172-2"><a href="gsp.html#cb172-2"></a><span class="kw">data</span>(Produc)</span>
+<span id="cb172-3"><a href="gsp.html#cb172-3"></a><span class="kw">head</span>(Produc)</span>
+<span id="cb172-4"><a href="gsp.html#cb172-4"></a><span class="co">#&gt;     state year     pcap     hwy   water    util       pc   gsp    emp unemp</span></span>
+<span id="cb172-5"><a href="gsp.html#cb172-5"></a><span class="co">#&gt; 1 ALABAMA 1970 15032.67 7325.80 1655.68 6051.20 35793.80 28418 1010.5   4.7</span></span>
+<span id="cb172-6"><a href="gsp.html#cb172-6"></a><span class="co">#&gt; 2 ALABAMA 1971 15501.94 7525.94 1721.02 6254.98 37299.91 29375 1021.9   5.2</span></span>
+<span id="cb172-7"><a href="gsp.html#cb172-7"></a><span class="co">#&gt; 3 ALABAMA 1972 15972.41 7765.42 1764.75 6442.23 38670.30 31303 1072.3   4.7</span></span>
+<span id="cb172-8"><a href="gsp.html#cb172-8"></a><span class="co">#&gt; 4 ALABAMA 1973 16406.26 7907.66 1742.41 6756.19 40084.01 33430 1135.5   3.9</span></span>
+<span id="cb172-9"><a href="gsp.html#cb172-9"></a><span class="co">#&gt; 5 ALABAMA 1974 16762.67 8025.52 1734.85 7002.29 42057.31 33749 1169.8   5.5</span></span>
+<span id="cb172-10"><a href="gsp.html#cb172-10"></a><span class="co">#&gt; 6 ALABAMA 1975 17316.26 8158.23 1752.27 7405.76 43971.71 33604 1155.4   7.7</span></span></code></pre></div>
 </div>
-<div id="analysis-1" class="section level2">
+<div id="analysis-1" class="section level2" number="11.4">
 <h2><span class="header-section-number">11.4</span> Analysis</h2>
 <p>First, we load the required packages. <code>drake</code> is aware of all the packages you load with <code>library()</code> or <code>require()</code>.</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="kw">library</span>(biglm) <span class="co"># lightweight models, easier to store than with lm()</span></a>
-<a class="sourceLine" id="cb173-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb173-3" data-line-number="3"><span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span></a>
-<a class="sourceLine" id="cb173-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb173-5" data-line-number="5"><span class="kw">library</span>(knitr)</a>
-<a class="sourceLine" id="cb173-6" data-line-number="6"><span class="kw">library</span>(purrr)</a>
-<a class="sourceLine" id="cb173-7" data-line-number="7"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="gsp.html#cb173-1"></a><span class="kw">library</span>(biglm) <span class="co"># lightweight models, easier to store than with lm()</span></span>
+<span id="cb173-2"><a href="gsp.html#cb173-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb173-3"><a href="gsp.html#cb173-3"></a><span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span></span>
+<span id="cb173-4"><a href="gsp.html#cb173-4"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb173-5"><a href="gsp.html#cb173-5"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb173-6"><a href="gsp.html#cb173-6"></a><span class="kw">library</span>(purrr)</span>
+<span id="cb173-7"><a href="gsp.html#cb173-7"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
 <p>Next, we construct our plan. The following code uses <code>drake</code>’s special new language for generating plans (learn more <a href="plans.html#plans">here</a>).</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb174-1" data-line-number="1">predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)</a>
-<a class="sourceLine" id="cb174-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb174-3" data-line-number="3"><span class="co"># We will try all combinations of three covariates.</span></a>
-<a class="sourceLine" id="cb174-4" data-line-number="4">combos &lt;-<span class="st"> </span><span class="kw">combn</span>(predictors, <span class="dv">3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb174-5" data-line-number="5"><span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb174-6" data-line-number="6"><span class="st">  </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb174-7" data-line-number="7"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>))</a>
-<a class="sourceLine" id="cb174-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb174-9" data-line-number="9"><span class="kw">head</span>(combos)</a>
-<a class="sourceLine" id="cb174-10" data-line-number="10"><span class="co">#&gt;      x1   x2    x3</span></a>
-<a class="sourceLine" id="cb174-11" data-line-number="11"><span class="co">#&gt; 1 state year  pcap</span></a>
-<a class="sourceLine" id="cb174-12" data-line-number="12"><span class="co">#&gt; 2 state year   hwy</span></a>
-<a class="sourceLine" id="cb174-13" data-line-number="13"><span class="co">#&gt; 3 state year water</span></a>
-<a class="sourceLine" id="cb174-14" data-line-number="14"><span class="co">#&gt; 4 state year  util</span></a>
-<a class="sourceLine" id="cb174-15" data-line-number="15"><span class="co">#&gt; 5 state year    pc</span></a>
-<a class="sourceLine" id="cb174-16" data-line-number="16"><span class="co">#&gt; 6 state year   emp</span></a>
-<a class="sourceLine" id="cb174-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb174-18" data-line-number="18"><span class="co"># We need to list each covariate as a symbol.</span></a>
-<a class="sourceLine" id="cb174-19" data-line-number="19"><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(combos)) {</a>
-<a class="sourceLine" id="cb174-20" data-line-number="20">  combos[[col]] &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(combos[[col]])</a>
-<a class="sourceLine" id="cb174-21" data-line-number="21">}</a>
-<a class="sourceLine" id="cb174-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb174-23" data-line-number="23"><span class="co"># Requires drake &gt;= 7.0.0 or the development version</span></a>
-<a class="sourceLine" id="cb174-24" data-line-number="24"><span class="co"># at github.com/ropensci/drake.</span></a>
-<a class="sourceLine" id="cb174-25" data-line-number="25"><span class="co"># Install with remotes::install_github(&quot;ropensci/drake&quot;).</span></a>
-<a class="sourceLine" id="cb174-26" data-line-number="26">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb174-27" data-line-number="27">  <span class="dt">model =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb174-28" data-line-number="28">    <span class="kw">biglm</span>(gsp <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3, <span class="dt">data =</span> Ecdat<span class="op">::</span>Produc),</a>
-<a class="sourceLine" id="cb174-29" data-line-number="29">    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">.data =</span> <span class="op">!!</span>combos) <span class="co"># Remember the bang-bang!!</span></a>
-<a class="sourceLine" id="cb174-30" data-line-number="30">  ),</a>
-<a class="sourceLine" id="cb174-31" data-line-number="31">  <span class="dt">rmspe_i =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb174-32" data-line-number="32">    <span class="kw">get_rmspe</span>(model, Ecdat<span class="op">::</span>Produc),</a>
-<a class="sourceLine" id="cb174-33" data-line-number="33">    <span class="dt">transform =</span> <span class="kw">map</span>(model)</a>
-<a class="sourceLine" id="cb174-34" data-line-number="34">  ),</a>
-<a class="sourceLine" id="cb174-35" data-line-number="35">  <span class="dt">rmspe =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb174-36" data-line-number="36">    <span class="kw">bind_rows</span>(rmspe_i, <span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>),</a>
-<a class="sourceLine" id="cb174-37" data-line-number="37">    <span class="dt">transform =</span> <span class="kw">combine</span>(rmspe_i)</a>
-<a class="sourceLine" id="cb174-38" data-line-number="38">  ),</a>
-<a class="sourceLine" id="cb174-39" data-line-number="39">  <span class="dt">plot =</span> <span class="kw">ggsave</span>(</a>
-<a class="sourceLine" id="cb174-40" data-line-number="40">    <span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>),</a>
-<a class="sourceLine" id="cb174-41" data-line-number="41">    <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe),</a>
-<a class="sourceLine" id="cb174-42" data-line-number="42">    <span class="dt">width =</span> <span class="dv">8</span>,</a>
-<a class="sourceLine" id="cb174-43" data-line-number="43">    <span class="dt">height =</span> <span class="dv">8</span></a>
-<a class="sourceLine" id="cb174-44" data-line-number="44">  ),</a>
-<a class="sourceLine" id="cb174-45" data-line-number="45">  <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb174-46" data-line-number="46">)</a>
-<a class="sourceLine" id="cb174-47" data-line-number="47"></a>
-<a class="sourceLine" id="cb174-48" data-line-number="48">plan</a>
-<a class="sourceLine" id="cb174-49" data-line-number="49"><span class="co">#&gt; # A tibble: 171 x 2</span></a>
-<a class="sourceLine" id="cb174-50" data-line-number="50"><span class="co">#&gt;    target                 command                                               </span></a>
-<a class="sourceLine" id="cb174-51" data-line-number="51"><span class="co">#&gt;    &lt;chr&gt;                  &lt;expr_lst&gt;                                            </span></a>
-<a class="sourceLine" id="cb174-52" data-line-number="52"><span class="co">#&gt;  1 model_state_year_pcap  biglm(gsp ~ state + year + pcap, data = Ecdat::Produc…</span></a>
-<a class="sourceLine" id="cb174-53" data-line-number="53"><span class="co">#&gt;  2 model_state_year_hwy   biglm(gsp ~ state + year + hwy, data = Ecdat::Produc)…</span></a>
-<a class="sourceLine" id="cb174-54" data-line-number="54"><span class="co">#&gt;  3 model_state_year_water biglm(gsp ~ state + year + water, data = Ecdat::Produ…</span></a>
-<a class="sourceLine" id="cb174-55" data-line-number="55"><span class="co">#&gt;  4 model_state_year_util  biglm(gsp ~ state + year + util, data = Ecdat::Produc…</span></a>
-<a class="sourceLine" id="cb174-56" data-line-number="56"><span class="co">#&gt;  5 model_state_year_pc    biglm(gsp ~ state + year + pc, data = Ecdat::Produc) …</span></a>
-<a class="sourceLine" id="cb174-57" data-line-number="57"><span class="co">#&gt;  6 model_state_year_emp   biglm(gsp ~ state + year + emp, data = Ecdat::Produc)…</span></a>
-<a class="sourceLine" id="cb174-58" data-line-number="58"><span class="co">#&gt;  7 model_state_year_unemp biglm(gsp ~ state + year + unemp, data = Ecdat::Produ…</span></a>
-<a class="sourceLine" id="cb174-59" data-line-number="59"><span class="co">#&gt;  8 model_state_pcap_hwy   biglm(gsp ~ state + pcap + hwy, data = Ecdat::Produc)…</span></a>
-<a class="sourceLine" id="cb174-60" data-line-number="60"><span class="co">#&gt;  9 model_state_pcap_water biglm(gsp ~ state + pcap + water, data = Ecdat::Produ…</span></a>
-<a class="sourceLine" id="cb174-61" data-line-number="61"><span class="co">#&gt; 10 model_state_pcap_util  biglm(gsp ~ state + pcap + util, data = Ecdat::Produc…</span></a>
-<a class="sourceLine" id="cb174-62" data-line-number="62"><span class="co">#&gt; # … with 161 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="gsp.html#cb174-1"></a>predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)</span>
+<span id="cb174-2"><a href="gsp.html#cb174-2"></a></span>
+<span id="cb174-3"><a href="gsp.html#cb174-3"></a><span class="co"># We will try all combinations of three covariates.</span></span>
+<span id="cb174-4"><a href="gsp.html#cb174-4"></a>combos &lt;-<span class="st"> </span><span class="kw">combn</span>(predictors, <span class="dv">3</span>) <span class="op">%&gt;%</span></span>
+<span id="cb174-5"><a href="gsp.html#cb174-5"></a><span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span></span>
+<span id="cb174-6"><a href="gsp.html#cb174-6"></a><span class="st">  </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb174-7"><a href="gsp.html#cb174-7"></a><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>))</span>
+<span id="cb174-8"><a href="gsp.html#cb174-8"></a></span>
+<span id="cb174-9"><a href="gsp.html#cb174-9"></a><span class="kw">head</span>(combos)</span>
+<span id="cb174-10"><a href="gsp.html#cb174-10"></a><span class="co">#&gt;      x1   x2    x3</span></span>
+<span id="cb174-11"><a href="gsp.html#cb174-11"></a><span class="co">#&gt; 1 state year  pcap</span></span>
+<span id="cb174-12"><a href="gsp.html#cb174-12"></a><span class="co">#&gt; 2 state year   hwy</span></span>
+<span id="cb174-13"><a href="gsp.html#cb174-13"></a><span class="co">#&gt; 3 state year water</span></span>
+<span id="cb174-14"><a href="gsp.html#cb174-14"></a><span class="co">#&gt; 4 state year  util</span></span>
+<span id="cb174-15"><a href="gsp.html#cb174-15"></a><span class="co">#&gt; 5 state year    pc</span></span>
+<span id="cb174-16"><a href="gsp.html#cb174-16"></a><span class="co">#&gt; 6 state year   emp</span></span>
+<span id="cb174-17"><a href="gsp.html#cb174-17"></a></span>
+<span id="cb174-18"><a href="gsp.html#cb174-18"></a><span class="co"># We need to list each covariate as a symbol.</span></span>
+<span id="cb174-19"><a href="gsp.html#cb174-19"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(combos)) {</span>
+<span id="cb174-20"><a href="gsp.html#cb174-20"></a>  combos[[col]] &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(combos[[col]])</span>
+<span id="cb174-21"><a href="gsp.html#cb174-21"></a>}</span>
+<span id="cb174-22"><a href="gsp.html#cb174-22"></a></span>
+<span id="cb174-23"><a href="gsp.html#cb174-23"></a><span class="co"># Requires drake &gt;= 7.0.0 or the development version</span></span>
+<span id="cb174-24"><a href="gsp.html#cb174-24"></a><span class="co"># at github.com/ropensci/drake.</span></span>
+<span id="cb174-25"><a href="gsp.html#cb174-25"></a><span class="co"># Install with remotes::install_github(&quot;ropensci/drake&quot;).</span></span>
+<span id="cb174-26"><a href="gsp.html#cb174-26"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb174-27"><a href="gsp.html#cb174-27"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
+<span id="cb174-28"><a href="gsp.html#cb174-28"></a>    <span class="kw">biglm</span>(gsp <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3, <span class="dt">data =</span> Ecdat<span class="op">::</span>Produc),</span>
+<span id="cb174-29"><a href="gsp.html#cb174-29"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">.data =</span> <span class="op">!!</span>combos) <span class="co"># Remember the bang-bang!!</span></span>
+<span id="cb174-30"><a href="gsp.html#cb174-30"></a>  ),</span>
+<span id="cb174-31"><a href="gsp.html#cb174-31"></a>  <span class="dt">rmspe_i =</span> <span class="kw">target</span>(</span>
+<span id="cb174-32"><a href="gsp.html#cb174-32"></a>    <span class="kw">get_rmspe</span>(model, Ecdat<span class="op">::</span>Produc),</span>
+<span id="cb174-33"><a href="gsp.html#cb174-33"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(model)</span>
+<span id="cb174-34"><a href="gsp.html#cb174-34"></a>  ),</span>
+<span id="cb174-35"><a href="gsp.html#cb174-35"></a>  <span class="dt">rmspe =</span> <span class="kw">target</span>(</span>
+<span id="cb174-36"><a href="gsp.html#cb174-36"></a>    <span class="kw">bind_rows</span>(rmspe_i, <span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>),</span>
+<span id="cb174-37"><a href="gsp.html#cb174-37"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(rmspe_i)</span>
+<span id="cb174-38"><a href="gsp.html#cb174-38"></a>  ),</span>
+<span id="cb174-39"><a href="gsp.html#cb174-39"></a>  <span class="dt">plot =</span> <span class="kw">ggsave</span>(</span>
+<span id="cb174-40"><a href="gsp.html#cb174-40"></a>    <span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>),</span>
+<span id="cb174-41"><a href="gsp.html#cb174-41"></a>    <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe),</span>
+<span id="cb174-42"><a href="gsp.html#cb174-42"></a>    <span class="dt">width =</span> <span class="dv">8</span>,</span>
+<span id="cb174-43"><a href="gsp.html#cb174-43"></a>    <span class="dt">height =</span> <span class="dv">8</span></span>
+<span id="cb174-44"><a href="gsp.html#cb174-44"></a>  ),</span>
+<span id="cb174-45"><a href="gsp.html#cb174-45"></a>  <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb174-46"><a href="gsp.html#cb174-46"></a>)</span>
+<span id="cb174-47"><a href="gsp.html#cb174-47"></a></span>
+<span id="cb174-48"><a href="gsp.html#cb174-48"></a>plan</span>
+<span id="cb174-49"><a href="gsp.html#cb174-49"></a><span class="co">#&gt; # A tibble: 171 x 2</span></span>
+<span id="cb174-50"><a href="gsp.html#cb174-50"></a><span class="co">#&gt;    target                 command                                               </span></span>
+<span id="cb174-51"><a href="gsp.html#cb174-51"></a><span class="co">#&gt;    &lt;chr&gt;                  &lt;expr_lst&gt;                                            </span></span>
+<span id="cb174-52"><a href="gsp.html#cb174-52"></a><span class="co">#&gt;  1 model_state_year_pcap  biglm(gsp ~ state + year + pcap, data = Ecdat::Produc…</span></span>
+<span id="cb174-53"><a href="gsp.html#cb174-53"></a><span class="co">#&gt;  2 model_state_year_hwy   biglm(gsp ~ state + year + hwy, data = Ecdat::Produc)…</span></span>
+<span id="cb174-54"><a href="gsp.html#cb174-54"></a><span class="co">#&gt;  3 model_state_year_water biglm(gsp ~ state + year + water, data = Ecdat::Produ…</span></span>
+<span id="cb174-55"><a href="gsp.html#cb174-55"></a><span class="co">#&gt;  4 model_state_year_util  biglm(gsp ~ state + year + util, data = Ecdat::Produc…</span></span>
+<span id="cb174-56"><a href="gsp.html#cb174-56"></a><span class="co">#&gt;  5 model_state_year_pc    biglm(gsp ~ state + year + pc, data = Ecdat::Produc) …</span></span>
+<span id="cb174-57"><a href="gsp.html#cb174-57"></a><span class="co">#&gt;  6 model_state_year_emp   biglm(gsp ~ state + year + emp, data = Ecdat::Produc)…</span></span>
+<span id="cb174-58"><a href="gsp.html#cb174-58"></a><span class="co">#&gt;  7 model_state_year_unemp biglm(gsp ~ state + year + unemp, data = Ecdat::Produ…</span></span>
+<span id="cb174-59"><a href="gsp.html#cb174-59"></a><span class="co">#&gt;  8 model_state_pcap_hwy   biglm(gsp ~ state + pcap + hwy, data = Ecdat::Produc)…</span></span>
+<span id="cb174-60"><a href="gsp.html#cb174-60"></a><span class="co">#&gt;  9 model_state_pcap_water biglm(gsp ~ state + pcap + water, data = Ecdat::Produ…</span></span>
+<span id="cb174-61"><a href="gsp.html#cb174-61"></a><span class="co">#&gt; 10 model_state_pcap_util  biglm(gsp ~ state + pcap + util, data = Ecdat::Produc…</span></span>
+<span id="cb174-62"><a href="gsp.html#cb174-62"></a><span class="co">#&gt; # … with 161 more rows</span></span></code></pre></div>
 <p>We also need to define functions for summaries and plots.</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1">get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(model_fit, data){</a>
-<a class="sourceLine" id="cb175-2" data-line-number="2">  y &lt;-<span class="st"> </span>data<span class="op">$</span>gsp</a>
-<a class="sourceLine" id="cb175-3" data-line-number="3">  yhat &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">predict</span>(model_fit, <span class="dt">newdata =</span> data))</a>
-<a class="sourceLine" id="cb175-4" data-line-number="4">  terms &lt;-<span class="st"> </span><span class="kw">attr</span>(model_fit<span class="op">$</span>terms, <span class="st">&quot;term.labels&quot;</span>)</a>
-<a class="sourceLine" id="cb175-5" data-line-number="5">  <span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb175-6" data-line-number="6">    <span class="dt">rmspe =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>((y <span class="op">-</span><span class="st"> </span>yhat)<span class="op">^</span><span class="dv">2</span>)), <span class="co"># nolint</span></a>
-<a class="sourceLine" id="cb175-7" data-line-number="7">    <span class="dt">X1 =</span> terms[<span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb175-8" data-line-number="8">    <span class="dt">X2 =</span> terms[<span class="dv">2</span>],</a>
-<a class="sourceLine" id="cb175-9" data-line-number="9">    <span class="dt">X3 =</span> terms[<span class="dv">3</span>]</a>
-<a class="sourceLine" id="cb175-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb175-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb175-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb175-13" data-line-number="13">plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){</a>
-<a class="sourceLine" id="cb175-14" data-line-number="14">  <span class="kw">ggplot</span>(rmspe) <span class="op">+</span></a>
-<a class="sourceLine" id="cb175-15" data-line-number="15"><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb175-16" data-line-number="16">}</a></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="gsp.html#cb175-1"></a>get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(model_fit, data){</span>
+<span id="cb175-2"><a href="gsp.html#cb175-2"></a>  y &lt;-<span class="st"> </span>data<span class="op">$</span>gsp</span>
+<span id="cb175-3"><a href="gsp.html#cb175-3"></a>  yhat &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">predict</span>(model_fit, <span class="dt">newdata =</span> data))</span>
+<span id="cb175-4"><a href="gsp.html#cb175-4"></a>  terms &lt;-<span class="st"> </span><span class="kw">attr</span>(model_fit<span class="op">$</span>terms, <span class="st">&quot;term.labels&quot;</span>)</span>
+<span id="cb175-5"><a href="gsp.html#cb175-5"></a>  <span class="kw">tibble</span>(</span>
+<span id="cb175-6"><a href="gsp.html#cb175-6"></a>    <span class="dt">rmspe =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>((y <span class="op">-</span><span class="st"> </span>yhat)<span class="op">^</span><span class="dv">2</span>)), <span class="co"># nolint</span></span>
+<span id="cb175-7"><a href="gsp.html#cb175-7"></a>    <span class="dt">X1 =</span> terms[<span class="dv">1</span>],</span>
+<span id="cb175-8"><a href="gsp.html#cb175-8"></a>    <span class="dt">X2 =</span> terms[<span class="dv">2</span>],</span>
+<span id="cb175-9"><a href="gsp.html#cb175-9"></a>    <span class="dt">X3 =</span> terms[<span class="dv">3</span>]</span>
+<span id="cb175-10"><a href="gsp.html#cb175-10"></a>  )</span>
+<span id="cb175-11"><a href="gsp.html#cb175-11"></a>}</span>
+<span id="cb175-12"><a href="gsp.html#cb175-12"></a></span>
+<span id="cb175-13"><a href="gsp.html#cb175-13"></a>plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){</span>
+<span id="cb175-14"><a href="gsp.html#cb175-14"></a>  <span class="kw">ggplot</span>(rmspe) <span class="op">+</span></span>
+<span id="cb175-15"><a href="gsp.html#cb175-15"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">15</span>)</span>
+<span id="cb175-16"><a href="gsp.html#cb175-16"></a>}</span></code></pre></div>
 <p>We have a <a href="https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd"><code>report.Rmd</code> file</a> to summarize our results at the end.</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1"><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</a>
-<a class="sourceLine" id="cb176-2" data-line-number="2"><span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb176-3" data-line-number="3"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="gsp.html#cb176-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span>
+<span id="cb176-2"><a href="gsp.html#cb176-2"></a><span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb176-3"><a href="gsp.html#cb176-3"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>We can inspect the project before we run it.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="gsp.html#cb177-1"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
 <div id="htmlwidget-57eed0b74d3330bbf7a9" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-57eed0b74d3330bbf7a9">{"x":{"nodes":{"id":["n-IVRWIYLUHI5FA4TPMR2WG","get_rmspe","plot_rmspe","p-OJSXA33SOQXFE3LE","model_year_pcap_water","model_year_hwy_water","model_state_pcap_emp","model_state_hwy_unemp","model_year_hwy_emp","model_hwy_util_unemp","model_pcap_hwy_emp","model_state_pc_unemp","model_state_hwy_water","model_pcap_hwy_pc","model_hwy_emp_unemp","model_pcap_util_emp","model_util_pc_unemp","model_state_year_hwy","model_hwy_pc_emp","model_pcap_pc_emp","model_year_hwy_unemp","model_state_pcap_hwy","model_year_util_emp","model_state_pcap_util","model_year_water_util","model_year_util_unemp","model_state_pcap_pc","model_year_pcap_unemp","model_state_pcap_unemp","model_state_emp_unemp","model_year_hwy_util","model_state_water_unemp","model_year_pcap_pc","model_year_water_emp","model_state_hwy_util","model_pcap_water_emp","model_state_water_emp","model_state_year_unemp","model_pcap_pc_unemp","model_hwy_util_pc","model_hwy_pc_unemp","model_pcap_water_unemp","model_water_util_unemp","model_year_water_unemp","model_pcap_util_pc","model_hwy_water_pc","model_pcap_water_util","model_state_year_util","model_state_util_emp","model_pc_emp_unemp","model_water_pc_emp","model_water_util_emp","model_year_emp_unemp","model_state_util_pc","model_year_water_pc","model_state_water_util","model_util_emp_unemp","model_year_pc_emp","model_state_util_unemp","model_state_pc_emp","model_year_pcap_hwy","model_state_hwy_pc","model_hwy_water_util","model_water_util_pc","model_year_hwy_pc","model_hwy_util_emp","model_year_pc_unemp","model_state_pcap_water","model_hwy_water_unemp","model_state_year_water","model_year_util_pc","model_state_water_pc","model_state_hwy_emp","model_util_pc_emp","model_pcap_emp_unemp","model_year_pcap_emp","model_year_pcap_util","model_hwy_water_emp","model_pcap_water_pc","model_pcap_hwy_util","model_water_pc_unemp","model_state_year_emp","model_state_year_pcap","model_water_emp_unemp","model_pcap_util_unemp","model_pcap_hwy_unemp","model_pcap_hwy_water","model_state_year_pc","rmspe_i_model_year_pcap_water","rmspe_i_model_year_hwy_water","rmspe_i_model_state_pcap_emp","rmspe_i_model_state_hwy_unemp","rmspe_i_model_year_hwy_emp","rmspe_i_model_hwy_util_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_state_pc_unemp","rmspe_i_model_state_hwy_water","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_hwy_pc_emp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_emp","rmspe_i_model_state_pcap_util","rmspe_i_model_year_water_util","rmspe_i_model_year_util_unemp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_pcap_unemp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_state_emp_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_state_water_unemp","rmspe_i_model_year_pcap_pc","rmspe_i_model_year_water_emp","rmspe_i_model_state_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_year_unemp","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_hwy_util_pc","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_water_unemp","rmspe_i_model_pcap_util_pc","rmspe_i_model_hwy_water_pc","rmspe_i_model_pcap_water_util","rmspe_i_model_state_year_util","rmspe_i_model_state_util_emp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_water_util_emp","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_year_water_pc","rmspe_i_model_state_water_util","rmspe_i_model_util_emp_unemp","rmspe_i_model_year_pc_emp","rmspe_i_model_state_util_unemp","rmspe_i_model_state_pc_emp","rmspe_i_model_year_pcap_hwy","rmspe_i_model_state_hwy_pc","rmspe_i_model_hwy_water_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_hwy_util_emp","rmspe_i_model_year_pc_unemp","rmspe_i_model_state_pcap_water","rmspe_i_model_hwy_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_year_util_pc","rmspe_i_model_state_water_pc","rmspe_i_model_state_hwy_emp","rmspe_i_model_util_pc_emp","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_year_pcap_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_hwy_water_emp","rmspe_i_model_pcap_water_pc","rmspe_i_model_pcap_hwy_util","rmspe_i_model_water_pc_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_year_pcap","rmspe_i_model_water_emp_unemp","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_year_pc","rmspe","report","plot","p-OJSXA33SOQXG2ZA","p-OJWXG4DFFZYGIZQ"],"imported":[true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"label":["Ecdat::Produc","get_rmspe","plot_rmspe","file report.Rmd","model_year_pcap_water","model_year_hwy_water","model_state_pcap_emp","model_state_hwy_unemp","model_year_hwy_emp","model_hwy_util_unemp","model_pcap_hwy_emp","model_state_pc_unemp","model_state_hwy_water","model_pcap_hwy_pc","model_hwy_emp_unemp","model_pcap_util_emp","model_util_pc_unemp","model_state_year_hwy","model_hwy_pc_emp","model_pcap_pc_emp","model_year_hwy_unemp","model_state_pcap_hwy","model_year_util_emp","model_state_pcap_util","model_year_water_util","model_year_util_unemp","model_state_pcap_pc","model_year_pcap_unemp","model_state_pcap_unemp","model_state_emp_unemp","model_year_hwy_util","model_state_water_unemp","model_year_pcap_pc","model_year_water_emp","model_state_hwy_util","model_pcap_water_emp","model_state_water_emp","model_state_year_unemp","model_pcap_pc_unemp","model_hwy_util_pc","model_hwy_pc_unemp","model_pcap_water_unemp","model_water_util_unemp","model_year_water_unemp","model_pcap_util_pc","model_hwy_water_pc","model_pcap_water_util","model_state_year_util","model_state_util_emp","model_pc_emp_unemp","model_water_pc_emp","model_water_util_emp","model_year_emp_unemp","model_state_util_pc","model_year_water_pc","model_state_water_util","model_util_emp_unemp","model_year_pc_emp","model_state_util_unemp","model_state_pc_emp","model_year_pcap_hwy","model_state_hwy_pc","model_hwy_water_util","model_water_util_pc","model_year_hwy_pc","model_hwy_util_emp","model_year_pc_unemp","model_state_pcap_water","model_hwy_water_unemp","model_state_year_water","model_year_util_pc","model_state_water_pc","model_state_hwy_emp","model_util_pc_emp","model_pcap_emp_unemp","model_year_pcap_emp","model_year_pcap_util","model_hwy_water_emp","model_pcap_water_pc","model_pcap_hwy_util","model_water_pc_unemp","model_state_year_emp","model_state_year_pcap","model_water_emp_unemp","model_pcap_util_unemp","model_pcap_hwy_unemp","model_pcap_hwy_water","model_state_year_pc","rmspe_i_model_year_pcap_water","rmspe_i_model_year_hwy_water","rmspe_i_model_state_pcap_emp","rmspe_i_model_state_hwy_unemp","rmspe_i_model_year_hwy_emp","rmspe_i_model_hwy_util_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_state_pc_unemp","rmspe_i_model_state_hwy_water","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_hwy_pc_emp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_emp","rmspe_i_model_state_pcap_util","rmspe_i_model_year_water_util","rmspe_i_model_year_util_unemp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_pcap_unemp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_state_emp_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_state_water_unemp","rmspe_i_model_year_pcap_pc","rmspe_i_model_year_water_emp","rmspe_i_model_state_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_year_unemp","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_hwy_util_pc","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_water_unemp","rmspe_i_model_pcap_util_pc","rmspe_i_model_hwy_water_pc","rmspe_i_model_pcap_water_util","rmspe_i_model_state_year_util","rmspe_i_model_state_util_emp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_water_util_emp","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_year_water_pc","rmspe_i_model_state_water_util","rmspe_i_model_util_emp_unemp","rmspe_i_model_year_pc_emp","rmspe_i_model_state_util_unemp","rmspe_i_model_state_pc_emp","rmspe_i_model_year_pcap_hwy","rmspe_i_model_state_hwy_pc","rmspe_i_model_hwy_water_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_hwy_util_emp","rmspe_i_model_year_pc_unemp","rmspe_i_model_state_pcap_water","rmspe_i_model_hwy_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_year_util_pc","rmspe_i_model_state_water_pc","rmspe_i_model_state_hwy_emp","rmspe_i_model_util_pc_emp","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_year_pcap_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_hwy_water_emp","rmspe_i_model_pcap_water_pc","rmspe_i_model_pcap_hwy_util","rmspe_i_model_water_pc_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_year_pcap","rmspe_i_model_water_emp_unemp","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_year_pc","rmspe","report","plot","file report.md","file rmspe.pdf"],"status":["imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["object","function","function","file","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","object","file","file"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["dot","triangle","triangle","square","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","square","square"],"level":[1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,5,5,6,6],"x":[-1,-1,-1,-1,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.6,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,-0.2,0.2,0.6,0.6,1,1],"y":[-0.614457831325301,-0.204819277108434,0.204819277108434,0.614457831325301,-1,-0.975903614457831,-0.951807228915663,-0.927710843373494,-0.903614457831325,-0.879518072289157,-0.855421686746988,-0.831325301204819,-0.807228915662651,-0.783132530120482,-0.759036144578313,-0.734939759036145,-0.710843373493976,-0.686746987951807,-0.662650602409639,-0.63855421686747,-0.614457831325301,-0.590361445783133,-0.566265060240964,-0.542168674698795,-0.518072289156627,-0.493975903614458,-0.469879518072289,-0.445783132530121,-0.421686746987952,-0.397590361445783,-0.373493975903615,-0.349397590361446,-0.325301204819277,-0.301204819277109,-0.27710843373494,-0.253012048192771,-0.228915662650602,-0.204819277108434,-0.180722891566265,-0.156626506024096,-0.132530120481928,-0.108433734939759,-0.0843373493975905,-0.0602409638554218,-0.0361445783132531,-0.0120481927710844,0.0120481927710843,0.0361445783132528,0.0602409638554215,0.0843373493975901,0.108433734939759,0.132530120481928,0.156626506024096,0.180722891566265,0.204819277108433,0.228915662650603,0.253012048192771,0.27710843373494,0.301204819277108,0.325301204819277,0.349397590361445,0.373493975903614,0.397590361445783,0.421686746987952,0.44578313253012,0.469879518072289,0.493975903614458,0.518072289156627,0.542168674698795,0.566265060240964,0.590361445783132,0.614457831325301,0.63855421686747,0.662650602409638,0.686746987951807,0.710843373493976,0.734939759036144,0.759036144578313,0.783132530120482,0.80722891566265,0.831325301204819,0.855421686746987,0.879518072289157,0.903614457831325,0.927710843373494,0.951807228915662,0.975903614457831,1,-1,-0.975903614457831,-0.951807228915663,-0.927710843373494,-0.903614457831325,-0.879518072289157,-0.855421686746988,-0.831325301204819,-0.807228915662651,-0.783132530120482,-0.759036144578313,-0.734939759036145,-0.710843373493976,-0.686746987951807,-0.662650602409639,-0.63855421686747,-0.614457831325301,-0.590361445783133,-0.566265060240964,-0.542168674698795,-0.518072289156627,-0.493975903614458,-0.469879518072289,-0.445783132530121,-0.421686746987952,-0.397590361445783,-0.373493975903615,-0.349397590361446,-0.325301204819277,-0.301204819277109,-0.27710843373494,-0.253012048192771,-0.228915662650602,-0.204819277108434,-0.180722891566265,-0.156626506024096,-0.132530120481928,-0.108433734939759,-0.0843373493975905,-0.0602409638554218,-0.0361445783132531,-0.0120481927710844,0.0120481927710843,0.0361445783132528,0.0602409638554215,0.0843373493975901,0.108433734939759,0.132530120481928,0.156626506024096,0.180722891566265,0.204819277108433,0.228915662650603,0.253012048192771,0.27710843373494,0.301204819277108,0.325301204819277,0.349397590361445,0.373493975903614,0.397590361445783,0.421686746987952,0.44578313253012,0.469879518072289,0.493975903614458,0.518072289156627,0.542168674698795,0.566265060240964,0.590361445783132,0.614457831325301,0.63855421686747,0.662650602409638,0.686746987951807,0.710843373493976,0.734939759036144,0.759036144578313,0.783132530120482,0.80722891566265,0.831325301204819,0.855421686746987,0.879518072289157,0.903614457831325,0.927710843373494,0.951807228915662,0.975903614457831,1,-1.11022302462516e-16,-0.34136546184739,0.341365461847389,-0.34136546184739,0.341365461847389]},"edges":{"from":["n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","n-IVRWIYLUHI5FA4TPMR2WG","model_year_pcap_water","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","get_rmspe","model_year_hwy_water","model_state_pcap_emp","model_state_hwy_unemp","model_year_hwy_emp","model_hwy_util_unemp","model_pcap_hwy_emp","model_state_pc_unemp","model_state_hwy_water","model_pcap_hwy_pc","model_hwy_emp_unemp","model_pcap_util_emp","model_util_pc_unemp","model_state_year_hwy","model_hwy_pc_emp","model_pcap_pc_emp","model_year_hwy_unemp","model_state_pcap_hwy","model_year_util_emp","model_state_pcap_util","model_year_water_util","model_year_util_unemp","model_state_pcap_pc","model_year_pcap_unemp","model_state_pcap_unemp","model_state_emp_unemp","model_year_hwy_util","model_state_water_unemp","model_year_pcap_pc","model_year_water_emp","model_state_hwy_util","model_pcap_water_emp","model_state_water_emp","model_state_year_unemp","model_pcap_pc_unemp","model_hwy_util_pc","model_hwy_pc_unemp","model_pcap_water_unemp","model_water_util_unemp","model_year_water_unemp","model_pcap_util_pc","model_hwy_water_pc","model_pcap_water_util","model_state_year_util","model_state_util_emp","model_pc_emp_unemp","model_water_pc_emp","model_water_util_emp","model_year_emp_unemp","model_state_util_pc","model_year_water_pc","model_state_water_util","model_util_emp_unemp","model_year_pc_emp","model_state_util_unemp","model_state_pc_emp","model_year_pcap_hwy","model_state_hwy_pc","model_hwy_water_util","model_water_util_pc","model_year_hwy_pc","model_hwy_util_emp","model_year_pc_unemp","model_state_pcap_water","model_hwy_water_unemp","model_state_year_water","model_year_util_pc","model_state_water_pc","model_state_hwy_emp","model_util_pc_emp","plot_rmspe","plot_rmspe","rmspe","rmspe","p-OJSXA33SOQXFE3LE","report","model_pcap_emp_unemp","model_year_pcap_emp","model_year_pcap_util","model_hwy_water_emp","model_pcap_water_pc","model_pcap_hwy_util","plot","model_water_pc_unemp","model_state_year_emp","model_state_year_pcap","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_year_pcap_pc","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_pcap_util_pc","rmspe_i_model_pcap_water_pc","rmspe_i_model_state_emp_unemp","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_hwy_water_unemp","rmspe_i_model_water_util_emp","rmspe_i_model_year_water_unemp","rmspe_i_model_state_pc_unemp","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_pcap","rmspe_i_model_state_pcap_water","rmspe_i_model_state_pcap_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_pc_unemp","rmspe_i_model_water_emp_unemp","rmspe_i_model_state_year_pc","rmspe_i_model_hwy_water_emp","rmspe_i_model_hwy_util_emp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_water_pc","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_state_hwy_pc","rmspe_i_model_state_hwy_unemp","rmspe_i_model_state_year_util","rmspe_i_model_year_pcap_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_water_unemp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_pcap_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_state_util_unemp","rmspe_i_model_pcap_water_util","rmspe_i_model_year_water_util","rmspe_i_model_hwy_pc_emp","rmspe_i_model_hwy_water_util","rmspe_i_model_state_hwy_emp","rmspe_i_model_state_water_pc","rmspe_i_model_hwy_util_pc","rmspe_i_model_state_pcap_emp","rmspe_i_model_util_emp_unemp","rmspe_i_model_hwy_water_pc","rmspe_i_model_year_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_year_pc_emp","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_hwy_water","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_hwy_util","rmspe_i_model_year_pcap_hwy","rmspe_i_model_pcap_hwy_util","rmspe_i_model_year_hwy_emp","rmspe_i_model_state_hwy_water","rmspe_i_model_state_year_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_pc_emp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_state_water_util","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_unemp","rmspe_i_model_year_pcap_water","rmspe_i_model_hwy_util_unemp","rmspe_i_model_water_pc_unemp","rmspe_i_model_year_water_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_util_pc_emp","rmspe_i_model_year_util_emp","rmspe_i_model_state_util_emp","model_water_emp_unemp","model_pcap_util_unemp","model_pcap_hwy_unemp","model_pcap_hwy_water","model_state_year_pc"],"to":["model_year_pcap_water","model_year_hwy_water","model_state_pcap_emp","model_state_hwy_unemp","model_year_hwy_emp","model_hwy_util_unemp","model_pcap_hwy_emp","model_state_pc_unemp","model_state_hwy_water","model_pcap_hwy_pc","model_hwy_emp_unemp","model_pcap_util_emp","model_util_pc_unemp","model_state_year_hwy","model_hwy_pc_emp","model_pcap_pc_emp","model_year_hwy_unemp","model_state_pcap_hwy","model_year_util_emp","model_state_pcap_util","model_year_water_util","model_year_util_unemp","model_state_pcap_pc","model_year_pcap_unemp","model_state_pcap_unemp","model_state_emp_unemp","model_year_hwy_util","model_state_water_unemp","model_year_pcap_pc","model_year_water_emp","model_state_hwy_util","model_pcap_water_emp","model_state_water_emp","model_state_year_unemp","model_pcap_pc_unemp","model_hwy_util_pc","model_hwy_pc_unemp","model_pcap_water_unemp","model_water_util_unemp","model_year_water_unemp","model_pcap_util_pc","model_hwy_water_pc","model_pcap_water_util","model_state_year_util","model_state_util_emp","model_pc_emp_unemp","model_water_pc_emp","model_water_util_emp","model_year_emp_unemp","model_state_util_pc","model_year_water_pc","model_state_water_util","model_util_emp_unemp","model_year_pc_emp","model_state_util_unemp","model_state_pc_emp","model_year_pcap_hwy","model_state_hwy_pc","model_hwy_water_util","model_water_util_pc","model_year_hwy_pc","model_hwy_util_emp","model_year_pc_unemp","model_state_pcap_water","model_hwy_water_unemp","model_state_year_water","model_year_util_pc","model_state_water_pc","model_state_hwy_emp","model_util_pc_emp","model_pcap_emp_unemp","model_year_pcap_emp","model_year_pcap_util","model_hwy_water_emp","model_pcap_water_pc","model_pcap_hwy_util","model_water_pc_unemp","model_state_year_emp","model_state_year_pcap","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_year_pcap_pc","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_pcap_util_pc","rmspe_i_model_pcap_water_pc","rmspe_i_model_state_emp_unemp","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_hwy_water_unemp","rmspe_i_model_water_util_emp","rmspe_i_model_year_water_unemp","rmspe_i_model_state_pc_unemp","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_pcap","rmspe_i_model_state_pcap_water","rmspe_i_model_state_pcap_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_pc_unemp","rmspe_i_model_water_emp_unemp","rmspe_i_model_state_year_pc","rmspe_i_model_hwy_water_emp","rmspe_i_model_hwy_util_emp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_water_pc","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_state_hwy_pc","rmspe_i_model_state_hwy_unemp","rmspe_i_model_state_year_util","rmspe_i_model_year_pcap_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_water_unemp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_pcap_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_state_util_unemp","rmspe_i_model_pcap_water_util","rmspe_i_model_year_water_util","rmspe_i_model_hwy_pc_emp","rmspe_i_model_hwy_water_util","rmspe_i_model_state_hwy_emp","rmspe_i_model_state_water_pc","rmspe_i_model_hwy_util_pc","rmspe_i_model_state_pcap_emp","rmspe_i_model_util_emp_unemp","rmspe_i_model_hwy_water_pc","rmspe_i_model_year_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_year_pc_emp","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_hwy_water","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_hwy_util","rmspe_i_model_year_pcap_hwy","rmspe_i_model_pcap_hwy_util","rmspe_i_model_year_hwy_emp","rmspe_i_model_state_hwy_water","rmspe_i_model_state_year_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_pc_emp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_state_water_util","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_unemp","rmspe_i_model_year_pcap_water","rmspe_i_model_hwy_util_unemp","rmspe_i_model_water_pc_unemp","rmspe_i_model_year_water_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_util_pc_emp","rmspe_i_model_year_util_emp","rmspe_i_model_state_util_emp","model_water_emp_unemp","model_pcap_util_unemp","model_pcap_hwy_unemp","model_pcap_hwy_water","model_state_year_pc","rmspe_i_model_year_pcap_water","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_year_pcap_pc","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_pcap_util_pc","rmspe_i_model_pcap_water_pc","rmspe_i_model_state_emp_unemp","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_hwy_water_unemp","rmspe_i_model_water_util_emp","rmspe_i_model_year_water_unemp","rmspe_i_model_state_pc_unemp","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_pcap","rmspe_i_model_state_pcap_water","rmspe_i_model_state_pcap_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_pc_unemp","rmspe_i_model_water_emp_unemp","rmspe_i_model_state_year_pc","rmspe_i_model_hwy_water_emp","rmspe_i_model_hwy_util_emp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_water_pc","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_state_hwy_pc","rmspe_i_model_state_hwy_unemp","rmspe_i_model_state_year_util","rmspe_i_model_year_pcap_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_water_unemp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_pcap_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_state_util_unemp","rmspe_i_model_pcap_water_util","rmspe_i_model_year_water_util","rmspe_i_model_hwy_pc_emp","rmspe_i_model_hwy_water_util","rmspe_i_model_state_hwy_emp","rmspe_i_model_state_water_pc","rmspe_i_model_hwy_util_pc","rmspe_i_model_state_pcap_emp","rmspe_i_model_util_emp_unemp","rmspe_i_model_hwy_water_pc","rmspe_i_model_year_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_year_pc_emp","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_hwy_water","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_hwy_util","rmspe_i_model_year_pcap_hwy","rmspe_i_model_pcap_hwy_util","rmspe_i_model_year_hwy_emp","rmspe_i_model_state_hwy_water","rmspe_i_model_state_year_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_pc_emp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_state_water_util","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_unemp","rmspe_i_model_year_pcap_water","rmspe_i_model_hwy_util_unemp","rmspe_i_model_water_pc_unemp","rmspe_i_model_year_water_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_util_pc_emp","rmspe_i_model_year_util_emp","rmspe_i_model_state_util_emp","rmspe_i_model_year_hwy_water","rmspe_i_model_state_pcap_emp","rmspe_i_model_state_hwy_unemp","rmspe_i_model_year_hwy_emp","rmspe_i_model_hwy_util_unemp","rmspe_i_model_pcap_hwy_emp","rmspe_i_model_state_pc_unemp","rmspe_i_model_state_hwy_water","rmspe_i_model_pcap_hwy_pc","rmspe_i_model_hwy_emp_unemp","rmspe_i_model_pcap_util_emp","rmspe_i_model_util_pc_unemp","rmspe_i_model_state_year_hwy","rmspe_i_model_hwy_pc_emp","rmspe_i_model_pcap_pc_emp","rmspe_i_model_year_hwy_unemp","rmspe_i_model_state_pcap_hwy","rmspe_i_model_year_util_emp","rmspe_i_model_state_pcap_util","rmspe_i_model_year_water_util","rmspe_i_model_year_util_unemp","rmspe_i_model_state_pcap_pc","rmspe_i_model_year_pcap_unemp","rmspe_i_model_state_pcap_unemp","rmspe_i_model_state_emp_unemp","rmspe_i_model_year_hwy_util","rmspe_i_model_state_water_unemp","rmspe_i_model_year_pcap_pc","rmspe_i_model_year_water_emp","rmspe_i_model_state_hwy_util","rmspe_i_model_pcap_water_emp","rmspe_i_model_state_water_emp","rmspe_i_model_state_year_unemp","rmspe_i_model_pcap_pc_unemp","rmspe_i_model_hwy_util_pc","rmspe_i_model_hwy_pc_unemp","rmspe_i_model_pcap_water_unemp","rmspe_i_model_water_util_unemp","rmspe_i_model_year_water_unemp","rmspe_i_model_pcap_util_pc","rmspe_i_model_hwy_water_pc","rmspe_i_model_pcap_water_util","rmspe_i_model_state_year_util","rmspe_i_model_state_util_emp","rmspe_i_model_pc_emp_unemp","rmspe_i_model_water_pc_emp","rmspe_i_model_water_util_emp","rmspe_i_model_year_emp_unemp","rmspe_i_model_state_util_pc","rmspe_i_model_year_water_pc","rmspe_i_model_state_water_util","rmspe_i_model_util_emp_unemp","rmspe_i_model_year_pc_emp","rmspe_i_model_state_util_unemp","rmspe_i_model_state_pc_emp","rmspe_i_model_year_pcap_hwy","rmspe_i_model_state_hwy_pc","rmspe_i_model_hwy_water_util","rmspe_i_model_water_util_pc","rmspe_i_model_year_hwy_pc","rmspe_i_model_hwy_util_emp","rmspe_i_model_year_pc_unemp","rmspe_i_model_state_pcap_water","rmspe_i_model_hwy_water_unemp","rmspe_i_model_state_year_water","rmspe_i_model_year_util_pc","rmspe_i_model_state_water_pc","rmspe_i_model_state_hwy_emp","rmspe_i_model_util_pc_emp","report","plot","report","plot","report","p-OJSXA33SOQXG2ZA","rmspe_i_model_pcap_emp_unemp","rmspe_i_model_year_pcap_emp","rmspe_i_model_year_pcap_util","rmspe_i_model_hwy_water_emp","rmspe_i_model_pcap_water_pc","rmspe_i_model_pcap_hwy_util","p-OJWXG4DFFZYGIZQ","rmspe_i_model_water_pc_unemp","rmspe_i_model_state_year_emp","rmspe_i_model_state_year_pcap","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe","rmspe_i_model_water_emp_unemp","rmspe_i_model_pcap_util_unemp","rmspe_i_model_pcap_hwy_unemp","rmspe_i_model_pcap_hwy_water","rmspe_i_model_state_year_pc"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"edges":{"smooth":false},"physics":{"stabilization":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","igraphlayout":{"type":"square"}},"evals":[],"jsHooks":[]}</script>
 <p>Now, we can run the project.</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb178-1" data-line-number="1"><span class="kw">make</span>(plan, <span class="dt">verbose =</span> 0L)</a></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="gsp.html#cb178-1"></a><span class="kw">make</span>(plan, <span class="dt">verbose =</span> 0L)</span></code></pre></div>
 </div>
-<div id="results" class="section level2">
+<div id="results" class="section level2" number="11.5">
 <h2><span class="header-section-number">11.5</span> Results</h2>
 <p>Here are the root mean squared prediction errors of all the models.</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1">results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)</a>
-<a class="sourceLine" id="cb179-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb179-3" data-line-number="3"><span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</a></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="gsp.html#cb179-1"></a>results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)</span>
+<span id="cb179-2"><a href="gsp.html#cb179-2"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb179-3"><a href="gsp.html#cb179-3"></a><span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</span></code></pre></div>
 <p><img src="drake-manual_files/figure-html/unnamed-chunk-189-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>And here are the best models. The best variables are in the top row under <code>X1</code>, <code>X2</code>, and <code>X3</code>.</p>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb180-1" data-line-number="1"><span class="kw">head</span>(results[<span class="kw">order</span>(results<span class="op">$</span>rmspe, <span class="dt">decreasing =</span> <span class="ot">FALSE</span>), ])</a>
-<a class="sourceLine" id="cb180-2" data-line-number="2"><span class="co">#&gt; # A tibble: 6 x 5</span></a>
-<a class="sourceLine" id="cb180-3" data-line-number="3"><span class="co">#&gt;   model rmspe X1    X2    X3   </span></a>
-<a class="sourceLine" id="cb180-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></a>
-<a class="sourceLine" id="cb180-5" data-line-number="5"><span class="co">#&gt; 1 17    2614. state hwy   emp  </span></a>
-<a class="sourceLine" id="cb180-6" data-line-number="6"><span class="co">#&gt; 2 21    2665. state water emp  </span></a>
-<a class="sourceLine" id="cb180-7" data-line-number="7"><span class="co">#&gt; 3 24    2666. state util  emp  </span></a>
-<a class="sourceLine" id="cb180-8" data-line-number="8"><span class="co">#&gt; 4 26    2666. state pc    emp  </span></a>
-<a class="sourceLine" id="cb180-9" data-line-number="9"><span class="co">#&gt; 5 12    2675. state pcap  emp  </span></a>
-<a class="sourceLine" id="cb180-10" data-line-number="10"><span class="co">#&gt; 6 28    2693. state emp   unemp</span></a></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="gsp.html#cb180-1"></a><span class="kw">head</span>(results[<span class="kw">order</span>(results<span class="op">$</span>rmspe, <span class="dt">decreasing =</span> <span class="ot">FALSE</span>), ])</span>
+<span id="cb180-2"><a href="gsp.html#cb180-2"></a><span class="co">#&gt; # A tibble: 6 x 5</span></span>
+<span id="cb180-3"><a href="gsp.html#cb180-3"></a><span class="co">#&gt;   model rmspe X1    X2    X3   </span></span>
+<span id="cb180-4"><a href="gsp.html#cb180-4"></a><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></span>
+<span id="cb180-5"><a href="gsp.html#cb180-5"></a><span class="co">#&gt; 1 17    2614. state hwy   emp  </span></span>
+<span id="cb180-6"><a href="gsp.html#cb180-6"></a><span class="co">#&gt; 2 21    2665. state water emp  </span></span>
+<span id="cb180-7"><a href="gsp.html#cb180-7"></a><span class="co">#&gt; 3 24    2666. state util  emp  </span></span>
+<span id="cb180-8"><a href="gsp.html#cb180-8"></a><span class="co">#&gt; 4 26    2666. state pc    emp  </span></span>
+<span id="cb180-9"><a href="gsp.html#cb180-9"></a><span class="co">#&gt; 5 12    2675. state pcap  emp  </span></span>
+<span id="cb180-10"><a href="gsp.html#cb180-10"></a><span class="co">#&gt; 6 28    2693. state emp   unemp</span></span></code></pre></div>
 </div>
-<div id="comparison-with-gnu-make" class="section level2">
+<div id="comparison-with-gnu-make" class="section level2" number="11.6">
 <h2><span class="header-section-number">11.6</span> Comparison with GNU Make</h2>
 <p>If we were using <a href="https://www.gnu.org/software/make/">Make</a> instead of <code>drake</code> with the same set of targets, the analogous <a href="https://www.gnu.org/software/make/">Makefile</a> would look something like this pseudo-code sketch.</p>
 <pre><code>models = model_state_year_pcap.rds model_state_year_hwy.rds ... # 84 of these
@@ -630,12 +673,12 @@ report.md: report.Rmd
 <li>The user needs to write the names of the 84 <code>models</code> near the top of the <code>Makefile</code>, which is less convenient than maintaining a data frame in R.</li>
 </ol>
 </div>
-<div id="references" class="section level2">
+<div id="references" class="section level2" number="11.7">
 <h2><span class="header-section-number">11.7</span> References</h2>
 <ul>
 <li>Baltagi, Badi H (2003). Econometric analysis of panel data, John Wiley and sons, <a href="http://www.wiley.com/legacy/wileychi/baltagi/" class="uri">http://www.wiley.com/legacy/wileychi/baltagi/</a>.</li>
 <li>Baltagi, B. H. and N. Pinnoi (1995). “Public capital stock and state productivity growth: further evidence”, Empirical Economics, 20, 351-359.</li>
-<li>Munnell, A. (1990). “Why has productivity growth declined? Productivity and public investment”&quot;, New England Economic Review, 3-22.</li>
+<li>Munnell, A. (1990). “Why has productivity growth declined? Productivity and public investment”", New England Economic Review, 3-22.</li>
 <li>Yves Croissant (2016). Ecdat: Data Sets for Econometrics. R package version 0.3-1. <a href="https://CRAN.R-project.org/package=Ecdat" class="uri">https://CRAN.R-project.org/package=Ecdat</a>.</li>
 </ul>
 

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 15 Storage | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 15 Storage | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -33,6 +33,7 @@
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="memory.html"/>
 <link rel="next" href="visuals.html"/>
+<script src="libs/header-attrs-2.2/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -57,6 +58,7 @@
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
+  
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150843595-1"></script>
 <script>
@@ -69,27 +71,26 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -98,9 +99,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -149,18 +150,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">The drake R Package User Manual</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#short-version"><i class="fa fa-check"></i><b>1.1</b> Short version</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#long-version"><i class="fa fa-check"></i><b>1.2</b> Long version</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.3</b> The drake R package</a></li>
 <li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.4</b> Installation</a></li>
-<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a>
+<ul>
 <li class="chapter" data-level="1.5.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.5.1</b> What gets done stays done.</a></li>
 <li class="chapter" data-level="1.5.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.5.2</b> Reproducibility with confidence</a></li>
 <li class="chapter" data-level="1.5.3" data-path="index.html"><a href="index.html#scale-up-and-out."><i class="fa fa-check"></i><b>1.5.3</b> Scale up and out.</a></li>
 </ul></li>
 <li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#with-docker"><i class="fa fa-check"></i><b>1.6</b> With Docker</a></li>
-<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a><ul>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a>
+<ul>
 <li class="chapter" data-level="1.7.1" data-path="index.html"><a href="index.html#core-concepts"><i class="fa fa-check"></i><b>1.7.1</b> Core concepts</a></li>
 <li class="chapter" data-level="1.7.2" data-path="index.html"><a href="index.html#in-practice"><i class="fa fa-check"></i><b>1.7.2</b> In practice</a></li>
 <li class="chapter" data-level="1.7.3" data-path="index.html"><a href="index.html#use-cases"><i class="fa fa-check"></i><b>1.7.3</b> Use cases</a></li>
@@ -175,15 +179,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="1.8" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.8</b> Help and troubleshooting</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a><ul>
-<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a><ul>
+<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="similar-work.html"><a href="similar-work.html#gnu-make"><i class="fa fa-check"></i><b>2.1.1</b> GNU Make</a></li>
 <li class="chapter" data-level="2.1.2" data-path="similar-work.html"><a href="similar-work.html#remake"><i class="fa fa-check"></i><b>2.1.2</b> Remake</a></li>
 <li class="chapter" data-level="2.1.3" data-path="similar-work.html"><a href="similar-work.html#factuals-drake"><i class="fa fa-check"></i><b>2.1.3</b> Factual’s Drake</a></li>
 <li class="chapter" data-level="2.1.4" data-path="similar-work.html"><a href="similar-work.html#other-pipeline-tools"><i class="fa fa-check"></i><b>2.1.4</b> Other pipeline tools</a></li>
 </ul></li>
 <li class="chapter" data-level="2.2" data-path="similar-work.html"><a href="similar-work.html#memoization"><i class="fa fa-check"></i><b>2.2</b> Memoization</a></li>
-<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a><ul>
+<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a>
+<ul>
 <li class="chapter" data-level="2.3.1" data-path="similar-work.html"><a href="similar-work.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>2.3.1</b> knitr and R Markdown</a></li>
 <li class="chapter" data-level="2.3.2" data-path="similar-work.html"><a href="similar-work.html#version-control"><i class="fa fa-check"></i><b>2.3.2</b> Version control</a></li>
 <li class="chapter" data-level="2.3.3" data-path="similar-work.html"><a href="similar-work.html#containerization-and-r-package-environments"><i class="fa fa-check"></i><b>2.3.3</b> Containerization and R package environments</a></li>
@@ -192,42 +199,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.4" data-path="similar-work.html"><a href="similar-work.html#acknowledgements"><i class="fa fa-check"></i><b>2.4</b> Acknowledgements</a></li>
 </ul></li>
 <li class="part"><span><b>I Getting started</b></span></li>
-<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a><ul>
+<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a>
+<ul>
 <li class="chapter" data-level="3.1" data-path="walkthrough.html"><a href="walkthrough.html#set-the-stage."><i class="fa fa-check"></i><b>3.1</b> Set the stage.</a></li>
 <li class="chapter" data-level="3.2" data-path="walkthrough.html"><a href="walkthrough.html#make-your-results."><i class="fa fa-check"></i><b>3.2</b> Make your results.</a></li>
 <li class="chapter" data-level="3.3" data-path="walkthrough.html"><a href="walkthrough.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>3.3</b> Go back and fix things.</a></li>
 <li class="chapter" data-level="3.4" data-path="walkthrough.html"><a href="walkthrough.html#history-and-provenance"><i class="fa fa-check"></i><b>3.4</b> History and provenance</a></li>
-<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a><ul>
+<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a>
+<ul>
 <li class="chapter" data-level="3.5.1" data-path="walkthrough.html"><a href="walkthrough.html#undoing-clean"><i class="fa fa-check"></i><b>3.5.1</b> Undoing <code>clean()</code></a></li>
 <li class="chapter" data-level="3.5.2" data-path="walkthrough.html"><a href="walkthrough.html#renaming"><i class="fa fa-check"></i><b>3.5.2</b> Renaming</a></li>
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="walkthrough.html"><a href="walkthrough.html#try-the-code-yourself"><i class="fa fa-check"></i><b>3.6</b> Try the code yourself!</a></li>
 <li class="chapter" data-level="3.7" data-path="walkthrough.html"><a href="walkthrough.html#thanks"><i class="fa fa-check"></i><b>3.7</b> Thanks</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a><ul>
+<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="plans.html"><a href="plans.html#functions"><i class="fa fa-check"></i><b>4.1</b> Functions</a></li>
 <li class="chapter" data-level="4.2" data-path="plans.html"><a href="plans.html#intro-to-plans"><i class="fa fa-check"></i><b>4.2</b> Intro to plans</a></li>
 <li class="chapter" data-level="4.3" data-path="plans.html"><a href="plans.html#how-to-choose-good-targets"><i class="fa fa-check"></i><b>4.3</b> How to choose good targets</a></li>
 <li class="chapter" data-level="4.4" data-path="plans.html"><a href="plans.html#special-data-formats-for-targets"><i class="fa fa-check"></i><b>4.4</b> Special data formats for targets</a></li>
 <li class="chapter" data-level="4.5" data-path="plans.html"><a href="plans.html#special-columns"><i class="fa fa-check"></i><b>4.5</b> Special columns</a></li>
-<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a><ul>
+<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a>
+<ul>
 <li class="chapter" data-level="4.6.1" data-path="plans.html"><a href="plans.html#urls"><i class="fa fa-check"></i><b>4.6.1</b> URLs</a></li>
 <li class="chapter" data-level="4.6.2" data-path="plans.html"><a href="plans.html#limitations-of-static-files"><i class="fa fa-check"></i><b>4.6.2</b> Limitations of static files</a></li>
 </ul></li>
-<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a><ul>
+<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a>
+<ul>
 <li class="chapter" data-level="4.7.1" data-path="plans.html"><a href="plans.html#how-to-use-dynamic-files"><i class="fa fa-check"></i><b>4.7.1</b> How to use dynamic files</a></li>
 <li class="chapter" data-level="4.7.2" data-path="plans.html"><a href="plans.html#example-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.2</b> Example of dynamic files</a></li>
 <li class="chapter" data-level="4.7.3" data-path="plans.html"><a href="plans.html#limitations-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.3</b> Limitations of dynamic files</a></li>
 </ul></li>
 <li class="chapter" data-level="4.8" data-path="plans.html"><a href="plans.html#large-plans"><i class="fa fa-check"></i><b>4.8</b> Large plans</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a><ul>
+<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a>
+<ul>
 <li class="chapter" data-level="5.1" data-path="static.html"><a href="static.html#why-static-branching"><i class="fa fa-check"></i><b>5.1</b> Why static branching?</a></li>
-<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a><ul>
+<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a>
+<ul>
 <li class="chapter" data-level="5.2.1" data-path="static.html"><a href="static.html#limitations-of-grouping-variables"><i class="fa fa-check"></i><b>5.2.1</b> Limitations of grouping variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="static.html"><a href="static.html#tidy-evaluation"><i class="fa fa-check"></i><b>5.3</b> Tidy evaluation</a></li>
-<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a><ul>
+<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a>
+<ul>
 <li class="chapter" data-level="5.4.1" data-path="static.html"><a href="static.html#map"><i class="fa fa-check"></i><b>5.4.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
@@ -236,12 +251,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5</b> Target names</a></li>
 <li class="chapter" data-level="5.6" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.6</b> Tags</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
+<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
 <li class="chapter" data-level="6.2" data-path="dynamic.html"><a href="dynamic.html#motivation"><i class="fa fa-check"></i><b>6.2</b> Motivation</a></li>
 <li class="chapter" data-level="6.3" data-path="dynamic.html"><a href="dynamic.html#which-kind-of-branching-should-i-use"><i class="fa fa-check"></i><b>6.3</b> Which kind of branching should I use?</a></li>
 <li class="chapter" data-level="6.4" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>6.4</b> Dynamic targets</a></li>
-<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a><ul>
+<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a>
+<ul>
 <li class="chapter" data-level="6.5.1" data-path="dynamic.html"><a href="dynamic.html#map-1"><i class="fa fa-check"></i><b>6.5.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="6.5.2" data-path="dynamic.html"><a href="dynamic.html#cross-1"><i class="fa fa-check"></i><b>6.5.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="6.5.3" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>6.5.3</b> <code>group()</code></a></li>
@@ -249,10 +266,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.6" data-path="dynamic.html"><a href="dynamic.html#trace"><i class="fa fa-check"></i><b>6.6</b> Trace</a></li>
 <li class="chapter" data-level="6.7" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>6.7</b> <code>max_expand</code></a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a><ul>
+<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="projects.html"><a href="projects.html#external-resources"><i class="fa fa-check"></i><b>7.1</b> External resources</a></li>
 <li class="chapter" data-level="7.2" data-path="projects.html"><a href="projects.html#code-files"><i class="fa fa-check"></i><b>7.2</b> Code files</a></li>
-<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a><ul>
+<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a>
+<ul>
 <li class="chapter" data-level="7.3.1" data-path="projects.html"><a href="projects.html#motivation-1"><i class="fa fa-check"></i><b>7.3.1</b> Motivation</a></li>
 <li class="chapter" data-level="7.3.2" data-path="projects.html"><a href="projects.html#usage"><i class="fa fa-check"></i><b>7.3.2</b> Usage</a></li>
 </ul></li>
@@ -260,7 +279,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.5" data-path="projects.html"><a href="projects.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.5</b> Workflows as R packages</a></li>
 <li class="chapter" data-level="7.6" data-path="projects.html"><a href="projects.html#other-tools"><i class="fa fa-check"></i><b>7.6</b> Other tools</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a><ul>
+<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="scripts.html"><a href="scripts.html#function-oriented-workflows"><i class="fa fa-check"></i><b>8.1</b> Function-oriented workflows</a></li>
 <li class="chapter" data-level="8.2" data-path="scripts.html"><a href="scripts.html#traditional-and-legacy-workflows"><i class="fa fa-check"></i><b>8.2</b> Traditional and legacy workflows</a></li>
 <li class="chapter" data-level="8.3" data-path="scripts.html"><a href="scripts.html#overcoming-technical-debt"><i class="fa fa-check"></i><b>8.3</b> Overcoming Technical Debt</a></li>
@@ -271,7 +291,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.8" data-path="scripts.html"><a href="scripts.html#final-thoughts"><i class="fa fa-check"></i><b>8.8</b> Final thoughts</a></li>
 </ul></li>
 <li class="part"><span><b>II Examples</b></span></li>
-<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a><ul>
+<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a>
+<ul>
 <li class="chapter" data-level="9.1" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>9.1</b> Packages</a></li>
 <li class="chapter" data-level="9.2" data-path="churn.html"><a href="churn.html#functions-1"><i class="fa fa-check"></i><b>9.2</b> Functions</a></li>
 <li class="chapter" data-level="9.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>9.3</b> Plan</a></li>
@@ -283,13 +304,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.9" data-path="churn.html"><a href="churn.html#update-your-code"><i class="fa fa-check"></i><b>9.9</b> Update your code</a></li>
 <li class="chapter" data-level="9.10" data-path="churn.html"><a href="churn.html#history-and-provenance-1"><i class="fa fa-check"></i><b>9.10</b> History and provenance</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a><ul>
+<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a>
+<ul>
 <li class="chapter" data-level="10.1" data-path="packages.html"><a href="packages.html"><i class="fa fa-check"></i><b>10.1</b> Get the code.</a></li>
 <li class="chapter" data-level="10.2" data-path="packages.html"><a href="packages.html#overview"><i class="fa fa-check"></i><b>10.2</b> Overview</a></li>
 <li class="chapter" data-level="10.3" data-path="packages.html"><a href="packages.html#analysis"><i class="fa fa-check"></i><b>10.3</b> Analysis</a></li>
 <li class="chapter" data-level="10.4" data-path="packages.html"><a href="packages.html#other-ways-to-trigger-downloads"><i class="fa fa-check"></i><b>10.4</b> Other ways to trigger downloads</a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a><ul>
+<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a>
+<ul>
 <li class="chapter" data-level="11.1" data-path="gsp.html"><a href="gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>11.1</b> Get the code.</a></li>
 <li class="chapter" data-level="11.2" data-path="gsp.html"><a href="gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>11.2</b> Objective and methods</a></li>
 <li class="chapter" data-level="11.3" data-path="gsp.html"><a href="gsp.html#data"><i class="fa fa-check"></i><b>11.3</b> Data</a></li>
@@ -299,27 +322,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>11.7</b> References</a></li>
 </ul></li>
 <li class="part"><span><b>III Resource management</b></span></li>
-<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a><ul>
+<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a>
+<ul>
 <li class="chapter" data-level="12.1" data-path="hpc.html"><a href="hpc.html#start-small"><i class="fa fa-check"></i><b>12.1</b> Start small</a></li>
 <li class="chapter" data-level="12.2" data-path="hpc.html"><a href="hpc.html#let-make-schedule-your-targets."><i class="fa fa-check"></i><b>12.2</b> Let <code>make()</code> schedule your targets.</a></li>
-<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a><ul>
+<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a>
+<ul>
 <li class="chapter" data-level="12.3.1" data-path="hpc.html"><a href="hpc.html#master-on-a-cluster"><i class="fa fa-check"></i><b>12.3.1</b> Master on a cluster</a></li>
 <li class="chapter" data-level="12.3.2" data-path="hpc.html"><a href="hpc.html#local-master"><i class="fa fa-check"></i><b>12.3.2</b> Local master</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>12.4</b> Parallel backends</a></li>
-<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a><ul>
+<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.5.1" data-path="hpc.html"><a href="hpc.html#persistent-workers"><i class="fa fa-check"></i><b>12.5.1</b> Persistent workers</a></li>
 <li class="chapter" data-level="12.5.2" data-path="hpc.html"><a href="hpc.html#installation-1"><i class="fa fa-check"></i><b>12.5.2</b> Installation</a></li>
 <li class="chapter" data-level="12.5.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine"><i class="fa fa-check"></i><b>12.5.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.5.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster"><i class="fa fa-check"></i><b>12.5.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a><ul>
+<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.6.1" data-path="hpc.html"><a href="hpc.html#transient-workers"><i class="fa fa-check"></i><b>12.6.1</b> Transient workers</a></li>
 <li class="chapter" data-level="12.6.2" data-path="hpc.html"><a href="hpc.html#installation-2"><i class="fa fa-check"></i><b>12.6.2</b> Installation</a></li>
 <li class="chapter" data-level="12.6.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine-1"><i class="fa fa-check"></i><b>12.6.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.6.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster-1"><i class="fa fa-check"></i><b>12.6.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a><ul>
+<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a>
+<ul>
 <li class="chapter" data-level="12.7.1" data-path="hpc.html"><a href="hpc.html#selectivity"><i class="fa fa-check"></i><b>12.7.1</b> Selectivity</a></li>
 <li class="chapter" data-level="12.7.2" data-path="hpc.html"><a href="hpc.html#memory-options"><i class="fa fa-check"></i><b>12.7.2</b> Memory options</a></li>
 <li class="chapter" data-level="12.7.3" data-path="hpc.html"><a href="hpc.html#storage-options"><i class="fa fa-check"></i><b>12.7.3</b> Storage options</a></li>
@@ -328,8 +356,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.7.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>12.7.6</b> Parallel computing <em>within</em> targets</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a><ul>
-<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a><ul>
+<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="time.html"><a href="time.html#help-us-find-out"><i class="fa fa-check"></i><b>13.1.1</b> Help us find out!</a></li>
 <li class="chapter" data-level="13.1.2" data-path="time.html"><a href="time.html#too-many-targets"><i class="fa fa-check"></i><b>13.1.2</b> Too many targets?</a></li>
 <li class="chapter" data-level="13.1.3" data-path="time.html"><a href="time.html#big-data"><i class="fa fa-check"></i><b>13.1.3</b> Big data?</a></li>
@@ -339,23 +369,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.3" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>13.3</b> Predict total runtime</a></li>
 <li class="chapter" data-level="13.4" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>13.4</b> Strategize your high-performance computing</a></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a><ul>
+<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a>
+<ul>
 <li class="chapter" data-level="14.1" data-path="memory.html"><a href="memory.html#garbage-collection-and-custom-files"><i class="fa fa-check"></i><b>14.1</b> Garbage collection and custom files</a></li>
 <li class="chapter" data-level="14.2" data-path="memory.html"><a href="memory.html#memory-strategies"><i class="fa fa-check"></i><b>14.2</b> Memory strategies</a></li>
 <li class="chapter" data-level="14.3" data-path="memory.html"><a href="memory.html#data-splitting"><i class="fa fa-check"></i><b>14.3</b> Data splitting</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a><ul>
+<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="storage.html"><a href="storage.html#drakes-cache"><i class="fa fa-check"></i><b>15.1</b> <code>drake</code>’s cache</a></li>
 <li class="chapter" data-level="15.2" data-path="storage.html"><a href="storage.html#efficient-target-storage"><i class="fa fa-check"></i><b>15.2</b> Efficient target storage</a></li>
-<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a><ul>
+<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a>
+<ul>
 <li class="chapter" data-level="15.3.1" data-path="storage.html"><a href="storage.html#old-targets"><i class="fa fa-check"></i><b>15.3.1</b> Old targets</a></li>
 <li class="chapter" data-level="15.3.2" data-path="storage.html"><a href="storage.html#garbage-from-interrupted-builds"><i class="fa fa-check"></i><b>15.3.2</b> Garbage from interrupted builds</a></li>
 </ul></li>
 <li class="chapter" data-level="15.4" data-path="storage.html"><a href="storage.html#interfaces-to-the-cache"><i class="fa fa-check"></i><b>15.4</b> Interfaces to the cache</a></li>
 </ul></li>
 <li class="part"><span><b>IV Extra features</b></span></li>
-<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a><ul>
-<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a><ul>
+<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a>
+<ul>
 <li class="chapter" data-level="16.1.1" data-path="visuals.html"><a href="visuals.html#vis_drake_graph"><i class="fa fa-check"></i><b>16.1.1</b> <code>vis_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.2" data-path="visuals.html"><a href="visuals.html#sankey_drake_graph"><i class="fa fa-check"></i><b>16.1.2</b> <code>sankey_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.3" data-path="visuals.html"><a href="visuals.html#drake_ggraph"><i class="fa fa-check"></i><b>16.1.3</b> <code>drake_ggraph()</code></a></li>
@@ -367,19 +402,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="16.5" data-path="visuals.html"><a href="visuals.html#control-the-vis_drake_graph-legend."><i class="fa fa-check"></i><b>16.5</b> Control the <code>vis_drake_graph()</code> legend.</a></li>
 <li class="chapter" data-level="16.6" data-path="visuals.html"><a href="visuals.html#clusters"><i class="fa fa-check"></i><b>16.6</b> Clusters</a></li>
 <li class="chapter" data-level="16.7" data-path="visuals.html"><a href="visuals.html#output-files"><i class="fa fa-check"></i><b>16.7</b> Output files</a></li>
-<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a><ul>
+<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a>
+<ul>
 <li class="chapter" data-level="16.8.1" data-path="visuals.html"><a href="visuals.html#perform-the-default-action-on-select"><i class="fa fa-check"></i><b>16.8.1</b> Perform the default action on select</a></li>
 <li class="chapter" data-level="16.8.2" data-path="visuals.html"><a href="visuals.html#perform-no-action-on-select"><i class="fa fa-check"></i><b>16.8.2</b> Perform no action on select</a></li>
 <li class="chapter" data-level="16.8.3" data-path="visuals.html"><a href="visuals.html#customize-the-onselect-event-behaviour"><i class="fa fa-check"></i><b>16.8.3</b> Customize the onSelect event behaviour</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a><ul>
-<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a><ul>
+<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a>
+<ul>
 <li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#diagnosing-errors"><i class="fa fa-check"></i><b>17.1.1</b> Diagnosing errors</a></li>
 <li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#interactive-debugging"><i class="fa fa-check"></i><b>17.1.2</b> Interactive debugging</a></li>
 <li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#efficient-trial-and-error"><i class="fa fa-check"></i><b>17.1.3</b> Efficient trial and error</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a><ul>
+<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a>
+<ul>
 <li class="chapter" data-level="17.2.1" data-path="debugging.html"><a href="debugging.html#how-your-workflow-fits-together"><i class="fa fa-check"></i><b>17.2.1</b> How your workflow fits together</a></li>
 <li class="chapter" data-level="17.2.2" data-path="debugging.html"><a href="debugging.html#which-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.2</b> Which targets are outdated</a></li>
 <li class="chapter" data-level="17.2.3" data-path="debugging.html"><a href="debugging.html#why-your-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.3</b> Why your targets are outdated</a></li>
@@ -387,7 +426,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.3</b> More help</a></li>
 </ul></li>
-<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a><ul>
+<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a>
+<ul>
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="18.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>18.2</b> Customization</a></li>
 <li class="chapter" data-level="18.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>18.3</b> Alternative trigger modes</a></li>
@@ -395,15 +435,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a><ul>
-<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a><ul>
+<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a>
+<ul>
 <li class="chapter" data-level="B.1.1" data-path="design.html"><a href="design.html#functions-first"><i class="fa fa-check"></i><b>B.1.1</b> Functions first</a></li>
 <li class="chapter" data-level="B.1.2" data-path="design.html"><a href="design.html#light-use-of-traditional-oop"><i class="fa fa-check"></i><b>B.1.2</b> Light use of traditional OOP</a></li>
 <li class="chapter" data-level="B.1.3" data-path="design.html"><a href="design.html#high-performant-small-objects"><i class="fa fa-check"></i><b>B.1.3</b> High-performant small objects</a></li>
 <li class="chapter" data-level="B.1.4" data-path="design.html"><a href="design.html#fast-iteration-along-aggregated-data"><i class="fa fa-check"></i><b>B.1.4</b> Fast iteration along aggregated data</a></li>
 <li class="chapter" data-level="B.1.5" data-path="design.html"><a href="design.html#access-to-information-across-targets"><i class="fa fa-check"></i><b>B.1.5</b> Access to information across targets</a></li>
 </ul></li>
-<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a><ul>
+<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a>
+<ul>
 <li class="chapter" data-level="B.2.1" data-path="design.html"><a href="design.html#config"><i class="fa fa-check"></i><b>B.2.1</b> Config</a></li>
 <li class="chapter" data-level="B.2.2" data-path="design.html"><a href="design.html#settings"><i class="fa fa-check"></i><b>B.2.2</b> Settings</a></li>
 <li class="chapter" data-level="B.2.3" data-path="design.html"><a href="design.html#plan-1"><i class="fa fa-check"></i><b>B.2.3</b> Plan</a></li>
@@ -438,160 +481,160 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="storage" class="section level1">
+<div id="storage" class="section level1" number="15">
 <h1><span class="header-section-number">Chapter 15</span> Storage</h1>
-<div id="drakes-cache" class="section level2">
+<div id="drakes-cache" class="section level2" number="15.1">
 <h2><span class="header-section-number">15.1</span> <code>drake</code>’s cache</h2>
 <p>When you run <code>make()</code>, <code>drake</code> stores your targets in a hidden storage cache.</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb226-2" data-line-number="2"><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></a>
-<a class="sourceLine" id="cb226-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</a></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="storage.html#cb226-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb226-2"><a href="storage.html#cb226-2"></a><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></span>
+<span id="cb226-3"><a href="storage.html#cb226-3"></a><span class="kw">make</span>(my_plan, <span class="dt">verbose =</span> 0L)</span></code></pre></div>
 <p>The default cache is a hidden <code>.drake</code> folder.</p>
-<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb227-1" data-line-number="1"><span class="kw">find_cache</span>()</a>
-<a class="sourceLine" id="cb227-2" data-line-number="2">### [1] &quot;/home/you/project/.drake&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="storage.html#cb227-1"></a><span class="kw">find_cache</span>()</span>
+<span id="cb227-2"><a href="storage.html#cb227-2"></a><span class="co">### [1] &quot;/home/you/project/.drake&quot;</span></span></code></pre></div>
 <p><code>drake</code>’s <code>loadd()</code> and <code>readd()</code> functions load targets into memory.</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1"><span class="kw">loadd</span>(large)</a>
-<a class="sourceLine" id="cb228-2" data-line-number="2"><span class="kw">head</span>(large)</a>
-<a class="sourceLine" id="cb228-3" data-line-number="3"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb228-4" data-line-number="4"><span class="co">#&gt; 1 2.140 26.0</span></a>
-<a class="sourceLine" id="cb228-5" data-line-number="5"><span class="co">#&gt; 2 3.730 17.3</span></a>
-<a class="sourceLine" id="cb228-6" data-line-number="6"><span class="co">#&gt; 3 1.935 27.3</span></a>
-<a class="sourceLine" id="cb228-7" data-line-number="7"><span class="co">#&gt; 4 2.780 21.4</span></a>
-<a class="sourceLine" id="cb228-8" data-line-number="8"><span class="co">#&gt; 5 2.320 22.8</span></a>
-<a class="sourceLine" id="cb228-9" data-line-number="9"><span class="co">#&gt; 6 2.780 21.4</span></a>
-<a class="sourceLine" id="cb228-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb228-11" data-line-number="11"><span class="kw">head</span>(<span class="kw">readd</span>(small))</a>
-<a class="sourceLine" id="cb228-12" data-line-number="12"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb228-13" data-line-number="13"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb228-14" data-line-number="14"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb228-15" data-line-number="15"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb228-16" data-line-number="16"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb228-17" data-line-number="17"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb228-18" data-line-number="18"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="storage.html#cb228-1"></a><span class="kw">loadd</span>(large)</span>
+<span id="cb228-2"><a href="storage.html#cb228-2"></a><span class="kw">head</span>(large)</span>
+<span id="cb228-3"><a href="storage.html#cb228-3"></a><span class="co">#&gt;       x    y</span></span>
+<span id="cb228-4"><a href="storage.html#cb228-4"></a><span class="co">#&gt; 1 2.140 26.0</span></span>
+<span id="cb228-5"><a href="storage.html#cb228-5"></a><span class="co">#&gt; 2 3.730 17.3</span></span>
+<span id="cb228-6"><a href="storage.html#cb228-6"></a><span class="co">#&gt; 3 1.935 27.3</span></span>
+<span id="cb228-7"><a href="storage.html#cb228-7"></a><span class="co">#&gt; 4 2.780 21.4</span></span>
+<span id="cb228-8"><a href="storage.html#cb228-8"></a><span class="co">#&gt; 5 2.320 22.8</span></span>
+<span id="cb228-9"><a href="storage.html#cb228-9"></a><span class="co">#&gt; 6 2.780 21.4</span></span>
+<span id="cb228-10"><a href="storage.html#cb228-10"></a></span>
+<span id="cb228-11"><a href="storage.html#cb228-11"></a><span class="kw">head</span>(<span class="kw">readd</span>(small))</span>
+<span id="cb228-12"><a href="storage.html#cb228-12"></a><span class="co">#&gt;       x    y</span></span>
+<span id="cb228-13"><a href="storage.html#cb228-13"></a><span class="co">#&gt; 1 3.780 15.2</span></span>
+<span id="cb228-14"><a href="storage.html#cb228-14"></a><span class="co">#&gt; 2 3.440 17.8</span></span>
+<span id="cb228-15"><a href="storage.html#cb228-15"></a><span class="co">#&gt; 3 3.215 21.4</span></span>
+<span id="cb228-16"><a href="storage.html#cb228-16"></a><span class="co">#&gt; 4 3.440 19.2</span></span>
+<span id="cb228-17"><a href="storage.html#cb228-17"></a><span class="co">#&gt; 5 2.770 19.7</span></span>
+<span id="cb228-18"><a href="storage.html#cb228-18"></a><span class="co">#&gt; 6 2.465 21.5</span></span></code></pre></div>
 </div>
-<div id="efficient-target-storage" class="section level2">
+<div id="efficient-target-storage" class="section level2" number="15.2">
 <h2><span class="header-section-number">15.2</span> Efficient target storage</h2>
-<p><code>drake</code> supports custom formats for large and specialized targets. For example, the <code>&quot;fst&quot;</code> format uses the <a href="https://github.com/fstpackage/fst"><code>fst</code></a> package to save data frames faster. Simply enclose the command and the format together with the <code>target()</code> function.</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb229-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="fl">1e8</span> <span class="co"># Each target is 1.6 GB in memory.</span></a>
-<a class="sourceLine" id="cb229-3" data-line-number="3">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb229-4" data-line-number="4">  <span class="dt">data_fst =</span> <span class="kw">target</span>(</a>
-<a class="sourceLine" id="cb229-5" data-line-number="5">    <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n)),</a>
-<a class="sourceLine" id="cb229-6" data-line-number="6">    <span class="dt">format =</span> <span class="st">&quot;fst&quot;</span></a>
-<a class="sourceLine" id="cb229-7" data-line-number="7">  ),</a>
-<a class="sourceLine" id="cb229-8" data-line-number="8">  <span class="dt">data_old =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n))</a>
-<a class="sourceLine" id="cb229-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb229-10" data-line-number="10"><span class="kw">make</span>(plan)</a>
-<a class="sourceLine" id="cb229-11" data-line-number="11"><span class="co">#&gt; target data_fst</span></a>
-<a class="sourceLine" id="cb229-12" data-line-number="12"><span class="co">#&gt; target data_old</span></a>
-<a class="sourceLine" id="cb229-13" data-line-number="13"><span class="kw">build_times</span>(<span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)</a>
-<a class="sourceLine" id="cb229-14" data-line-number="14"><span class="co">#&gt; # A tibble: 2 x 4</span></a>
-<a class="sourceLine" id="cb229-15" data-line-number="15"><span class="co">#&gt;   target   elapsed              user                 system    </span></a>
-<a class="sourceLine" id="cb229-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;    &lt;Duration&gt;           &lt;Duration&gt;           &lt;Duration&gt;</span></a>
-<a class="sourceLine" id="cb229-17" data-line-number="17"><span class="co">#&gt; 1 data_fst 13.93s               37.562s              7.954s    </span></a>
-<a class="sourceLine" id="cb229-18" data-line-number="18"><span class="co">#&gt; 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s</span></a></code></pre></div>
+<p><code>drake</code> supports custom formats for large and specialized targets. For example, the <code>"fst"</code> format uses the <a href="https://github.com/fstpackage/fst"><code>fst</code></a> package to save data frames faster. Simply enclose the command and the format together with the <code>target()</code> function.</p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="storage.html#cb229-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb229-2"><a href="storage.html#cb229-2"></a>n &lt;-<span class="st"> </span><span class="fl">1e8</span> <span class="co"># Each target is 1.6 GB in memory.</span></span>
+<span id="cb229-3"><a href="storage.html#cb229-3"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb229-4"><a href="storage.html#cb229-4"></a>  <span class="dt">data_fst =</span> <span class="kw">target</span>(</span>
+<span id="cb229-5"><a href="storage.html#cb229-5"></a>    <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n)),</span>
+<span id="cb229-6"><a href="storage.html#cb229-6"></a>    <span class="dt">format =</span> <span class="st">&quot;fst&quot;</span></span>
+<span id="cb229-7"><a href="storage.html#cb229-7"></a>  ),</span>
+<span id="cb229-8"><a href="storage.html#cb229-8"></a>  <span class="dt">data_old =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n))</span>
+<span id="cb229-9"><a href="storage.html#cb229-9"></a>)</span>
+<span id="cb229-10"><a href="storage.html#cb229-10"></a><span class="kw">make</span>(plan)</span>
+<span id="cb229-11"><a href="storage.html#cb229-11"></a><span class="co">#&gt; target data_fst</span></span>
+<span id="cb229-12"><a href="storage.html#cb229-12"></a><span class="co">#&gt; target data_old</span></span>
+<span id="cb229-13"><a href="storage.html#cb229-13"></a><span class="kw">build_times</span>(<span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)</span>
+<span id="cb229-14"><a href="storage.html#cb229-14"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
+<span id="cb229-15"><a href="storage.html#cb229-15"></a><span class="co">#&gt;   target   elapsed              user                 system    </span></span>
+<span id="cb229-16"><a href="storage.html#cb229-16"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;Duration&gt;           &lt;Duration&gt;           &lt;Duration&gt;</span></span>
+<span id="cb229-17"><a href="storage.html#cb229-17"></a><span class="co">#&gt; 1 data_fst 13.93s               37.562s              7.954s    </span></span>
+<span id="cb229-18"><a href="storage.html#cb229-18"></a><span class="co">#&gt; 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s</span></span></code></pre></div>
 <p>For more details and a complete list of formats, see <a href="https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets" class="uri">https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets</a>.</p>
 </div>
-<div id="why-is-my-cache-so-big" class="section level2">
+<div id="why-is-my-cache-so-big" class="section level2" number="15.3">
 <h2><span class="header-section-number">15.3</span> Why is my cache so big?</h2>
-<div id="old-targets" class="section level3">
+<div id="old-targets" class="section level3" number="15.3.1">
 <h3><span class="header-section-number">15.3.1</span> Old targets</h3>
 <p>By default, <code>drake</code> holds on to all your targets from all your runs of <code>make()</code>. Even if you run <code>clean()</code>, the data stays in the cache in case you need to recover it.</p>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb230-1" data-line-number="1"><span class="kw">clean</span>()</a>
-<a class="sourceLine" id="cb230-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb230-3" data-line-number="3"><span class="kw">make</span>(my_plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb230-4" data-line-number="4"><span class="co">#&gt; ℹ unloading 1 targets from environment</span></a>
-<a class="sourceLine" id="cb230-5" data-line-number="5"><span class="co">#&gt; ✔ recover small</span></a>
-<a class="sourceLine" id="cb230-6" data-line-number="6"><span class="co">#&gt; ✔ recover large</span></a>
-<a class="sourceLine" id="cb230-7" data-line-number="7"><span class="co">#&gt; ✔ recover regression2_small</span></a>
-<a class="sourceLine" id="cb230-8" data-line-number="8"><span class="co">#&gt; ✔ recover regression1_small</span></a>
-<a class="sourceLine" id="cb230-9" data-line-number="9"><span class="co">#&gt; ✔ recover regression1_large</span></a>
-<a class="sourceLine" id="cb230-10" data-line-number="10"><span class="co">#&gt; ✔ recover regression2_large</span></a>
-<a class="sourceLine" id="cb230-11" data-line-number="11"><span class="co">#&gt; ✔ recover coef_regression2_small</span></a>
-<a class="sourceLine" id="cb230-12" data-line-number="12"><span class="co">#&gt; ✔ recover summ_regression2_small</span></a>
-<a class="sourceLine" id="cb230-13" data-line-number="13"><span class="co">#&gt; ✔ recover summ_regression1_small</span></a>
-<a class="sourceLine" id="cb230-14" data-line-number="14"><span class="co">#&gt; ✔ recover coef_regression1_small</span></a>
-<a class="sourceLine" id="cb230-15" data-line-number="15"><span class="co">#&gt; ✔ recover coef_regression1_large</span></a>
-<a class="sourceLine" id="cb230-16" data-line-number="16"><span class="co">#&gt; ✔ recover summ_regression1_large</span></a>
-<a class="sourceLine" id="cb230-17" data-line-number="17"><span class="co">#&gt; ✔ recover summ_regression2_large</span></a>
-<a class="sourceLine" id="cb230-18" data-line-number="18"><span class="co">#&gt; ✔ recover coef_regression2_large</span></a>
-<a class="sourceLine" id="cb230-19" data-line-number="19"><span class="co">#&gt; ✔ recover report</span></a></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="storage.html#cb230-1"></a><span class="kw">clean</span>()</span>
+<span id="cb230-2"><a href="storage.html#cb230-2"></a></span>
+<span id="cb230-3"><a href="storage.html#cb230-3"></a><span class="kw">make</span>(my_plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb230-4"><a href="storage.html#cb230-4"></a><span class="co">#&gt; ℹ unloading 1 targets from environment</span></span>
+<span id="cb230-5"><a href="storage.html#cb230-5"></a><span class="co">#&gt; ✔ recover small</span></span>
+<span id="cb230-6"><a href="storage.html#cb230-6"></a><span class="co">#&gt; ✔ recover large</span></span>
+<span id="cb230-7"><a href="storage.html#cb230-7"></a><span class="co">#&gt; ✔ recover regression2_small</span></span>
+<span id="cb230-8"><a href="storage.html#cb230-8"></a><span class="co">#&gt; ✔ recover regression1_small</span></span>
+<span id="cb230-9"><a href="storage.html#cb230-9"></a><span class="co">#&gt; ✔ recover regression1_large</span></span>
+<span id="cb230-10"><a href="storage.html#cb230-10"></a><span class="co">#&gt; ✔ recover regression2_large</span></span>
+<span id="cb230-11"><a href="storage.html#cb230-11"></a><span class="co">#&gt; ✔ recover coef_regression2_small</span></span>
+<span id="cb230-12"><a href="storage.html#cb230-12"></a><span class="co">#&gt; ✔ recover summ_regression2_small</span></span>
+<span id="cb230-13"><a href="storage.html#cb230-13"></a><span class="co">#&gt; ✔ recover summ_regression1_small</span></span>
+<span id="cb230-14"><a href="storage.html#cb230-14"></a><span class="co">#&gt; ✔ recover coef_regression1_small</span></span>
+<span id="cb230-15"><a href="storage.html#cb230-15"></a><span class="co">#&gt; ✔ recover coef_regression1_large</span></span>
+<span id="cb230-16"><a href="storage.html#cb230-16"></a><span class="co">#&gt; ✔ recover summ_regression1_large</span></span>
+<span id="cb230-17"><a href="storage.html#cb230-17"></a><span class="co">#&gt; ✔ recover summ_regression2_large</span></span>
+<span id="cb230-18"><a href="storage.html#cb230-18"></a><span class="co">#&gt; ✔ recover coef_regression2_large</span></span>
+<span id="cb230-19"><a href="storage.html#cb230-19"></a><span class="co">#&gt; ✔ recover report</span></span></code></pre></div>
 <p>If you really want to remove old historical values of targets, run <code>drake_gc()</code> or <code>drake_cache()$gc()</code>.</p>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="kw">drake_gc</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="storage.html#cb231-1"></a><span class="kw">drake_gc</span>()</span></code></pre></div>
 <p><code>clean()</code> also has a <code>garbage_collection</code> argument for this purpose. Here is a slick way to remove historical targets and targets no longer in your plan.</p>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" data-line-number="1"><span class="kw">clean</span>(<span class="dt">list =</span> <span class="kw">cached_unplanned</span>(my_plan), <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="storage.html#cb232-1"></a><span class="kw">clean</span>(<span class="dt">list =</span> <span class="kw">cached_unplanned</span>(my_plan), <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 </div>
-<div id="garbage-from-interrupted-builds" class="section level3">
+<div id="garbage-from-interrupted-builds" class="section level3" number="15.3.2">
 <h3><span class="header-section-number">15.3.2</span> Garbage from interrupted builds</h3>
 <p>If <code>make()</code> crashes or gets interrupted, old files can accumulate in <code>.drake/scratch/</code> and <code>.drake/drake/tmp/</code>. As long as <code>make()</code> is no longer running, can safely remove the files in those folders (but keep the folders themselves).</p>
 </div>
 </div>
-<div id="interfaces-to-the-cache" class="section level2">
+<div id="interfaces-to-the-cache" class="section level2" number="15.4">
 <h2><span class="header-section-number">15.4</span> Interfaces to the cache</h2>
 <p><code>drake</code> uses the <a href="https://github.com/richfitz/storr">storr</a> package to create and modify caches.</p>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb233-1" data-line-number="1"><span class="kw">library</span>(storr)</a>
-<a class="sourceLine" id="cb233-2" data-line-number="2">cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;.drake&quot;</span>)</a>
-<a class="sourceLine" id="cb233-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb233-4" data-line-number="4"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">list</span>())</a>
-<a class="sourceLine" id="cb233-5" data-line-number="5"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
-<a class="sourceLine" id="cb233-6" data-line-number="6"><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></a>
-<a class="sourceLine" id="cb233-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb233-8" data-line-number="8"><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))</a>
-<a class="sourceLine" id="cb233-9" data-line-number="9"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb233-10" data-line-number="10"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb233-11" data-line-number="11"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb233-12" data-line-number="12"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb233-13" data-line-number="13"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb233-14" data-line-number="14"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb233-15" data-line-number="15"><span class="co">#&gt; 6 2.465 21.5</span></a></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="storage.html#cb233-1"></a><span class="kw">library</span>(storr)</span>
+<span id="cb233-2"><a href="storage.html#cb233-2"></a>cache &lt;-<span class="st"> </span><span class="kw">storr_rds</span>(<span class="st">&quot;.drake&quot;</span>)</span>
+<span id="cb233-3"><a href="storage.html#cb233-3"></a></span>
+<span id="cb233-4"><a href="storage.html#cb233-4"></a><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">list</span>())</span>
+<span id="cb233-5"><a href="storage.html#cb233-5"></a><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></span>
+<span id="cb233-6"><a href="storage.html#cb233-6"></a><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></span>
+<span id="cb233-7"><a href="storage.html#cb233-7"></a></span>
+<span id="cb233-8"><a href="storage.html#cb233-8"></a><span class="kw">head</span>(cache<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;small&quot;</span>))</span>
+<span id="cb233-9"><a href="storage.html#cb233-9"></a><span class="co">#&gt;       x    y</span></span>
+<span id="cb233-10"><a href="storage.html#cb233-10"></a><span class="co">#&gt; 1 3.780 15.2</span></span>
+<span id="cb233-11"><a href="storage.html#cb233-11"></a><span class="co">#&gt; 2 3.440 17.8</span></span>
+<span id="cb233-12"><a href="storage.html#cb233-12"></a><span class="co">#&gt; 3 3.215 21.4</span></span>
+<span id="cb233-13"><a href="storage.html#cb233-13"></a><span class="co">#&gt; 4 3.440 19.2</span></span>
+<span id="cb233-14"><a href="storage.html#cb233-14"></a><span class="co">#&gt; 5 2.770 19.7</span></span>
+<span id="cb233-15"><a href="storage.html#cb233-15"></a><span class="co">#&gt; 6 2.465 21.5</span></span></code></pre></div>
 <p><code>drake</code> has its own interface on top of <a href="https://github.com/richfitz/storr">storr</a> to make it easier to work with the default <code>.drake/</code> cache. The <code>loadd()</code>, <code>readd()</code>, and <code>cached()</code> functions explore saved targets.</p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb234-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">cached</span>())</a>
-<a class="sourceLine" id="cb234-2" data-line-number="2"><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></a>
-<a class="sourceLine" id="cb234-3" data-line-number="3"><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></a>
-<a class="sourceLine" id="cb234-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb234-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">readd</span>(small))</a>
-<a class="sourceLine" id="cb234-6" data-line-number="6"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb234-7" data-line-number="7"><span class="co">#&gt; 1 3.780 15.2</span></a>
-<a class="sourceLine" id="cb234-8" data-line-number="8"><span class="co">#&gt; 2 3.440 17.8</span></a>
-<a class="sourceLine" id="cb234-9" data-line-number="9"><span class="co">#&gt; 3 3.215 21.4</span></a>
-<a class="sourceLine" id="cb234-10" data-line-number="10"><span class="co">#&gt; 4 3.440 19.2</span></a>
-<a class="sourceLine" id="cb234-11" data-line-number="11"><span class="co">#&gt; 5 2.770 19.7</span></a>
-<a class="sourceLine" id="cb234-12" data-line-number="12"><span class="co">#&gt; 6 2.465 21.5</span></a>
-<a class="sourceLine" id="cb234-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb234-14" data-line-number="14"><span class="kw">loadd</span>(large)</a>
-<a class="sourceLine" id="cb234-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb234-16" data-line-number="16"><span class="kw">head</span>(large)</a>
-<a class="sourceLine" id="cb234-17" data-line-number="17"><span class="co">#&gt;       x    y</span></a>
-<a class="sourceLine" id="cb234-18" data-line-number="18"><span class="co">#&gt; 1 2.140 26.0</span></a>
-<a class="sourceLine" id="cb234-19" data-line-number="19"><span class="co">#&gt; 2 3.730 17.3</span></a>
-<a class="sourceLine" id="cb234-20" data-line-number="20"><span class="co">#&gt; 3 1.935 27.3</span></a>
-<a class="sourceLine" id="cb234-21" data-line-number="21"><span class="co">#&gt; 4 2.780 21.4</span></a>
-<a class="sourceLine" id="cb234-22" data-line-number="22"><span class="co">#&gt; 5 2.320 22.8</span></a>
-<a class="sourceLine" id="cb234-23" data-line-number="23"><span class="co">#&gt; 6 2.780 21.4</span></a>
-<a class="sourceLine" id="cb234-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb234-25" data-line-number="25"><span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></a></code></pre></div>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="storage.html#cb234-1"></a><span class="kw">head</span>(<span class="kw">cached</span>())</span>
+<span id="cb234-2"><a href="storage.html#cb234-2"></a><span class="co">#&gt; [1] &quot;coef_regression1_large&quot; &quot;coef_regression1_small&quot; &quot;coef_regression2_large&quot;</span></span>
+<span id="cb234-3"><a href="storage.html#cb234-3"></a><span class="co">#&gt; [4] &quot;coef_regression2_small&quot; &quot;large&quot;                  &quot;regression1_large&quot;</span></span>
+<span id="cb234-4"><a href="storage.html#cb234-4"></a></span>
+<span id="cb234-5"><a href="storage.html#cb234-5"></a><span class="kw">head</span>(<span class="kw">readd</span>(small))</span>
+<span id="cb234-6"><a href="storage.html#cb234-6"></a><span class="co">#&gt;       x    y</span></span>
+<span id="cb234-7"><a href="storage.html#cb234-7"></a><span class="co">#&gt; 1 3.780 15.2</span></span>
+<span id="cb234-8"><a href="storage.html#cb234-8"></a><span class="co">#&gt; 2 3.440 17.8</span></span>
+<span id="cb234-9"><a href="storage.html#cb234-9"></a><span class="co">#&gt; 3 3.215 21.4</span></span>
+<span id="cb234-10"><a href="storage.html#cb234-10"></a><span class="co">#&gt; 4 3.440 19.2</span></span>
+<span id="cb234-11"><a href="storage.html#cb234-11"></a><span class="co">#&gt; 5 2.770 19.7</span></span>
+<span id="cb234-12"><a href="storage.html#cb234-12"></a><span class="co">#&gt; 6 2.465 21.5</span></span>
+<span id="cb234-13"><a href="storage.html#cb234-13"></a></span>
+<span id="cb234-14"><a href="storage.html#cb234-14"></a><span class="kw">loadd</span>(large)</span>
+<span id="cb234-15"><a href="storage.html#cb234-15"></a></span>
+<span id="cb234-16"><a href="storage.html#cb234-16"></a><span class="kw">head</span>(large)</span>
+<span id="cb234-17"><a href="storage.html#cb234-17"></a><span class="co">#&gt;       x    y</span></span>
+<span id="cb234-18"><a href="storage.html#cb234-18"></a><span class="co">#&gt; 1 2.140 26.0</span></span>
+<span id="cb234-19"><a href="storage.html#cb234-19"></a><span class="co">#&gt; 2 3.730 17.3</span></span>
+<span id="cb234-20"><a href="storage.html#cb234-20"></a><span class="co">#&gt; 3 1.935 27.3</span></span>
+<span id="cb234-21"><a href="storage.html#cb234-21"></a><span class="co">#&gt; 4 2.780 21.4</span></span>
+<span id="cb234-22"><a href="storage.html#cb234-22"></a><span class="co">#&gt; 5 2.320 22.8</span></span>
+<span id="cb234-23"><a href="storage.html#cb234-23"></a><span class="co">#&gt; 6 2.780 21.4</span></span>
+<span id="cb234-24"><a href="storage.html#cb234-24"></a></span>
+<span id="cb234-25"><a href="storage.html#cb234-25"></a><span class="kw">rm</span>(large) <span class="co"># Does not remove `large` from the cache.</span></span></code></pre></div>
 <p><code>new_cache()</code> create caches and <code>drake_cache()</code> recovers existing ones. (<code>drake_cache()</code> is only supported in <code>drake</code> version 7.4.0 and above.)</p>
-<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb235-1" data-line-number="1">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</a>
-<a class="sourceLine" id="cb235-2" data-line-number="2">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb235-3" data-line-number="3"><span class="co">#&gt; [1] &quot;/tmp/Rtmp7DAX95/file38cc3c043af5/.drake&quot;</span></a>
-<a class="sourceLine" id="cb235-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb235-5" data-line-number="5">cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></a>
-<a class="sourceLine" id="cb235-6" data-line-number="6">cache<span class="op">$</span>driver<span class="op">$</span>path</a>
-<a class="sourceLine" id="cb235-7" data-line-number="7"><span class="co">#&gt; [1] &quot;/tmp/Rtmp7DAX95/file38cc3c043af5/.drake&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="storage.html#cb235-1"></a>cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>()</span>
+<span id="cb235-2"><a href="storage.html#cb235-2"></a>cache<span class="op">$</span>driver<span class="op">$</span>path</span>
+<span id="cb235-3"><a href="storage.html#cb235-3"></a><span class="co">#&gt; [1] &quot;/private/var/folders/k3/q1f45fsn4_13jbn0742d4zj40000gn/T/Rtmp3jyh82/file102245777e89d/.drake&quot;</span></span>
+<span id="cb235-4"><a href="storage.html#cb235-4"></a></span>
+<span id="cb235-5"><a href="storage.html#cb235-5"></a>cache &lt;-<span class="st"> </span><span class="kw">drake_cache</span>(<span class="dt">path =</span> <span class="st">&quot;.drake&quot;</span>) <span class="co"># File path to drake&#39;s cache.</span></span>
+<span id="cb235-6"><a href="storage.html#cb235-6"></a>cache<span class="op">$</span>driver<span class="op">$</span>path</span>
+<span id="cb235-7"><a href="storage.html#cb235-7"></a><span class="co">#&gt; [1] &quot;/private/var/folders/k3/q1f45fsn4_13jbn0742d4zj40000gn/T/Rtmp3jyh82/file102245777e89d/.drake&quot;</span></span></code></pre></div>
 <p>You can supply your own cache to <code>make()</code> and friends (including specialized <code>storr</code> caches like <a href="http://richfitz.github.io/storr/reference/storr_dbi.html"><code>storr_dbi()</code></a>).</p>
-<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb236-1" data-line-number="1">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">sqrt</span>(x))</a>
-<a class="sourceLine" id="cb236-2" data-line-number="2"><span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)</a>
-<a class="sourceLine" id="cb236-3" data-line-number="3"><span class="co">#&gt; ▶ target x</span></a>
-<a class="sourceLine" id="cb236-4" data-line-number="4"><span class="co">#&gt; ▶ target y</span></a>
-<a class="sourceLine" id="cb236-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb236-6" data-line-number="6"><span class="kw">vis_drake_graph</span>(plan, <span class="dt">cache =</span> cache)</a></code></pre></div>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="storage.html#cb236-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">sqrt</span>(x))</span>
+<span id="cb236-2"><a href="storage.html#cb236-2"></a><span class="kw">make</span>(plan, <span class="dt">cache =</span> cache)</span>
+<span id="cb236-3"><a href="storage.html#cb236-3"></a><span class="co">#&gt; ▶ target x</span></span>
+<span id="cb236-4"><a href="storage.html#cb236-4"></a><span class="co">#&gt; ▶ target y</span></span>
+<span id="cb236-5"><a href="storage.html#cb236-5"></a></span>
+<span id="cb236-6"><a href="storage.html#cb236-6"></a><span class="kw">vis_drake_graph</span>(plan, <span class="dt">cache =</span> cache)</span></code></pre></div>
 <div id="htmlwidget-44eed51e93cee206fe24" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-44eed51e93cee206fe24">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.003s","y\n0.004s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-44eed51e93cee206fe24">{"x":{"nodes":{"id":["x","y"],"imported":[false,false],"label":["x\n0.003s","y\n0.003s"],"status":["up to date","up to date"],"type":["object","object"],"font.size":[20,20],"color":["#228B22","#228B22"],"shape":["dot","dot"],"level":[1,2],"x":[-1,1],"y":[0,0]},"edges":{"from":["x"],"to":["y"],"arrows":["to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object"],"color":["#228B22","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[1,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Destroy caches to remove them from your file system.</p>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb237-1" data-line-number="1">cache<span class="op">$</span><span class="kw">destroy</span>()</a>
-<a class="sourceLine" id="cb237-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb237-3" data-line-number="3"><span class="kw">file.exists</span>(<span class="st">&quot;.drake&quot;</span>)</a>
-<a class="sourceLine" id="cb237-4" data-line-number="4"><span class="co">#&gt; [1] FALSE</span></a></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="storage.html#cb237-1"></a>cache<span class="op">$</span><span class="kw">destroy</span>()</span>
+<span id="cb237-2"><a href="storage.html#cb237-2"></a></span>
+<span id="cb237-3"><a href="storage.html#cb237-3"></a><span class="kw">file.exists</span>(<span class="st">&quot;.drake&quot;</span>)</span>
+<span id="cb237-4"><a href="storage.html#cb237-4"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 
 </div>
 </div>

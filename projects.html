@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 7 drake projects | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 7 drake projects | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
@@ -33,6 +33,7 @@
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="dynamic.html"/>
 <link rel="next" href="scripts.html"/>
+<script src="libs/header-attrs-2.2/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -57,6 +58,7 @@
 <script src="libs/d3-4.5.0/d3.min.js"></script>
 <script src="libs/sankey-1/sankey.js"></script>
 <script src="libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
+  
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150843595-1"></script>
 <script>
@@ -69,27 +71,26 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -98,9 +99,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -149,18 +150,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">The drake R Package User Manual</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#short-version"><i class="fa fa-check"></i><b>1.1</b> Short version</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#long-version"><i class="fa fa-check"></i><b>1.2</b> Long version</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#the-drake-r-package"><i class="fa fa-check"></i><b>1.3</b> The drake R package</a></li>
 <li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#installation"><i class="fa fa-check"></i><b>1.4</b> Installation</a></li>
-<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a><ul>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#why-drake"><i class="fa fa-check"></i><b>1.5</b> Why drake?</a>
+<ul>
 <li class="chapter" data-level="1.5.1" data-path="index.html"><a href="index.html#what-gets-done-stays-done."><i class="fa fa-check"></i><b>1.5.1</b> What gets done stays done.</a></li>
 <li class="chapter" data-level="1.5.2" data-path="index.html"><a href="index.html#reproducibility-with-confidence"><i class="fa fa-check"></i><b>1.5.2</b> Reproducibility with confidence</a></li>
 <li class="chapter" data-level="1.5.3" data-path="index.html"><a href="index.html#scale-up-and-out."><i class="fa fa-check"></i><b>1.5.3</b> Scale up and out.</a></li>
 </ul></li>
 <li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#with-docker"><i class="fa fa-check"></i><b>1.6</b> With Docker</a></li>
-<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a><ul>
+<li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#documentation"><i class="fa fa-check"></i><b>1.7</b> Documentation</a>
+<ul>
 <li class="chapter" data-level="1.7.1" data-path="index.html"><a href="index.html#core-concepts"><i class="fa fa-check"></i><b>1.7.1</b> Core concepts</a></li>
 <li class="chapter" data-level="1.7.2" data-path="index.html"><a href="index.html#in-practice"><i class="fa fa-check"></i><b>1.7.2</b> In practice</a></li>
 <li class="chapter" data-level="1.7.3" data-path="index.html"><a href="index.html#use-cases"><i class="fa fa-check"></i><b>1.7.3</b> Use cases</a></li>
@@ -175,15 +179,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="1.8" data-path="index.html"><a href="index.html#help-and-troubleshooting"><i class="fa fa-check"></i><b>1.8</b> Help and troubleshooting</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a><ul>
-<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a><ul>
+<li class="chapter" data-level="2" data-path="similar-work.html"><a href="similar-work.html"><i class="fa fa-check"></i><b>2</b> Similar work</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="similar-work.html"><a href="similar-work.html#pipeline-tools"><i class="fa fa-check"></i><b>2.1</b> Pipeline tools</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="similar-work.html"><a href="similar-work.html#gnu-make"><i class="fa fa-check"></i><b>2.1.1</b> GNU Make</a></li>
 <li class="chapter" data-level="2.1.2" data-path="similar-work.html"><a href="similar-work.html#remake"><i class="fa fa-check"></i><b>2.1.2</b> Remake</a></li>
 <li class="chapter" data-level="2.1.3" data-path="similar-work.html"><a href="similar-work.html#factuals-drake"><i class="fa fa-check"></i><b>2.1.3</b> Factual’s Drake</a></li>
 <li class="chapter" data-level="2.1.4" data-path="similar-work.html"><a href="similar-work.html#other-pipeline-tools"><i class="fa fa-check"></i><b>2.1.4</b> Other pipeline tools</a></li>
 </ul></li>
 <li class="chapter" data-level="2.2" data-path="similar-work.html"><a href="similar-work.html#memoization"><i class="fa fa-check"></i><b>2.2</b> Memoization</a></li>
-<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a><ul>
+<li class="chapter" data-level="2.3" data-path="similar-work.html"><a href="similar-work.html#literate-programming"><i class="fa fa-check"></i><b>2.3</b> Literate programming</a>
+<ul>
 <li class="chapter" data-level="2.3.1" data-path="similar-work.html"><a href="similar-work.html#knitr-and-r-markdown"><i class="fa fa-check"></i><b>2.3.1</b> knitr and R Markdown</a></li>
 <li class="chapter" data-level="2.3.2" data-path="similar-work.html"><a href="similar-work.html#version-control"><i class="fa fa-check"></i><b>2.3.2</b> Version control</a></li>
 <li class="chapter" data-level="2.3.3" data-path="similar-work.html"><a href="similar-work.html#containerization-and-r-package-environments"><i class="fa fa-check"></i><b>2.3.3</b> Containerization and R package environments</a></li>
@@ -192,42 +199,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.4" data-path="similar-work.html"><a href="similar-work.html#acknowledgements"><i class="fa fa-check"></i><b>2.4</b> Acknowledgements</a></li>
 </ul></li>
 <li class="part"><span><b>I Getting started</b></span></li>
-<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a><ul>
+<li class="chapter" data-level="3" data-path="walkthrough.html"><a href="walkthrough.html"><i class="fa fa-check"></i><b>3</b> Walkthrough</a>
+<ul>
 <li class="chapter" data-level="3.1" data-path="walkthrough.html"><a href="walkthrough.html#set-the-stage."><i class="fa fa-check"></i><b>3.1</b> Set the stage.</a></li>
 <li class="chapter" data-level="3.2" data-path="walkthrough.html"><a href="walkthrough.html#make-your-results."><i class="fa fa-check"></i><b>3.2</b> Make your results.</a></li>
 <li class="chapter" data-level="3.3" data-path="walkthrough.html"><a href="walkthrough.html#go-back-and-fix-things."><i class="fa fa-check"></i><b>3.3</b> Go back and fix things.</a></li>
 <li class="chapter" data-level="3.4" data-path="walkthrough.html"><a href="walkthrough.html#history-and-provenance"><i class="fa fa-check"></i><b>3.4</b> History and provenance</a></li>
-<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a><ul>
+<li class="chapter" data-level="3.5" data-path="walkthrough.html"><a href="walkthrough.html#reproducible-data-recovery-and-renaming"><i class="fa fa-check"></i><b>3.5</b> Reproducible data recovery and renaming</a>
+<ul>
 <li class="chapter" data-level="3.5.1" data-path="walkthrough.html"><a href="walkthrough.html#undoing-clean"><i class="fa fa-check"></i><b>3.5.1</b> Undoing <code>clean()</code></a></li>
 <li class="chapter" data-level="3.5.2" data-path="walkthrough.html"><a href="walkthrough.html#renaming"><i class="fa fa-check"></i><b>3.5.2</b> Renaming</a></li>
 </ul></li>
 <li class="chapter" data-level="3.6" data-path="walkthrough.html"><a href="walkthrough.html#try-the-code-yourself"><i class="fa fa-check"></i><b>3.6</b> Try the code yourself!</a></li>
 <li class="chapter" data-level="3.7" data-path="walkthrough.html"><a href="walkthrough.html#thanks"><i class="fa fa-check"></i><b>3.7</b> Thanks</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a><ul>
+<li class="chapter" data-level="4" data-path="plans.html"><a href="plans.html"><i class="fa fa-check"></i><b>4</b> <code>drake</code> plans</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="plans.html"><a href="plans.html#functions"><i class="fa fa-check"></i><b>4.1</b> Functions</a></li>
 <li class="chapter" data-level="4.2" data-path="plans.html"><a href="plans.html#intro-to-plans"><i class="fa fa-check"></i><b>4.2</b> Intro to plans</a></li>
 <li class="chapter" data-level="4.3" data-path="plans.html"><a href="plans.html#how-to-choose-good-targets"><i class="fa fa-check"></i><b>4.3</b> How to choose good targets</a></li>
 <li class="chapter" data-level="4.4" data-path="plans.html"><a href="plans.html#special-data-formats-for-targets"><i class="fa fa-check"></i><b>4.4</b> Special data formats for targets</a></li>
 <li class="chapter" data-level="4.5" data-path="plans.html"><a href="plans.html#special-columns"><i class="fa fa-check"></i><b>4.5</b> Special columns</a></li>
-<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a><ul>
+<li class="chapter" data-level="4.6" data-path="plans.html"><a href="plans.html#static-files"><i class="fa fa-check"></i><b>4.6</b> Static files</a>
+<ul>
 <li class="chapter" data-level="4.6.1" data-path="plans.html"><a href="plans.html#urls"><i class="fa fa-check"></i><b>4.6.1</b> URLs</a></li>
 <li class="chapter" data-level="4.6.2" data-path="plans.html"><a href="plans.html#limitations-of-static-files"><i class="fa fa-check"></i><b>4.6.2</b> Limitations of static files</a></li>
 </ul></li>
-<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a><ul>
+<li class="chapter" data-level="4.7" data-path="plans.html"><a href="plans.html#dynamic-files"><i class="fa fa-check"></i><b>4.7</b> Dynamic files</a>
+<ul>
 <li class="chapter" data-level="4.7.1" data-path="plans.html"><a href="plans.html#how-to-use-dynamic-files"><i class="fa fa-check"></i><b>4.7.1</b> How to use dynamic files</a></li>
 <li class="chapter" data-level="4.7.2" data-path="plans.html"><a href="plans.html#example-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.2</b> Example of dynamic files</a></li>
 <li class="chapter" data-level="4.7.3" data-path="plans.html"><a href="plans.html#limitations-of-dynamic-files"><i class="fa fa-check"></i><b>4.7.3</b> Limitations of dynamic files</a></li>
 </ul></li>
 <li class="chapter" data-level="4.8" data-path="plans.html"><a href="plans.html#large-plans"><i class="fa fa-check"></i><b>4.8</b> Large plans</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a><ul>
+<li class="chapter" data-level="5" data-path="static.html"><a href="static.html"><i class="fa fa-check"></i><b>5</b> Static branching</a>
+<ul>
 <li class="chapter" data-level="5.1" data-path="static.html"><a href="static.html#why-static-branching"><i class="fa fa-check"></i><b>5.1</b> Why static branching?</a></li>
-<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a><ul>
+<li class="chapter" data-level="5.2" data-path="static.html"><a href="static.html#grouping-variables"><i class="fa fa-check"></i><b>5.2</b> Grouping variables</a>
+<ul>
 <li class="chapter" data-level="5.2.1" data-path="static.html"><a href="static.html#limitations-of-grouping-variables"><i class="fa fa-check"></i><b>5.2.1</b> Limitations of grouping variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="static.html"><a href="static.html#tidy-evaluation"><i class="fa fa-check"></i><b>5.3</b> Tidy evaluation</a></li>
-<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a><ul>
+<li class="chapter" data-level="5.4" data-path="static.html"><a href="static.html#static-transformations"><i class="fa fa-check"></i><b>5.4</b> Static transformations</a>
+<ul>
 <li class="chapter" data-level="5.4.1" data-path="static.html"><a href="static.html#map"><i class="fa fa-check"></i><b>5.4.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="5.4.2" data-path="static.html"><a href="static.html#cross"><i class="fa fa-check"></i><b>5.4.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="5.4.3" data-path="static.html"><a href="static.html#split"><i class="fa fa-check"></i><b>5.4.3</b> <code>split()</code></a></li>
@@ -236,12 +251,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5" data-path="static.html"><a href="static.html#target-names"><i class="fa fa-check"></i><b>5.5</b> Target names</a></li>
 <li class="chapter" data-level="5.6" data-path="static.html"><a href="static.html#tags"><i class="fa fa-check"></i><b>5.6</b> Tags</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a><ul>
+<li class="chapter" data-level="6" data-path="dynamic.html"><a href="dynamic.html"><i class="fa fa-check"></i><b>6</b> Dynamic branching</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="dynamic.html"><a href="dynamic.html#a-note-about-versions"><i class="fa fa-check"></i><b>6.1</b> A note about versions</a></li>
 <li class="chapter" data-level="6.2" data-path="dynamic.html"><a href="dynamic.html#motivation"><i class="fa fa-check"></i><b>6.2</b> Motivation</a></li>
 <li class="chapter" data-level="6.3" data-path="dynamic.html"><a href="dynamic.html#which-kind-of-branching-should-i-use"><i class="fa fa-check"></i><b>6.3</b> Which kind of branching should I use?</a></li>
 <li class="chapter" data-level="6.4" data-path="dynamic.html"><a href="dynamic.html#dynamic-targets"><i class="fa fa-check"></i><b>6.4</b> Dynamic targets</a></li>
-<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a><ul>
+<li class="chapter" data-level="6.5" data-path="dynamic.html"><a href="dynamic.html#dynamic-transformations"><i class="fa fa-check"></i><b>6.5</b> Dynamic transformations</a>
+<ul>
 <li class="chapter" data-level="6.5.1" data-path="dynamic.html"><a href="dynamic.html#map-1"><i class="fa fa-check"></i><b>6.5.1</b> <code>map()</code></a></li>
 <li class="chapter" data-level="6.5.2" data-path="dynamic.html"><a href="dynamic.html#cross-1"><i class="fa fa-check"></i><b>6.5.2</b> <code>cross()</code></a></li>
 <li class="chapter" data-level="6.5.3" data-path="dynamic.html"><a href="dynamic.html#group"><i class="fa fa-check"></i><b>6.5.3</b> <code>group()</code></a></li>
@@ -249,10 +266,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.6" data-path="dynamic.html"><a href="dynamic.html#trace"><i class="fa fa-check"></i><b>6.6</b> Trace</a></li>
 <li class="chapter" data-level="6.7" data-path="dynamic.html"><a href="dynamic.html#max_expand"><i class="fa fa-check"></i><b>6.7</b> <code>max_expand</code></a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a><ul>
+<li class="chapter" data-level="7" data-path="projects.html"><a href="projects.html"><i class="fa fa-check"></i><b>7</b> <code>drake</code> projects</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="projects.html"><a href="projects.html#external-resources"><i class="fa fa-check"></i><b>7.1</b> External resources</a></li>
 <li class="chapter" data-level="7.2" data-path="projects.html"><a href="projects.html#code-files"><i class="fa fa-check"></i><b>7.2</b> Code files</a></li>
-<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a><ul>
+<li class="chapter" data-level="7.3" data-path="projects.html"><a href="projects.html#safer-interactivity"><i class="fa fa-check"></i><b>7.3</b> Safer interactivity</a>
+<ul>
 <li class="chapter" data-level="7.3.1" data-path="projects.html"><a href="projects.html#motivation-1"><i class="fa fa-check"></i><b>7.3.1</b> Motivation</a></li>
 <li class="chapter" data-level="7.3.2" data-path="projects.html"><a href="projects.html#usage"><i class="fa fa-check"></i><b>7.3.2</b> Usage</a></li>
 </ul></li>
@@ -260,7 +279,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.5" data-path="projects.html"><a href="projects.html#workflows-as-r-packages"><i class="fa fa-check"></i><b>7.5</b> Workflows as R packages</a></li>
 <li class="chapter" data-level="7.6" data-path="projects.html"><a href="projects.html#other-tools"><i class="fa fa-check"></i><b>7.6</b> Other tools</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a><ul>
+<li class="chapter" data-level="8" data-path="scripts.html"><a href="scripts.html"><i class="fa fa-check"></i><b>8</b> Script-based workflows</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="scripts.html"><a href="scripts.html#function-oriented-workflows"><i class="fa fa-check"></i><b>8.1</b> Function-oriented workflows</a></li>
 <li class="chapter" data-level="8.2" data-path="scripts.html"><a href="scripts.html#traditional-and-legacy-workflows"><i class="fa fa-check"></i><b>8.2</b> Traditional and legacy workflows</a></li>
 <li class="chapter" data-level="8.3" data-path="scripts.html"><a href="scripts.html#overcoming-technical-debt"><i class="fa fa-check"></i><b>8.3</b> Overcoming Technical Debt</a></li>
@@ -271,7 +291,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.8" data-path="scripts.html"><a href="scripts.html#final-thoughts"><i class="fa fa-check"></i><b>8.8</b> Final thoughts</a></li>
 </ul></li>
 <li class="part"><span><b>II Examples</b></span></li>
-<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a><ul>
+<li class="chapter" data-level="9" data-path="churn.html"><a href="churn.html"><i class="fa fa-check"></i><b>9</b> Customer churn and deep learning</a>
+<ul>
 <li class="chapter" data-level="9.1" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>9.1</b> Packages</a></li>
 <li class="chapter" data-level="9.2" data-path="churn.html"><a href="churn.html#functions-1"><i class="fa fa-check"></i><b>9.2</b> Functions</a></li>
 <li class="chapter" data-level="9.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>9.3</b> Plan</a></li>
@@ -283,13 +304,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.9" data-path="churn.html"><a href="churn.html#update-your-code"><i class="fa fa-check"></i><b>9.9</b> Update your code</a></li>
 <li class="chapter" data-level="9.10" data-path="churn.html"><a href="churn.html#history-and-provenance-1"><i class="fa fa-check"></i><b>9.10</b> History and provenance</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a><ul>
+<li class="chapter" data-level="10" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>10</b> An analysis of R package download trends</a>
+<ul>
 <li class="chapter" data-level="10.1" data-path="packages.html"><a href="packages.html"><i class="fa fa-check"></i><b>10.1</b> Get the code.</a></li>
 <li class="chapter" data-level="10.2" data-path="packages.html"><a href="packages.html#overview"><i class="fa fa-check"></i><b>10.2</b> Overview</a></li>
 <li class="chapter" data-level="10.3" data-path="packages.html"><a href="packages.html#analysis"><i class="fa fa-check"></i><b>10.3</b> Analysis</a></li>
 <li class="chapter" data-level="10.4" data-path="packages.html"><a href="packages.html#other-ways-to-trigger-downloads"><i class="fa fa-check"></i><b>10.4</b> Other ways to trigger downloads</a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a><ul>
+<li class="chapter" data-level="11" data-path="gsp.html"><a href="gsp.html"><i class="fa fa-check"></i><b>11</b> Finding the best model of gross state product</a>
+<ul>
 <li class="chapter" data-level="11.1" data-path="gsp.html"><a href="gsp.html#get-the-code.-1"><i class="fa fa-check"></i><b>11.1</b> Get the code.</a></li>
 <li class="chapter" data-level="11.2" data-path="gsp.html"><a href="gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>11.2</b> Objective and methods</a></li>
 <li class="chapter" data-level="11.3" data-path="gsp.html"><a href="gsp.html#data"><i class="fa fa-check"></i><b>11.3</b> Data</a></li>
@@ -299,27 +322,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="11.7" data-path="gsp.html"><a href="gsp.html#references"><i class="fa fa-check"></i><b>11.7</b> References</a></li>
 </ul></li>
 <li class="part"><span><b>III Resource management</b></span></li>
-<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a><ul>
+<li class="chapter" data-level="12" data-path="hpc.html"><a href="hpc.html"><i class="fa fa-check"></i><b>12</b> High-performance computing</a>
+<ul>
 <li class="chapter" data-level="12.1" data-path="hpc.html"><a href="hpc.html#start-small"><i class="fa fa-check"></i><b>12.1</b> Start small</a></li>
 <li class="chapter" data-level="12.2" data-path="hpc.html"><a href="hpc.html#let-make-schedule-your-targets."><i class="fa fa-check"></i><b>12.2</b> Let <code>make()</code> schedule your targets.</a></li>
-<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a><ul>
+<li class="chapter" data-level="12.3" data-path="hpc.html"><a href="hpc.html#the-master-process"><i class="fa fa-check"></i><b>12.3</b> The master process</a>
+<ul>
 <li class="chapter" data-level="12.3.1" data-path="hpc.html"><a href="hpc.html#master-on-a-cluster"><i class="fa fa-check"></i><b>12.3.1</b> Master on a cluster</a></li>
 <li class="chapter" data-level="12.3.2" data-path="hpc.html"><a href="hpc.html#local-master"><i class="fa fa-check"></i><b>12.3.2</b> Local master</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="hpc.html"><a href="hpc.html#parallel-backends"><i class="fa fa-check"></i><b>12.4</b> Parallel backends</a></li>
-<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a><ul>
+<li class="chapter" data-level="12.5" data-path="hpc.html"><a href="hpc.html#the-clustermq-backend"><i class="fa fa-check"></i><b>12.5</b> The <code>clustermq</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.5.1" data-path="hpc.html"><a href="hpc.html#persistent-workers"><i class="fa fa-check"></i><b>12.5.1</b> Persistent workers</a></li>
 <li class="chapter" data-level="12.5.2" data-path="hpc.html"><a href="hpc.html#installation-1"><i class="fa fa-check"></i><b>12.5.2</b> Installation</a></li>
 <li class="chapter" data-level="12.5.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine"><i class="fa fa-check"></i><b>12.5.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.5.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster"><i class="fa fa-check"></i><b>12.5.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a><ul>
+<li class="chapter" data-level="12.6" data-path="hpc.html"><a href="hpc.html#the-future-backend"><i class="fa fa-check"></i><b>12.6</b> The <code>future</code> backend</a>
+<ul>
 <li class="chapter" data-level="12.6.1" data-path="hpc.html"><a href="hpc.html#transient-workers"><i class="fa fa-check"></i><b>12.6.1</b> Transient workers</a></li>
 <li class="chapter" data-level="12.6.2" data-path="hpc.html"><a href="hpc.html#installation-2"><i class="fa fa-check"></i><b>12.6.2</b> Installation</a></li>
 <li class="chapter" data-level="12.6.3" data-path="hpc.html"><a href="hpc.html#on-your-local-machine-1"><i class="fa fa-check"></i><b>12.6.3</b> On your local machine</a></li>
 <li class="chapter" data-level="12.6.4" data-path="hpc.html"><a href="hpc.html#on-a-cluster-1"><i class="fa fa-check"></i><b>12.6.4</b> On a cluster</a></li>
 </ul></li>
-<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a><ul>
+<li class="chapter" data-level="12.7" data-path="hpc.html"><a href="hpc.html#advanced-options"><i class="fa fa-check"></i><b>12.7</b> Advanced options</a>
+<ul>
 <li class="chapter" data-level="12.7.1" data-path="hpc.html"><a href="hpc.html#selectivity"><i class="fa fa-check"></i><b>12.7.1</b> Selectivity</a></li>
 <li class="chapter" data-level="12.7.2" data-path="hpc.html"><a href="hpc.html#memory-options"><i class="fa fa-check"></i><b>12.7.2</b> Memory options</a></li>
 <li class="chapter" data-level="12.7.3" data-path="hpc.html"><a href="hpc.html#storage-options"><i class="fa fa-check"></i><b>12.7.3</b> Storage options</a></li>
@@ -328,8 +356,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.7.6" data-path="hpc.html"><a href="hpc.html#parallel-computing-within-targets"><i class="fa fa-check"></i><b>12.7.6</b> Parallel computing <em>within</em> targets</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a><ul>
-<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a><ul>
+<li class="chapter" data-level="13" data-path="time.html"><a href="time.html"><i class="fa fa-check"></i><b>13</b> Time: speed, time logging, prediction, and strategy</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="time.html"><a href="time.html#why-is-drake-so-slow"><i class="fa fa-check"></i><b>13.1</b> Why is <code>drake</code> so slow?</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="time.html"><a href="time.html#help-us-find-out"><i class="fa fa-check"></i><b>13.1.1</b> Help us find out!</a></li>
 <li class="chapter" data-level="13.1.2" data-path="time.html"><a href="time.html#too-many-targets"><i class="fa fa-check"></i><b>13.1.2</b> Too many targets?</a></li>
 <li class="chapter" data-level="13.1.3" data-path="time.html"><a href="time.html#big-data"><i class="fa fa-check"></i><b>13.1.3</b> Big data?</a></li>
@@ -339,23 +369,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.3" data-path="time.html"><a href="time.html#predict-total-runtime"><i class="fa fa-check"></i><b>13.3</b> Predict total runtime</a></li>
 <li class="chapter" data-level="13.4" data-path="time.html"><a href="time.html#strategize-your-high-performance-computing"><i class="fa fa-check"></i><b>13.4</b> Strategize your high-performance computing</a></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a><ul>
+<li class="chapter" data-level="14" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>14</b> Memory management</a>
+<ul>
 <li class="chapter" data-level="14.1" data-path="memory.html"><a href="memory.html#garbage-collection-and-custom-files"><i class="fa fa-check"></i><b>14.1</b> Garbage collection and custom files</a></li>
 <li class="chapter" data-level="14.2" data-path="memory.html"><a href="memory.html#memory-strategies"><i class="fa fa-check"></i><b>14.2</b> Memory strategies</a></li>
 <li class="chapter" data-level="14.3" data-path="memory.html"><a href="memory.html#data-splitting"><i class="fa fa-check"></i><b>14.3</b> Data splitting</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a><ul>
+<li class="chapter" data-level="15" data-path="storage.html"><a href="storage.html"><i class="fa fa-check"></i><b>15</b> Storage</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="storage.html"><a href="storage.html#drakes-cache"><i class="fa fa-check"></i><b>15.1</b> <code>drake</code>’s cache</a></li>
 <li class="chapter" data-level="15.2" data-path="storage.html"><a href="storage.html#efficient-target-storage"><i class="fa fa-check"></i><b>15.2</b> Efficient target storage</a></li>
-<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a><ul>
+<li class="chapter" data-level="15.3" data-path="storage.html"><a href="storage.html#why-is-my-cache-so-big"><i class="fa fa-check"></i><b>15.3</b> Why is my cache so big?</a>
+<ul>
 <li class="chapter" data-level="15.3.1" data-path="storage.html"><a href="storage.html#old-targets"><i class="fa fa-check"></i><b>15.3.1</b> Old targets</a></li>
 <li class="chapter" data-level="15.3.2" data-path="storage.html"><a href="storage.html#garbage-from-interrupted-builds"><i class="fa fa-check"></i><b>15.3.2</b> Garbage from interrupted builds</a></li>
 </ul></li>
 <li class="chapter" data-level="15.4" data-path="storage.html"><a href="storage.html#interfaces-to-the-cache"><i class="fa fa-check"></i><b>15.4</b> Interfaces to the cache</a></li>
 </ul></li>
 <li class="part"><span><b>IV Extra features</b></span></li>
-<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a><ul>
-<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a><ul>
+<li class="chapter" data-level="16" data-path="visuals.html"><a href="visuals.html"><i class="fa fa-check"></i><b>16</b> Visualization with drake</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="visuals.html"><a href="visuals.html#plotting-plans"><i class="fa fa-check"></i><b>16.1</b> Plotting plans</a>
+<ul>
 <li class="chapter" data-level="16.1.1" data-path="visuals.html"><a href="visuals.html#vis_drake_graph"><i class="fa fa-check"></i><b>16.1.1</b> <code>vis_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.2" data-path="visuals.html"><a href="visuals.html#sankey_drake_graph"><i class="fa fa-check"></i><b>16.1.2</b> <code>sankey_drake_graph()</code></a></li>
 <li class="chapter" data-level="16.1.3" data-path="visuals.html"><a href="visuals.html#drake_ggraph"><i class="fa fa-check"></i><b>16.1.3</b> <code>drake_ggraph()</code></a></li>
@@ -367,19 +402,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="16.5" data-path="visuals.html"><a href="visuals.html#control-the-vis_drake_graph-legend."><i class="fa fa-check"></i><b>16.5</b> Control the <code>vis_drake_graph()</code> legend.</a></li>
 <li class="chapter" data-level="16.6" data-path="visuals.html"><a href="visuals.html#clusters"><i class="fa fa-check"></i><b>16.6</b> Clusters</a></li>
 <li class="chapter" data-level="16.7" data-path="visuals.html"><a href="visuals.html#output-files"><i class="fa fa-check"></i><b>16.7</b> Output files</a></li>
-<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a><ul>
+<li class="chapter" data-level="16.8" data-path="visuals.html"><a href="visuals.html#node-selection"><i class="fa fa-check"></i><b>16.8</b> Node Selection</a>
+<ul>
 <li class="chapter" data-level="16.8.1" data-path="visuals.html"><a href="visuals.html#perform-the-default-action-on-select"><i class="fa fa-check"></i><b>16.8.1</b> Perform the default action on select</a></li>
 <li class="chapter" data-level="16.8.2" data-path="visuals.html"><a href="visuals.html#perform-no-action-on-select"><i class="fa fa-check"></i><b>16.8.2</b> Perform no action on select</a></li>
 <li class="chapter" data-level="16.8.3" data-path="visuals.html"><a href="visuals.html#customize-the-onselect-event-behaviour"><i class="fa fa-check"></i><b>16.8.3</b> Customize the onSelect event behaviour</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a><ul>
-<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a><ul>
+<li class="chapter" data-level="17" data-path="debugging.html"><a href="debugging.html"><i class="fa fa-check"></i><b>17</b> Debugging and testing drake projects</a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="debugging.html"><a href="debugging.html#debugging-failed-targets"><i class="fa fa-check"></i><b>17.1</b> Debugging failed targets</a>
+<ul>
 <li class="chapter" data-level="17.1.1" data-path="debugging.html"><a href="debugging.html#diagnosing-errors"><i class="fa fa-check"></i><b>17.1.1</b> Diagnosing errors</a></li>
 <li class="chapter" data-level="17.1.2" data-path="debugging.html"><a href="debugging.html#interactive-debugging"><i class="fa fa-check"></i><b>17.1.2</b> Interactive debugging</a></li>
 <li class="chapter" data-level="17.1.3" data-path="debugging.html"><a href="debugging.html#efficient-trial-and-error"><i class="fa fa-check"></i><b>17.1.3</b> Efficient trial and error</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a><ul>
+<li class="chapter" data-level="17.2" data-path="debugging.html"><a href="debugging.html#why-do-my-targets-keep-rerunning"><i class="fa fa-check"></i><b>17.2</b> Why do my targets keep rerunning?</a>
+<ul>
 <li class="chapter" data-level="17.2.1" data-path="debugging.html"><a href="debugging.html#how-your-workflow-fits-together"><i class="fa fa-check"></i><b>17.2.1</b> How your workflow fits together</a></li>
 <li class="chapter" data-level="17.2.2" data-path="debugging.html"><a href="debugging.html#which-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.2</b> Which targets are outdated</a></li>
 <li class="chapter" data-level="17.2.3" data-path="debugging.html"><a href="debugging.html#why-your-targets-are-outdated"><i class="fa fa-check"></i><b>17.2.3</b> Why your targets are outdated</a></li>
@@ -387,7 +426,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="17.3" data-path="debugging.html"><a href="debugging.html#more-help"><i class="fa fa-check"></i><b>17.3</b> More help</a></li>
 </ul></li>
-<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a><ul>
+<li class="chapter" data-level="18" data-path="triggers.html"><a href="triggers.html"><i class="fa fa-check"></i><b>18</b> Triggers: decision rules for building targets</a>
+<ul>
 <li class="chapter" data-level="18.1" data-path="triggers.html"><a href="triggers.html#what-are-triggers"><i class="fa fa-check"></i><b>18.1</b> What are triggers?</a></li>
 <li class="chapter" data-level="18.2" data-path="triggers.html"><a href="triggers.html#customization"><i class="fa fa-check"></i><b>18.2</b> Customization</a></li>
 <li class="chapter" data-level="18.3" data-path="triggers.html"><a href="triggers.html#alternative-trigger-modes"><i class="fa fa-check"></i><b>18.3</b> Alternative trigger modes</a></li>
@@ -395,15 +435,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="faq.html"><a href="faq.html"><i class="fa fa-check"></i><b>A</b> Frequently-asked questions</a></li>
-<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a><ul>
-<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a><ul>
+<li class="chapter" data-level="B" data-path="design.html"><a href="design.html"><i class="fa fa-check"></i><b>B</b> Design</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="design.html"><a href="design.html#principles"><i class="fa fa-check"></i><b>B.1</b> Principles</a>
+<ul>
 <li class="chapter" data-level="B.1.1" data-path="design.html"><a href="design.html#functions-first"><i class="fa fa-check"></i><b>B.1.1</b> Functions first</a></li>
 <li class="chapter" data-level="B.1.2" data-path="design.html"><a href="design.html#light-use-of-traditional-oop"><i class="fa fa-check"></i><b>B.1.2</b> Light use of traditional OOP</a></li>
 <li class="chapter" data-level="B.1.3" data-path="design.html"><a href="design.html#high-performant-small-objects"><i class="fa fa-check"></i><b>B.1.3</b> High-performant small objects</a></li>
 <li class="chapter" data-level="B.1.4" data-path="design.html"><a href="design.html#fast-iteration-along-aggregated-data"><i class="fa fa-check"></i><b>B.1.4</b> Fast iteration along aggregated data</a></li>
 <li class="chapter" data-level="B.1.5" data-path="design.html"><a href="design.html#access-to-information-across-targets"><i class="fa fa-check"></i><b>B.1.5</b> Access to information across targets</a></li>
 </ul></li>
-<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a><ul>
+<li class="chapter" data-level="B.2" data-path="design.html"><a href="design.html#specific-classes"><i class="fa fa-check"></i><b>B.2</b> Specific classes</a>
+<ul>
 <li class="chapter" data-level="B.2.1" data-path="design.html"><a href="design.html#config"><i class="fa fa-check"></i><b>B.2.1</b> Config</a></li>
 <li class="chapter" data-level="B.2.2" data-path="design.html"><a href="design.html#settings"><i class="fa fa-check"></i><b>B.2.2</b> Settings</a></li>
 <li class="chapter" data-level="B.2.3" data-path="design.html"><a href="design.html#plan-1"><i class="fa fa-check"></i><b>B.2.3</b> Plan</a></li>
@@ -438,10 +481,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="projects" class="section level1">
+<div id="projects" class="section level1" number="7">
 <h1><span class="header-section-number">Chapter 7</span> <code>drake</code> projects</h1>
 <p><code>drake</code>’s design philosophy is extremely R-focused. It embraces in-memory configuration, in-memory dependencies, interactivity, and flexibility. This scope leaves project setup and file management decisions mostly up to the user. This chapter tries to fill in the blanks and address practical hurdles when it comes to setting up projects.</p>
-<div id="external-resources" class="section level2">
+<div id="external-resources" class="section level2" number="7.1">
 <h2><span class="header-section-number">7.1</span> External resources</h2>
 <ul>
 <li><a href="https://github.com/MilesMcBain">Miles McBain</a>’s <a href="https://milesmcbain.xyz/the-drake-post/">excellent blog post</a> explains the practical issues {drake} solves for most projects, how to set up a project as quickly and painlessly as possible, and how to overcome common obstacles.</li>
@@ -449,7 +492,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>drake</code> is heavily function-oriented by design, and Miles’ <a href="https://github.com/MilesMcBain/fnmate"><code>fnmate</code></a> package automatically generates boilerplate code and docstrings for functions you mention in <code>drake</code> plans.</li>
 </ul>
 </div>
-<div id="code-files" class="section level2">
+<div id="code-files" class="section level2" number="7.2">
 <h2><span class="header-section-number">7.2</span> Code files</h2>
 <p>The names and locations of the files are entirely up to you, but this pattern is particularly useful to start with.</p>
 <pre><code>make.R
@@ -463,77 +506,77 @@ R/
 <li>Creates the <code>drake</code> plan.</li>
 <li>Calls <code>make()</code>.</li>
 </ol>
-<p>Let’s consider the <a href="https://github.com/wlandau/drake-examples/tree/master/main">main example</a>, which you can download with <code>drake_example(&quot;main&quot;)</code>. Here, our master script is called <code>make.R</code>:</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)  <span class="co"># loads packages</span></a>
-<a class="sourceLine" id="cb109-2" data-line-number="2"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>) <span class="co"># defines the create_plot() function</span></a>
-<a class="sourceLine" id="cb109-3" data-line-number="3"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)      <span class="co"># creates the drake plan</span></a>
-<a class="sourceLine" id="cb109-4" data-line-number="4"><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing. Also needs parallelism = &quot;clustermq&quot;</span></a>
-<a class="sourceLine" id="cb109-5" data-line-number="5"><span class="kw">make</span>(</a>
-<a class="sourceLine" id="cb109-6" data-line-number="6">  plan, <span class="co"># defined in R/plan.R</span></a>
-<a class="sourceLine" id="cb109-7" data-line-number="7">  <span class="dt">verbose =</span> <span class="dv">2</span></a>
-<a class="sourceLine" id="cb109-8" data-line-number="8">)</a></code></pre></div>
+<p>Let’s consider the <a href="https://github.com/wlandau/drake-examples/tree/master/main">main example</a>, which you can download with <code>drake_example("main")</code>. Here, our master script is called <code>make.R</code>:</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="projects.html#cb109-1"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)  <span class="co"># loads packages</span></span>
+<span id="cb109-2"><a href="projects.html#cb109-2"></a><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>) <span class="co"># defines the create_plot() function</span></span>
+<span id="cb109-3"><a href="projects.html#cb109-3"></a><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)      <span class="co"># creates the drake plan</span></span>
+<span id="cb109-4"><a href="projects.html#cb109-4"></a><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing. Also needs parallelism = &quot;clustermq&quot;</span></span>
+<span id="cb109-5"><a href="projects.html#cb109-5"></a><span class="kw">make</span>(</span>
+<span id="cb109-6"><a href="projects.html#cb109-6"></a>  plan, <span class="co"># defined in R/plan.R</span></span>
+<span id="cb109-7"><a href="projects.html#cb109-7"></a>  <span class="dt">verbose =</span> <span class="dv">2</span></span>
+<span id="cb109-8"><a href="projects.html#cb109-8"></a>)</span></code></pre></div>
 <p>We have an <code>R</code> folder containing our supporting files. <code>packages.R</code> typically includes all the packages you will use in the workflow.</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1"><span class="co"># packages.R</span></a>
-<a class="sourceLine" id="cb110-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb110-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb110-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="projects.html#cb110-1"></a><span class="co"># packages.R</span></span>
+<span id="cb110-2"><a href="projects.html#cb110-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb110-3"><a href="projects.html#cb110-3"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb110-4"><a href="projects.html#cb110-4"></a><span class="kw">library</span>(ggplot2)</span></code></pre></div>
 <p><code>drake</code> does not automatically watch package functions for changes, so if you have any specialized packages and you want <code>drake</code> to track those functions, here is a great place to call <code>expose_imports()</code>.</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="co"># alternative packages.R</span></a>
-<a class="sourceLine" id="cb111-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb111-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb111-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb111-5" data-line-number="5"><span class="kw">library</span>(PackageContainingYourWorkflow)</a>
-<a class="sourceLine" id="cb111-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb111-7" data-line-number="7"><span class="co"># Tell drake to track the package&#39;s functions.</span></a>
-<a class="sourceLine" id="cb111-8" data-line-number="8"><span class="kw">expose_imports</span>(PackageContainingYourWorkflow)</a></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="projects.html#cb111-1"></a><span class="co"># alternative packages.R</span></span>
+<span id="cb111-2"><a href="projects.html#cb111-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb111-3"><a href="projects.html#cb111-3"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb111-4"><a href="projects.html#cb111-4"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb111-5"><a href="projects.html#cb111-5"></a><span class="kw">library</span>(PackageContainingYourWorkflow)</span>
+<span id="cb111-6"><a href="projects.html#cb111-6"></a></span>
+<span id="cb111-7"><a href="projects.html#cb111-7"></a><span class="co"># Tell drake to track the package&#39;s functions.</span></span>
+<span id="cb111-8"><a href="projects.html#cb111-8"></a><span class="kw">expose_imports</span>(PackageContainingYourWorkflow)</span></code></pre></div>
 <p>Your <code>functions.R</code> typically has the supporting custom functions you write for the workflow. If there are many functions, you could split them up into multiple files.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1"><span class="co"># functions.R</span></a>
-<a class="sourceLine" id="cb112-2" data-line-number="2">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb112-3" data-line-number="3">  <span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Width, <span class="dt">fill =</span> Species)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb112-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">0.25</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb112-5" data-line-number="5"><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb112-6" data-line-number="6">}</a></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="projects.html#cb112-1"></a><span class="co"># functions.R</span></span>
+<span id="cb112-2"><a href="projects.html#cb112-2"></a>create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
+<span id="cb112-3"><a href="projects.html#cb112-3"></a>  <span class="kw">ggplot</span>(data) <span class="op">+</span></span>
+<span id="cb112-4"><a href="projects.html#cb112-4"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Ozone), <span class="dt">binwidth =</span> <span class="dv">10</span>) <span class="op">+</span></span>
+<span id="cb112-5"><a href="projects.html#cb112-5"></a><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</span>
+<span id="cb112-6"><a href="projects.html#cb112-6"></a>}</span></code></pre></div>
 <p>Finally, it is good practice to define a <code>plan.R</code> that defines the plan.</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="co"># plan.R</span></a>
-<a class="sourceLine" id="cb113-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb113-3" data-line-number="3">  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),</a>
-<a class="sourceLine" id="cb113-4" data-line-number="4">  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb113-5" data-line-number="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Species =</span> forcats<span class="op">::</span><span class="kw">fct_inorder</span>(Species)),</a>
-<a class="sourceLine" id="cb113-6" data-line-number="6">  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</a>
-<a class="sourceLine" id="cb113-7" data-line-number="7">  <span class="dt">fit =</span> <span class="kw">lm</span>(Sepal.Width <span class="op">~</span><span class="st"> </span>Petal.Width <span class="op">+</span><span class="st"> </span>Species, data),</a>
-<a class="sourceLine" id="cb113-8" data-line-number="8">  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
-<a class="sourceLine" id="cb113-9" data-line-number="9">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb113-10" data-line-number="10">    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
-<a class="sourceLine" id="cb113-11" data-line-number="11">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb113-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb113-13" data-line-number="13">)</a></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="projects.html#cb113-1"></a><span class="co"># plan.R</span></span>
+<span id="cb113-2"><a href="projects.html#cb113-2"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb113-3"><a href="projects.html#cb113-3"></a>  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),</span>
+<span id="cb113-4"><a href="projects.html#cb113-4"></a>  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></span>
+<span id="cb113-5"><a href="projects.html#cb113-5"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Ozone =</span> <span class="kw">replace_na</span>(Ozone, <span class="kw">mean</span>(Ozone, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))),</span>
+<span id="cb113-6"><a href="projects.html#cb113-6"></a>  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</span>
+<span id="cb113-7"><a href="projects.html#cb113-7"></a>  <span class="dt">fit =</span> <span class="kw">lm</span>(Ozone <span class="op">~</span><span class="st"> </span>Wind <span class="op">+</span><span class="st"> </span>Temp, data),</span>
+<span id="cb113-8"><a href="projects.html#cb113-8"></a>  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</span>
+<span id="cb113-9"><a href="projects.html#cb113-9"></a>    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
+<span id="cb113-10"><a href="projects.html#cb113-10"></a>    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</span>
+<span id="cb113-11"><a href="projects.html#cb113-11"></a>    <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
+<span id="cb113-12"><a href="projects.html#cb113-12"></a>  )</span>
+<span id="cb113-13"><a href="projects.html#cb113-13"></a>)</span></code></pre></div>
 <p>To run the example project above,</p>
 <ol style="list-style-type: decimal">
 <li>Start a clean new R session.</li>
 <li>Run the <code>make.R</code> script.</li>
 </ol>
-<p>On Mac and Linux, you can do this by opening a terminal and entering <code>R CMD BATCH --no-save make.R</code>. On Windows, restart your R session and call <code>source(&quot;make.R&quot;)</code> in the R console.</p>
+<p>On Mac and Linux, you can do this by opening a terminal and entering <code>R CMD BATCH --no-save make.R</code>. On Windows, restart your R session and call <code>source("make.R")</code> in the R console.</p>
 <p>Note: this part of <code>drake</code> does not inherently focus on your script files. There is nothing magical about the names <code>make.R</code>, <code>packages.R</code>, <code>functions.R</code>, or <code>plan.R</code>. Different projects may require different file structures.</p>
 <p><code>drake</code> has other functions to inspect your results and examine your workflow. Before invoking them interactively, it is best to start with a clean new R session.</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="co"># Restart R.</span></a>
-<a class="sourceLine" id="cb114-2" data-line-number="2"><span class="kw">interactive</span>()</a>
-<a class="sourceLine" id="cb114-3" data-line-number="3"><span class="co">#&gt; [1] TRUE</span></a>
-<a class="sourceLine" id="cb114-4" data-line-number="4"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-5" data-line-number="5"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-6" data-line-number="6"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="projects.html#cb114-1"></a><span class="co"># Restart R.</span></span>
+<span id="cb114-2"><a href="projects.html#cb114-2"></a><span class="kw">interactive</span>()</span>
+<span id="cb114-3"><a href="projects.html#cb114-3"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb114-4"><a href="projects.html#cb114-4"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
+<span id="cb114-5"><a href="projects.html#cb114-5"></a><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</span>
+<span id="cb114-6"><a href="projects.html#cb114-6"></a><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</span>
+<span id="cb114-7"><a href="projects.html#cb114-7"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
 </div>
-<div id="safer-interactivity" class="section level2">
+<div id="safer-interactivity" class="section level2" number="7.3">
 <h2><span class="header-section-number">7.3</span> Safer interactivity</h2>
-<div id="motivation-1" class="section level3">
+<div id="motivation-1" class="section level3" number="7.3.1">
 <h3><span class="header-section-number">7.3.1</span> Motivation</h3>
 <p>A serious <a href="https://github.com/ropensci/drake"><code>drake</code></a> workflow should be consistent and reliable, ideally with the help of a <a href="https://github.com/wlandau/drake-examples/blob/master/gsp/make.R">master R script</a>. Before it builds your targets, this script should begin in a fresh R session and load your packages and functions in a <a href="https://github.com/wlandau/drake-examples/blob/d9417547a05aec416afbbda913eaf2d44a552d5b/gsp/make.R#L4-L6">dependable manner</a>. <a href="https://www.statmethods.net/interface/batch.html">Batch mode</a> makes sure all this goes according to plan.</p>
 <p>If you use a single persistent <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/interactive.html">interactive R session</a> to repeatedly invoke <code>make()</code> while you develop the workflow, then over time, your session could grow stale and accidentally invalidate targets. For example, if you interactively tinker with a new version of <code>create_plot()</code>, targets <code>hist</code> and <code>report</code> will fall out of date without warning, and the next <code>make()</code> will build them again. Even worse, the outputs from <code>hist</code> and <code>report</code> will be wrong if they depend on a half-finished <code>create_plot()</code>.</p>
 <p>The quickest workaround is to restart R and <code>source()</code> your setup scripts all over again. However, a better solution is to use <a href="https://docs.ropensci.org/drake/reference/r_make.html"><code>r_make()</code></a> and friends. <a href="https://docs.ropensci.org/drake/reference/r_make.html"><code>r_make()</code></a> runs <code>make()</code> in a new transient R session so that accidental changes to your interactive environment do not break your workflow.</p>
 </div>
-<div id="usage" class="section level3">
+<div id="usage" class="section level3" number="7.3.2">
 <h3><span class="header-section-number">7.3.2</span> Usage</h3>
-<p>To use <a href="https://docs.ropensci.org/drake/reference/r_make.html"><code>r_make()</code></a>, you need a configuration R script. Unless you supply a custom file path (e.g. <code>r_make(source = &quot;your_file.R&quot;)</code> or <code>options(drake_source = &quot;your_file.R&quot;)</code>) <code>drake</code> assumes this configuration script is called <code>_drake.R</code>. (So the file name really <em>is</em> magical in this case). The suggested file structure becomes:</p>
+<p>To use <a href="https://docs.ropensci.org/drake/reference/r_make.html"><code>r_make()</code></a>, you need a configuration R script. Unless you supply a custom file path (e.g. <code>r_make(source = "your_file.R")</code> or <code>options(drake_source = "your_file.R")</code>) <code>drake</code> assumes this configuration script is called <code>_drake.R</code>. (So the file name really <em>is</em> magical in this case). The suggested file structure becomes:</p>
 <pre><code>_drake.R
 R/
 ├── packages.R
@@ -541,24 +584,24 @@ R/
 └── plan.R</code></pre>
 <p>Like our previous <code>make.R</code> script, <code>_drake.R</code> runs all our pre-<code>make()</code> setup steps. But this time, rather than calling <code>make()</code>, it ends with a call to <code>drake_config()</code>. <code>drake_config()</code> is the initial preprocessing stage of <code>make()</code>, and it accepts all the same arguments as <code>make()</code>.</p>
 <p>Example <code>_drake.R</code>:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-2" data-line-number="2"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-3" data-line-number="3"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-4" data-line-number="4"><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing</span></a>
-<a class="sourceLine" id="cb116-5" data-line-number="5"><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="projects.html#cb116-1"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
+<span id="cb116-2"><a href="projects.html#cb116-2"></a><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</span>
+<span id="cb116-3"><a href="projects.html#cb116-3"></a><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</span>
+<span id="cb116-4"><a href="projects.html#cb116-4"></a><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing</span></span>
+<span id="cb116-5"><a href="projects.html#cb116-5"></a><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>Here is what happens when you call <code>r_make()</code>.</p>
 <ol style="list-style-type: decimal">
 <li><code>drake</code> launches a new transient R session using <a href="https://github.com/r-lib/callr"><code>callr::r()</code></a>. The remaining steps all happen within this transient session.</li>
-<li>Run the configuration script (e.g. <code>_drake.R</code>) to
+<li>Run the configuration script (e.g. <code>_drake.R</code>) to
 <ol style="list-style-type: lower-alpha">
 <li>Load the packages, functions, global options, <code>drake</code> plan, etc. into the session’s environnment, and</li>
 <li>Run the call to <code>drake_config()</code>and store the results in a variable called <code>config</code>.</li>
 </ol></li>
 <li>Execute <code>make_impl(config = config)</code>, an internal <code>drake</code> function.</li>
 </ol>
-<p>The purpose of <code>drake_config()</code> is to collect and sanitize all the parameters and settings that <code>make()</code> needs to do its job. In fact, if you do not set the <code>config</code> argument explicitly, then <code>make()</code> invokes <code>drake_config()</code> behind the scenes. <code>make(plan, parallelism = &quot;clustermq&quot;, jobs = 2, verbose = 6)</code> is equivalent to</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="kw">make_impl</span>(<span class="dt">config =</span> config)</a></code></pre></div>
+<p>The purpose of <code>drake_config()</code> is to collect and sanitize all the parameters and settings that <code>make()</code> needs to do its job. In fact, if you do not set the <code>config</code> argument explicitly, then <code>make()</code> invokes <code>drake_config()</code> behind the scenes. <code>make(plan, parallelism = "clustermq", jobs = 2, verbose = 6)</code> is equivalent to</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="projects.html#cb117-1"></a>config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</span>
+<span id="cb117-2"><a href="projects.html#cb117-2"></a><span class="kw">make_impl</span>(<span class="dt">config =</span> config)</span></code></pre></div>
 <p>There are many more <code>r_*()</code> functions besides <code>r_make()</code>, each of which launches a fresh session and runs an inner <code>drake</code> function on the <code>config</code> object from <code>_drake.R</code>.</p>
 <table>
 <thead>
@@ -610,90 +653,96 @@ R/
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="kw">clean</span>()</a>
-<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="co">#&gt; [1] &quot;data&quot;     &quot;fit&quot;      &quot;hist&quot;     &quot;raw_data&quot; &quot;report&quot;</span></a>
-<a class="sourceLine" id="cb118-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb118-5" data-line-number="5"><span class="kw">r_make</span>()</a>
-<a class="sourceLine" id="cb118-6" data-line-number="6"><span class="co">#&gt; Loading required package: dplyr</span></a>
-<a class="sourceLine" id="cb118-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-8" data-line-number="8"><span class="co">#&gt; Attaching package: ‘dplyr’</span></a>
-<a class="sourceLine" id="cb118-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-10" data-line-number="10"><span class="co">#&gt; The following objects are masked from ‘package:stats’:</span></a>
-<a class="sourceLine" id="cb118-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-12" data-line-number="12"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb118-13" data-line-number="13"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-14" data-line-number="14"><span class="co">#&gt; The following objects are masked from ‘package:base’:</span></a>
-<a class="sourceLine" id="cb118-15" data-line-number="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-16" data-line-number="16"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb118-17" data-line-number="17"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-18" data-line-number="18"><span class="co">#&gt; Loading required package: ggplot2</span></a>
-<a class="sourceLine" id="cb118-19" data-line-number="19"><span class="co">#&gt; ℹ Consider drake::r_make() to improve robustness.</span></a>
-<a class="sourceLine" id="cb118-20" data-line-number="20"><span class="co">#&gt; ▶ target raw_data</span></a>
-<a class="sourceLine" id="cb118-21" data-line-number="21"><span class="co">#&gt; ▶ target data</span></a>
-<a class="sourceLine" id="cb118-22" data-line-number="22"><span class="co">#&gt; ▶ target fit</span></a>
-<a class="sourceLine" id="cb118-23" data-line-number="23"><span class="co">#&gt; ▶ target hist</span></a>
-<a class="sourceLine" id="cb118-24" data-line-number="24"><span class="co">#&gt; ▶ target report</span></a>
-<a class="sourceLine" id="cb118-25" data-line-number="25"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb118-26" data-line-number="26"><span class="co">#&gt; character(0)</span></a>
-<a class="sourceLine" id="cb118-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb118-28" data-line-number="28"><span class="kw">r_vis_drake_graph</span>(<span class="dt">targets_only =</span> <span class="ot">TRUE</span>, <span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="projects.html#cb118-1"></a><span class="kw">clean</span>()</span>
+<span id="cb118-2"><a href="projects.html#cb118-2"></a><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</span>
+<span id="cb118-3"><a href="projects.html#cb118-3"></a><span class="co">#&gt; [1] &quot;data&quot;     &quot;fit&quot;      &quot;hist&quot;     &quot;raw_data&quot; &quot;report&quot;</span></span>
+<span id="cb118-4"><a href="projects.html#cb118-4"></a></span>
+<span id="cb118-5"><a href="projects.html#cb118-5"></a><span class="kw">r_make</span>()</span>
+<span id="cb118-6"><a href="projects.html#cb118-6"></a><span class="co">#&gt; Loading required package: dplyr</span></span>
+<span id="cb118-7"><a href="projects.html#cb118-7"></a><span class="co">#&gt; </span></span>
+<span id="cb118-8"><a href="projects.html#cb118-8"></a><span class="co">#&gt; Attaching package: ‘dplyr’</span></span>
+<span id="cb118-9"><a href="projects.html#cb118-9"></a><span class="co">#&gt; </span></span>
+<span id="cb118-10"><a href="projects.html#cb118-10"></a><span class="co">#&gt; The following objects are masked from ‘package:stats’:</span></span>
+<span id="cb118-11"><a href="projects.html#cb118-11"></a><span class="co">#&gt; </span></span>
+<span id="cb118-12"><a href="projects.html#cb118-12"></a><span class="co">#&gt;     filter, lag</span></span>
+<span id="cb118-13"><a href="projects.html#cb118-13"></a><span class="co">#&gt; </span></span>
+<span id="cb118-14"><a href="projects.html#cb118-14"></a><span class="co">#&gt; The following objects are masked from ‘package:base’:</span></span>
+<span id="cb118-15"><a href="projects.html#cb118-15"></a><span class="co">#&gt; </span></span>
+<span id="cb118-16"><a href="projects.html#cb118-16"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span id="cb118-17"><a href="projects.html#cb118-17"></a><span class="co">#&gt; </span></span>
+<span id="cb118-18"><a href="projects.html#cb118-18"></a><span class="co">#&gt; Loading required package: ggplot2</span></span>
+<span id="cb118-19"><a href="projects.html#cb118-19"></a><span class="co">#&gt; </span></span>
+<span id="cb118-20"><a href="projects.html#cb118-20"></a><span class="co">#&gt; Attaching package: ‘tidyr’</span></span>
+<span id="cb118-21"><a href="projects.html#cb118-21"></a><span class="co">#&gt; </span></span>
+<span id="cb118-22"><a href="projects.html#cb118-22"></a><span class="co">#&gt; The following objects are masked from ‘package:drake’:</span></span>
+<span id="cb118-23"><a href="projects.html#cb118-23"></a><span class="co">#&gt; </span></span>
+<span id="cb118-24"><a href="projects.html#cb118-24"></a><span class="co">#&gt;     expand, gather</span></span>
+<span id="cb118-25"><a href="projects.html#cb118-25"></a><span class="co">#&gt; </span></span>
+<span id="cb118-26"><a href="projects.html#cb118-26"></a><span class="co">#&gt; ▶ target raw_data</span></span>
+<span id="cb118-27"><a href="projects.html#cb118-27"></a><span class="co">#&gt; ▶ target data</span></span>
+<span id="cb118-28"><a href="projects.html#cb118-28"></a><span class="co">#&gt; ▶ target fit</span></span>
+<span id="cb118-29"><a href="projects.html#cb118-29"></a><span class="co">#&gt; ▶ target hist</span></span>
+<span id="cb118-30"><a href="projects.html#cb118-30"></a><span class="co">#&gt; ▶ target report</span></span>
+<span id="cb118-31"><a href="projects.html#cb118-31"></a><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</span>
+<span id="cb118-32"><a href="projects.html#cb118-32"></a><span class="co">#&gt; character(0)</span></span>
+<span id="cb118-33"><a href="projects.html#cb118-33"></a></span>
+<span id="cb118-34"><a href="projects.html#cb118-34"></a><span class="kw">r_vis_drake_graph</span>(<span class="dt">targets_only =</span> <span class="ot">TRUE</span>, <span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</span></code></pre></div>
 <div id="htmlwidget-e02e43334c73f9ab2792" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e02e43334c73f9ab2792">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.024s","data\n0.006s","fit\n0.008s","hist\n0.03s","report\n0.803s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-e02e43334c73f9ab2792">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.023s","data\n0.014s","fit\n0.014s","hist\n0.029s","report\n0.978s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Remarks:</p>
 <ul>
 <li>You can run <code>r_make()</code> in an interactive session, but the transient process it launches will not be interactive. Thus, any <code>browser()</code> statements in the commands in your <code>drake</code> plan will be ignored.</li>
 <li>You can select and configure the underlying <a href="https://github.com/r-lib/callr"><code>callr</code></a> function using arguments <code>r_fn</code> and <code>r_args</code>, respectively.</li>
-<li>For example code, you can download the updated <a href="https://github.com/wlandau/drake-examples/tree/master/main">main example</a> (<code>drake_example(&quot;main&quot;)</code>) and experiment with files <a href="https://github.com/wlandau/drake-examples/blob/master/main/_drake.R"><code>_drake.R</code></a> and <a href="https://github.com/wlandau/drake-examples/blob/master/main/interactive.R"><code>interactive.R</code></a>.</li>
+<li>For example code, you can download the updated <a href="https://github.com/wlandau/drake-examples/tree/master/main">main example</a> (<code>drake_example("main")</code>) and experiment with files <a href="https://github.com/wlandau/drake-examples/blob/master/main/_drake.R"><code>_drake.R</code></a> and <a href="https://github.com/wlandau/drake-examples/blob/master/main/interactive.R"><code>interactive.R</code></a>.</li>
 </ul>
 </div>
 </div>
-<div id="script-file-pitfalls" class="section level2">
+<div id="script-file-pitfalls" class="section level2" number="7.4">
 <h2><span class="header-section-number">7.4</span> Script file pitfalls</h2>
 <p>Despite the above discussion of R scripts, <code>drake</code> plans rely more on in-memory functions. You might be tempted to write a plan like the following, but then <code>drake</code> cannot tell that <code>my_analysis</code> depends on <code>my_data</code>.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb119-2" data-line-number="2">  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),</a>
-<a class="sourceLine" id="cb119-3" data-line-number="3">  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),</a>
-<a class="sourceLine" id="cb119-4" data-line-number="4">  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))</a>
-<a class="sourceLine" id="cb119-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb119-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb119-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(bad_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="projects.html#cb119-1"></a>bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb119-2"><a href="projects.html#cb119-2"></a>  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),</span>
+<span id="cb119-3"><a href="projects.html#cb119-3"></a>  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),</span>
+<span id="cb119-4"><a href="projects.html#cb119-4"></a>  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))</span>
+<span id="cb119-5"><a href="projects.html#cb119-5"></a>)</span>
+<span id="cb119-6"><a href="projects.html#cb119-6"></a></span>
+<span id="cb119-7"><a href="projects.html#cb119-7"></a><span class="kw">vis_drake_graph</span>(bad_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <div id="htmlwidget-b772353b80e4087eabc8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-b772353b80e4087eabc8">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,1],"x":[0,0,0],"y":[-1,0,1]},"edges":{"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>When it comes to plans, use <em>functions</em> instead.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>) <span class="co"># defines get_data(), analyze_data(), etc.</span></a>
-<a class="sourceLine" id="cb120-2" data-line-number="2">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb120-3" data-line-number="3">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span></a>
-<a class="sourceLine" id="cb120-4" data-line-number="4">  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),</a>
-<a class="sourceLine" id="cb120-5" data-line-number="5">  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)</a>
-<a class="sourceLine" id="cb120-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb120-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb120-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="projects.html#cb120-1"></a><span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>) <span class="co"># defines get_data(), analyze_data(), etc.</span></span>
+<span id="cb120-2"><a href="projects.html#cb120-2"></a>good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb120-3"><a href="projects.html#cb120-3"></a>  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span></span>
+<span id="cb120-4"><a href="projects.html#cb120-4"></a>  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),</span>
+<span id="cb120-5"><a href="projects.html#cb120-5"></a>  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)</span>
+<span id="cb120-6"><a href="projects.html#cb120-6"></a>)</span>
+<span id="cb120-7"><a href="projects.html#cb120-7"></a></span>
+<span id="cb120-8"><a href="projects.html#cb120-8"></a><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>In <code>drake</code> &gt;= 7.6.2.9000, code_to_function() leverages existing imperative scripts for use in a <code>drake</code> plan.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">get_data &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;get_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-2" data-line-number="2">do_analysis &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;analyze_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-3" data-line-number="3">do_summary &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;summarize_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb121-5" data-line-number="5">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb121-6" data-line-number="6">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(),</a>
-<a class="sourceLine" id="cb121-7" data-line-number="7">  <span class="dt">my_analysis =</span> <span class="kw">do_analysis</span>(my_data),</a>
-<a class="sourceLine" id="cb121-8" data-line-number="8">  <span class="dt">my_summaries =</span> <span class="kw">do_summary</span>(my_data, my_analysis)</a>
-<a class="sourceLine" id="cb121-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb121-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb121-11" data-line-number="11"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="projects.html#cb121-1"></a>get_data &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;get_data.R&quot;</span>)</span>
+<span id="cb121-2"><a href="projects.html#cb121-2"></a>do_analysis &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;analyze_data.R&quot;</span>)</span>
+<span id="cb121-3"><a href="projects.html#cb121-3"></a>do_summary &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;summarize_data.R&quot;</span>)</span>
+<span id="cb121-4"><a href="projects.html#cb121-4"></a></span>
+<span id="cb121-5"><a href="projects.html#cb121-5"></a>good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb121-6"><a href="projects.html#cb121-6"></a>  <span class="dt">my_data =</span> <span class="kw">get_data</span>(),</span>
+<span id="cb121-7"><a href="projects.html#cb121-7"></a>  <span class="dt">my_analysis =</span> <span class="kw">do_analysis</span>(my_data),</span>
+<span id="cb121-8"><a href="projects.html#cb121-8"></a>  <span class="dt">my_summaries =</span> <span class="kw">do_summary</span>(my_data, my_analysis)</span>
+<span id="cb121-9"><a href="projects.html#cb121-9"></a>)</span>
+<span id="cb121-10"><a href="projects.html#cb121-10"></a></span>
+<span id="cb121-11"><a href="projects.html#cb121-11"></a><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <div id="htmlwidget-da4198830feeec77f806" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-da4198830feeec77f806">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,2,3],"x":[-1,0,1],"y":[0,0,0]},"edges":{"from":["my_data","my_data","my_analysis"],"to":["my_analysis","my_summaries","my_summaries"],"arrows":["to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="workflows-as-r-packages" class="section level2">
+<div id="workflows-as-r-packages" class="section level2" number="7.5">
 <h2><span class="header-section-number">7.5</span> Workflows as R packages</h2>
 <p>The R package structure is a great way to organize and quality-control a data analysis project. If you write a <code>drake</code> workflow as a package, you will need</p>
 <ol style="list-style-type: decimal">
 <li>Use <code>expose_imports()</code> to properly account for all your nested function dependencies, and</li>
-<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code>.</li>
+<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = "devtools::load_all()")</code>.</li>
 </ol>
 <p>For a minimal example, see <a href="https://github.com/tiernanmartin">Tiernan Martin</a>’s <a href="https://github.com/tiernanmartin/drakepkg"><code>drakepkg</code></a>.</p>
 </div>
-<div id="other-tools" class="section level2">
+<div id="other-tools" class="section level2" number="7.6">
 <h2><span class="header-section-number">7.6</span> Other tools</h2>
 <p><a href="https://github.com/ropensci/drake"><code>drake</code></a> enhances reproducibility, but not in all respects. <a href="https://rstudio.github.io/packrat">Local library managers</a>, <a href="https://www.docker.com">containerization</a>, and <a href="https://github.com/tidyverse/reprex">session management tools</a> offer more robust solutions in their respective domains. Reproducibility encompasses a <a href="https://github.com/karthik/rstudio2019">wide variety of tools and techniques</a> all working together. Comprehensive overviews:</p>
 <ul>
