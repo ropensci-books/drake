@@ -31,12 +31,12 @@ get_data <- function(file){
 }
 
 munge_data <- function(raw_data){
-  raw_data %>% 
-    mutate(Species = forcats::fct_inorder(Species))
+  raw_data %>%
+    mutate(Ozone = replace_na(Ozone, mean(Ozone, na.rm = TRUE)))
 }
 
 fit_model <- function(munged_data){
-  lm(Sepal.Width ~ Petal.Width + Species, munged_data)
+  lm(Ozone ~ Wind + Temp, munged_data)
 }
 ```
 
@@ -67,7 +67,7 @@ It is common to express data analysis tasks as numbered scripts.
 
 The numeric prefixes indicate the order in which these scripts need to run.
 
-```{r,eval=FALSE}
+```{r, eval=FALSE}
 # run_everything.R
 source("01_data.R")
 source("02_munge.R")
@@ -162,18 +162,15 @@ writeLines(
   c(
     "munged_data <- readRDS(\"data/munged_data.RDS\")",
     "gg <- ggplot(munged_data) +",
-    "  geom_histogram(",
-    "    aes(x = Petal.Width, fill = Species),",
-    "    binwidth = 0.5",
-    "  ) + ",
+    "  geom_histogram(aes(x = Ozone)) +",
     "  theme_gray(20)",
     "ggsave(",
-    "  filename = \"data/Petal_Width_vs_Species.PNG\",",
+    "  filename = \"data/ozone.PNG\",",
     "  plot = gg,",
     "  width = 6,",
     "  height = 6",
     ")",
-    "saveRDS(gg, \"data/Petal_Width_vs_Species.RDS\")"
+    "saveRDS(gg, \"data/ozone.RDS\")"
   ),
   "03_histogram.R"
 )
