@@ -100,9 +100,9 @@ We create plans with the `drake_plan()` function.
 plan <- drake_plan(
   raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
   data = raw_data %>%
-    mutate(Species = forcats::fct_inorder(Species)),
+    mutate(Ozone = replace_na(Ozone, mean(Ozone, na.rm = TRUE))),
   hist = create_plot(data),
-  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
+  fit = lm(Ozone ~ Wind + Temp, data),
   report = rmarkdown::render(
     knitr_in("report.Rmd"),
     output_file = file_out("report.html"),
@@ -117,9 +117,9 @@ The plan makes use of a custom `create_plot()` function to produce target `hist`
 
 ```{r}
 create_plot <- function(data) {
-  ggplot(data, aes(x = Petal.Width, fill = Species)) +
-    geom_histogram(binwidth = 0.1) +
-    theme_gray(20)
+  ggplot(data) +
+    geom_histogram(aes(x = Ozone)) +
+    theme_gray(24)
 }
 ```
 
@@ -133,16 +133,16 @@ We can write the targets in any order and `drake` still understands the dependen
 
 ```{r}
 plan <- drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Ozone = replace_na(Ozone, mean(Ozone, na.rm = TRUE))),
+  hist = create_plot(data),
+  fit = lm(Ozone ~ Wind + Temp, data),
   report = rmarkdown::render(
     knitr_in("report.Rmd"),
     output_file = file_out("report.html"),
     quiet = TRUE
-  ),
-  fit = lm(Sepal.Width ~ Petal.Width + Species, data),
-  data = raw_data %>%
-    mutate(Species = forcats::fct_inorder(Species)),
-  hist = create_plot(data),
-  raw_data = readxl::read_excel(file_in("raw_data.xlsx"))
+  )
 )
 
 vis_drake_graph(plan)
@@ -167,9 +167,9 @@ The purpose of the plan is to identify steps we can skip in our workflow. If we 
 
 ```{r}
 create_plot <- function(data) {
-  ggplot(data, aes(x = Petal.Width, fill = Species)) +
-    geom_histogram(binwidth = 0.25) + # new bin width
-    theme_gray(20)
+  ggplot(data) +
+    geom_histogram(aes(x = Ozone), binwidth = 10) + # new bin width
+    theme_gray(24)
 }
 
 vis_drake_graph(plan)
