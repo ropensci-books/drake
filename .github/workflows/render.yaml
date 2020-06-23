@@ -26,7 +26,7 @@ jobs:
         with:
           path: $HOME/.local/share/renv
           key: r-${{ hashFiles('renv.lock') }}
-          restore-keys: r-
+          restore-keys: r-  
 
       - name: Cache bookdown results
         uses: actions/cache@v1
@@ -39,10 +39,14 @@ jobs:
         run: |
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
+      
+      - name: Install Keras and TensorFlow
+        run: |
+          R -e 'tensorflow::install_tensorflow(version = "2.1.0")'
+          R -e 'keras::install_keras(tensorflow = "2.1.0")'
 
       - name: Build site
         run: |
           Rscript faq.R
           Rscript build.R
           ./deploy.sh
-
