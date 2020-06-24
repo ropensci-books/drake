@@ -273,8 +273,8 @@ vis_drake_graph(good_plan, targets_only = TRUE)
 
 The R package structure is a great way to organize and quality-control a data analysis project. If you write a `drake` workflow as a package, you will need
 
-1. Use `expose_imports()` to properly account for all your nested function dependencies, and
-2. If you load the package with `devtools::load_all()`, set the `prework` argument of `make()`: e.g. `make(prework = "devtools::load_all()")`.
+1. Supply the namespace of your package to the `envir` argument of `make()` and friends (e.g. `make(envir = getNamespace("yourPackage")` so `drake` can watch you package's functions for changes and rebuild downstream targets accordingly.
+2. If you load the package with `devtools::load_all()`, set the `prework` argument of `make()`: e.g. `make(prework = "devtools::load_all()")` and custom set the `packages` argument so your package name is not included. (Everything in `packages` is loaded with `library()`).
 
 For a minimal example, see [Tiernan Martin](https://github.com/tiernanmartin)'s [`drakepkg`](https://github.com/tiernanmartin/drakepkg).
 
