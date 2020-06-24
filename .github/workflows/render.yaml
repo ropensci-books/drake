@@ -6,7 +6,7 @@ name: bookdown
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUBPAT }}
     steps:
@@ -16,9 +16,11 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@master
 
-      - name: Install sys reqs
+      - name: Install system requirements
         run: |
-          sudo apt-get install -y pandoc pandoc-citeproc
+          brew install pandoc
+          brew install pandoc-citeproc
+          brew install python
 
       - name: Cache Renv packages
         uses: actions/cache@v1
