@@ -473,36 +473,27 @@ R/
 <a class="sourceLine" id="cb110-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
 <a class="sourceLine" id="cb110-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
 <a class="sourceLine" id="cb110-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a></code></pre></div>
-<p><code>drake</code> does not automatically watch package functions for changes, so if you have any specialized packages and you want <code>drake</code> to track those functions, here is a great place to call <code>expose_imports()</code>.</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="co"># alternative packages.R</span></a>
-<a class="sourceLine" id="cb111-2" data-line-number="2"><span class="kw">library</span>(drake)</a>
-<a class="sourceLine" id="cb111-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb111-4" data-line-number="4"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb111-5" data-line-number="5"><span class="kw">library</span>(PackageContainingYourWorkflow)</a>
-<a class="sourceLine" id="cb111-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb111-7" data-line-number="7"><span class="co"># Tell drake to track the package&#39;s functions.</span></a>
-<a class="sourceLine" id="cb111-8" data-line-number="8"><span class="kw">expose_imports</span>(PackageContainingYourWorkflow)</a></code></pre></div>
 <p>Your <code>functions.R</code> typically has the supporting custom functions you write for the workflow. If there are many functions, you could split them up into multiple files.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1"><span class="co"># functions.R</span></a>
-<a class="sourceLine" id="cb112-2" data-line-number="2">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb112-3" data-line-number="3">  <span class="kw">ggplot</span>(data) <span class="op">+</span></a>
-<a class="sourceLine" id="cb112-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Ozone), <span class="dt">binwidth =</span> <span class="dv">10</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb112-5" data-line-number="5"><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</a>
-<a class="sourceLine" id="cb112-6" data-line-number="6">}</a></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="co"># functions.R</span></a>
+<a class="sourceLine" id="cb111-2" data-line-number="2">create_plot &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb111-3" data-line-number="3">  <span class="kw">ggplot</span>(data) <span class="op">+</span></a>
+<a class="sourceLine" id="cb111-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Ozone), <span class="dt">binwidth =</span> <span class="dv">10</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb111-5" data-line-number="5"><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</a>
+<a class="sourceLine" id="cb111-6" data-line-number="6">}</a></code></pre></div>
 <p>Finally, it is good practice to define a <code>plan.R</code> that defines the plan.</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="co"># plan.R</span></a>
-<a class="sourceLine" id="cb113-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb113-3" data-line-number="3">  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),</a>
-<a class="sourceLine" id="cb113-4" data-line-number="4">  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb113-5" data-line-number="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Ozone =</span> <span class="kw">replace_na</span>(Ozone, <span class="kw">mean</span>(Ozone, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))),</a>
-<a class="sourceLine" id="cb113-6" data-line-number="6">  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</a>
-<a class="sourceLine" id="cb113-7" data-line-number="7">  <span class="dt">fit =</span> <span class="kw">lm</span>(Ozone <span class="op">~</span><span class="st"> </span>Wind <span class="op">+</span><span class="st"> </span>Temp, data),</a>
-<a class="sourceLine" id="cb113-8" data-line-number="8">  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
-<a class="sourceLine" id="cb113-9" data-line-number="9">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
-<a class="sourceLine" id="cb113-10" data-line-number="10">    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
-<a class="sourceLine" id="cb113-11" data-line-number="11">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb113-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb113-13" data-line-number="13">)</a></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1"><span class="co"># plan.R</span></a>
+<a class="sourceLine" id="cb112-2" data-line-number="2">plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb112-3" data-line-number="3">  <span class="dt">raw_data =</span> readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="kw">file_in</span>(<span class="st">&quot;raw_data.xlsx&quot;</span>)),</a>
+<a class="sourceLine" id="cb112-4" data-line-number="4">  <span class="dt">data =</span> raw_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb112-5" data-line-number="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Ozone =</span> <span class="kw">replace_na</span>(Ozone, <span class="kw">mean</span>(Ozone, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))),</a>
+<a class="sourceLine" id="cb112-6" data-line-number="6">  <span class="dt">hist =</span> <span class="kw">create_plot</span>(data),</a>
+<a class="sourceLine" id="cb112-7" data-line-number="7">  <span class="dt">fit =</span> <span class="kw">lm</span>(Ozone <span class="op">~</span><span class="st"> </span>Wind <span class="op">+</span><span class="st"> </span>Temp, data),</a>
+<a class="sourceLine" id="cb112-8" data-line-number="8">  <span class="dt">report =</span> rmarkdown<span class="op">::</span><span class="kw">render</span>(</a>
+<a class="sourceLine" id="cb112-9" data-line-number="9">    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</a>
+<a class="sourceLine" id="cb112-10" data-line-number="10">    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</a>
+<a class="sourceLine" id="cb112-11" data-line-number="11">    <span class="dt">quiet =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb112-12" data-line-number="12">  )</a>
+<a class="sourceLine" id="cb112-13" data-line-number="13">)</a></code></pre></div>
 <p>To run the example project above,</p>
 <ol style="list-style-type: decimal">
 <li>Start a clean new R session.</li>
@@ -511,13 +502,13 @@ R/
 <p>On Mac and Linux, you can do this by opening a terminal and entering <code>R CMD BATCH --no-save make.R</code>. On Windows, restart your R session and call <code>source(&quot;make.R&quot;)</code> in the R console.</p>
 <p>Note: this part of <code>drake</code> does not inherently focus on your script files. There is nothing magical about the names <code>make.R</code>, <code>packages.R</code>, <code>functions.R</code>, or <code>plan.R</code>. Different projects may require different file structures.</p>
 <p><code>drake</code> has other functions to inspect your results and examine your workflow. Before invoking them interactively, it is best to start with a clean new R session.</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="co"># Restart R.</span></a>
-<a class="sourceLine" id="cb114-2" data-line-number="2"><span class="kw">interactive</span>()</a>
-<a class="sourceLine" id="cb114-3" data-line-number="3"><span class="co">#&gt; [1] TRUE</span></a>
-<a class="sourceLine" id="cb114-4" data-line-number="4"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-5" data-line-number="5"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-6" data-line-number="6"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
-<a class="sourceLine" id="cb114-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="co"># Restart R.</span></a>
+<a class="sourceLine" id="cb113-2" data-line-number="2"><span class="kw">interactive</span>()</a>
+<a class="sourceLine" id="cb113-3" data-line-number="3"><span class="co">#&gt; [1] TRUE</span></a>
+<a class="sourceLine" id="cb113-4" data-line-number="4"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
+<a class="sourceLine" id="cb113-5" data-line-number="5"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
+<a class="sourceLine" id="cb113-6" data-line-number="6"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
+<a class="sourceLine" id="cb113-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(plan)</a></code></pre></div>
 </div>
 <div id="safer-interactivity" class="section level2">
 <h2><span class="header-section-number">7.3</span> Safer interactivity</h2>
@@ -537,11 +528,11 @@ R/
 └── plan.R</code></pre>
 <p>Like our previous <code>make.R</code> script, <code>_drake.R</code> runs all our pre-<code>make()</code> setup steps. But this time, rather than calling <code>make()</code>, it ends with a call to <code>drake_config()</code>. <code>drake_config()</code> is the initial preprocessing stage of <code>make()</code>, and it accepts all the same arguments as <code>make()</code>.</p>
 <p>Example <code>_drake.R</code>:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-2" data-line-number="2"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-3" data-line-number="3"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
-<a class="sourceLine" id="cb116-4" data-line-number="4"><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing</span></a>
-<a class="sourceLine" id="cb116-5" data-line-number="5"><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</a>
+<a class="sourceLine" id="cb115-2" data-line-number="2"><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>)</a>
+<a class="sourceLine" id="cb115-3" data-line-number="3"><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>)</a>
+<a class="sourceLine" id="cb115-4" data-line-number="4"><span class="co"># options(clustermq.scheduler = &quot;multicore&quot;) # optional parallel computing</span></a>
+<a class="sourceLine" id="cb115-5" data-line-number="5"><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p>Here is what happens when you call <code>r_make()</code>.</p>
 <ol style="list-style-type: decimal">
 <li><code>drake</code> launches a new transient R session using <a href="https://github.com/r-lib/callr"><code>callr::r()</code></a>. The remaining steps all happen within this transient session.</li>
@@ -553,8 +544,8 @@ R/
 <li>Execute <code>make_impl(config = config)</code>, an internal <code>drake</code> function.</li>
 </ol>
 <p>The purpose of <code>drake_config()</code> is to collect and sanitize all the parameters and settings that <code>make()</code> needs to do its job. In fact, if you do not set the <code>config</code> argument explicitly, then <code>make()</code> invokes <code>drake_config()</code> behind the scenes. <code>make(plan, parallelism = &quot;clustermq&quot;, jobs = 2, verbose = 6)</code> is equivalent to</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="kw">make_impl</span>(<span class="dt">config =</span> config)</a></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1">config &lt;-<span class="st"> </span><span class="kw">drake_config</span>(plan, <span class="dt">verbose =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb116-2" data-line-number="2"><span class="kw">make_impl</span>(<span class="dt">config =</span> config)</a></code></pre></div>
 <p>There are many more <code>r_*()</code> functions besides <code>r_make()</code>, each of which launches a fresh session and runs an inner <code>drake</code> function on the <code>config</code> object from <code>_drake.R</code>.</p>
 <table>
 <thead>
@@ -606,42 +597,42 @@ R/
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="kw">clean</span>()</a>
-<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="co">#&gt; [1] &quot;data&quot;     &quot;fit&quot;      &quot;hist&quot;     &quot;raw_data&quot; &quot;report&quot;</span></a>
-<a class="sourceLine" id="cb118-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb118-5" data-line-number="5"><span class="kw">r_make</span>()</a>
-<a class="sourceLine" id="cb118-6" data-line-number="6"><span class="co">#&gt; Loading required package: dplyr</span></a>
-<a class="sourceLine" id="cb118-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-8" data-line-number="8"><span class="co">#&gt; Attaching package: ‘dplyr’</span></a>
-<a class="sourceLine" id="cb118-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-10" data-line-number="10"><span class="co">#&gt; The following objects are masked from ‘package:stats’:</span></a>
-<a class="sourceLine" id="cb118-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-12" data-line-number="12"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb118-13" data-line-number="13"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-14" data-line-number="14"><span class="co">#&gt; The following objects are masked from ‘package:base’:</span></a>
-<a class="sourceLine" id="cb118-15" data-line-number="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-16" data-line-number="16"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb118-17" data-line-number="17"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-18" data-line-number="18"><span class="co">#&gt; Loading required package: ggplot2</span></a>
-<a class="sourceLine" id="cb118-19" data-line-number="19"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-20" data-line-number="20"><span class="co">#&gt; Attaching package: ‘tidyr’</span></a>
-<a class="sourceLine" id="cb118-21" data-line-number="21"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-22" data-line-number="22"><span class="co">#&gt; The following objects are masked from ‘package:drake’:</span></a>
-<a class="sourceLine" id="cb118-23" data-line-number="23"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-24" data-line-number="24"><span class="co">#&gt;     expand, gather</span></a>
-<a class="sourceLine" id="cb118-25" data-line-number="25"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb118-26" data-line-number="26"><span class="co">#&gt; [32m▶[39m target raw_data</span></a>
-<a class="sourceLine" id="cb118-27" data-line-number="27"><span class="co">#&gt; [32m▶[39m target data</span></a>
-<a class="sourceLine" id="cb118-28" data-line-number="28"><span class="co">#&gt; [32m▶[39m target fit</span></a>
-<a class="sourceLine" id="cb118-29" data-line-number="29"><span class="co">#&gt; [32m▶[39m target hist</span></a>
-<a class="sourceLine" id="cb118-30" data-line-number="30"><span class="co">#&gt; [32m▶[39m target report</span></a>
-<a class="sourceLine" id="cb118-31" data-line-number="31"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb118-32" data-line-number="32"><span class="co">#&gt; character(0)</span></a>
-<a class="sourceLine" id="cb118-33" data-line-number="33"></a>
-<a class="sourceLine" id="cb118-34" data-line-number="34"><span class="kw">r_vis_drake_graph</span>(<span class="dt">targets_only =</span> <span class="ot">TRUE</span>, <span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1"><span class="kw">clean</span>()</a>
+<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb117-3" data-line-number="3"><span class="co">#&gt; [1] &quot;data&quot;     &quot;fit&quot;      &quot;hist&quot;     &quot;raw_data&quot; &quot;report&quot;</span></a>
+<a class="sourceLine" id="cb117-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb117-5" data-line-number="5"><span class="kw">r_make</span>()</a>
+<a class="sourceLine" id="cb117-6" data-line-number="6"><span class="co">#&gt; Loading required package: dplyr</span></a>
+<a class="sourceLine" id="cb117-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-8" data-line-number="8"><span class="co">#&gt; Attaching package: ‘dplyr’</span></a>
+<a class="sourceLine" id="cb117-9" data-line-number="9"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-10" data-line-number="10"><span class="co">#&gt; The following objects are masked from ‘package:stats’:</span></a>
+<a class="sourceLine" id="cb117-11" data-line-number="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-12" data-line-number="12"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb117-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-14" data-line-number="14"><span class="co">#&gt; The following objects are masked from ‘package:base’:</span></a>
+<a class="sourceLine" id="cb117-15" data-line-number="15"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-16" data-line-number="16"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb117-17" data-line-number="17"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-18" data-line-number="18"><span class="co">#&gt; Loading required package: ggplot2</span></a>
+<a class="sourceLine" id="cb117-19" data-line-number="19"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-20" data-line-number="20"><span class="co">#&gt; Attaching package: ‘tidyr’</span></a>
+<a class="sourceLine" id="cb117-21" data-line-number="21"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-22" data-line-number="22"><span class="co">#&gt; The following objects are masked from ‘package:drake’:</span></a>
+<a class="sourceLine" id="cb117-23" data-line-number="23"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-24" data-line-number="24"><span class="co">#&gt;     expand, gather</span></a>
+<a class="sourceLine" id="cb117-25" data-line-number="25"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb117-26" data-line-number="26"><span class="co">#&gt; [32m▶[39m target raw_data</span></a>
+<a class="sourceLine" id="cb117-27" data-line-number="27"><span class="co">#&gt; [32m▶[39m target data</span></a>
+<a class="sourceLine" id="cb117-28" data-line-number="28"><span class="co">#&gt; [32m▶[39m target fit</span></a>
+<a class="sourceLine" id="cb117-29" data-line-number="29"><span class="co">#&gt; [32m▶[39m target hist</span></a>
+<a class="sourceLine" id="cb117-30" data-line-number="30"><span class="co">#&gt; [32m▶[39m target report</span></a>
+<a class="sourceLine" id="cb117-31" data-line-number="31"><span class="kw">r_outdated</span>(<span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb117-32" data-line-number="32"><span class="co">#&gt; character(0)</span></a>
+<a class="sourceLine" id="cb117-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb117-34" data-line-number="34"><span class="kw">r_vis_drake_graph</span>(<span class="dt">targets_only =</span> <span class="ot">TRUE</span>, <span class="dt">r_args =</span> <span class="kw">list</span>(<span class="dt">show =</span> <span class="ot">FALSE</span>))</a></code></pre></div>
 <div id="htmlwidget-e02e43334c73f9ab2792" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e02e43334c73f9ab2792">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.015s","data\n0.011s","fit\n0.006s","hist\n0.028s","report\n0.613s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-e02e43334c73f9ab2792">{"x":{"nodes":{"id":["raw_data","data","fit","hist","report","p-OJSXA33SOQXGQ5DNNQ"],"imported":[false,false,false,false,false,false],"label":["raw_data\n0.015s","data\n0.011s","fit\n0.007s","hist\n0.029s","report\n0.609s","file report.html"],"status":["up to date","up to date","up to date","up to date","up to date","up to date"],"type":["object","object","object","object","object","file"],"font.size":[20,20,20,20,20,20],"color":["#228B22","#228B22","#228B22","#228B22","#228B22","#228B22"],"shape":["dot","dot","dot","dot","dot","square"],"level":[1,2,3,3,4,5],"x":[-1,-0.5,0,0,0.5,1],"y":[2.22044604925031e-16,2.22044604925031e-16,-1,1,2.22044604925031e-16,2.22044604925031e-16]},"edges":{"from":["fit","hist","report","data","data","raw_data"],"to":["report","report","p-OJSXA33SOQXGQ5DNNQ","fit","hist","data"],"arrows":["to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Object","File"],"color":["#228B22","#888888","#888888"],"shape":["dot","dot","square"],"font.color":["black","black","black"],"font.size":[20,20,20],"id":[1,8,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>Remarks:</p>
 <ul>
 <li>You can run <code>r_make()</code> in an interactive session, but the transient process it launches will not be interactive. Thus, any <code>browser()</code> statements in the commands in your <code>drake</code> plan will be ignored.</li>
@@ -653,36 +644,36 @@ R/
 <div id="script-file-pitfalls" class="section level2">
 <h2><span class="header-section-number">7.4</span> Script file pitfalls</h2>
 <p>Despite the above discussion of R scripts, <code>drake</code> plans rely more on in-memory functions. You might be tempted to write a plan like the following, but then <code>drake</code> cannot tell that <code>my_analysis</code> depends on <code>my_data</code>.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb119-2" data-line-number="2">  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),</a>
-<a class="sourceLine" id="cb119-3" data-line-number="3">  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),</a>
-<a class="sourceLine" id="cb119-4" data-line-number="4">  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))</a>
-<a class="sourceLine" id="cb119-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb119-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb119-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(bad_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">bad_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb118-2" data-line-number="2">  <span class="dt">my_data =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;get_data.R&quot;</span>)),</a>
+<a class="sourceLine" id="cb118-3" data-line-number="3">  <span class="dt">my_analysis =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;analyze_data.R&quot;</span>)),</a>
+<a class="sourceLine" id="cb118-4" data-line-number="4">  <span class="dt">my_summaries =</span> <span class="kw">source</span>(<span class="kw">file_in</span>(<span class="st">&quot;summarize_data.R&quot;</span>))</a>
+<a class="sourceLine" id="cb118-5" data-line-number="5">)</a>
+<a class="sourceLine" id="cb118-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb118-7" data-line-number="7"><span class="kw">vis_drake_graph</span>(bad_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div id="htmlwidget-b772353b80e4087eabc8" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-b772353b80e4087eabc8">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,1,1],"x":[0,0,0],"y":[-1,0,1]},"edges":{"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p>When it comes to plans, use <em>functions</em> instead.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>) <span class="co"># defines get_data(), analyze_data(), etc.</span></a>
-<a class="sourceLine" id="cb120-2" data-line-number="2">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb120-3" data-line-number="3">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span></a>
-<a class="sourceLine" id="cb120-4" data-line-number="4">  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),</a>
-<a class="sourceLine" id="cb120-5" data-line-number="5">  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)</a>
-<a class="sourceLine" id="cb120-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb120-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb120-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;my_functions.R&quot;</span>) <span class="co"># defines get_data(), analyze_data(), etc.</span></a>
+<a class="sourceLine" id="cb119-2" data-line-number="2">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb119-3" data-line-number="3">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(<span class="kw">file_in</span>(<span class="st">&quot;data.csv&quot;</span>)), <span class="co"># External files need to be in commands explicitly. # nolint</span></a>
+<a class="sourceLine" id="cb119-4" data-line-number="4">  <span class="dt">my_analysis =</span> <span class="kw">analyze_data</span>(my_data),</a>
+<a class="sourceLine" id="cb119-5" data-line-number="5">  <span class="dt">my_summaries =</span> <span class="kw">summarize_results</span>(my_data, my_analysis)</a>
+<a class="sourceLine" id="cb119-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb119-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb119-8" data-line-number="8"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>In <code>drake</code> &gt;= 7.6.2.9000, code_to_function() leverages existing imperative scripts for use in a <code>drake</code> plan.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">get_data &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;get_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-2" data-line-number="2">do_analysis &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;analyze_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-3" data-line-number="3">do_summary &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;summarize_data.R&quot;</span>)</a>
-<a class="sourceLine" id="cb121-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb121-5" data-line-number="5">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
-<a class="sourceLine" id="cb121-6" data-line-number="6">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(),</a>
-<a class="sourceLine" id="cb121-7" data-line-number="7">  <span class="dt">my_analysis =</span> <span class="kw">do_analysis</span>(my_data),</a>
-<a class="sourceLine" id="cb121-8" data-line-number="8">  <span class="dt">my_summaries =</span> <span class="kw">do_summary</span>(my_data, my_analysis)</a>
-<a class="sourceLine" id="cb121-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb121-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb121-11" data-line-number="11"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1">get_data &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;get_data.R&quot;</span>)</a>
+<a class="sourceLine" id="cb120-2" data-line-number="2">do_analysis &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;analyze_data.R&quot;</span>)</a>
+<a class="sourceLine" id="cb120-3" data-line-number="3">do_summary &lt;-<span class="st"> </span><span class="kw">code_to_function</span>(<span class="st">&quot;summarize_data.R&quot;</span>)</a>
+<a class="sourceLine" id="cb120-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb120-5" data-line-number="5">good_plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</a>
+<a class="sourceLine" id="cb120-6" data-line-number="6">  <span class="dt">my_data =</span> <span class="kw">get_data</span>(),</a>
+<a class="sourceLine" id="cb120-7" data-line-number="7">  <span class="dt">my_analysis =</span> <span class="kw">do_analysis</span>(my_data),</a>
+<a class="sourceLine" id="cb120-8" data-line-number="8">  <span class="dt">my_summaries =</span> <span class="kw">do_summary</span>(my_data, my_analysis)</a>
+<a class="sourceLine" id="cb120-9" data-line-number="9">)</a>
+<a class="sourceLine" id="cb120-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb120-11" data-line-number="11"><span class="kw">vis_drake_graph</span>(good_plan, <span class="dt">targets_only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div id="htmlwidget-da4198830feeec77f806" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
 <script type="application/json" data-for="htmlwidget-da4198830feeec77f806">{"x":{"nodes":{"id":["my_data","my_analysis","my_summaries"],"imported":[false,false,false],"label":["my_data","my_analysis","my_summaries"],"status":["outdated","outdated","outdated"],"type":["object","object","object"],"font.size":[20,20,20],"color":["#000000","#000000","#000000"],"shape":["dot","dot","dot"],"level":[1,2,3],"x":[-1,0,1],"y":[0,0,0]},"edges":{"from":["my_data","my_data","my_analysis"],"to":["my_analysis","my_summaries","my_summaries"],"arrows":["to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Object"],"color":["#000000","#888888"],"shape":["dot","dot"],"font.color":["black","black"],"font.size":[20,20],"id":[2,8]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
@@ -690,8 +681,8 @@ R/
 <h2><span class="header-section-number">7.5</span> Workflows as R packages</h2>
 <p>The R package structure is a great way to organize and quality-control a data analysis project. If you write a <code>drake</code> workflow as a package, you will need</p>
 <ol style="list-style-type: decimal">
-<li>Use <code>expose_imports()</code> to properly account for all your nested function dependencies, and</li>
-<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code>.</li>
+<li>Supply the namespace of your package to the <code>envir</code> argument of <code>make()</code> or <code>drake_config()</code> (e.g. <code>make(envir = getNamespace(&quot;yourPackage&quot;)</code> so <code>drake</code> can watch you package’s functions for changes and rebuild downstream targets accordingly.</li>
+<li>If you load the package with <code>devtools::load_all()</code>, set the <code>prework</code> argument of <code>make()</code>: e.g. <code>make(prework = &quot;devtools::load_all()&quot;)</code> and custom set the <code>packages</code> argument so your package name is not included. (Everything in <code>packages</code> is loaded with <code>library()</code>).</li>
 </ol>
 <p>For a minimal example, see <a href="https://github.com/tiernanmartin">Tiernan Martin</a>’s <a href="https://github.com/tiernanmartin/drakepkg"><code>drakepkg</code></a>.</p>
 </div>
