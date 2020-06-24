@@ -21,10 +21,7 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@master
 
-      - name: Install system requirements
-        run: |
-          brew install pandoc
-          brew install pandoc-citeproc
+      
 
       - name: Cache Renv packages
         uses: actions/cache@v1
@@ -40,12 +37,11 @@ jobs:
           key: bookdown-${{ hashFiles('**/*Rmd') }}
           restore-keys: bookdown-
 
-      
+
       
       - name: Install Python
         run: |
-          Rscript -e "install.packages('remotes')"
-          Rscript -e "remotes::install_github('rstudio/reticulate')"
+          Rscript -e "install.packages('reticulate')"
           Rscript -e "reticulate::install_miniconda()"
           Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
 
