@@ -21,7 +21,10 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@master
 
-      
+      - name: Install system requirements
+        run: |
+          brew install pandoc
+          brew install pandoc-citeproc
 
       - name: Cache Renv packages
         uses: actions/cache@v1
@@ -37,7 +40,10 @@ jobs:
           key: bookdown-${{ hashFiles('**/*Rmd') }}
           restore-keys: bookdown-
 
-
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
       
       - name: Install Python
         run: |
