@@ -6,7 +6,7 @@ name: bookdown
 
 jobs:
   build:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUBPAT }}
     steps:
@@ -16,10 +16,9 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@master
 
-      - name: Install pandoc and pandoc citeproc
+      - name: Install sys reqs
         run: |
-          brew install pandoc
-          brew install pandoc-citeproc
+          sudo apt-get install -y pandoc pandoc-citeproc
 
       - name: Cache Renv packages
         uses: actions/cache@v1
@@ -40,13 +39,9 @@ jobs:
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
       
-      - name: Install Keras and TensorFlow
+      - name: Install Keras
         run: |
-          R -e 'install.packages("remotes")'
-          R -e 'remotes::install_github("rstudio/reticulate")'
-          R -e 'reticulate::install_miniconda()'
-          R -e 'tensorflow::install_tensorflow(version = "2.1.0")'
-          R -e 'keras::install_keras(tensorflow = "2.1.0")'
+          R -e 'keras::install_keras()'
 
       - name: Build site
         run: |
