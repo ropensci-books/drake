@@ -40,16 +40,19 @@ jobs:
           key: bookdown-${{ hashFiles('**/*Rmd') }}
           restore-keys: bookdown-
 
+      - name: Install Python
+        run: |
+          Rscript -e "install.packages('reticulate')"
+          Rscript -e "writeLines(paste0("RETICULATE_PYTHON=", file.path(reticulate::miniconda_path(), "bin", "python3")), "~/.Renviron")"
+          Rscript -e "readLines('~/.Renviron')"
+          Rscript -e "Sys.getenv("RETICULATE_PYTHON")"
+          Rscript -e "reticulate::install_miniconda()"
+          Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
+
       - name: Install packages
         run: |
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
-      
-      - name: Install Python
-        run: |
-          Rscript -e "install.packages('reticulate')"
-          Rscript -e "reticulate::install_miniconda()"
-          Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
 
       - name: Install TensorFlow
         run: |
