@@ -47,15 +47,15 @@ jobs:
           Rscript -e "reticulate::install_miniconda()"
           Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
 
-      - name: Install packages
-        run: |
-          R -e 'install.packages("renv")'
-          R -e 'renv::restore()'
-
       - name: Install TensorFlow
         run: |
           Rscript -e "remotes::install_local()"
           Rscript -e "keras::install_keras(tensorflow = Sys.getenv('TF_VERSION')
+
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
 
       - name: Build manual
         run: |
