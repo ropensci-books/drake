@@ -304,6 +304,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="10.1" data-path="stan.html"><a href="stan.html#the-drake-project"><i class="fa fa-check"></i><b>10.1</b> The <code>drake</code> project</a></li>
 <li class="chapter" data-level="10.2" data-path="plans.html"><a href="plans.html#functions"><i class="fa fa-check"></i><b>10.2</b> Functions</a></li>
+<li class="chapter" data-level="10.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>10.3</b> Plan</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="stan.html"><a href="stan.html#model"><i class="fa fa-check"></i><b>10.3.1</b> Model</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#compiled"><i class="fa fa-check"></i><b>10.3.2</b> Compiled</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.3</b> Index</a></li>
+<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.4</b> Data</a></li>
+<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.5</b> Fit</a></li>
+<li class="chapter" data-level="10.3.6" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.6</b> Report</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="stan.html"><a href="stan.html#try-it-out"><i class="fa fa-check"></i><b>10.4</b> Try it out!</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>11</b> An analysis of R package download trends</a>
 <ul>
@@ -316,7 +326,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="12.1" data-path="packages.html"><a href="packages.html#get-the-code."><i class="fa fa-check"></i><b>12.1</b> Get the code.</a></li>
 <li class="chapter" data-level="12.2" data-path="gsp.html"><a href="gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>12.2</b> Objective and methods</a></li>
-<li class="chapter" data-level="12.3" data-path="gsp.html"><a href="gsp.html#data"><i class="fa fa-check"></i><b>12.3</b> Data</a></li>
+<li class="chapter" data-level="12.3" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>12.3</b> Data</a></li>
 <li class="chapter" data-level="12.4" data-path="packages.html"><a href="packages.html#analysis"><i class="fa fa-check"></i><b>12.4</b> Analysis</a></li>
 <li class="chapter" data-level="12.5" data-path="gsp.html"><a href="gsp.html#results"><i class="fa fa-check"></i><b>12.5</b> Results</a></li>
 <li class="chapter" data-level="12.6" data-path="gsp.html"><a href="gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>12.6</b> Comparison with GNU Make</a></li>
@@ -492,8 +502,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="let-make-schedule-your-targets." class="section level2" number="13.2">
 <h2><span class="header-section-number">13.2</span> Let <code>make()</code> schedule your targets.</h2>
 <p>When it comes time to activate high-performance computing, <code>drake</code> launches its own parallel workers and sends targets to those workers. The workers can be local processes or jobs on a cluster. <code>drake</code> uses your project’s implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="hpc.html#cb184-1"></a><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></span>
-<span id="cb184-2"><a href="hpc.html#cb184-2"></a><span class="kw">vis_drake_graph</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="hpc.html#cb191-1"></a><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></span>
+<span id="cb191-2"><a href="hpc.html#cb191-2"></a><span class="kw">vis_drake_graph</span>(my_plan)</span></code></pre></div>
 <p>You do not need to not micromanage how targets are scheduled, and you do not need to run simultaneous instances of <code>make()</code>.</p>
 </div>
 <div id="the-master-process" class="section level2" number="13.3">
@@ -502,32 +512,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="master-on-a-cluster" class="section level3" number="13.3.1">
 <h3><span class="header-section-number">13.3.1</span> Master on a cluster</h3>
 <p>Most clusters will let you submit <code>make()</code> as a job on a compute node. Let’s consider the Sun Grid Engine (SGE) as an example. First, we create a script that calls <code>make()</code> (or <a href="https://docs.ropensci.org/drake/reference/r_make.html"><code>r_make()</code></a>).</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="hpc.html#cb185-1"></a><span class="co"># make.R</span></span>
-<span id="cb185-2"><a href="hpc.html#cb185-2"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
-<span id="cb185-3"><a href="hpc.html#cb185-3"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
-<span id="cb185-4"><a href="hpc.html#cb185-4"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
-<span id="cb185-5"><a href="hpc.html#cb185-5"></a><span class="kw">options</span>(</span>
-<span id="cb185-6"><a href="hpc.html#cb185-6"></a>  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>,</span>
-<span id="cb185-7"><a href="hpc.html#cb185-7"></a>  <span class="co"># Created by drake_hpc_template_file(&quot;sge_clustermq.tmpl&quot;):</span></span>
-<span id="cb185-8"><a href="hpc.html#cb185-8"></a>  <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
-<span id="cb185-9"><a href="hpc.html#cb185-9"></a>)</span>
-<span id="cb185-10"><a href="hpc.html#cb185-10"></a><span class="kw">make</span>(</span>
-<span id="cb185-11"><a href="hpc.html#cb185-11"></a>  plan,</span>
-<span id="cb185-12"><a href="hpc.html#cb185-12"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
-<span id="cb185-13"><a href="hpc.html#cb185-13"></a>  <span class="dt">jobs =</span> <span class="dv">8</span>,</span>
-<span id="cb185-14"><a href="hpc.html#cb185-14"></a>  <span class="dt">console_log_file =</span> <span class="st">&quot;drake.log&quot;</span></span>
-<span id="cb185-15"><a href="hpc.html#cb185-15"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="hpc.html#cb192-1"></a><span class="co"># make.R</span></span>
+<span id="cb192-2"><a href="hpc.html#cb192-2"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
+<span id="cb192-3"><a href="hpc.html#cb192-3"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
+<span id="cb192-4"><a href="hpc.html#cb192-4"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>)</span>
+<span id="cb192-5"><a href="hpc.html#cb192-5"></a><span class="kw">options</span>(</span>
+<span id="cb192-6"><a href="hpc.html#cb192-6"></a>  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>,</span>
+<span id="cb192-7"><a href="hpc.html#cb192-7"></a>  <span class="co"># Created by drake_hpc_template_file(&quot;sge_clustermq.tmpl&quot;):</span></span>
+<span id="cb192-8"><a href="hpc.html#cb192-8"></a>  <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
+<span id="cb192-9"><a href="hpc.html#cb192-9"></a>)</span>
+<span id="cb192-10"><a href="hpc.html#cb192-10"></a><span class="kw">make</span>(</span>
+<span id="cb192-11"><a href="hpc.html#cb192-11"></a>  plan,</span>
+<span id="cb192-12"><a href="hpc.html#cb192-12"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
+<span id="cb192-13"><a href="hpc.html#cb192-13"></a>  <span class="dt">jobs =</span> <span class="dv">8</span>,</span>
+<span id="cb192-14"><a href="hpc.html#cb192-14"></a>  <span class="dt">console_log_file =</span> <span class="st">&quot;drake.log&quot;</span></span>
+<span id="cb192-15"><a href="hpc.html#cb192-15"></a>)</span></code></pre></div>
 <p>Then, we create a shell script (say, <code>run.sh</code>) to call <code>make.R</code>. This script may look different if you use a different scheduler such as <a href="https://slurm.schedmd.com">SLURM</a>.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb186-1"><a href="hpc.html#cb186-1"></a><span class="co"># run.sh</span></span>
-<span id="cb186-2"><a href="hpc.html#cb186-2"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb186-3"><a href="hpc.html#cb186-3"></a><span class="co">#$ -j y       # combine stdout/error in one file</span></span>
-<span id="cb186-4"><a href="hpc.html#cb186-4"></a><span class="co">#$ -o log.out # output file</span></span>
-<span id="cb186-5"><a href="hpc.html#cb186-5"></a><span class="co">#$ -cwd       # use pwd as work dir</span></span>
-<span id="cb186-6"><a href="hpc.html#cb186-6"></a><span class="co">#$ -V         # use environment variable</span></span>
-<span id="cb186-7"><a href="hpc.html#cb186-7"></a><span class="ex">module</span> load R <span class="co"># Uncomment if R is an environment module.</span></span>
-<span id="cb186-8"><a href="hpc.html#cb186-8"></a><span class="ex">R</span> --no-save CMD BATCH make.R</span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb193-1"><a href="hpc.html#cb193-1"></a><span class="co"># run.sh</span></span>
+<span id="cb193-2"><a href="hpc.html#cb193-2"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb193-3"><a href="hpc.html#cb193-3"></a><span class="co">#$ -j y       # combine stdout/error in one file</span></span>
+<span id="cb193-4"><a href="hpc.html#cb193-4"></a><span class="co">#$ -o log.out # output file</span></span>
+<span id="cb193-5"><a href="hpc.html#cb193-5"></a><span class="co">#$ -cwd       # use pwd as work dir</span></span>
+<span id="cb193-6"><a href="hpc.html#cb193-6"></a><span class="co">#$ -V         # use environment variable</span></span>
+<span id="cb193-7"><a href="hpc.html#cb193-7"></a><span class="ex">module</span> load R <span class="co"># Uncomment if R is an environment module.</span></span>
+<span id="cb193-8"><a href="hpc.html#cb193-8"></a><span class="ex">R</span> --no-save CMD BATCH make.R</span></code></pre></div>
 <p>Finally, to run the whole workflow, we call <code>qsub</code>.</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb187-1"><a href="hpc.html#cb187-1"></a><span class="ex">qsub</span> run.sh</span></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb194-1"><a href="hpc.html#cb194-1"></a><span class="ex">qsub</span> run.sh</span></code></pre></div>
 <p>And here is what happens:</p>
 <ol style="list-style-type: decimal">
 <li>A new job starts on the cluster with the configuration flags next to <code>#$</code> in <code>run.sh</code>.</li>
@@ -556,7 +566,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="parallel-backends" class="section level2" number="13.4">
 <h2><span class="header-section-number">13.4</span> Parallel backends</h2>
 <p>Choose the parallel backend with the <code>parallelism</code> argument and set the <code>jobs</code> argument to scale the work appropriately.</p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="hpc.html#cb188-1"></a><span class="kw">make</span>(my_plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="hpc.html#cb195-1"></a><span class="kw">make</span>(my_plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>The two primary backends with long term support are <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> and <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a>. If you can install <a href="http://zeromq.org">ZeroMQ</a>, the best choice is usually <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a>. (It is faster than <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a>.) However, <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> is more accessible: it does not require <a href="http://zeromq.org">ZeroMQ</a>, it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it <a href="https://github.com/wlandau/drake-examples/tree/master/Docker-psock">can deploy targets to Docker images</a> (<code>drake_example("Docker-psock")</code>).</p>
 </div>
 <div id="the-clustermq-backend" class="section level2" number="13.5">
@@ -583,17 +593,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="on-your-local-machine" class="section level3" number="13.5.3">
 <h3><span class="header-section-number">13.5.3</span> On your local machine</h3>
 <p>To run your targets in parallel over the cores of your local machine, set the global option below and run <code>make()</code>.</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="hpc.html#cb189-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;multicore&quot;</span>)</span>
-<span id="cb189-2"><a href="hpc.html#cb189-2"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="hpc.html#cb196-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;multicore&quot;</span>)</span>
+<span id="cb196-2"><a href="hpc.html#cb196-2"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="on-a-cluster" class="section level3" number="13.5.4">
 <h3><span class="header-section-number">13.5.4</span> On a cluster</h3>
 <p>Set the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> global options to register your computing resources. For <a href="https://slurm.schedmd.com/slurmd.html">SLURM</a>:</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="hpc.html#cb190-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="hpc.html#cb197-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span>)</span></code></pre></div>
 <p>Here, <code>slurm_clustermq.tmpl</code> is a <a href="https://github.com/ropensci/drake/tree/master/inst/templates/hpc">template file</a> with configuration details. Use <code>drake_hpc_template_file()</code> to write one of the available examples.</p>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="hpc.html#cb191-1"></a><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Write the file slurm_clustermq.tmpl.</span></span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="hpc.html#cb198-1"></a><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># Write the file slurm_clustermq.tmpl.</span></span></code></pre></div>
 <p>After modifying <code>slurm_clustermq.tmpl</code> by hand to meet your needs, call <code>make()</code> as usual.</p>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="hpc.html#cb192-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="hpc.html#cb199-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">4</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="the-future-backend" class="section level2" number="13.6">
@@ -617,27 +627,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="installation-1" class="section level3" number="13.6.2">
 <h3><span class="header-section-number">13.6.2</span> Installation</h3>
 <p>Install the <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> package.</p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="hpc.html#cb193-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;future&quot;</span>) <span class="co"># CRAN release</span></span>
-<span id="cb193-2"><a href="hpc.html#cb193-2"></a><span class="co"># Alternatively, install the GitHub development version.</span></span>
-<span id="cb193-3"><a href="hpc.html#cb193-3"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;HenrikBengtsson/future&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;develop&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="hpc.html#cb200-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;future&quot;</span>) <span class="co"># CRAN release</span></span>
+<span id="cb200-2"><a href="hpc.html#cb200-2"></a><span class="co"># Alternatively, install the GitHub development version.</span></span>
+<span id="cb200-3"><a href="hpc.html#cb200-3"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;HenrikBengtsson/future&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;develop&quot;</span>)</span></code></pre></div>
 <p>If you intend to use a cluster, be sure to install the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> package too. The <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> ecosystem contains even more packages that extend <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a>’s parallel computing functionality, such as <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a>.</p>
 </div>
 <div id="on-your-local-machine-1" class="section level3" number="13.6.3">
 <h3><span class="header-section-number">13.6.3</span> On your local machine</h3>
 <p>First, select a <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> plan to tell <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> how to create the workers. See <a href="https://github.com/HenrikBengtsson/future#controlling-how-futures-are-resolved">this table</a> for descriptions of the core options.</p>
-<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="hpc.html#cb194-1"></a>future<span class="op">::</span><span class="kw">plan</span>(future<span class="op">::</span>multiprocess) </span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="hpc.html#cb201-1"></a>future<span class="op">::</span><span class="kw">plan</span>(future<span class="op">::</span>multiprocess) </span></code></pre></div>
 <p>Next, run <code>make()</code>.</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="hpc.html#cb195-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="hpc.html#cb202-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="on-a-cluster-1" class="section level3" number="13.6.4">
 <h3><span class="header-section-number">13.6.4</span> On a cluster</h3>
 <p>Install the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> package and use <a href="https://github.com/HenrikBengtsson/future.batchtools#choosing-batchtools-backend">this list</a> to select a <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> plan that matches your resources. You will also need a compatible <a href="https://github.com/mllg/batchtools/tree/master/inst/templates">template file</a> with configuration details. As with <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a>, <code>drake</code> can generate some examples:</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="hpc.html#cb196-1"></a><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_batchtools.tmpl&quot;</span>) <span class="co"># Edit by hand.</span></span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="hpc.html#cb203-1"></a><span class="kw">drake_hpc_template_file</span>(<span class="st">&quot;slurm_batchtools.tmpl&quot;</span>) <span class="co"># Edit by hand.</span></span></code></pre></div>
 <p>Next, register the template file with a plan.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="hpc.html#cb197-1"></a><span class="kw">library</span>(future.batchtools)</span>
-<span id="cb197-2"><a href="hpc.html#cb197-2"></a>future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;slurm_batchtools.tmpl&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="hpc.html#cb204-1"></a><span class="kw">library</span>(future.batchtools)</span>
+<span id="cb204-2"><a href="hpc.html#cb204-2"></a>future<span class="op">::</span><span class="kw">plan</span>(batchtools_slurm, <span class="dt">template =</span> <span class="st">&quot;slurm_batchtools.tmpl&quot;</span>)</span></code></pre></div>
 <p>Finally, run <code>make()</code>.</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="hpc.html#cb198-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="hpc.html#cb205-1"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="advanced-options" class="section level2" number="13.7">
@@ -645,26 +655,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="selectivity" class="section level3" number="13.7.1">
 <h3><span class="header-section-number">13.7.1</span> Selectivity</h3>
 <p>Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the master process, define a special <code>hpc</code> column of your <code>drake</code> plan. Below, <code>NA</code> and <code>TRUE</code> are treated the same, and <code>make(plan, parallelism = "clustermq")</code> only sends <code>model_1</code> and <code>model_2</code> to parallel workers.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="hpc.html#cb199-1"></a><span class="kw">drake_plan</span>(</span>
-<span id="cb199-2"><a href="hpc.html#cb199-2"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb199-3"><a href="hpc.html#cb199-3"></a>    <span class="kw">crazy_long_computation</span>(index),</span>
-<span id="cb199-4"><a href="hpc.html#cb199-4"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">index =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb199-5"><a href="hpc.html#cb199-5"></a>  ),</span>
-<span id="cb199-6"><a href="hpc.html#cb199-6"></a>  <span class="dt">accuracy =</span> <span class="kw">target</span>(</span>
-<span id="cb199-7"><a href="hpc.html#cb199-7"></a>    <span class="kw">summarize_accuracy</span>(model),</span>
-<span id="cb199-8"><a href="hpc.html#cb199-8"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(model),</span>
-<span id="cb199-9"><a href="hpc.html#cb199-9"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb199-10"><a href="hpc.html#cb199-10"></a>  ),</span>
-<span id="cb199-11"><a href="hpc.html#cb199-11"></a>  <span class="dt">specificity =</span> <span class="kw">target</span>(</span>
-<span id="cb199-12"><a href="hpc.html#cb199-12"></a>    <span class="kw">summarize_specificity</span>(model),</span>
-<span id="cb199-13"><a href="hpc.html#cb199-13"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(model),</span>
-<span id="cb199-14"><a href="hpc.html#cb199-14"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb199-15"><a href="hpc.html#cb199-15"></a>  ),</span>
-<span id="cb199-16"><a href="hpc.html#cb199-16"></a>  <span class="dt">report =</span> <span class="kw">target</span>(</span>
-<span id="cb199-17"><a href="hpc.html#cb199-17"></a>    <span class="kw">render</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;results.Rmd&quot;</span>), <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;results.html&quot;</span>)),</span>
-<span id="cb199-18"><a href="hpc.html#cb199-18"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb199-19"><a href="hpc.html#cb199-19"></a>  )</span>
-<span id="cb199-20"><a href="hpc.html#cb199-20"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="hpc.html#cb206-1"></a><span class="kw">drake_plan</span>(</span>
+<span id="cb206-2"><a href="hpc.html#cb206-2"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
+<span id="cb206-3"><a href="hpc.html#cb206-3"></a>    <span class="kw">crazy_long_computation</span>(index),</span>
+<span id="cb206-4"><a href="hpc.html#cb206-4"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">index =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb206-5"><a href="hpc.html#cb206-5"></a>  ),</span>
+<span id="cb206-6"><a href="hpc.html#cb206-6"></a>  <span class="dt">accuracy =</span> <span class="kw">target</span>(</span>
+<span id="cb206-7"><a href="hpc.html#cb206-7"></a>    <span class="kw">summarize_accuracy</span>(model),</span>
+<span id="cb206-8"><a href="hpc.html#cb206-8"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(model),</span>
+<span id="cb206-9"><a href="hpc.html#cb206-9"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb206-10"><a href="hpc.html#cb206-10"></a>  ),</span>
+<span id="cb206-11"><a href="hpc.html#cb206-11"></a>  <span class="dt">specificity =</span> <span class="kw">target</span>(</span>
+<span id="cb206-12"><a href="hpc.html#cb206-12"></a>    <span class="kw">summarize_specificity</span>(model),</span>
+<span id="cb206-13"><a href="hpc.html#cb206-13"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(model),</span>
+<span id="cb206-14"><a href="hpc.html#cb206-14"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb206-15"><a href="hpc.html#cb206-15"></a>  ),</span>
+<span id="cb206-16"><a href="hpc.html#cb206-16"></a>  <span class="dt">report =</span> <span class="kw">target</span>(</span>
+<span id="cb206-17"><a href="hpc.html#cb206-17"></a>    <span class="kw">render</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;results.Rmd&quot;</span>), <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;results.html&quot;</span>)),</span>
+<span id="cb206-18"><a href="hpc.html#cb206-18"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb206-19"><a href="hpc.html#cb206-19"></a>  )</span>
+<span id="cb206-20"><a href="hpc.html#cb206-20"></a>)</span></code></pre></div>
 </div>
 <div id="memory-options" class="section level3" number="13.7.2">
 <h3><span class="header-section-number">13.7.2</span> Memory options</h3>
@@ -701,39 +711,39 @@ module load R
 ulimit -v $(( 1024 * {{ memory | 4096 }} ))
 CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(&quot;{{ master }}&quot;)&#39;</code></pre>
 <p>Then when you run <code>make()</code>, use the <code>template</code> argument to set <code>n_slots</code>.</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="hpc.html#cb201-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span>)</span>
-<span id="cb201-2"><a href="hpc.html#cb201-2"></a><span class="kw">library</span>(drake)</span>
-<span id="cb201-3"><a href="hpc.html#cb201-3"></a><span class="kw">load_mtcars_example</span>()</span>
-<span id="cb201-4"><a href="hpc.html#cb201-4"></a><span class="kw">make</span>(</span>
-<span id="cb201-5"><a href="hpc.html#cb201-5"></a>  my_plan,</span>
-<span id="cb201-6"><a href="hpc.html#cb201-6"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
-<span id="cb201-7"><a href="hpc.html#cb201-7"></a>  <span class="dt">jobs =</span> <span class="dv">16</span>,</span>
-<span id="cb201-8"><a href="hpc.html#cb201-8"></a>  <span class="dt">template =</span> <span class="kw">list</span>(<span class="dt">n_slots =</span> <span class="dv">4</span>) <span class="co"># Request 4 cores per persistent worker.</span></span>
-<span id="cb201-9"><a href="hpc.html#cb201-9"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="hpc.html#cb208-1"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>, <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span>)</span>
+<span id="cb208-2"><a href="hpc.html#cb208-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb208-3"><a href="hpc.html#cb208-3"></a><span class="kw">load_mtcars_example</span>()</span>
+<span id="cb208-4"><a href="hpc.html#cb208-4"></a><span class="kw">make</span>(</span>
+<span id="cb208-5"><a href="hpc.html#cb208-5"></a>  my_plan,</span>
+<span id="cb208-6"><a href="hpc.html#cb208-6"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
+<span id="cb208-7"><a href="hpc.html#cb208-7"></a>  <span class="dt">jobs =</span> <span class="dv">16</span>,</span>
+<span id="cb208-8"><a href="hpc.html#cb208-8"></a>  <span class="dt">template =</span> <span class="kw">list</span>(<span class="dt">n_slots =</span> <span class="dv">4</span>) <span class="co"># Request 4 cores per persistent worker.</span></span>
+<span id="cb208-9"><a href="hpc.html#cb208-9"></a>)</span></code></pre></div>
 <p>Custom placeholders like <code>n_slots</code> are processed with the <a href="https://github.com/Bart6114/infuser"><code>infuser</code></a> package.</p>
 </div>
 <div id="the-resources-column-for-transient-workers" class="section level3" number="13.7.5">
 <h3><span class="header-section-number">13.7.5</span> The <code>resources</code> column for transient workers</h3>
 <p>Different targets may need different resources. For example,</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="hpc.html#cb202-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb202-2"><a href="hpc.html#cb202-2"></a>  <span class="dt">data =</span> <span class="kw">download_data</span>(),</span>
-<span id="cb202-3"><a href="hpc.html#cb202-3"></a>  <span class="dt">model =</span> <span class="kw">big_machine_learning_model</span>(data)</span>
-<span id="cb202-4"><a href="hpc.html#cb202-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="hpc.html#cb209-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb209-2"><a href="hpc.html#cb209-2"></a>  <span class="dt">data =</span> <span class="kw">download_data</span>(),</span>
+<span id="cb209-3"><a href="hpc.html#cb209-3"></a>  <span class="dt">model =</span> <span class="kw">big_machine_learning_model</span>(data)</span>
+<span id="cb209-4"><a href="hpc.html#cb209-4"></a>)</span></code></pre></div>
 <p>The <code>model</code> needs a GPU and multiple CPU cores, and the <code>data</code> only needs the bare minimum resources. Declare these requirements with <code>target()</code>, as below. This is equivalent to adding a new list column to the <code>plan</code>, where each element is a named list for the <code>resources</code> argument of <code>future::future()</code>.</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="hpc.html#cb203-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb203-2"><a href="hpc.html#cb203-2"></a>  <span class="dt">data =</span> <span class="kw">target</span>(</span>
-<span id="cb203-3"><a href="hpc.html#cb203-3"></a>    <span class="kw">download_data</span>(),</span>
-<span id="cb203-4"><a href="hpc.html#cb203-4"></a>    <span class="dt">resources =</span> <span class="kw">list</span>(<span class="dt">cores =</span> <span class="dv">1</span>, <span class="dt">gpus =</span> <span class="dv">0</span>)</span>
-<span id="cb203-5"><a href="hpc.html#cb203-5"></a>  ),</span>
-<span id="cb203-6"><a href="hpc.html#cb203-6"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb203-7"><a href="hpc.html#cb203-7"></a>    <span class="kw">big_machine_learning_model</span>(data),</span>
-<span id="cb203-8"><a href="hpc.html#cb203-8"></a>    <span class="dt">resources =</span> <span class="kw">list</span>(<span class="dt">cores =</span> <span class="dv">4</span>, <span class="dt">gpus =</span> <span class="dv">1</span>)</span>
-<span id="cb203-9"><a href="hpc.html#cb203-9"></a>  )</span>
-<span id="cb203-10"><a href="hpc.html#cb203-10"></a>)</span>
-<span id="cb203-11"><a href="hpc.html#cb203-11"></a></span>
-<span id="cb203-12"><a href="hpc.html#cb203-12"></a>plan</span>
-<span id="cb203-13"><a href="hpc.html#cb203-13"></a></span>
-<span id="cb203-14"><a href="hpc.html#cb203-14"></a><span class="kw">str</span>(plan<span class="op">$</span>resources)</span></code></pre></div>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="hpc.html#cb210-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb210-2"><a href="hpc.html#cb210-2"></a>  <span class="dt">data =</span> <span class="kw">target</span>(</span>
+<span id="cb210-3"><a href="hpc.html#cb210-3"></a>    <span class="kw">download_data</span>(),</span>
+<span id="cb210-4"><a href="hpc.html#cb210-4"></a>    <span class="dt">resources =</span> <span class="kw">list</span>(<span class="dt">cores =</span> <span class="dv">1</span>, <span class="dt">gpus =</span> <span class="dv">0</span>)</span>
+<span id="cb210-5"><a href="hpc.html#cb210-5"></a>  ),</span>
+<span id="cb210-6"><a href="hpc.html#cb210-6"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
+<span id="cb210-7"><a href="hpc.html#cb210-7"></a>    <span class="kw">big_machine_learning_model</span>(data),</span>
+<span id="cb210-8"><a href="hpc.html#cb210-8"></a>    <span class="dt">resources =</span> <span class="kw">list</span>(<span class="dt">cores =</span> <span class="dv">4</span>, <span class="dt">gpus =</span> <span class="dv">1</span>)</span>
+<span id="cb210-9"><a href="hpc.html#cb210-9"></a>  )</span>
+<span id="cb210-10"><a href="hpc.html#cb210-10"></a>)</span>
+<span id="cb210-11"><a href="hpc.html#cb210-11"></a></span>
+<span id="cb210-12"><a href="hpc.html#cb210-12"></a>plan</span>
+<span id="cb210-13"><a href="hpc.html#cb210-13"></a></span>
+<span id="cb210-14"><a href="hpc.html#cb210-14"></a><span class="kw">str</span>(plan<span class="op">$</span>resources)</span></code></pre></div>
 <p>Next, plug the names of your resources into the <a href="https://CRAN.R-project.org/package=brew"><code>brew</code></a> patterns of your <a href="https://github.com/mllg/batchtools"><code>batchtools</code></a> template file. The following <code>sge_batchtools.tmpl</code> file shows how to do it, but the file itself probably requires modification before it will work with your own machine.</p>
 <pre><code>#!/bin/bash
 #$ -cwd
@@ -746,10 +756,10 @@ CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(&quot;{{
 Rscript -e &#39;batchtools::doJobCollection(&quot;&lt;%= uri %&gt;&quot;)&#39;
 exit 0</code></pre>
 <p>Finally, register the template file and run your project.</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="hpc.html#cb205-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb205-2"><a href="hpc.html#cb205-2"></a><span class="kw">library</span>(future.batchtools)</span>
-<span id="cb205-3"><a href="hpc.html#cb205-3"></a>future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span>)</span>
-<span id="cb205-4"><a href="hpc.html#cb205-4"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="hpc.html#cb212-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb212-2"><a href="hpc.html#cb212-2"></a><span class="kw">library</span>(future.batchtools)</span>
+<span id="cb212-3"><a href="hpc.html#cb212-3"></a>future<span class="op">::</span><span class="kw">plan</span>(batchtools_sge, <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span>)</span>
+<span id="cb212-4"><a href="hpc.html#cb212-4"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="parallel-computing-within-targets" class="section level3" number="13.7.6">
 <h3><span class="header-section-number">13.7.6</span> Parallel computing <em>within</em> targets</h3>
@@ -757,128 +767,128 @@ exit 0</code></pre>
 <div id="locally" class="section level4" number="13.7.6.1">
 <h4><span class="header-section-number">13.7.6.1</span> Locally</h4>
 <p>Use <a href="https://github.com/HenrikBengtsson/future.callr"><code>future.callr</code></a> and <a href="https://github.com/DavisVaughan/furrr"><code>furrr</code></a> normally.</p>
-<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="hpc.html#cb206-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb206-2"><a href="hpc.html#cb206-2"></a></span>
-<span id="cb206-3"><a href="hpc.html#cb206-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
-<span id="cb206-4"><a href="hpc.html#cb206-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb206-5"><a href="hpc.html#cb206-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
-<span id="cb206-6"><a href="hpc.html#cb206-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
-<span id="cb206-7"><a href="hpc.html#cb206-7"></a>)</span>
-<span id="cb206-8"><a href="hpc.html#cb206-8"></a></span>
-<span id="cb206-9"><a href="hpc.html#cb206-9"></a><span class="co"># Tell the drake targets to fork up to 4 callr processes.</span></span>
-<span id="cb206-10"><a href="hpc.html#cb206-10"></a>future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr)</span>
-<span id="cb206-11"><a href="hpc.html#cb206-11"></a></span>
-<span id="cb206-12"><a href="hpc.html#cb206-12"></a><span class="co"># Build the targets.</span></span>
-<span id="cb206-13"><a href="hpc.html#cb206-13"></a><span class="kw">make</span>(plan)</span>
-<span id="cb206-14"><a href="hpc.html#cb206-14"></a></span>
-<span id="cb206-15"><a href="hpc.html#cb206-15"></a><span class="co"># Process IDs of the local workers of x:</span></span>
-<span id="cb206-16"><a href="hpc.html#cb206-16"></a><span class="kw">readd</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="hpc.html#cb213-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb213-2"><a href="hpc.html#cb213-2"></a></span>
+<span id="cb213-3"><a href="hpc.html#cb213-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
+<span id="cb213-4"><a href="hpc.html#cb213-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb213-5"><a href="hpc.html#cb213-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
+<span id="cb213-6"><a href="hpc.html#cb213-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
+<span id="cb213-7"><a href="hpc.html#cb213-7"></a>)</span>
+<span id="cb213-8"><a href="hpc.html#cb213-8"></a></span>
+<span id="cb213-9"><a href="hpc.html#cb213-9"></a><span class="co"># Tell the drake targets to fork up to 4 callr processes.</span></span>
+<span id="cb213-10"><a href="hpc.html#cb213-10"></a>future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr)</span>
+<span id="cb213-11"><a href="hpc.html#cb213-11"></a></span>
+<span id="cb213-12"><a href="hpc.html#cb213-12"></a><span class="co"># Build the targets.</span></span>
+<span id="cb213-13"><a href="hpc.html#cb213-13"></a><span class="kw">make</span>(plan)</span>
+<span id="cb213-14"><a href="hpc.html#cb213-14"></a></span>
+<span id="cb213-15"><a href="hpc.html#cb213-15"></a><span class="co"># Process IDs of the local workers of x:</span></span>
+<span id="cb213-16"><a href="hpc.html#cb213-16"></a><span class="kw">readd</span>(x)</span></code></pre></div>
 </div>
 <div id="persistent-workers-1" class="section level4" number="13.7.6.2">
 <h4><span class="header-section-number">13.7.6.2</span> Persistent workers</h4>
 <p>Each persistent worker needs its own <a href="https://github.com/HenrikBengtsson/future"><code>future::plan()</code></a>, which we set with the <code>prework</code> argument of <code>make()</code>. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> documentation.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="hpc.html#cb207-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb207-2"><a href="hpc.html#cb207-2"></a></span>
-<span id="cb207-3"><a href="hpc.html#cb207-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
-<span id="cb207-4"><a href="hpc.html#cb207-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb207-5"><a href="hpc.html#cb207-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
-<span id="cb207-6"><a href="hpc.html#cb207-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
-<span id="cb207-7"><a href="hpc.html#cb207-7"></a>)</span>
-<span id="cb207-8"><a href="hpc.html#cb207-8"></a></span>
-<span id="cb207-9"><a href="hpc.html#cb207-9"></a><span class="co"># Write a template file for clustermq.</span></span>
-<span id="cb207-10"><a href="hpc.html#cb207-10"></a><span class="kw">writeLines</span>(</span>
-<span id="cb207-11"><a href="hpc.html#cb207-11"></a>  <span class="kw">c</span>(</span>
-<span id="cb207-12"><a href="hpc.html#cb207-12"></a>    <span class="st">&quot;#!/bin/bash&quot;</span>,</span>
-<span id="cb207-13"><a href="hpc.html#cb207-13"></a>    <span class="st">&quot;#$ -N {{ job_name }}               # job name&quot;</span>,</span>
-<span id="cb207-14"><a href="hpc.html#cb207-14"></a>    <span class="st">&quot;#$ -t 1-{{ n_jobs }}               # submit jobs as array&quot;</span>,</span>
-<span id="cb207-15"><a href="hpc.html#cb207-15"></a>    <span class="st">&quot;#$ -j y                            # combine stdout/error in one file&quot;</span>,</span>
-<span id="cb207-16"><a href="hpc.html#cb207-16"></a>    <span class="st">&quot;#$ -o {{ log_file | /dev/null }}   # output file&quot;</span>,</span>
-<span id="cb207-17"><a href="hpc.html#cb207-17"></a>    <span class="st">&quot;#$ -cwd                            # use pwd as work dir&quot;</span>,</span>
-<span id="cb207-18"><a href="hpc.html#cb207-18"></a>    <span class="st">&quot;#$ -V                              # use environment variables&quot;</span>,</span>
-<span id="cb207-19"><a href="hpc.html#cb207-19"></a>    <span class="st">&quot;#$ -pe smp 4                       # request 4 cores per job&quot;</span>,</span>
-<span id="cb207-20"><a href="hpc.html#cb207-20"></a>    <span class="st">&quot;module load R-qualified/3.5.2      # if loading R from an environment module&quot;</span>,</span>
-<span id="cb207-21"><a href="hpc.html#cb207-21"></a>    <span class="st">&quot;ulimit -v $(( 1024 * {{ memory | 4096 }} ))&quot;</span>,</span>
-<span id="cb207-22"><a href="hpc.html#cb207-22"></a>    <span class="st">&quot;CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(</span><span class="ch">\&quot;</span><span class="st">{{ master }}</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span></span>
-<span id="cb207-23"><a href="hpc.html#cb207-23"></a>  ),</span>
-<span id="cb207-24"><a href="hpc.html#cb207-24"></a>  <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
-<span id="cb207-25"><a href="hpc.html#cb207-25"></a>)</span>
-<span id="cb207-26"><a href="hpc.html#cb207-26"></a></span>
-<span id="cb207-27"><a href="hpc.html#cb207-27"></a><span class="co"># Register the scheduler and template file with clustermq.</span></span>
-<span id="cb207-28"><a href="hpc.html#cb207-28"></a><span class="kw">options</span>(</span>
-<span id="cb207-29"><a href="hpc.html#cb207-29"></a>  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>,</span>
-<span id="cb207-30"><a href="hpc.html#cb207-30"></a>  <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
-<span id="cb207-31"><a href="hpc.html#cb207-31"></a>)</span>
-<span id="cb207-32"><a href="hpc.html#cb207-32"></a></span>
-<span id="cb207-33"><a href="hpc.html#cb207-33"></a><span class="co"># Build the targets.</span></span>
-<span id="cb207-34"><a href="hpc.html#cb207-34"></a><span class="kw">make</span>(</span>
-<span id="cb207-35"><a href="hpc.html#cb207-35"></a>  plan,</span>
-<span id="cb207-36"><a href="hpc.html#cb207-36"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
-<span id="cb207-37"><a href="hpc.html#cb207-37"></a>  <span class="dt">jobs =</span> <span class="dv">2</span>,</span>
-<span id="cb207-38"><a href="hpc.html#cb207-38"></a>  <span class="co"># Each of the two workers can spawn up to 4 local processes.</span></span>
-<span id="cb207-39"><a href="hpc.html#cb207-39"></a>  <span class="dt">prework =</span> <span class="kw">quote</span>(future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr))</span>
-<span id="cb207-40"><a href="hpc.html#cb207-40"></a>)</span>
-<span id="cb207-41"><a href="hpc.html#cb207-41"></a></span>
-<span id="cb207-42"><a href="hpc.html#cb207-42"></a><span class="co"># Process IDs of the local workers of x:</span></span>
-<span id="cb207-43"><a href="hpc.html#cb207-43"></a><span class="kw">readd</span>(x) </span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="hpc.html#cb214-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb214-2"><a href="hpc.html#cb214-2"></a></span>
+<span id="cb214-3"><a href="hpc.html#cb214-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
+<span id="cb214-4"><a href="hpc.html#cb214-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb214-5"><a href="hpc.html#cb214-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
+<span id="cb214-6"><a href="hpc.html#cb214-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
+<span id="cb214-7"><a href="hpc.html#cb214-7"></a>)</span>
+<span id="cb214-8"><a href="hpc.html#cb214-8"></a></span>
+<span id="cb214-9"><a href="hpc.html#cb214-9"></a><span class="co"># Write a template file for clustermq.</span></span>
+<span id="cb214-10"><a href="hpc.html#cb214-10"></a><span class="kw">writeLines</span>(</span>
+<span id="cb214-11"><a href="hpc.html#cb214-11"></a>  <span class="kw">c</span>(</span>
+<span id="cb214-12"><a href="hpc.html#cb214-12"></a>    <span class="st">&quot;#!/bin/bash&quot;</span>,</span>
+<span id="cb214-13"><a href="hpc.html#cb214-13"></a>    <span class="st">&quot;#$ -N {{ job_name }}               # job name&quot;</span>,</span>
+<span id="cb214-14"><a href="hpc.html#cb214-14"></a>    <span class="st">&quot;#$ -t 1-{{ n_jobs }}               # submit jobs as array&quot;</span>,</span>
+<span id="cb214-15"><a href="hpc.html#cb214-15"></a>    <span class="st">&quot;#$ -j y                            # combine stdout/error in one file&quot;</span>,</span>
+<span id="cb214-16"><a href="hpc.html#cb214-16"></a>    <span class="st">&quot;#$ -o {{ log_file | /dev/null }}   # output file&quot;</span>,</span>
+<span id="cb214-17"><a href="hpc.html#cb214-17"></a>    <span class="st">&quot;#$ -cwd                            # use pwd as work dir&quot;</span>,</span>
+<span id="cb214-18"><a href="hpc.html#cb214-18"></a>    <span class="st">&quot;#$ -V                              # use environment variables&quot;</span>,</span>
+<span id="cb214-19"><a href="hpc.html#cb214-19"></a>    <span class="st">&quot;#$ -pe smp 4                       # request 4 cores per job&quot;</span>,</span>
+<span id="cb214-20"><a href="hpc.html#cb214-20"></a>    <span class="st">&quot;module load R-qualified/3.5.2      # if loading R from an environment module&quot;</span>,</span>
+<span id="cb214-21"><a href="hpc.html#cb214-21"></a>    <span class="st">&quot;ulimit -v $(( 1024 * {{ memory | 4096 }} ))&quot;</span>,</span>
+<span id="cb214-22"><a href="hpc.html#cb214-22"></a>    <span class="st">&quot;CMQ_AUTH={{ auth }} R --no-save --no-restore -e &#39;clustermq:::worker(</span><span class="ch">\&quot;</span><span class="st">{{ master }}</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span></span>
+<span id="cb214-23"><a href="hpc.html#cb214-23"></a>  ),</span>
+<span id="cb214-24"><a href="hpc.html#cb214-24"></a>  <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
+<span id="cb214-25"><a href="hpc.html#cb214-25"></a>)</span>
+<span id="cb214-26"><a href="hpc.html#cb214-26"></a></span>
+<span id="cb214-27"><a href="hpc.html#cb214-27"></a><span class="co"># Register the scheduler and template file with clustermq.</span></span>
+<span id="cb214-28"><a href="hpc.html#cb214-28"></a><span class="kw">options</span>(</span>
+<span id="cb214-29"><a href="hpc.html#cb214-29"></a>  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;sge&quot;</span>,</span>
+<span id="cb214-30"><a href="hpc.html#cb214-30"></a>  <span class="dt">clustermq.template =</span> <span class="st">&quot;sge_clustermq.tmpl&quot;</span></span>
+<span id="cb214-31"><a href="hpc.html#cb214-31"></a>)</span>
+<span id="cb214-32"><a href="hpc.html#cb214-32"></a></span>
+<span id="cb214-33"><a href="hpc.html#cb214-33"></a><span class="co"># Build the targets.</span></span>
+<span id="cb214-34"><a href="hpc.html#cb214-34"></a><span class="kw">make</span>(</span>
+<span id="cb214-35"><a href="hpc.html#cb214-35"></a>  plan,</span>
+<span id="cb214-36"><a href="hpc.html#cb214-36"></a>  <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>,</span>
+<span id="cb214-37"><a href="hpc.html#cb214-37"></a>  <span class="dt">jobs =</span> <span class="dv">2</span>,</span>
+<span id="cb214-38"><a href="hpc.html#cb214-38"></a>  <span class="co"># Each of the two workers can spawn up to 4 local processes.</span></span>
+<span id="cb214-39"><a href="hpc.html#cb214-39"></a>  <span class="dt">prework =</span> <span class="kw">quote</span>(future<span class="op">::</span><span class="kw">plan</span>(future.callr<span class="op">::</span>callr))</span>
+<span id="cb214-40"><a href="hpc.html#cb214-40"></a>)</span>
+<span id="cb214-41"><a href="hpc.html#cb214-41"></a></span>
+<span id="cb214-42"><a href="hpc.html#cb214-42"></a><span class="co"># Process IDs of the local workers of x:</span></span>
+<span id="cb214-43"><a href="hpc.html#cb214-43"></a><span class="kw">readd</span>(x) </span></code></pre></div>
 </div>
 <div id="transient-workers-1" class="section level4" number="13.7.6.3">
 <h4><span class="header-section-number">13.7.6.3</span> Transient workers</h4>
 <p>As explained in the <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html"><code>future</code> vignette</a>, we can nest our <code>future::plans()</code>. Each target gets its own remote job, and each job can spawn up to 4 local <code>callr</code> processes. The following example uses <a href="http://gridscheduler.sourceforge.net/htmlman/manuals.html">SGE</a>. To learn about templates for other clusters, please consult the <a href="https://github.com/HenrikBengtsson/future.batchtools"><code>future.batchtools</code></a> documentation.</p>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="hpc.html#cb208-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb208-2"><a href="hpc.html#cb208-2"></a></span>
-<span id="cb208-3"><a href="hpc.html#cb208-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
-<span id="cb208-4"><a href="hpc.html#cb208-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb208-5"><a href="hpc.html#cb208-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
-<span id="cb208-6"><a href="hpc.html#cb208-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
-<span id="cb208-7"><a href="hpc.html#cb208-7"></a>)</span>
-<span id="cb208-8"><a href="hpc.html#cb208-8"></a></span>
-<span id="cb208-9"><a href="hpc.html#cb208-9"></a><span class="co"># Write a template file for future.batchtools.</span></span>
-<span id="cb208-10"><a href="hpc.html#cb208-10"></a><span class="kw">writeLines</span>(</span>
-<span id="cb208-11"><a href="hpc.html#cb208-11"></a>  <span class="kw">c</span>(</span>
-<span id="cb208-12"><a href="hpc.html#cb208-12"></a>    <span class="st">&quot;#!/bin/bash&quot;</span>,</span>
-<span id="cb208-13"><a href="hpc.html#cb208-13"></a>    <span class="st">&quot;#$ -cwd                # use pwd as work dir&quot;</span>,</span>
-<span id="cb208-14"><a href="hpc.html#cb208-14"></a>    <span class="st">&quot;#$ -j y                # combine stdout/error in one file&quot;</span>,</span>
-<span id="cb208-15"><a href="hpc.html#cb208-15"></a>    <span class="st">&quot;#$ -o &lt;%= log.file %&gt;  # output file&quot;</span>,</span>
-<span id="cb208-16"><a href="hpc.html#cb208-16"></a>    <span class="st">&quot;#$ -V                  # use environment variables&quot;</span>,</span>
-<span id="cb208-17"><a href="hpc.html#cb208-17"></a>    <span class="st">&quot;#$ -N &lt;%= job.name %&gt;  # job name&quot;</span>,</span>
-<span id="cb208-18"><a href="hpc.html#cb208-18"></a>    <span class="st">&quot;#$ -pe smp 4           # 4 cores per job&quot;</span>,</span>
-<span id="cb208-19"><a href="hpc.html#cb208-19"></a>    <span class="st">&quot;module load R          # if loading R from an environment module&quot;</span>,</span>
-<span id="cb208-20"><a href="hpc.html#cb208-20"></a>    <span class="st">&quot;Rscript -e &#39;batchtools::doJobCollection(</span><span class="ch">\&quot;</span><span class="st">&lt;%= uri %&gt;</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span>,</span>
-<span id="cb208-21"><a href="hpc.html#cb208-21"></a>    <span class="st">&quot;exit 0&quot;</span></span>
-<span id="cb208-22"><a href="hpc.html#cb208-22"></a>  ),</span>
-<span id="cb208-23"><a href="hpc.html#cb208-23"></a>  <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
-<span id="cb208-24"><a href="hpc.html#cb208-24"></a>)</span>
-<span id="cb208-25"><a href="hpc.html#cb208-25"></a></span>
-<span id="cb208-26"><a href="hpc.html#cb208-26"></a><span class="co"># In our nested plans, each target gets its own remote SGE job,</span></span>
-<span id="cb208-27"><a href="hpc.html#cb208-27"></a><span class="co"># and each worker can spawn up to 4 `callr` processes.</span></span>
-<span id="cb208-28"><a href="hpc.html#cb208-28"></a>future<span class="op">::</span><span class="kw">plan</span>(</span>
-<span id="cb208-29"><a href="hpc.html#cb208-29"></a>  <span class="kw">list</span>(</span>
-<span id="cb208-30"><a href="hpc.html#cb208-30"></a>    future<span class="op">::</span><span class="kw">tweak</span>(</span>
-<span id="cb208-31"><a href="hpc.html#cb208-31"></a>      future.batchtools<span class="op">::</span>batchtools_sge,</span>
-<span id="cb208-32"><a href="hpc.html#cb208-32"></a>      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
-<span id="cb208-33"><a href="hpc.html#cb208-33"></a>    ),</span>
-<span id="cb208-34"><a href="hpc.html#cb208-34"></a>    future.callr<span class="op">::</span>callr</span>
-<span id="cb208-35"><a href="hpc.html#cb208-35"></a>  )</span>
-<span id="cb208-36"><a href="hpc.html#cb208-36"></a>)</span>
-<span id="cb208-37"><a href="hpc.html#cb208-37"></a></span>
-<span id="cb208-38"><a href="hpc.html#cb208-38"></a><span class="co"># Build the targets.</span></span>
-<span id="cb208-39"><a href="hpc.html#cb208-39"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span>
-<span id="cb208-40"><a href="hpc.html#cb208-40"></a></span>
-<span id="cb208-41"><a href="hpc.html#cb208-41"></a><span class="co"># Process IDs of the local workers of x:</span></span>
-<span id="cb208-42"><a href="hpc.html#cb208-42"></a><span class="kw">readd</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="hpc.html#cb215-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb215-2"><a href="hpc.html#cb215-2"></a></span>
+<span id="cb215-3"><a href="hpc.html#cb215-3"></a><span class="co"># The targets just collect the process IDs of the callr processes.</span></span>
+<span id="cb215-4"><a href="hpc.html#cb215-4"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb215-5"><a href="hpc.html#cb215-5"></a>  <span class="dt">x =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>()),</span>
+<span id="cb215-6"><a href="hpc.html#cb215-6"></a>  <span class="dt">y =</span> furrr<span class="op">::</span><span class="kw">future_map_int</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">Sys.getpid</span>())</span>
+<span id="cb215-7"><a href="hpc.html#cb215-7"></a>)</span>
+<span id="cb215-8"><a href="hpc.html#cb215-8"></a></span>
+<span id="cb215-9"><a href="hpc.html#cb215-9"></a><span class="co"># Write a template file for future.batchtools.</span></span>
+<span id="cb215-10"><a href="hpc.html#cb215-10"></a><span class="kw">writeLines</span>(</span>
+<span id="cb215-11"><a href="hpc.html#cb215-11"></a>  <span class="kw">c</span>(</span>
+<span id="cb215-12"><a href="hpc.html#cb215-12"></a>    <span class="st">&quot;#!/bin/bash&quot;</span>,</span>
+<span id="cb215-13"><a href="hpc.html#cb215-13"></a>    <span class="st">&quot;#$ -cwd                # use pwd as work dir&quot;</span>,</span>
+<span id="cb215-14"><a href="hpc.html#cb215-14"></a>    <span class="st">&quot;#$ -j y                # combine stdout/error in one file&quot;</span>,</span>
+<span id="cb215-15"><a href="hpc.html#cb215-15"></a>    <span class="st">&quot;#$ -o &lt;%= log.file %&gt;  # output file&quot;</span>,</span>
+<span id="cb215-16"><a href="hpc.html#cb215-16"></a>    <span class="st">&quot;#$ -V                  # use environment variables&quot;</span>,</span>
+<span id="cb215-17"><a href="hpc.html#cb215-17"></a>    <span class="st">&quot;#$ -N &lt;%= job.name %&gt;  # job name&quot;</span>,</span>
+<span id="cb215-18"><a href="hpc.html#cb215-18"></a>    <span class="st">&quot;#$ -pe smp 4           # 4 cores per job&quot;</span>,</span>
+<span id="cb215-19"><a href="hpc.html#cb215-19"></a>    <span class="st">&quot;module load R          # if loading R from an environment module&quot;</span>,</span>
+<span id="cb215-20"><a href="hpc.html#cb215-20"></a>    <span class="st">&quot;Rscript -e &#39;batchtools::doJobCollection(</span><span class="ch">\&quot;</span><span class="st">&lt;%= uri %&gt;</span><span class="ch">\&quot;</span><span class="st">)&#39;&quot;</span>,</span>
+<span id="cb215-21"><a href="hpc.html#cb215-21"></a>    <span class="st">&quot;exit 0&quot;</span></span>
+<span id="cb215-22"><a href="hpc.html#cb215-22"></a>  ),</span>
+<span id="cb215-23"><a href="hpc.html#cb215-23"></a>  <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
+<span id="cb215-24"><a href="hpc.html#cb215-24"></a>)</span>
+<span id="cb215-25"><a href="hpc.html#cb215-25"></a></span>
+<span id="cb215-26"><a href="hpc.html#cb215-26"></a><span class="co"># In our nested plans, each target gets its own remote SGE job,</span></span>
+<span id="cb215-27"><a href="hpc.html#cb215-27"></a><span class="co"># and each worker can spawn up to 4 `callr` processes.</span></span>
+<span id="cb215-28"><a href="hpc.html#cb215-28"></a>future<span class="op">::</span><span class="kw">plan</span>(</span>
+<span id="cb215-29"><a href="hpc.html#cb215-29"></a>  <span class="kw">list</span>(</span>
+<span id="cb215-30"><a href="hpc.html#cb215-30"></a>    future<span class="op">::</span><span class="kw">tweak</span>(</span>
+<span id="cb215-31"><a href="hpc.html#cb215-31"></a>      future.batchtools<span class="op">::</span>batchtools_sge,</span>
+<span id="cb215-32"><a href="hpc.html#cb215-32"></a>      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
+<span id="cb215-33"><a href="hpc.html#cb215-33"></a>    ),</span>
+<span id="cb215-34"><a href="hpc.html#cb215-34"></a>    future.callr<span class="op">::</span>callr</span>
+<span id="cb215-35"><a href="hpc.html#cb215-35"></a>  )</span>
+<span id="cb215-36"><a href="hpc.html#cb215-36"></a>)</span>
+<span id="cb215-37"><a href="hpc.html#cb215-37"></a></span>
+<span id="cb215-38"><a href="hpc.html#cb215-38"></a><span class="co"># Build the targets.</span></span>
+<span id="cb215-39"><a href="hpc.html#cb215-39"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;future&quot;</span>, <span class="dt">jobs =</span> <span class="dv">2</span>)</span>
+<span id="cb215-40"><a href="hpc.html#cb215-40"></a></span>
+<span id="cb215-41"><a href="hpc.html#cb215-41"></a><span class="co"># Process IDs of the local workers of x:</span></span>
+<span id="cb215-42"><a href="hpc.html#cb215-42"></a><span class="kw">readd</span>(x)</span></code></pre></div>
 </div>
 <div id="number-of-local-workers-per-target" class="section level4" number="13.7.6.4">
 <h4><span class="header-section-number">13.7.6.4</span> Number of local workers per target</h4>
 <p>By default, <code>future::availableCores()</code> determines the number of local <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers. To better manage resources, you may wish to further restrict the number of <a href="https://github.com/r-lib/callr"><code>callr</code></a> workers for all targets in the plan, e.g. <code>future::plan(future::callr, workers = 4L)</code> or:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="hpc.html#cb209-1"></a>future<span class="op">::</span><span class="kw">plan</span>(</span>
-<span id="cb209-2"><a href="hpc.html#cb209-2"></a>  <span class="kw">list</span>(</span>
-<span id="cb209-3"><a href="hpc.html#cb209-3"></a>    future<span class="op">::</span><span class="kw">tweak</span>(</span>
-<span id="cb209-4"><a href="hpc.html#cb209-4"></a>      future.batchtools<span class="op">::</span>batchtools_sge,</span>
-<span id="cb209-5"><a href="hpc.html#cb209-5"></a>      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
-<span id="cb209-6"><a href="hpc.html#cb209-6"></a>    ),</span>
-<span id="cb209-7"><a href="hpc.html#cb209-7"></a>    future<span class="op">::</span><span class="kw">tweak</span>(future.callr<span class="op">::</span>callr, <span class="dt">workers =</span> 4L)</span>
-<span id="cb209-8"><a href="hpc.html#cb209-8"></a>  )</span>
-<span id="cb209-9"><a href="hpc.html#cb209-9"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="hpc.html#cb216-1"></a>future<span class="op">::</span><span class="kw">plan</span>(</span>
+<span id="cb216-2"><a href="hpc.html#cb216-2"></a>  <span class="kw">list</span>(</span>
+<span id="cb216-3"><a href="hpc.html#cb216-3"></a>    future<span class="op">::</span><span class="kw">tweak</span>(</span>
+<span id="cb216-4"><a href="hpc.html#cb216-4"></a>      future.batchtools<span class="op">::</span>batchtools_sge,</span>
+<span id="cb216-5"><a href="hpc.html#cb216-5"></a>      <span class="dt">template =</span> <span class="st">&quot;sge_batchtools.tmpl&quot;</span></span>
+<span id="cb216-6"><a href="hpc.html#cb216-6"></a>    ),</span>
+<span id="cb216-7"><a href="hpc.html#cb216-7"></a>    future<span class="op">::</span><span class="kw">tweak</span>(future.callr<span class="op">::</span>callr, <span class="dt">workers =</span> 4L)</span>
+<span id="cb216-8"><a href="hpc.html#cb216-8"></a>  )</span>
+<span id="cb216-9"><a href="hpc.html#cb216-9"></a>)</span></code></pre></div>
 <p>Alternatively, you can use chunking to prevent individual targets from using too many workers, e.g. <code>furrr::future_map(.options = furrr::future_options(scheduling = 4))</code>. Here, the <code>scheduling</code> argument sets the average number of futures per worker.</p>
 </div>
 <div id="locked-bindingenvironment-errors" class="section level4" number="13.7.6.5">
@@ -888,23 +898,23 @@ exit 0</code></pre>
 <li>Use <code>make(lock_envir = FALSE)</code>.</li>
 <li>Use the <code>envir</code> argument of <code>make()</code>. That way, <code>drake</code> locks your special custom environment instead of the global environment.</li>
 </ol>
-<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="hpc.html#cb210-1"></a><span class="co"># Load the main example: https://github.com/wlandau/drake-examples</span></span>
-<span id="cb210-2"><a href="hpc.html#cb210-2"></a><span class="kw">library</span>(drake)</span>
-<span id="cb210-3"><a href="hpc.html#cb210-3"></a><span class="kw">drake_example</span>(<span class="st">&quot;main&quot;</span>)</span>
-<span id="cb210-4"><a href="hpc.html#cb210-4"></a><span class="kw">setwd</span>(<span class="st">&quot;main&quot;</span>)</span>
-<span id="cb210-5"><a href="hpc.html#cb210-5"></a></span>
-<span id="cb210-6"><a href="hpc.html#cb210-6"></a><span class="co"># Define and populate a special custom environment.</span></span>
-<span id="cb210-7"><a href="hpc.html#cb210-7"></a>envir &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">globalenv</span>())</span>
-<span id="cb210-8"><a href="hpc.html#cb210-8"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>, <span class="dt">local =</span> envir)</span>
-<span id="cb210-9"><a href="hpc.html#cb210-9"></a><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>, <span class="dt">local =</span> envir)</span>
-<span id="cb210-10"><a href="hpc.html#cb210-10"></a><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>, <span class="dt">local =</span> envir)</span>
-<span id="cb210-11"><a href="hpc.html#cb210-11"></a></span>
-<span id="cb210-12"><a href="hpc.html#cb210-12"></a><span class="co"># Check the contents of your environments.</span></span>
-<span id="cb210-13"><a href="hpc.html#cb210-13"></a><span class="kw">ls</span>(envir) <span class="co"># Should have your functions and plan</span></span>
-<span id="cb210-14"><a href="hpc.html#cb210-14"></a><span class="kw">ls</span>()         <span class="co"># The global environment should only have what you started with.</span></span>
-<span id="cb210-15"><a href="hpc.html#cb210-15"></a></span>
-<span id="cb210-16"><a href="hpc.html#cb210-16"></a><span class="co"># Build the targets using your custom environment</span></span>
-<span id="cb210-17"><a href="hpc.html#cb210-17"></a><span class="kw">make</span>(envir<span class="op">$</span>plan, <span class="dt">envir =</span> envir)</span></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="hpc.html#cb217-1"></a><span class="co"># Load the main example: https://github.com/wlandau/drake-examples</span></span>
+<span id="cb217-2"><a href="hpc.html#cb217-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb217-3"><a href="hpc.html#cb217-3"></a><span class="kw">drake_example</span>(<span class="st">&quot;main&quot;</span>)</span>
+<span id="cb217-4"><a href="hpc.html#cb217-4"></a><span class="kw">setwd</span>(<span class="st">&quot;main&quot;</span>)</span>
+<span id="cb217-5"><a href="hpc.html#cb217-5"></a></span>
+<span id="cb217-6"><a href="hpc.html#cb217-6"></a><span class="co"># Define and populate a special custom environment.</span></span>
+<span id="cb217-7"><a href="hpc.html#cb217-7"></a>envir &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">globalenv</span>())</span>
+<span id="cb217-8"><a href="hpc.html#cb217-8"></a><span class="kw">source</span>(<span class="st">&quot;R/packages.R&quot;</span>, <span class="dt">local =</span> envir)</span>
+<span id="cb217-9"><a href="hpc.html#cb217-9"></a><span class="kw">source</span>(<span class="st">&quot;R/functions.R&quot;</span>, <span class="dt">local =</span> envir)</span>
+<span id="cb217-10"><a href="hpc.html#cb217-10"></a><span class="kw">source</span>(<span class="st">&quot;R/plan.R&quot;</span>, <span class="dt">local =</span> envir)</span>
+<span id="cb217-11"><a href="hpc.html#cb217-11"></a></span>
+<span id="cb217-12"><a href="hpc.html#cb217-12"></a><span class="co"># Check the contents of your environments.</span></span>
+<span id="cb217-13"><a href="hpc.html#cb217-13"></a><span class="kw">ls</span>(envir) <span class="co"># Should have your functions and plan</span></span>
+<span id="cb217-14"><a href="hpc.html#cb217-14"></a><span class="kw">ls</span>()         <span class="co"># The global environment should only have what you started with.</span></span>
+<span id="cb217-15"><a href="hpc.html#cb217-15"></a></span>
+<span id="cb217-16"><a href="hpc.html#cb217-16"></a><span class="co"># Build the targets using your custom environment</span></span>
+<span id="cb217-17"><a href="hpc.html#cb217-17"></a><span class="kw">make</span>(envir<span class="op">$</span>plan, <span class="dt">envir =</span> envir)</span></code></pre></div>
 
 </div>
 </div>

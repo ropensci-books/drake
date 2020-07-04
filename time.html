@@ -304,6 +304,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="10.1" data-path="stan.html"><a href="stan.html#the-drake-project"><i class="fa fa-check"></i><b>10.1</b> The <code>drake</code> project</a></li>
 <li class="chapter" data-level="10.2" data-path="plans.html"><a href="plans.html#functions"><i class="fa fa-check"></i><b>10.2</b> Functions</a></li>
+<li class="chapter" data-level="10.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>10.3</b> Plan</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="stan.html"><a href="stan.html#model"><i class="fa fa-check"></i><b>10.3.1</b> Model</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#compiled"><i class="fa fa-check"></i><b>10.3.2</b> Compiled</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.3</b> Index</a></li>
+<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.4</b> Data</a></li>
+<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.5</b> Fit</a></li>
+<li class="chapter" data-level="10.3.6" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.6</b> Report</a></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="stan.html"><a href="stan.html#try-it-out"><i class="fa fa-check"></i><b>10.4</b> Try it out!</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="churn.html"><a href="churn.html#packages"><i class="fa fa-check"></i><b>11</b> An analysis of R package download trends</a>
 <ul>
@@ -316,7 +326,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="12.1" data-path="packages.html"><a href="packages.html#get-the-code."><i class="fa fa-check"></i><b>12.1</b> Get the code.</a></li>
 <li class="chapter" data-level="12.2" data-path="gsp.html"><a href="gsp.html#objective-and-methods"><i class="fa fa-check"></i><b>12.2</b> Objective and methods</a></li>
-<li class="chapter" data-level="12.3" data-path="gsp.html"><a href="gsp.html#data"><i class="fa fa-check"></i><b>12.3</b> Data</a></li>
+<li class="chapter" data-level="12.3" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>12.3</b> Data</a></li>
 <li class="chapter" data-level="12.4" data-path="packages.html"><a href="packages.html#analysis"><i class="fa fa-check"></i><b>12.4</b> Analysis</a></li>
 <li class="chapter" data-level="12.5" data-path="gsp.html"><a href="gsp.html#results"><i class="fa fa-check"></i><b>12.5</b> Results</a></li>
 <li class="chapter" data-level="12.6" data-path="gsp.html"><a href="gsp.html#comparison-with-gnu-make"><i class="fa fa-check"></i><b>12.6</b> Comparison with GNU Make</a></li>
@@ -501,68 +511,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="aggressive-shortcuts" class="section level3" number="14.1.4">
 <h3><span class="header-section-number">14.1.4</span> Aggressive shortcuts</h3>
 <p>If your plan <em>still</em> needs tens of thousands of targets, you can take aggressive shortcuts to make things run faster.</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="time.html#cb211-1"></a><span class="kw">make</span>(</span>
-<span id="cb211-2"><a href="time.html#cb211-2"></a>  plan,</span>
-<span id="cb211-3"><a href="time.html#cb211-3"></a>  <span class="dt">verbose =</span> 0L, <span class="co"># Console messages can pile up runtime.</span></span>
-<span id="cb211-4"><a href="time.html#cb211-4"></a>  <span class="dt">log_progress =</span> <span class="ot">FALSE</span>, <span class="co"># drake_progress() will be useless.</span></span>
-<span id="cb211-5"><a href="time.html#cb211-5"></a>  <span class="dt">log_build_times =</span> <span class="ot">FALSE</span>, <span class="co"># build_times() will be useless.</span></span>
-<span id="cb211-6"><a href="time.html#cb211-6"></a>  <span class="dt">recoverable =</span> <span class="ot">FALSE</span>, <span class="co"># make(recover = TRUE) cannot be used later.</span></span>
-<span id="cb211-7"><a href="time.html#cb211-7"></a>  <span class="dt">history =</span> <span class="ot">FALSE</span>, <span class="co"># drake_history() cannot be used later.</span></span>
-<span id="cb211-8"><a href="time.html#cb211-8"></a>  <span class="dt">session_info =</span> <span class="ot">FALSE</span>, <span class="co"># drake_get_session_info() cannot be used later.</span></span>
-<span id="cb211-9"><a href="time.html#cb211-9"></a>  <span class="dt">lock_envir =</span> <span class="ot">FALSE</span>, <span class="co"># See https://docs.ropensci.org/drake/reference/make.html#self-invalidation.</span></span>
-<span id="cb211-10"><a href="time.html#cb211-10"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="time.html#cb218-1"></a><span class="kw">make</span>(</span>
+<span id="cb218-2"><a href="time.html#cb218-2"></a>  plan,</span>
+<span id="cb218-3"><a href="time.html#cb218-3"></a>  <span class="dt">verbose =</span> 0L, <span class="co"># Console messages can pile up runtime.</span></span>
+<span id="cb218-4"><a href="time.html#cb218-4"></a>  <span class="dt">log_progress =</span> <span class="ot">FALSE</span>, <span class="co"># drake_progress() will be useless.</span></span>
+<span id="cb218-5"><a href="time.html#cb218-5"></a>  <span class="dt">log_build_times =</span> <span class="ot">FALSE</span>, <span class="co"># build_times() will be useless.</span></span>
+<span id="cb218-6"><a href="time.html#cb218-6"></a>  <span class="dt">recoverable =</span> <span class="ot">FALSE</span>, <span class="co"># make(recover = TRUE) cannot be used later.</span></span>
+<span id="cb218-7"><a href="time.html#cb218-7"></a>  <span class="dt">history =</span> <span class="ot">FALSE</span>, <span class="co"># drake_history() cannot be used later.</span></span>
+<span id="cb218-8"><a href="time.html#cb218-8"></a>  <span class="dt">session_info =</span> <span class="ot">FALSE</span>, <span class="co"># drake_get_session_info() cannot be used later.</span></span>
+<span id="cb218-9"><a href="time.html#cb218-9"></a>  <span class="dt">lock_envir =</span> <span class="ot">FALSE</span>, <span class="co"># See https://docs.ropensci.org/drake/reference/make.html#self-invalidation.</span></span>
+<span id="cb218-10"><a href="time.html#cb218-10"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="time-logging" class="section level2" number="14.2">
 <h2><span class="header-section-number">14.2</span> Time logging</h2>
 <p>Thanks to <a href="https://github.com/dapperjapper">Jasper Clarkberg</a>, <code>drake</code> records how long it takes to build each target. For large projects that take hours or days to run, this feature becomes important for planning and execution.</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="time.html#cb212-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb212-2"><a href="time.html#cb212-2"></a><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></span>
-<span id="cb212-3"><a href="time.html#cb212-3"></a><span class="kw">make</span>(my_plan)</span>
-<span id="cb212-4"><a href="time.html#cb212-4"></a></span>
-<span id="cb212-5"><a href="time.html#cb212-5"></a><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span></span>
-<span id="cb212-6"><a href="time.html#cb212-6"></a></span>
-<span id="cb212-7"><a href="time.html#cb212-7"></a><span class="co">## `dplyr`-style `tidyselect` commands</span></span>
-<span id="cb212-8"><a href="time.html#cb212-8"></a><span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="time.html#cb219-1"></a><span class="kw">library</span>(drake)</span>
+<span id="cb219-2"><a href="time.html#cb219-2"></a><span class="kw">load_mtcars_example</span>() <span class="co"># from https://github.com/wlandau/drake-examples/tree/master/mtcars</span></span>
+<span id="cb219-3"><a href="time.html#cb219-3"></a><span class="kw">make</span>(my_plan)</span>
+<span id="cb219-4"><a href="time.html#cb219-4"></a></span>
+<span id="cb219-5"><a href="time.html#cb219-5"></a><span class="kw">build_times</span>(<span class="dt">digits =</span> <span class="dv">8</span>) <span class="co"># From the cache.</span></span>
+<span id="cb219-6"><a href="time.html#cb219-6"></a></span>
+<span id="cb219-7"><a href="time.html#cb219-7"></a><span class="co">## `dplyr`-style `tidyselect` commands</span></span>
+<span id="cb219-8"><a href="time.html#cb219-8"></a><span class="kw">build_times</span>(<span class="kw">starts_with</span>(<span class="st">&quot;coef&quot;</span>), <span class="dt">digits =</span> <span class="dv">8</span>)</span></code></pre></div>
 </div>
 <div id="predict-total-runtime" class="section level2" number="14.3">
 <h2><span class="header-section-number">14.3</span> Predict total runtime</h2>
 <p><code>drake</code> uses these times to predict the runtime of the next <code>make()</code>. At this moment, everything is up to date in the current example, so the next <code>make()</code> should ideally take no time at all (except for preprocessing overhead).</p>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="time.html#cb213-1"></a><span class="kw">predict_runtime</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="time.html#cb220-1"></a><span class="kw">predict_runtime</span>(my_plan)</span></code></pre></div>
 <p>Suppose we change a dependency to make some targets out of date. Now, the next <code>make()</code> should take longer since some targets are out of date.</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="time.html#cb214-1"></a>reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){</span>
-<span id="cb214-2"><a href="time.html#cb214-2"></a>  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span></span>
-<span id="cb214-3"><a href="time.html#cb214-3"></a>  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)</span>
-<span id="cb214-4"><a href="time.html#cb214-4"></a>}</span>
-<span id="cb214-5"><a href="time.html#cb214-5"></a></span>
-<span id="cb214-6"><a href="time.html#cb214-6"></a><span class="kw">predict_runtime</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="time.html#cb221-1"></a>reg2 &lt;-<span class="st"> </span><span class="cf">function</span>(d){</span>
+<span id="cb221-2"><a href="time.html#cb221-2"></a>  d<span class="op">$</span>x3 &lt;-<span class="st"> </span>d<span class="op">$</span>x <span class="op">^</span><span class="st"> </span><span class="dv">3</span></span>
+<span id="cb221-3"><a href="time.html#cb221-3"></a>  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x3, <span class="dt">data =</span> d)</span>
+<span id="cb221-4"><a href="time.html#cb221-4"></a>}</span>
+<span id="cb221-5"><a href="time.html#cb221-5"></a></span>
+<span id="cb221-6"><a href="time.html#cb221-6"></a><span class="kw">predict_runtime</span>(my_plan)</span></code></pre></div>
 <p>And what if you plan to delete the cache and build all the targets from scratch?</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="time.html#cb215-1"></a><span class="kw">predict_runtime</span>(my_plan, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="time.html#cb222-1"></a><span class="kw">predict_runtime</span>(my_plan, <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="strategize-your-high-performance-computing" class="section level2" number="14.4">
 <h2><span class="header-section-number">14.4</span> Strategize your high-performance computing</h2>
 <p>Let’s say you are scaling up your workflow. You just put bigger data and heavier computation in your custom code, and the next time you run <code>make()</code>, your targets will take much longer to build. In fact, you estimate that every target except for your R Markdown report will take two hours to complete. Let’s write down these known times in seconds.</p>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="time.html#cb216-1"></a>known_times &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan))</span>
-<span id="cb216-2"><a href="time.html#cb216-2"></a><span class="kw">names</span>(known_times) &lt;-<span class="st"> </span>my_plan<span class="op">$</span>target</span>
-<span id="cb216-3"><a href="time.html#cb216-3"></a>known_times[<span class="st">&quot;report&quot;</span>] &lt;-<span class="st"> </span><span class="dv">5</span></span>
-<span id="cb216-4"><a href="time.html#cb216-4"></a>known_times</span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="time.html#cb223-1"></a>known_times &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">7200</span>, <span class="kw">nrow</span>(my_plan))</span>
+<span id="cb223-2"><a href="time.html#cb223-2"></a><span class="kw">names</span>(known_times) &lt;-<span class="st"> </span>my_plan<span class="op">$</span>target</span>
+<span id="cb223-3"><a href="time.html#cb223-3"></a>known_times[<span class="st">&quot;report&quot;</span>] &lt;-<span class="st"> </span><span class="dv">5</span></span>
+<span id="cb223-4"><a href="time.html#cb223-4"></a>known_times</span></code></pre></div>
 <p>How many parallel jobs should you use in the next <code>make()</code>? The <code>predict_runtime()</code> function can help you decide. <code>predict_runtime(jobs = n)</code> simulates persistent parallel workers and reports the estimated total runtime of <code>make(jobs = n)</code>. (See also <code>predict_workers()</code>.)</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="time.html#cb217-1"></a>time &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
-<span id="cb217-2"><a href="time.html#cb217-2"></a><span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){</span>
-<span id="cb217-3"><a href="time.html#cb217-3"></a>  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(</span>
-<span id="cb217-4"><a href="time.html#cb217-4"></a>    my_plan,</span>
-<span id="cb217-5"><a href="time.html#cb217-5"></a>    <span class="dt">jobs_predict =</span> jobs,</span>
-<span id="cb217-6"><a href="time.html#cb217-6"></a>    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb217-7"><a href="time.html#cb217-7"></a>    <span class="dt">known_times =</span> known_times</span>
-<span id="cb217-8"><a href="time.html#cb217-8"></a>  )</span>
-<span id="cb217-9"><a href="time.html#cb217-9"></a>}</span>
-<span id="cb217-10"><a href="time.html#cb217-10"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb217-11"><a href="time.html#cb217-11"></a><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span></span>
-<span id="cb217-12"><a href="time.html#cb217-12"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span></span>
-<span id="cb217-13"><a href="time.html#cb217-13"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span></span>
-<span id="cb217-14"><a href="time.html#cb217-14"></a><span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span></span>
-<span id="cb217-15"><a href="time.html#cb217-15"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span></span>
-<span id="cb217-16"><a href="time.html#cb217-16"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="time.html#cb224-1"></a>time &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
+<span id="cb224-2"><a href="time.html#cb224-2"></a><span class="cf">for</span> (jobs <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){</span>
+<span id="cb224-3"><a href="time.html#cb224-3"></a>  time[jobs] &lt;-<span class="st"> </span><span class="kw">predict_runtime</span>(</span>
+<span id="cb224-4"><a href="time.html#cb224-4"></a>    my_plan,</span>
+<span id="cb224-5"><a href="time.html#cb224-5"></a>    <span class="dt">jobs_predict =</span> jobs,</span>
+<span id="cb224-6"><a href="time.html#cb224-6"></a>    <span class="dt">from_scratch =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb224-7"><a href="time.html#cb224-7"></a>    <span class="dt">known_times =</span> known_times</span>
+<span id="cb224-8"><a href="time.html#cb224-8"></a>  )</span>
+<span id="cb224-9"><a href="time.html#cb224-9"></a>}</span>
+<span id="cb224-10"><a href="time.html#cb224-10"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb224-11"><a href="time.html#cb224-11"></a><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">time =</span> time <span class="op">/</span><span class="st"> </span><span class="dv">3600</span>, <span class="dt">jobs =</span> <span class="kw">ordered</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>), <span class="dt">group =</span> <span class="dv">1</span>)) <span class="op">+</span></span>
+<span id="cb224-12"><a href="time.html#cb224-12"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> jobs, <span class="dt">y =</span> time, <span class="dt">group =</span> group)) <span class="op">+</span></span>
+<span id="cb224-13"><a href="time.html#cb224-13"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">29</span>)) <span class="op">+</span></span>
+<span id="cb224-14"><a href="time.html#cb224-14"></a><span class="st">  </span><span class="kw">theme_gray</span>(<span class="dv">16</span>) <span class="op">+</span></span>
+<span id="cb224-15"><a href="time.html#cb224-15"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;jobs argument of make()&quot;</span>) <span class="op">+</span></span>
+<span id="cb224-16"><a href="time.html#cb224-16"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Predicted runtime of make() (hours)&quot;</span>)</span></code></pre></div>
 <p>We see serious potential speed gains up to 4 jobs, but beyond that point, we have to double the jobs to shave off another 2 hours. Your choice of <code>jobs</code> for <code>make()</code> ultimately depends on the runtime you can tolerate and the computing resources at your disposal.</p>
 <p>A final note on predicting runtime: the output of <code>predict_runtime()</code> and <code>predict_workers()</code> also depends the optional <code>workers</code> column of your <code>drake_plan()</code>. If you micromanage which workers are allowed to build which targets, you may minimize reads from disk, but you could also slow down your workflow if you are not careful. See the <a href="hpc.html#hpc">high-performance computing guide</a> for more.</p>
 
