@@ -24,7 +24,7 @@ To figure out whether it can skip a target, `drake` goes through an intricate ch
 3. The **depend** trigger: did any non-file dependencies change since the last `make()`? These could be:
     - Other targets.
     - Imported objects.
-    - Imported functions (ignoring changes to spacing, formatting, and comments).
+    - Imported functions. To track changes to a function, `drake` removes any code closed in `ignore()`, deparses the literal code so that whitespace is standardized and comments are removed, and then hashes the resulting string. In some cases, `drake` makes special adjustments for strange edge cases like [`Rcpp` functions with pointers](https://github.com/ropensci/drake/issues/806) and functions defined with `Vectorize()`. However, edge cases like [this one](https://github.com/ropensci-books/drake/issues/130#issue-522436582) are inevitable because of the flexibility of R.
     - Any dependencies of imported functions.
     - Any dependencies of dependencies of imported functions, and so on.
 4. The **file** trigger: did any file inputs or file outputs change since the last `make()`? These files are the ones explicitly declared in the command with `file_in()`, `knitr_in()`, and `file_out()`.
