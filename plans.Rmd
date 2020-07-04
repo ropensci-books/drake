@@ -303,7 +303,7 @@ The following columns have special meanings, and `make()` reads and interprets t
     - "worker": tell the HPC worker to store the target in the cache.
     - NA: default to the `caching` argument of `make()`.
 - `retries`: number of times to retry building a target in the event of an error.
-- `seed`: pseudo-random number generator (RNG) seed for each target. `drake` usually computes its own unique reproducible target-specific seeds using the target name and the global seed (the `seed` argument of `make()`). Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
+- `seed`: For statistical reproducibility, `drake` automatically assigns a unique pseudo-random number generator (RNG) seed to each target based on the target name and the global `seed` argument to `make()`. With the `seed` column of the plan, you can override these default seeds and set your own. Any non-missing seeds in the `seed` column override `drake`'s default target seeds.
 - `max_expand`: for dynamic branching only. Same as the `max_expand` argument of [make()], but on a target-by-target basis. Limits the number of sub-targets created for a given target. Only supported in `drake` >= 7.11.0.
 
 ## Static files

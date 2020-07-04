@@ -28,7 +28,7 @@ To figure out whether it can skip a target, `drake` goes through an intricate ch
     - Any dependencies of imported functions.
     - Any dependencies of dependencies of imported functions, and so on.
 4. The **file** trigger: did any file inputs or file outputs change since the last `make()`? These files are the ones explicitly declared in the command with `file_in()`, `knitr_in()`, and `file_out()`.
-5. The **seed** trigger: did the target's pseudo-random number generator seed change? Only applies if you supplied a `seed` column to the plan at some point.
+5. The **seed** trigger: for statistical reproducibility, `drake` assigns a unique seed to each target based on the target's name and the global `seed` argument to `make()`. If you change the target's pseudo-random number generator seed either with the `seed` argument or the custom `seed` column in the plan, this change will cause a rebuild if the `seed` trigger is turned on.
 6. The **format** trigger: did you add or change the target's storage format since last build? Details: <https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets>.
 7. The **condition** trigger: an optional user-defined piece of code that evaluates to a `TRUE`/`FALSE` value. The target builds if the value is `TRUE`.
 8. The **change** trigger:  an optional user-defined piece of code that evaluates to any value (preferably small and quick to compute). The target builds if the value changed since the last `make()`.
