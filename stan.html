@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>The drake R Package User Manual</title>
+  <title>Chapter 10 Validating a small hierarchical model with Stan | The drake R Package User Manual</title>
   <meta name="description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="The drake R Package User Manual" />
+  <meta property="og:title" content="Chapter 10 Validating a small hierarchical model with Stan | The drake R Package User Manual" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="https://books.ropensci.org/drake/" />
   <meta property="og:image" content="https://books.ropensci.org/drake//images/logo.png" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ropensci-books/drake" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The drake R Package User Manual" />
+  <meta name="twitter:title" content="Chapter 10 Validating a small hierarchical model with Stan | The drake R Package User Manual" />
   
   <meta name="twitter:description" content="In-depth walkthroughs and examples of drake, an R package for reproducible computation at scale." />
   <meta name="twitter:image" content="https://books.ropensci.org/drake//images/logo.png" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-
-<link rel="next" href="similar-work.html"/>
+<link rel="prev" href="churn.html"/>
+<link rel="next" href="packages.html"/>
 <script src="libs/header-attrs-2.3/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -482,368 +482,127 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">The drake R Package User Manual</h1>
-<p class="author"><em>Will Landau, Kirill Müller, Alex Axthelm, Jasper Clarkberg, Lorenz Walthert, Ellis Hughes, Matthew Mark Strasiotto</em></p>
-<p class="author"><em>Copyright Eli Lilly and Company</em></p>
-</div>
-<div id="intro" class="section level1" number="1">
-<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
-<iframe title="vimeo-player" src="https://player.vimeo.com/video/362383350" width="640" height="360" frameborder="0" allowfullscreen>
-</iframe>
-<p>The video above is the recording from the <a href="https://ropensci.org/commcalls/2019-09-24/">rOpenSci Community Call from 2019-09-24</a>. Visit the <a href="https://ropensci.org/commcalls/2019-09-24/">call’s page</a> for links to additional resources, and <a href="https://github.com/ropensci-org/community-calls">chime in here</a> to propose and vote for ideas for new Community Call topics and speakers.</p>
-<div id="the-drake-r-package" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> The drake R package</h2>
-<p>Data analysis can be slow. A round of scientific computation can take several minutes, hours, or even days to complete. After it finishes, if you update your code or data, your hard-earned results may no longer be valid. How much of that valuable output can you keep, and how much do you need to update? How much runtime must you endure all over again?</p>
-<p>For projects in R, the <code>drake</code> package can help. It <a href="https://books.ropensci.org/drake/plans.html">analyzes your workflow</a>, skips steps with up-to-date results, and orchestrates the rest with <a href="https://books.ropensci.org/drake/hpc.html">optional distributed computing</a>. At the end, <code>drake</code> provides evidence that your results match the underlying code and data, which increases your ability to trust your research.</p>
-</div>
-<div id="installation" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Installation</h2>
-<p>You can choose among different versions of <code>drake</code>. The latest CRAN release may be more convenient to install, but this manual is kept up to date with the GitHub version, so some features described here may not yet be available on CRAN.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="index.html#cb1-1"></a><span class="co"># Install the latest stable release from CRAN.</span></span>
-<span id="cb1-2"><a href="index.html#cb1-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;drake&quot;</span>)</span>
-<span id="cb1-3"><a href="index.html#cb1-3"></a></span>
-<span id="cb1-4"><a href="index.html#cb1-4"></a><span class="co"># Alternatively, install the development version from GitHub.</span></span>
-<span id="cb1-5"><a href="index.html#cb1-5"></a><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</span>
-<span id="cb1-6"><a href="index.html#cb1-6"></a><span class="kw">library</span>(devtools)</span>
-<span id="cb1-7"><a href="index.html#cb1-7"></a><span class="kw">install_github</span>(<span class="st">&quot;ropensci/drake&quot;</span>)</span></code></pre></div>
-</div>
-<div id="why-drake" class="section level2" number="1.3">
-<h2><span class="header-section-number">1.3</span> Why drake?</h2>
-<div id="what-gets-done-stays-done." class="section level3" number="1.3.1">
-<h3><span class="header-section-number">1.3.1</span> What gets done stays done.</h3>
-<p>Too many data science projects follow a <a href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphean loop</a>:</p>
-<ol style="list-style-type: decimal">
-<li>Launch the code.</li>
-<li>Wait while it runs.</li>
-<li>Discover an issue.</li>
-<li>Restart from scratch.</li>
-</ol>
-<p>For projects with long runtimes, people tend to get stuck. But with <code>drake</code>, you can automatically</p>
-<ol style="list-style-type: decimal">
-<li>Launch the parts that changed since last time.</li>
-<li>Skip the rest.</li>
-</ol>
-</div>
-<div id="reproducibility-with-confidence" class="section level3" number="1.3.2">
-<h3><span class="header-section-number">1.3.2</span> Reproducibility with confidence</h3>
-<p>The R community emphasizes reproducibility. Traditional themes include <a href="https://en.wikipedia.org/wiki/Replication_crisis">scientific replicability</a>, literate programming with <a href="https://yihui.name/knitr/">knitr</a>, and version control with <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">git</a>. But internal consistency is important too. Reproducibility carries the promise that your output matches the code and data you say you used. With the exception of any <a href="triggers.html#triggers">triggers</a> suppressed by the user, <code>drake</code> strives to keep this promise.</p>
-<div id="evidence" class="section level4" number="1.3.2.1">
-<h4><span class="header-section-number">1.3.2.1</span> Evidence</h4>
-<p>Suppose you are reviewing someone else’s data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With <code>drake</code>, it is quick and easy to find out.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="index.html#cb2-1"></a><span class="kw">make</span>(plan) <span class="co"># See also r_make().</span></span>
-<span id="cb2-2"><a href="index.html#cb2-2"></a></span>
-<span id="cb2-3"><a href="index.html#cb2-3"></a><span class="kw">outdated</span>(plan) <span class="co"># See also r_outdated().</span></span></code></pre></div>
-<p>With everything already up to date, you have <strong>tangible evidence</strong> of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They <strong>faithfully show</strong> what the code is producing. Given the right <a href="https://rstudio.github.io/packrat/">package environment</a> and <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html">system configuration</a>, you have everything you need to reproduce all the output by yourself.</p>
-</div>
-<div id="ease" class="section level4" number="1.3.2.2">
-<h4><span class="header-section-number">1.3.2.2</span> Ease</h4>
-<p>When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="index.html#cb3-1"></a><span class="kw">clean</span>()    <span class="co"># Remove the original author&#39;s results.</span></span>
-<span id="cb3-2"><a href="index.html#cb3-2"></a><span class="kw">make</span>(plan) <span class="co"># Independently re-create the results from the code and input data.</span></span></code></pre></div>
-</div>
-<div id="independent-replication" class="section level4" number="1.3.2.3">
-<h4><span class="header-section-number">1.3.2.3</span> Independent replication</h4>
-<p>With even more evidence and confidence, you can invest the time to independently replicate the original code base if necessary. Up until this point, you relied on basic <code>drake</code> functions such as <code>make()</code>, so you may not have needed to peek at any substantive author-defined code in advance. In that case, you can stay usefully ignorant as you reimplement the original author’s methodology. In other words, <code>drake</code> could potentially improve the integrity of independent replication.</p>
-</div>
-<div id="big-data-efficiency" class="section level4" number="1.3.2.4">
-<h4><span class="header-section-number">1.3.2.4</span> Big data efficiency</h4>
-<p>Select a specialized data format to increase speed and reduce memory consumption. In version 7.5.2.9000 and above, the available formats are <a href="https://github.com/fstpackage/fst">“fst”</a> for data frames (example below) and “keras” for <a href="https://keras.rstudio.com/">Keras</a> models (<a href="https://books.ropensci.org/drake/churn.html#plan">example here</a>).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="index.html#cb4-1"></a><span class="kw">library</span>(drake)</span>
-<span id="cb4-2"><a href="index.html#cb4-2"></a>n &lt;-<span class="st"> </span><span class="fl">1e8</span> <span class="co"># Each target is 1.6 GB in memory.</span></span>
-<span id="cb4-3"><a href="index.html#cb4-3"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb4-4"><a href="index.html#cb4-4"></a>  <span class="dt">data_fst =</span> <span class="kw">target</span>(</span>
-<span id="cb4-5"><a href="index.html#cb4-5"></a>    <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n)),</span>
-<span id="cb4-6"><a href="index.html#cb4-6"></a>    <span class="dt">format =</span> <span class="st">&quot;fst&quot;</span></span>
-<span id="cb4-7"><a href="index.html#cb4-7"></a>  ),</span>
-<span id="cb4-8"><a href="index.html#cb4-8"></a>  <span class="dt">data_old =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(n), <span class="dt">y =</span> <span class="kw">runif</span>(n))</span>
-<span id="cb4-9"><a href="index.html#cb4-9"></a>)</span>
-<span id="cb4-10"><a href="index.html#cb4-10"></a><span class="kw">make</span>(plan)</span>
-<span id="cb4-11"><a href="index.html#cb4-11"></a><span class="co">#&gt; target data_fst</span></span>
-<span id="cb4-12"><a href="index.html#cb4-12"></a><span class="co">#&gt; target data_old</span></span>
-<span id="cb4-13"><a href="index.html#cb4-13"></a><span class="kw">build_times</span>(<span class="dt">type =</span> <span class="st">&quot;build&quot;</span>)</span>
-<span id="cb4-14"><a href="index.html#cb4-14"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
-<span id="cb4-15"><a href="index.html#cb4-15"></a><span class="co">#&gt;   target   elapsed              user                 system    </span></span>
-<span id="cb4-16"><a href="index.html#cb4-16"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;Duration&gt;           &lt;Duration&gt;           &lt;Duration&gt;</span></span>
-<span id="cb4-17"><a href="index.html#cb4-17"></a><span class="co">#&gt; 1 data_fst 13.93s               37.562s              7.954s    </span></span>
-<span id="cb4-18"><a href="index.html#cb4-18"></a><span class="co">#&gt; 2 data_old 184s (~3.07 minutes) 177s (~2.95 minutes) 4.157s</span></span></code></pre></div>
-</div>
-<div id="history" class="section level4" number="1.3.2.5">
-<h4><span class="header-section-number">1.3.2.5</span> History</h4>
-<p>As of version 7.5.0, <code>drake</code> tracks the history of your analysis: what you built, when you built it, how you built it, the arguments you used in your function calls, and how to get the data back. (Disable with <code>make(history = FALSE)</code>)</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="index.html#cb5-1"></a><span class="kw">drake_history</span>(<span class="dt">analyze =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb5-2"><a href="index.html#cb5-2"></a><span class="co">#&gt; # A tibble: 7 x 8</span></span>
-<span id="cb5-3"><a href="index.html#cb5-3"></a><span class="co">#&gt;   target  time        hash   exists command            runtime latest quiet</span></span>
-<span id="cb5-4"><a href="index.html#cb5-4"></a><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;  &lt;lgl&gt;  &lt;chr&gt;                &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;</span></span>
-<span id="cb5-5"><a href="index.html#cb5-5"></a><span class="co">#&gt; 1 data    2019-06-23… e580e… TRUE   raw_data %&gt;% muta… 0.001   TRUE   NA   </span></span>
-<span id="cb5-6"><a href="index.html#cb5-6"></a><span class="co">#&gt; 2 fit     2019-06-23… 62a16… TRUE   lm(Ozone ~ Temp +… 0.00300 TRUE   NA   </span></span>
-<span id="cb5-7"><a href="index.html#cb5-7"></a><span class="co">#&gt; 3 hist    2019-06-23… 10bcd… TRUE   create_plot(data)  0.00500 FALSE  NA   </span></span>
-<span id="cb5-8"><a href="index.html#cb5-8"></a><span class="co">#&gt; 4 hist    2019-06-23… 00fad… TRUE   create_plot(data)  0.00300 TRUE   NA   </span></span>
-<span id="cb5-9"><a href="index.html#cb5-9"></a><span class="co">#&gt; 5 raw_da… 2019-06-23… 63172… TRUE   &quot;readxl::read_exc… 0.00900 TRUE   NA   </span></span>
-<span id="cb5-10"><a href="index.html#cb5-10"></a><span class="co">#&gt; 6 report  2019-06-23… dd965… TRUE   &quot;rmarkdown::rende… 0.476   FALSE  TRUE </span></span>
-<span id="cb5-11"><a href="index.html#cb5-11"></a><span class="co">#&gt; 7 report  2019-06-23… dd965… TRUE   &quot;rmarkdown::rende… 0.369   TRUE   TRUE</span></span></code></pre></div>
-<p>The history has arguments like <code>quiet</code> (because of the call to <code>knit(quiet = TRUE)</code>) and hashes to help you recover old data. To learn more, see the end of the <a href="walkthrough.html#walkthrough">walkthrough chapter</a> and the <a href="https://docs.ropensci.org/drake/reference/drake_history.html"><code>drake_history()</code></a> help file.</p>
-</div>
-<div id="reproducible-recovery" class="section level4" number="1.3.2.6">
-<h4><span class="header-section-number">1.3.2.6</span> Reproducible recovery</h4>
-<p><code>drake</code>’s data recovery feature is another way to avoid rerunning commands. It is useful if:</p>
-<ul>
-<li>You want to revert to your old code, maybe with <code>git reset</code>.</li>
-<li>You accidentally <code>clean()</code>ed a target and to get it back.</li>
-<li>You want to rename an expensive target.</li>
-</ul>
-<p>See the <a href="walkthrough.html#walkthrough">walkthrough chapter</a> for details.</p>
-</div>
-<div id="readability-and-transparency" class="section level4" number="1.3.2.7">
-<h4><span class="header-section-number">1.3.2.7</span> Readability and transparency</h4>
-<p>Ideally, independent observers should be able to read your code and understand it. <code>drake</code> helps in several ways.</p>
-<ul>
-<li>The <a href="https://docs.ropensci.org/drake/reference/drake_plan.html"><code>drake</code> plan</a> explicitly outlines the steps of the analysis, and <a href="https://docs.ropensci.org/drake/reference/vis_drake_graph.html"><code>vis_drake_graph()</code></a> visualizes how those steps depend on each other.</li>
-<li><code>drake</code> takes care of the parallel scheduling and high-performance computing (HPC) for you. That means the HPC code is no longer tangled up with the code that actually expresses your ideas.</li>
-<li>You can <a href="https://books.ropensci.org/drake/plans#large-plans">generate large collections of targets</a> without necessarily changing your code base of imported functions, another nice separation between the concepts and the execution of your workflow</li>
-</ul>
-</div>
-</div>
-<div id="scale-up-and-out." class="section level3" number="1.3.3">
-<h3><span class="header-section-number">1.3.3</span> Scale up and out.</h3>
-<p>Not every project can complete in a single R session on your laptop. Some projects need more speed or computing power. Some require a few local processor cores, and some need large high-performance computing systems. But parallel computing is hard. Your tables and figures depend on your analysis results, and your analyses depend on your datasets, so some tasks must finish before others even begin. <code>drake</code> knows what to do. Parallelism is implicit and automatic. See the <a href="https://books.ropensci.org/drake/hpc.html">high-performance computing guide</a> for all the details.
-a</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="index.html#cb6-1"></a><span class="co"># Use the spare cores on your local machine.</span></span>
-<span id="cb6-2"><a href="index.html#cb6-2"></a><span class="kw">options</span>(<span class="dt">clustermq.scheduler =</span> <span class="st">&quot;multicore&quot;</span>)</span>
-<span id="cb6-3"><a href="index.html#cb6-3"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">4</span>)</span>
-<span id="cb6-4"><a href="index.html#cb6-4"></a></span>
-<span id="cb6-5"><a href="index.html#cb6-5"></a><span class="co"># Or scale up to a supercomputer.</span></span>
-<span id="cb6-6"><a href="index.html#cb6-6"></a><span class="kw">drake_hpc_tmpl_file</span>(<span class="st">&quot;slurm_clustermq.tmpl&quot;</span>) <span class="co"># https://slurm.schedmd.com/</span></span>
-<span id="cb6-7"><a href="index.html#cb6-7"></a><span class="kw">options</span>(</span>
-<span id="cb6-8"><a href="index.html#cb6-8"></a>  <span class="dt">clustermq.scheduler =</span> <span class="st">&quot;slurm&quot;</span>,</span>
-<span id="cb6-9"><a href="index.html#cb6-9"></a>  <span class="dt">clustermq.template =</span> <span class="st">&quot;slurm_clustermq.tmpl&quot;</span></span>
-<span id="cb6-10"><a href="index.html#cb6-10"></a>)</span>
-<span id="cb6-11"><a href="index.html#cb6-11"></a><span class="kw">make</span>(plan, <span class="dt">parallelism =</span> <span class="st">&quot;clustermq&quot;</span>, <span class="dt">jobs =</span> <span class="dv">100</span>)</span></code></pre></div>
-</div>
-</div>
-<div id="with-docker" class="section level2" number="1.4">
-<h2><span class="header-section-number">1.4</span> With Docker</h2>
-<p><code>drake</code> and Docker are compatible and complementary. Here are some examples that run <code>drake</code> inside a Docker image.</p>
-<ul>
-<li><a href="https://gitlab.com/ecohealthalliance/drake-gitlab-docker-example"><code>drake-gitlab-docker-example</code></a>: A small pedagogical example workflow that leverages <code>drake</code>, Docker, GitLab, and continuous integration in a reproducible analysis pipeline. Created by <a href="https://www.noamross.net/">Noam Ross</a>.</li>
-<li><a href="https://github.com/joelnitta/pleurosoriopsis"><code>pleurosoriopsis</code></a>: The workflow that supports <a href="https://www.kahaku.go.jp/research/publication/botany.html">Ebihara <em>et al.</em> 2019. “Growth Dynamics of the Independent Gametophytes of <em>Pleurorosiopsis makinoi</em> (Polypodiaceae)” <em>Bulletin of the National Science Museum Series B (Botany)</em> 45:77-86.</a>. Created by <a href="https://github.com/joelnitta">Joel Nitta</a>.</li>
-</ul>
-<p>Alternatively, it is possible to run <code>drake</code> outside Docker and use the <a href="https://github.com/HenrikBengtsson/future"><code>future</code></a> package to send targets to a Docker image. <code>drake</code>’s <a href="https://github.com/wlandau/drake-examples/tree/master/Docker-psock"><code>Docker-psock</code></a> example demonstrates how. Download the code with <code>drake_example("Docker-psock")</code>.</p>
-</div>
-<div id="documentation" class="section level2" number="1.5">
-<h2><span class="header-section-number">1.5</span> Documentation</h2>
-<div id="core-concepts" class="section level3" number="1.5.1">
-<h3><span class="header-section-number">1.5.1</span> Core concepts</h3>
-<p>The following resources explain what <code>drake</code> can do and how it works. The <a href="https://github.com/wlandau/learndrake"><code>learndrake</code></a> workshop devotes particular attention to <code>drake</code>’s mental model.</p>
-<ul>
-<li>The <a href="https://books.ropensci.org/drake/">user manual</a>.</li>
-<li><a href="https://github.com/wlandau/drakeplanner"><code>drakeplanner</code></a>, an R/Shiny app to help learn <code>drake</code> and create new projects. Run locally with <code>drakeplanner::drakeplanner()</code> or access it at <a href="https://wlandau.shinyapps.io/drakeplanner" class="uri">https://wlandau.shinyapps.io/drakeplanner</a>.</li>
-<li><a href="https://github.com/wlandau/learndrake"><code>learndrake</code></a>, an R package for teaching an extended <code>drake</code> workshop. It contains notebooks, slides, Shiny apps, the latter two of which are publicly deployed. See the <a href="https://github.com/wlandau/learndrake/blob/master/README.md">README</a> for instructions and links.</li>
-</ul>
-</div>
-<div id="in-practice" class="section level3" number="1.5.2">
-<h3><span class="header-section-number">1.5.2</span> In practice</h3>
-<ul>
-<li><a href="https://github.com/MilesMcBain">Miles McBain</a>’s <a href="https://milesmcbain.xyz/the-drake-post/">excellent blog post</a> explains the motivating factors and practical issues {drake} addresses for most projects, how to set up a project as quickly and painlessly as possible, and how to overcome common obstacles.</li>
-<li>Miles’ <a href="https://github.com/MilesMcBain/dflow"><code>dflow</code></a> package generates the file structure for a boilerplate <code>drake</code> project. It is a more thorough alternative to <code>drake::use_drake()</code>.</li>
-<li><code>drake</code> is heavily function-oriented by design, and Miles’ <a href="https://github.com/MilesMcBain/fnmate"><code>fnmate</code></a> package automatically generates boilerplate code and docstrings for functions you mention in <code>drake</code> plans.</li>
-</ul>
-</div>
-<div id="use-cases" class="section level3" number="1.5.3">
-<h3><span class="header-section-number">1.5.3</span> Use cases</h3>
-<p>The official <a href="https://discuss.ropensci.org/c/usecases">rOpenSci use cases</a> and <a href="https://discuss.ropensci.org/c/usecases">associated discussion threads</a> describe applications of <code>drake</code> in the real world. Many of these use cases are linked from the <a href="https://discuss.ropensci.org/tag/drake"><code>drake</code> tag on the rOpenSci discussion forum</a>.</p>
-<p>Here are some additional applications of <code>drake</code> in real-world projects.</p>
-<ul>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/joelnitta/pleurosoriopsis">joelnitta/pleurosoriopsis</a></li>
-<li><a href="https://github.com/pat-s/pathogen-modeling">pat-s/pathogen-modeling</a></li>
-<li><a href="https://github.com/sol-eng/tensorflow-w-r">sol-eng/tensorflow-w-r</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-</div>
-<div id="drake-projects-as-r-packages" class="section level3" number="1.5.4">
-<h3><span class="header-section-number">1.5.4</span> <code>drake</code> projects as R packages</h3>
-<p>Some folks like to structure their <code>drake</code> workflows as R packages. Examples are below. In your own analysis packages, be sure to supply the namespace of your package to the <code>envir</code> argument of <code>make()</code> and friends (e.g. <code>make(envir = getNamespace("yourPackage")</code> so <code>drake</code> can watch you package’s functions for changes and rebuild downstream targets accordingly.</p>
-<ul>
-<li><a href="https://github.com/b-rodrigues/coolmlproject">b-rodrigues/coolmlproject</a></li>
-<li><a href="https://github.com/tiernanmartin/drakepkg">tiernanmartin/drakepkg</a></li>
-</ul>
-</div>
-<div id="frequently-asked-questions" class="section level3" number="1.5.5">
-<h3><span class="header-section-number">1.5.5</span> Frequently asked questions</h3>
-<p>The <a href="https://books.ropensci.org/drake/faq.html">FAQ page</a> is an index of links to <a href="https://github.com/ropensci/drake/issues?q=is%3Aissue+is%3Aopen+label%3A%22frequently+asked+question%22">appropriately-labeled issues on GitHub</a>. To contribute, please <a href="https://github.com/ropensci/drake/issues/new">submit a new issue</a> and ask that it be labeled as a frequently asked question.</p>
-</div>
-<div id="reference" class="section level3" number="1.5.6">
-<h3><span class="header-section-number">1.5.6</span> Reference</h3>
-<ul>
-<li>The <a href="https://docs.ropensci.org/drake/">reference website</a>.</li>
-<li>The <a href="https://github.com/wlandau/drake-examples">official repository of example code</a>. Download an example workflow from here with <code>drake_example()</code>.</li>
-<li>Presentations and workshops by <a href="https://github.com/wlandau">Will Landau</a>, <a href="https://github.com/krlmlr">Kirill Müller</a>, <a href="https://github.com/aedobbyn">Amanda Dobbyn</a>, <a href="http://github.com/karthik">Karthik Ram</a>, <a href="https://github.com/sinarueeger">Sina Rüeger</a>, <a href="https://github.com/cstawitz">Christine Stawitz</a>, and others. See specific links at <a href="https://books.ropensci.org/drake/index.html#presentations" class="uri">https://books.ropensci.org/drake/index.html#presentations</a></li>
-<li>The <a href="https://books.ropensci.org/drake/faq.html">FAQ page</a>, which links to <a href="https://github.com/ropensci/drake/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+label%3A%22frequently+asked+question%22+">appropriately-labeled issues on GitHub</a>.</li>
-</ul>
-</div>
-<div id="function-reference" class="section level3" number="1.5.7">
-<h3><span class="header-section-number">1.5.7</span> Function reference</h3>
-<p>The <a href="https://docs.ropensci.org/drake/reference/index.html">reference section</a> lists all the available functions. Here are the most important ones.</p>
-<ul>
-<li><code>drake_plan()</code>: create a workflow data frame (like <code>my_plan</code>).</li>
-<li><code>make()</code>: build your project.</li>
-<li><code>drake_history()</code>: show what you built, when you built it, and the function arguments you used.</li>
-<li><code>loadd()</code>: load one or more built targets into your R session.</li>
-<li><code>readd()</code>: read and return a built target.</li>
-<li><code>vis_drake_graph()</code>: show an interactive visual network representation of your workflow.</li>
-<li><code>outdated()</code>: see which targets will be built in the next <code>make()</code>.</li>
-<li><code>deps_code()</code>: check the dependencies of a command or function.</li>
-<li><code>drake_failed()</code>: list the targets that failed to build in the last <code>make()</code>.</li>
-<li><code>diagnose()</code>: return the full context of a build, including errors, warnings, and messages.</li>
-</ul>
-</div>
-<div id="tutorials" class="section level3" number="1.5.8">
-<h3><span class="header-section-number">1.5.8</span> Tutorials</h3>
-<p>Thanks to <a href="https://github.com/krlmlr">Kirill</a> for constructing two interactive <a href="https://rstudio.github.io/learnr/"><code>learnr</code></a> tutorials: <a href="https://krlmlr.shinyapps.io/cooking-drake-tutorial/">one supporting <code>drake</code> itself</a>, and a <a href="https://krlmlr.shinyapps.io/cooking-tutorial/">prerequisite walkthrough</a> of the <a href="https://github.com/krlmlr/cooking"><code>cooking</code> package</a>.</p>
-</div>
-<div id="examples" class="section level3" number="1.5.9">
-<h3><span class="header-section-number">1.5.9</span> Examples</h3>
-<p>The official <a href="https://ropensci.org/usecases/">rOpenSci use cases</a> and <a href="https://discuss.ropensci.org/c/usecases">associated discussion threads</a> describe applications of <code>drake</code> in action. Here are some more real-world sightings of <code>drake</code> in the wild.</p>
-<ul>
-<li><a href="https://gitlab.com/ecohealthalliance/drake-gitlab-docker-example">ecohealthalliance/drake-gitlab-docker-example</a></li>
-<li><a href="https://github.com/efcaguab/demografia-del-voto">efcaguab/demografia-del-voto</a></li>
-<li><a href="https://github.com/efcaguab/great-white-shark-nsw">efcaguab/great-white-shark-nsw</a></li>
-<li><a href="https://github.com/IndianaCHE/Detailed-SSP-Reports">IndianaCHE/Detailed-SSP-Reports</a></li>
-<li><a href="https://github.com/joelnitta/pleurosoriopsis">joelnitta/pleurosoriopsis</a></li>
-<li><a href="https://github.com/pat-s/pathogen-modeling">pat-s/pathogen-modeling</a></li>
-<li><a href="https://github.com/sol-eng/tensorflow-w-r">sol-eng/tensorflow-w-r</a></li>
-<li><a href="https://github.com/tiernanmartin/home-and-hope">tiernanmartin/home-and-hope</a></li>
-</ul>
-<p>There are also multiple <code>drake</code>-powered example projects <a href="https://github.com/wlandau/drake-examples">available here</a>, ranging from beginner-friendly stubs to demonstrations of high-performance computing. You can generate the files for a project with <code>drake_example()</code> (e.g. <code>drake_example("gsp")</code>), and you can list the available projects with <code>drake_examples()</code>. You can contribute your own example project with a <a href="https://github.com/wlandau/drake-examples/pulls">fork and pull request</a>.</p>
-</div>
-<div id="presentations" class="section level3" number="1.5.10">
-<h3><span class="header-section-number">1.5.10</span> Presentations</h3>
+<div id="stan" class="section level1" number="10">
+<h1><span class="header-section-number">Chapter 10</span> Validating a small hierarchical model with Stan</h1>
+<p>The goal of this example workflow is to validate a small Bayesian hierarchical model.</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="stan.html#cb155-1"></a>y_i <span class="op">~</span><span class="st"> </span>iid <span class="kw">Normal</span>(alpha <span class="op">+</span><span class="st"> </span>x_i <span class="op">*</span><span class="st"> </span>beta, sigma<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb155-2"><a href="stan.html#cb155-2"></a>alpha <span class="op">~</span><span class="st"> </span><span class="kw">Normal</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb155-3"><a href="stan.html#cb155-3"></a>beta <span class="op">~</span><span class="st"> </span><span class="kw">Normal</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb155-4"><a href="stan.html#cb155-4"></a>sigma <span class="op">~</span><span class="st"> </span><span class="kw">Uniform</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<p>We simulate multiple datasets from the model and fit the model on each dataset. For each model fit, we determine if the 50% credible interval of the regression coefficient <code>beta</code> contains the true value of <code>beta</code> used to generate the data. If we implemented the model correctly, roughly 50% of the models should recapture the true <code>beta</code> in 50% credible intervals.</p>
+<div id="the-drake-project" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> The <code>drake</code> project</h2>
+<p>Because of the long computation time involved, this chapter of the manual does not actually run the analysis code. The complete code can be found at <a href="https://github.com/wlandau/drake-examples/tree/master/stan" class="uri">https://github.com/wlandau/drake-examples/tree/master/stan</a> and downloaded with <code>drake::drake_example("stan")</code>, and we encourage you to try out the code yourself. This chapter serves to walk through the functions and plan and explain the overall thought process.</p>
+<p>The file structure is that of a <a href="projects.html#projects">typical <code>drake</code> project</a> with some additions to allow optional <a href="hpc.html#hpc">high-performance computing</a> on a cluster.</p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="stan.html#cb156-1"></a>├── run.sh</span>
+<span id="cb156-2"><a href="stan.html#cb156-2"></a>├── run.R</span>
+<span id="cb156-3"><a href="stan.html#cb156-3"></a>├── _drake.R</span>
+<span id="cb156-4"><a href="stan.html#cb156-4"></a>├── sge.tmpl</span>
+<span id="cb156-5"><a href="stan.html#cb156-5"></a>├── R<span class="op">/</span></span>
+<span id="cb156-6"><a href="stan.html#cb156-6"></a>├──── packages.R</span>
+<span id="cb156-7"><a href="stan.html#cb156-7"></a>├──── functions.R</span>
+<span id="cb156-8"><a href="stan.html#cb156-8"></a>├──── plan.R</span>
+<span id="cb156-9"><a href="stan.html#cb156-9"></a>├── stan<span class="op">/</span></span>
+<span id="cb156-10"><a href="stan.html#cb156-10"></a>├──── model.stan</span>
+<span id="cb156-11"><a href="stan.html#cb156-11"></a>└── report.Rmd</span></code></pre></div>
 <table>
 <colgroup>
-<col width="22%" />
-<col width="22%" />
-<col width="22%" />
-<col width="31%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th>Author</th>
-<th>Venue</th>
-<th>Date</th>
-<th>Materials</th>
+<th>File</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="http://github.com/b-rodrigues">Bruno Rodrigues</a></td>
-<td>YouTube</td>
-<td>2020-05-11</td>
-<td><a href="https://youtu.be/yNHwM3N8bAQ">video</a>, <a href="https://github.com/b-rodrigues/coolmlproject">source</a></td>
+<td><code>run.sh</code></td>
+<td>Shell script to run <code>run.R</code> in a persistent background process. Works on Unix-like systems. Helpful for long computations on servers.</td>
 </tr>
 <tr class="even">
-<td><a href="https://github.com/matt-dray">Matt Dray</a></td>
-<td><a href="https://www.meetup.com/Bioinformatics-London/">Bioinformatics London Meetup</a></td>
-<td>2020-01-30</td>
-<td><a href="https://github.com/matt-dray/drake-bioinformatics">slides</a>, <a href="https://matt-dray.github.io/drake-bioinformatics/">source</a></td>
+<td><code>run.R</code></td>
+<td>R script to run <code>r_make()</code>.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://github.com/matt-dray">Matt Dray</a></td>
-<td>Coffee &amp; Coding, <a href="https://www.gov.uk/government/organisations/department-for-transport">UK Dept for Transport</a></td>
-<td>2019-10-02</td>
-<td><a href="https://github.com/matt-dray/drake-egg-rap/blob/master/docs/drake-presentation.pdf">slides</a></td>
+<td><code>_drake.R</code></td>
+<td>The special R script that powers functions <code>r_make()</code> and friends (<a href="">details here</a>).</td>
 </tr>
 <tr class="even">
-<td><a href="https://github.com/pat-s">Patrick Schratz</a></td>
-<td><a href="http://whyr.pl/2019/">whyR Conference</a></td>
-<td>2019-09-27</td>
-<td><a href="https://github.com/mlr-org/mlr3-learndrake">workshop</a>, <a href="https://rawcdn.githack.com/mlr-org/mlr3-learndrake/c46dda78d2e4177a1e458c218056c3d00ec55407/slides/drake/index.html">slides</a>, <a href="https://github.com/mlr-org/mlr3-learndrake">source</a></td>
+<td><code>sge.tmpl</code></td>
+<td>A <a href="https://github.com/mschubert/clustermq"><code>clustermq</code></a> template file to deploy targets in parallel to a Sun Grid Engine cluster.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="https://ropensci.org/commcalls">rOpenSci Community Calls</a></td>
-<td>2019-09-24</td>
-<td><a href="https://ropensci.org/commcalls/2019-09-24/">Video recording and resource links</a></td>
+<td><code>R/packages.R</code></td>
+<td>A custom R script loading the packages we need.</td>
 </tr>
 <tr class="even">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="http://rinpharma.com/">R/Pharma 2019</a></td>
-<td>2019-08-21</td>
-<td><a href="https://wlandau.github.io/learndrake/#1">slides</a>, <a href="https://mybinder.org/v2/gh/wlandau/learndrake/binder?urlpath=rstudio">workspace</a>, <a href="https://github.com/wlandau/learndrake">source</a></td>
+<td><code>R/functions.R</code></td>
+<td>A custom R script with user-defined functions.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://github.com/gadenbuie">Garrick Aden-Buie</a></td>
-<td><a href="https://www.biodataclub.org/">Bio-Data Club at Moffitt Cancer Center</a></td>
-<td>2019-07-19</td>
-<td><a href="https://pkg.garrickadenbuie.com/drake-intro/">slides</a>, <a href="https://rstudio.cloud/project/405721">workspace</a>, <a href="https://github.com/gadenbuie/drake-intro">source</a></td>
+<td><code>R/plan.R</code></td>
+<td>A custom R script that defines the <code>drake</code> plan.</td>
 </tr>
 <tr class="even">
-<td><a href="https://github.com/tiernanmartin">Tiernan Martin</a></td>
-<td><a href="https://cascadiarconf.org">Cascadia R Conference</a></td>
-<td>2019-06-08</td>
-<td><a href="https://github.com/tiernanmartin/drakepkg/raw/master/drakepkg-slides-cascadiarconf2019.pdf">slides</a></td>
+<td><code>stan/model.stan</code></td>
+<td>The specification of our Stan model.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://github.com/DominikRafacz">Dominik Rafacz</a></td>
-<td><a href="https://gdansk2019.satrdays.org">satRday Gdansk</a></td>
-<td>2019-05-18</td>
-<td><a href="https://github.com/DominikRafacz/drake-presentation/blob/master/presentation.pdf">slides</a>, <a href="https://github.com/DominikRafacz/drake-presentation">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/aedobbyn">Amanda Dobbyn</a></td>
-<td><a href="http://www.rladiesnyc.org/">R-Ladies NYC</a></td>
-<td>2019-02-12</td>
-<td><a href="https://aedobbyn.github.io/nyc-fires/index.html#1">slides</a>, <a href="https://github.com/aedobbyn/nyc-fires">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="https://projects.iq.harvard.edu/datafest2019/home">Harvard DataFest</a></td>
-<td>2019-01-22</td>
-<td><a href="https://wlandau.github.io/drake-datafest-2019">slides</a>, <a href="https://github.com/wlandau/drake-datafest-2019">source</a></td>
-</tr>
-<tr class="even">
-<td><a href="http://github.com/karthik">Karthik Ram</a></td>
-<td><a href="https://www.rstudio.com/conference">RStudio Conference</a></td>
-<td>2019-01-18</td>
-<td><a href="https://resources.rstudio.com/rstudio-conf-2019/a-guide-to-modern-reproducible-data-science-with-r">video</a>, <a href="http://inundata.org/talks/rstd19/#/">slides</a>, <a href="https://github.com/karthik/rstudio2019">resources</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/sinarueeger">Sina Rüeger</a></td>
-<td><a href="https://www.meetup.com/Geneve-R-User-Group">Geneva R User Group</a></td>
-<td>2018-10-04</td>
-<td><a href="https://sinarueeger.github.io/20181004-geneve-rug">slides</a>, <a href="https://github.com/sinarueeger/workflow-example">example code</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/wlandau">Will Landau</a></td>
-<td><a href="http://rinpharma.com/">R in Pharma</a></td>
-<td>2018-08-16</td>
-<td><a href="https://books.ropensci.org/drake/">video</a>, <a href="https://wlandau.github.io/drake-talk">slides</a>, <a href="https://github.com/wlandau/drake-talk">source</a></td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/cstawitz">Christine Stawitz</a></td>
-<td><a href="https://www.meetup.com/rladies-seattle">R-Ladies Seattle</a></td>
-<td>2018-06-25</td>
-<td><a href="https://github.com/cstawitz/RLadies_Sea_drake">materials</a></td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/krlmlr">Kirill Müller</a></td>
-<td><a href="https://www.sib.swiss">Swiss Institute of Bioinformatics</a></td>
-<td>2018-03-05</td>
-<td><a href="https://www.sib.swiss/training/course/2018-03-remake">workshop</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich">slides</a>, <a href="https://github.com/krlmlr/drake-sib-zurich">source</a>, <a href="https://krlmlr.github.io/slides/drake-sib-zurich/cooking.html">exercises</a></td>
+<td><code>report.Rmd</code></td>
+<td>An R Markdown report summarizing the results of the analysis.</td>
 </tr>
 </tbody>
 </table>
+<p>The following sections walk through the functions and plan.</p>
 </div>
-<div id="context-and-history" class="section level3" number="1.5.11">
-<h3><span class="header-section-number">1.5.11</span> Context and history</h3>
-<p>For context and history, check out <a href="https://ropensci.org/blog/2018/02/06/drake/">this post on the rOpenSci blog</a> and <a href="https://www.r-podcast.org/episode/022-diving-in-to-drake-with-will-landau/">episode 22 of the R Podcast</a>.</p>
-</div>
-</div>
-<div id="help-and-troubleshooting" class="section level2" number="1.6">
-<h2><span class="header-section-number">1.6</span> Help and troubleshooting</h2>
-<p>The <a href="https://github.com/ropensci/drake/issues">GitHub issue tracker</a> is the best place to request help with your use case. Please search both open and closed ones before posting a new issue. Don’t be afraid to open a new issue, just please take 30 seconds to search for existing threads that could solve your problem.</p>
+<div id="functions" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> Functions</h2>
+<p>Good functions have meaningful inputs and outputs that are easy to generate. For data anlaysis, good inputs and outputs are typically datasets, models, and summaries of fitted models. The functions below for our Stan workflow follow this pattern.</p>
+<p>First, we need a function to compile the model. It accepts a Stan model specification file (a <code>*.stan</code> text file) and returns a path to the compiled RDS file. (We need to set <code>rstan_options(auto_write = TRUE)</code> to make sure <code>stan_model()</code> generates the RDS file.) We return the file path because the target that uses this function will be a <a href="https://books.ropensci.org/drake/plans.html#dynamic-files">dynamic file</a>.</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="stan.html#cb157-1"></a>compile_model &lt;-<span class="st"> </span><span class="cf">function</span>(model) {</span>
+<span id="cb157-2"><a href="stan.html#cb157-2"></a>  <span class="kw">rstan_options</span>(<span class="dt">auto_write =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb157-3"><a href="stan.html#cb157-3"></a>  <span class="kw">stan_model</span>(model)</span>
+<span id="cb157-4"><a href="stan.html#cb157-4"></a>  <span class="kw">path_ext_set</span>(model, <span class="st">&quot;rds&quot;</span>)</span>
+<span id="cb157-5"><a href="stan.html#cb157-5"></a>}</span></code></pre></div>
+<p>Next, we need a function to simulate a dataset from the hierarchical model.</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="stan.html#cb158-1"></a>simulate_data &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb158-2"><a href="stan.html#cb158-2"></a>  alpha &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb158-3"><a href="stan.html#cb158-3"></a>  beta &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb158-4"><a href="stan.html#cb158-4"></a>  sigma &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb158-5"><a href="stan.html#cb158-5"></a>  x &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dv">100</span>, <span class="dv">1</span>, <span class="fl">0.5</span>)</span>
+<span id="cb158-6"><a href="stan.html#cb158-6"></a>  y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, alpha <span class="op">+</span><span class="st"> </span>x <span class="op">*</span><span class="st"> </span>beta, sigma)</span>
+<span id="cb158-7"><a href="stan.html#cb158-7"></a>  <span class="kw">tibble</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">beta_true =</span> beta)</span>
+<span id="cb158-8"><a href="stan.html#cb158-8"></a>}</span></code></pre></div>
+<p>Lastly, we write a function to fit the compiled model to a simulated dataset. In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="stan.html#cb159-1"></a>fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(compiled, data) {</span>
+<span id="cb159-2"><a href="stan.html#cb159-2"></a>  <span class="kw">rstan_options</span>(<span class="dt">auto_write =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb159-3"><a href="stan.html#cb159-3"></a>  output &lt;-<span class="st"> </span><span class="kw">sampling</span>(</span>
+<span id="cb159-4"><a href="stan.html#cb159-4"></a>    <span class="kw">readRDS</span>(compiled),</span>
+<span id="cb159-5"><a href="stan.html#cb159-5"></a>    <span class="kw">list</span>(<span class="dt">x =</span> data<span class="op">$</span>x, <span class="dt">y =</span> data<span class="op">$</span>y, <span class="dt">n =</span> <span class="kw">nrow</span>(data)),</span>
+<span id="cb159-6"><a href="stan.html#cb159-6"></a>    <span class="dt">refresh =</span> <span class="dv">0</span></span>
+<span id="cb159-7"><a href="stan.html#cb159-7"></a>  )</span>
+<span id="cb159-8"><a href="stan.html#cb159-8"></a>  mcmc_list &lt;-<span class="st"> </span><span class="kw">As.mcmc.list</span>(output)</span>
+<span id="cb159-9"><a href="stan.html#cb159-9"></a>  samples &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(mcmc_list))</span>
+<span id="cb159-10"><a href="stan.html#cb159-10"></a>  beta_<span class="dv">25</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.25</span>)</span>
+<span id="cb159-11"><a href="stan.html#cb159-11"></a>  beta_median &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.5</span>)</span>
+<span id="cb159-12"><a href="stan.html#cb159-12"></a>  beta_<span class="dv">75</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.75</span>)</span>
+<span id="cb159-13"><a href="stan.html#cb159-13"></a>  beta_true &lt;-<span class="st"> </span>data<span class="op">$</span>beta_true[<span class="dv">1</span>]</span>
+<span id="cb159-14"><a href="stan.html#cb159-14"></a>  beta_cover &lt;-<span class="st"> </span>beta_<span class="dv">25</span> <span class="op">&lt;</span><span class="st"> </span>beta_true <span class="op">&amp;&amp;</span><span class="st"> </span>beta_true <span class="op">&lt;</span><span class="st"> </span>beta_<span class="dv">75</span></span>
+<span id="cb159-15"><a href="stan.html#cb159-15"></a>  psrf &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">gelman.diag</span>(mcmc_list, <span class="dt">multivariate =</span> <span class="ot">FALSE</span>)<span class="op">$</span>psrf[, <span class="dv">1</span>])</span>
+<span id="cb159-16"><a href="stan.html#cb159-16"></a>  ess &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">effectiveSize</span>(mcmc_list))</span>
+<span id="cb159-17"><a href="stan.html#cb159-17"></a>  <span class="kw">tibble</span>(</span>
+<span id="cb159-18"><a href="stan.html#cb159-18"></a>    <span class="dt">beta_cover =</span> beta_cover,</span>
+<span id="cb159-19"><a href="stan.html#cb159-19"></a>    <span class="dt">beta_true =</span> beta_true,</span>
+<span id="cb159-20"><a href="stan.html#cb159-20"></a>    <span class="dt">beta_25 =</span> beta_<span class="dv">25</span>,</span>
+<span id="cb159-21"><a href="stan.html#cb159-21"></a>    <span class="dt">beta_median =</span> beta_median,</span>
+<span id="cb159-22"><a href="stan.html#cb159-22"></a>    <span class="dt">beta_75 =</span> beta_<span class="dv">75</span>,</span>
+<span id="cb159-23"><a href="stan.html#cb159-23"></a>    <span class="dt">psrf =</span> psrf,</span>
+<span id="cb159-24"><a href="stan.html#cb159-24"></a>    <span class="dt">ess =</span> ess</span>
+<span id="cb159-25"><a href="stan.html#cb159-25"></a>  )</span>
+<span id="cb159-26"><a href="stan.html#cb159-26"></a>}</span></code></pre></div>
+
 </div>
 </div>
 <div style = "background: #1C356D; color: white; padding: 10px 10px 10px 25px; font-size: 1em; width: 100%;">
@@ -854,8 +613,8 @@ a</p>
           </div>
         </div>
       </div>
-
-<a href="similar-work.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="churn.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="packages.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -877,11 +636,11 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ropensci-books/drake/edit/master/index.Rmd",
+"link": "https://github.com/ropensci-books/drake/edit/master/stan.Rmd",
 "text": "Edit this chapter"
 },
 "history": {
-"link": "https://github.com/ropensci-books/drake/commits/master/index.Rmd",
+"link": "https://github.com/ropensci-books/drake/commits/master/stan.Rmd",
 "text": "Chapter edit history"
 },
 "view": {
