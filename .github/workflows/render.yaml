@@ -1,0 +1,58 @@
+on:
+  push:
+    branches: master
+
+name: bookdown
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUBPAT }}
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      TF_VERSION: '2.1.0'
+      CRAN: 
+      PIP_NO_WARN_SCRIPT_LOCATION: false
+      RETICULATE_AUTOCONFIGURE: 'FALSE'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@master
+
+      - name: Install system requirements
+        run: |
+          brew install pandoc
+          brew install pandoc-citeproc
+
+      - name: Cache bookdown results
+        uses: actions/cache@v1
+        with:
+          path: _bookdown_files
+          key: bookdown-${{ hashFiles('**/*Rmd') }}
+          restore-keys: bookdown-
+
+      - name: Install Python
+        run: |
+          Rscript -e "install.packages('remotes')"
+          Rscript -e "remotes::install_github('rstudio/reticulate')"
+          Rscript -e "reticulate::install_miniconda()"
+          Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
+
+      - name: Install TensorFlow
+        run: |
+          Rscript -e "install.packages(c('keras', 'tensorflow'))" 
+          Rscript -e "keras::install_keras(tensorflow = Sys.getenv('TF_VERSION'))"
+
+      - name: Install packages
+        run: |
+          Rscript -e "install.packages('remotes')"
+          Rscript -e "remotes::install_deps(dependencies = TRUE)"
+
+      - name: Build manual
+        run: |
+          Rscript faq.R
+          Rscript build.R
+          ./deploy.sh

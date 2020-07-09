@@ -69,20 +69,6 @@ library(dplyr)
 library(ggplot2)
 ```
 
-`drake` does not automatically watch package functions for changes, so if you have any specialized packages and you want `drake` to track those functions, here is a great place to call `expose_imports()`.
-
-```{r, eval = FALSE}
-# alternative packages.R
-library(drake)
-library(dplyr)
-library(ggplot2)
-library(PackageContainingYourWorkflow)
-
-# Tell drake to track the package's functions.
-expose_imports(PackageContainingYourWorkflow)
-```
-
-
 Your `functions.R` typically has the supporting custom functions you write for the workflow. If there are many functions, you could split them up into multiple files.
 
 ```{r, eval = FALSE}
@@ -273,8 +259,8 @@ vis_drake_graph(good_plan, targets_only = TRUE)
 
 The R package structure is a great way to organize and quality-control a data analysis project. If you write a `drake` workflow as a package, you will need
 
-1. Use `expose_imports()` to properly account for all your nested function dependencies, and
-2. If you load the package with `devtools::load_all()`, set the `prework` argument of `make()`: e.g. `make(prework = "devtools::load_all()")`.
+1. Supply the namespace of your package to the `envir` argument of `make()` or `drake_config()` (e.g. `make(envir = getNamespace("yourPackage")` so `drake` can watch you package's functions for changes and rebuild downstream targets accordingly.
+2. If you load the package with `devtools::load_all()`, set the `prework` argument of `make()`: e.g. `make(prework = "devtools::load_all()")` and custom set the `packages` argument so your package name is not included. (Everything in `packages` is loaded with `library()`).
 
 For a minimal example, see [Tiernan Martin](https://github.com/tiernanmartin)'s [`drakepkg`](https://github.com/tiernanmartin/drakepkg).
 

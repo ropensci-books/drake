@@ -29,12 +29,6 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 # Introduction {#intro}
 
-## Short version
-
-<iframe src="https://player.vimeo.com/video/288956463" width="640" height="358" frameborder="0" allowfullscreen></iframe>
-
-## Long version
-
 <iframe title="vimeo-player" src="https://player.vimeo.com/video/362383350" width="640" height="360" frameborder="0" allowfullscreen></iframe>
 
 The video above is the recording from the [rOpenSci Community Call from 2019-09-24](https://ropensci.org/commcalls/2019-09-24/). Visit the [call's page](https://ropensci.org/commcalls/2019-09-24/) for links to additional resources, and [chime in here](https://github.com/ropensci-org/community-calls) to propose and vote for ideas for new Community Call topics and speakers.
@@ -70,15 +64,7 @@ Too many data science projects follow a [Sisyphean loop](https://en.wikipedia.or
 3. Discover an issue.
 4. Restart from scratch.
 
-For projects with long runtimes, people tend to get stuck.
-<br>
-
-<center>
-<img src="https://docs.ropensci.org/drake/reference/figures/tweet.png" alt="tweet" align="center" style = "border: none; float: center;">
-</center>
-<br>
-
-But with `drake`, you can automatically
+For projects with long runtimes, people tend to get stuck. But with `drake`, you can automatically
 
 1. Launch the parts that changed since last time.
 2. Skip the rest.
@@ -92,9 +78,9 @@ The R community emphasizes reproducibility. Traditional themes include [scientif
 Suppose you are reviewing someone else's data analysis project for reproducibility. You scrutinize it carefully, checking that the datasets are available and the documentation is thorough. But could you re-create the results without the help of the original author? With `drake`, it is quick and easy to find out.
 
 ```{r, eval = FALSE}
-make(plan)
+make(plan) # See also r_make().
 
-outdated(plan)
+outdated(plan) # See also r_outdated().
 ```
 
 With everything already up to date, you have **tangible evidence** of reproducibility. Even though you did not re-create the results, you know the results are re-creatable. They **faithfully show** what the code is producing. Given the right [package environment](https://rstudio.github.io/packrat/) and [system configuration](https://stat.ethz.ch/R-manual/R-devel/library/utils/html/sessionInfo.html), you have everything you need to reproduce all the output by yourself.
@@ -104,7 +90,7 @@ With everything already up to date, you have **tangible evidence** of reproducib
 When it comes time to actually rerun the entire project, you have much more confidence. Starting over from scratch is trivially easy.
 
 ```{r, eval = FALSE}
-clean()       # Remove the original author's results.
+clean()    # Remove the original author's results.
 make(plan) # Independently re-create the results from the code and input data.
 ```
 
@@ -234,7 +220,7 @@ Here are some additional applications of `drake` in real-world projects.
 
 ### `drake` projects as R packages
 
-Some folks like to structure their `drake` workflows as R packages. Examples are below. In your own analysis packages, be sure to call `drake::expose_imports(yourPackage)` so `drake` can watch you package's functions for changes and rebuild downstream targets accordingly.
+Some folks like to structure their `drake` workflows as R packages. Examples are below. In your own analysis packages, be sure to supply the namespace of your package to the `envir` argument of `make()` and friends (e.g. `make(envir = getNamespace("yourPackage")` so `drake` can watch you package's functions for changes and rebuild downstream targets accordingly.
 
 - [b-rodrigues/coolmlproject](https://github.com/b-rodrigues/coolmlproject)
 - [tiernanmartin/drakepkg](https://github.com/tiernanmartin/drakepkg)

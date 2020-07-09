@@ -1,0 +1,239 @@
+# Validating a small hierarchical model with Stan {#stan}
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_knit$set(root.dir = fs::dir_create(tempfile()))
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE}
+options(tidyverse.quiet = TRUE)
+library(drake)
+library(tidyverse)
+tmp <- suppressWarnings(drake_plan(x = 1, y = 2))
+```
+
+The goal of this example workflow is to validate a small Bayesian hierarchical model.
+
+```{r, eval = FALSE}
+y_i ~ iid Normal(alpha + x_i * beta, sigma^2)
+alpha ~ Normal(0, 1)
+beta ~ Normal(0, 1)
+sigma ~ Uniform(0, 1)
+```
+
+We simulate multiple datasets from the model and fit the model on each dataset. For each model fit, we determine if the 50% credible interval of the regression coefficient `beta` contains the true value of `beta` used to generate the data. If we implemented the model correctly, roughly 50% of the models should recapture the true `beta` in 50% credible intervals.
+
+## The `drake` project
+
+Because of the long computation time involved, this chapter of the manual does not actually run the analysis code. The complete code can be found at <https://github.com/wlandau/drake-examples/tree/master/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself. This chapter serves to walk through the functions and plan and explain the overall thought process.
+
+The file structure is that of a [typical `drake` project](#projects) with some additions to allow optional [high-performance computing](#hpc) on a cluster.
+
+```{r, eval = FALSE}
+├── run.sh
+├── run.R
+├── _drake.R
+├── sge.tmpl
+├── R/
+├──── packages.R
+├──── functions.R
+├──── plan.R
+├── stan/
+├──── model.stan
+└── report.Rmd
+```
+
+File | Purpose
+---|---
+`run.sh` | Shell script to run `run.R` in a persistent background process. Works on Unix-like systems. Helpful for long computations on servers.
+`run.R` | R script to run `r_make()`.
+`_drake.R` | The special R script that powers functions `r_make()` and friends ([details here]()).
+`sge.tmpl` | A [`clustermq`](https://github.com/mschubert/clustermq) template file to deploy targets in parallel to a Sun Grid Engine cluster.
+`R/packages.R` | A custom R script loading the packages we need.
+`R/functions.R` | A custom R script with user-defined functions.
+`R/plan.R` | A custom R script that defines the `drake` plan.
+`stan/model.stan` | The specification of our Stan model.
+`report.Rmd` | An R Markdown report summarizing the results of the analysis.
+
+The following sections walk through the functions and plan.
+
+## Functions
+
+Good functions have meaningful inputs and outputs that are easy to generate. For data anlaysis, good inputs and outputs are typically datasets, models, and summaries of fitted models. The functions below for our Stan workflow follow this pattern.
+
+First, we need a function to compile the model. It accepts a Stan model specification file (a `*.stan` text file) and returns a path to the compiled RDS file. (We need to set `rstan_options(auto_write = TRUE)` to make sure `stan_model()` generates the RDS file.) We return the file path because the target that uses this function will be a [dynamic file](https://books.ropensci.org/drake/plans.html#dynamic-files).
+
+```{r}
+compile_model <- function(model) {
+  rstan_options(auto_write = TRUE)
+  stan_model(model)
+  path_ext_set(model, "rds")
+}
+```
+
+Next, we need a function to simulate a dataset from the hierarchical model.
+
+```{r}
+simulate_data <- function() {
+  alpha <- rnorm(1, 0, 1)
+  beta <- rnorm(1, 0, 1)
+  sigma <- runif(1, 0, 1)
+  x <- rbinom(100, 1, 0.5)
+  y <- rnorm(100, alpha + x * beta, sigma)
+  tibble(x = x, y = y, beta_true = beta)
+}
+```
+
+Lastly, we write a function to fit the compiled model to a simulated dataset. In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.
+
+```{r}
+fit_model <- function(compiled, data) {
+  rstan_options(auto_write = TRUE)
+  output <- sampling(
+    readRDS(compiled),
+    list(x = data$x, y = data$y, n = nrow(data)),
+    refresh = 0
+  )
+  mcmc_list <- As.mcmc.list(output)
+  samples <- as.data.frame(as.matrix(mcmc_list))
+  beta_25 <- quantile(samples$beta, 0.25)
+  beta_median <- quantile(samples$beta, 0.5)
+  beta_75 <- quantile(samples$beta, 0.75)
+  beta_true <- data$beta_true[1]
+  beta_cover <- beta_25 < beta_true && beta_true < beta_75
+  psrf <- max(gelman.diag(mcmc_list, multivariate = FALSE)$psrf[, 1])
+  ess <- min(effectiveSize(mcmc_list))
+  tibble(
+    beta_cover = beta_cover,
+    beta_true = beta_true,
+    beta_25 = beta_25,
+    beta_median = beta_median,
+    beta_75 = beta_75,
+    psrf = psrf,
+    ess = ess
+  )
+}
+```
+
+## Plan
+
+Our [`drake` plan](#plans) is defined in the `R/plan.R` script.
+
+```{r}
+plan <- drake_plan(
+  model = target(
+    "stan/model.stan",
+    format = "file",
+    hpc = FALSE
+  ),
+  compiled = target(
+    compile_model(model),
+    format = "file",
+    hpc = FALSE
+  ),
+  index = target(
+    seq_len(10), # Change the number of simulations here.
+    hpc = FALSE
+  ),
+  data = target(
+    simulate_data(),
+    dynamic = map(index),
+    format = "fst_tbl"
+  ),
+  fit = target(
+    fit_model(compiled, data),
+    dynamic = map(data),
+    format = "fst_tbl"
+  ),
+  report = target(
+    render(
+      knitr_in("report.Rmd"),
+      output_file = file_out("report.html"),
+      quiet = TRUE
+    ),
+    hpc = FALSE
+  )
+)
+```
+
+The following subsections describe the strategy and practical adjustments behind each target.
+
+### Model
+
+The `model` target is a [dynamic file](https://books.ropensci.org/drake/plans.html#dynamic-files) to reproducibly track our Stan model file in `stan/model.stan`. Below, `format = "file"` indicates that the target is a dynamic file, and `hpc = FALSE` tells `drake` not to run the target on a parallel worker in [high-performance computing](#hpc) scenarios.
+
+```{r}
+model = target(
+  "stan/model.stan",
+  format = "file",
+  hpc = FALSE
+)
+```
+
+### Compiled
+
+The `compiled` target compiles the Stan model in `stan/model.stan` and saves the result to the file `stan/model.rds`. This target is another dynamic file we want to run locally, so again, we write `format = "file"` and `hpc = FALSE`. Remember to set `rstan_options(auto_write = TRUE)` inside `compile_model()` so Stan actually generates this RDS file. The compiled model file is important because it allows us to avoid recompilation when we fit different models in different R processes in [high-performance computing](#hpc) scenarios. 
+
+```{r}
+compiled = target(
+  compile_model(model),
+  format = "file",
+  hpc = FALSE
+)
+```
+
+### Index
+
+The `index` target is simply a numeric vector from 1 to the number of simulations. To fit our model multiple times, we are going to [dynamically map](#dynamic) over `index`. This is a small target and we do not want to waste expensive computing resources on it, so we set `hpc = FALSE`.
+
+```{r}
+index = target(
+  seq_len(1000), # Change the number of simulations here.
+  hpc = FALSE
+)
+```
+
+### Data
+
+`data` is a [dynamic target](#dynamic) with one sub-target per simulated dataset, so we write `dynamic = map(index)` below. In addition, these datasets are data frames, so we choose `format = "fst_tbl"` below to increase read/write speeds and conserve storage space. [Read here](https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets) for more on specialized storage formats.
+
+```{r}
+data = target(
+  simulate_data(),
+  dynamic = map(index),
+  format = "fst_tbl"
+)
+```
+
+### Fit
+
+We want to fit our model once for each simulated dataset, so our `fit` target dynamically maps over the datasets with `dynamic = map(data)`. Since `fit_model()` returns a data frame, we also choose `format = "fst_tbl"` here.
+
+```{r}
+fit = target(
+  fit_model(compiled, data),
+  dynamic = map(data),
+  format = "fst_tbl"
+)
+```
+
+### Report
+
+R Markdown reports should never do any heavy lifting in `drake` pipelines. They should simply leverage the computationally expensive work done in the previous targets. If we follow this good practice and our report renders quickly, we should not need heavy computing resources to process it, and we can set `hpc = FALSE` below.
+
+The [`report.Rmd` file itself](https://github.com/wlandau/drake-examples/blob/master/stan/report.Rmd) has `loadd()` and `readd()` statements to refer to these targets, and with the `knitr_in()` keyword below, `drake` knows that it needs to update the report when the models or datasets change. Similarly, `file_out("report.html")` tells `drake` to rerun the report if the output file gets corrupted.
+
+```{r}
+report = target(
+  render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  ),
+  hpc = FALSE
+)
+```
+
+## Try it out!
+
+The complete code can be found at <https://github.com/wlandau/drake-examples/tree/master/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself.
