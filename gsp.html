@@ -307,11 +307,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>10.3</b> Plan</a>
 <ul>
 <li class="chapter" data-level="10.3.1" data-path="stan.html"><a href="stan.html#model"><i class="fa fa-check"></i><b>10.3.1</b> Model</a></li>
-<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#compiled"><i class="fa fa-check"></i><b>10.3.2</b> Compiled</a></li>
-<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.3</b> Index</a></li>
-<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.4</b> Data</a></li>
-<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.5</b> Fit</a></li>
-<li class="chapter" data-level="10.3.6" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.6</b> Report</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.2</b> Index</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.3</b> Data</a></li>
+<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.4</b> Fit</a></li>
+<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.5</b> Report</a></li>
 </ul></li>
 <li class="chapter" data-level="10.4" data-path="stan.html"><a href="stan.html#try-it-out"><i class="fa fa-check"></i><b>10.4</b> Try it out!</a></li>
 </ul></li>
@@ -498,7 +497,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="get-the-code." class="section level2" number="12.1">
 <h2><span class="header-section-number">12.1</span> Get the code.</h2>
 <p>Write the code files to your workspace.</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="gsp.html#cb181-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="gsp.html#cb180-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span></code></pre></div>
 <p>The new <code>gsp</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/wlandau/drake-examples/tree/master/gsp">online here</a>.</p>
 </div>
 <div id="objective-and-methods" class="section level2" number="12.2">
@@ -526,95 +525,95 @@ Here, <span class="math inline">\(y\)</span> is the vector of observed gross sta
 <li><code>emp</code>: labor input measured by the employment in non-agricultural payrolls.</li>
 <li><code>unemp</code>: state unemployment rate.</li>
 </ul>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="gsp.html#cb182-1"></a><span class="kw">library</span>(Ecdat)</span>
-<span id="cb182-2"><a href="gsp.html#cb182-2"></a><span class="kw">data</span>(Produc)</span>
-<span id="cb182-3"><a href="gsp.html#cb182-3"></a><span class="kw">head</span>(Produc)</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="gsp.html#cb181-1"></a><span class="kw">library</span>(Ecdat)</span>
+<span id="cb181-2"><a href="gsp.html#cb181-2"></a><span class="kw">data</span>(Produc)</span>
+<span id="cb181-3"><a href="gsp.html#cb181-3"></a><span class="kw">head</span>(Produc)</span></code></pre></div>
 </div>
 <div id="analysis" class="section level2" number="12.4">
 <h2><span class="header-section-number">12.4</span> Analysis</h2>
 <p>First, we load the required packages. <code>drake</code> is aware of all the packages you load with <code>library()</code> or <code>require()</code>.</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="gsp.html#cb183-1"></a><span class="kw">library</span>(biglm) <span class="co"># lightweight models, easier to store than with lm()</span></span>
-<span id="cb183-2"><a href="gsp.html#cb183-2"></a><span class="kw">library</span>(drake)</span>
-<span id="cb183-3"><a href="gsp.html#cb183-3"></a><span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span></span>
-<span id="cb183-4"><a href="gsp.html#cb183-4"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb183-5"><a href="gsp.html#cb183-5"></a><span class="kw">library</span>(knitr)</span>
-<span id="cb183-6"><a href="gsp.html#cb183-6"></a><span class="kw">library</span>(purrr)</span>
-<span id="cb183-7"><a href="gsp.html#cb183-7"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="gsp.html#cb182-1"></a><span class="kw">library</span>(biglm) <span class="co"># lightweight models, easier to store than with lm()</span></span>
+<span id="cb182-2"><a href="gsp.html#cb182-2"></a><span class="kw">library</span>(drake)</span>
+<span id="cb182-3"><a href="gsp.html#cb182-3"></a><span class="kw">library</span>(Ecdat) <span class="co"># econometrics datasets</span></span>
+<span id="cb182-4"><a href="gsp.html#cb182-4"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb182-5"><a href="gsp.html#cb182-5"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb182-6"><a href="gsp.html#cb182-6"></a><span class="kw">library</span>(purrr)</span>
+<span id="cb182-7"><a href="gsp.html#cb182-7"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
 <p>Next, we construct our plan. The following code uses <code>drake</code>’s special new language for generating plans (learn more <a href="plans.html#plans">here</a>).</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="gsp.html#cb184-1"></a>predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)</span>
-<span id="cb184-2"><a href="gsp.html#cb184-2"></a></span>
-<span id="cb184-3"><a href="gsp.html#cb184-3"></a><span class="co"># We will try all combinations of three covariates.</span></span>
-<span id="cb184-4"><a href="gsp.html#cb184-4"></a>combos &lt;-<span class="st"> </span><span class="kw">combn</span>(predictors, <span class="dv">3</span>) <span class="op">%&gt;%</span></span>
-<span id="cb184-5"><a href="gsp.html#cb184-5"></a><span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span></span>
-<span id="cb184-6"><a href="gsp.html#cb184-6"></a><span class="st">  </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></span>
-<span id="cb184-7"><a href="gsp.html#cb184-7"></a><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>))</span>
-<span id="cb184-8"><a href="gsp.html#cb184-8"></a></span>
-<span id="cb184-9"><a href="gsp.html#cb184-9"></a><span class="kw">head</span>(combos)</span>
-<span id="cb184-10"><a href="gsp.html#cb184-10"></a></span>
-<span id="cb184-11"><a href="gsp.html#cb184-11"></a><span class="co"># We need to list each covariate as a symbol.</span></span>
-<span id="cb184-12"><a href="gsp.html#cb184-12"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(combos)) {</span>
-<span id="cb184-13"><a href="gsp.html#cb184-13"></a>  combos[[col]] &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(combos[[col]])</span>
-<span id="cb184-14"><a href="gsp.html#cb184-14"></a>}</span>
-<span id="cb184-15"><a href="gsp.html#cb184-15"></a></span>
-<span id="cb184-16"><a href="gsp.html#cb184-16"></a><span class="co"># Requires drake &gt;= 7.0.0 or the development version</span></span>
-<span id="cb184-17"><a href="gsp.html#cb184-17"></a><span class="co"># at github.com/ropensci/drake.</span></span>
-<span id="cb184-18"><a href="gsp.html#cb184-18"></a><span class="co"># Install with remotes::install_github(&quot;ropensci/drake&quot;).</span></span>
-<span id="cb184-19"><a href="gsp.html#cb184-19"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb184-20"><a href="gsp.html#cb184-20"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb184-21"><a href="gsp.html#cb184-21"></a>    <span class="kw">biglm</span>(gsp <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3, <span class="dt">data =</span> Ecdat<span class="op">::</span>Produc),</span>
-<span id="cb184-22"><a href="gsp.html#cb184-22"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">.data =</span> <span class="op">!!</span>combos) <span class="co"># Remember the bang-bang!!</span></span>
-<span id="cb184-23"><a href="gsp.html#cb184-23"></a>  ),</span>
-<span id="cb184-24"><a href="gsp.html#cb184-24"></a>  <span class="dt">rmspe_i =</span> <span class="kw">target</span>(</span>
-<span id="cb184-25"><a href="gsp.html#cb184-25"></a>    <span class="kw">get_rmspe</span>(model, Ecdat<span class="op">::</span>Produc),</span>
-<span id="cb184-26"><a href="gsp.html#cb184-26"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(model)</span>
-<span id="cb184-27"><a href="gsp.html#cb184-27"></a>  ),</span>
-<span id="cb184-28"><a href="gsp.html#cb184-28"></a>  <span class="dt">rmspe =</span> <span class="kw">target</span>(</span>
-<span id="cb184-29"><a href="gsp.html#cb184-29"></a>    <span class="kw">bind_rows</span>(rmspe_i, <span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>),</span>
-<span id="cb184-30"><a href="gsp.html#cb184-30"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(rmspe_i)</span>
-<span id="cb184-31"><a href="gsp.html#cb184-31"></a>  ),</span>
-<span id="cb184-32"><a href="gsp.html#cb184-32"></a>  <span class="dt">plot =</span> <span class="kw">ggsave</span>(</span>
-<span id="cb184-33"><a href="gsp.html#cb184-33"></a>    <span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>),</span>
-<span id="cb184-34"><a href="gsp.html#cb184-34"></a>    <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe),</span>
-<span id="cb184-35"><a href="gsp.html#cb184-35"></a>    <span class="dt">width =</span> <span class="dv">8</span>,</span>
-<span id="cb184-36"><a href="gsp.html#cb184-36"></a>    <span class="dt">height =</span> <span class="dv">8</span></span>
-<span id="cb184-37"><a href="gsp.html#cb184-37"></a>  ),</span>
-<span id="cb184-38"><a href="gsp.html#cb184-38"></a>  <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb184-39"><a href="gsp.html#cb184-39"></a>)</span>
-<span id="cb184-40"><a href="gsp.html#cb184-40"></a></span>
-<span id="cb184-41"><a href="gsp.html#cb184-41"></a>plan</span></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="gsp.html#cb183-1"></a>predictors &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(Produc), <span class="st">&quot;gsp&quot;</span>)</span>
+<span id="cb183-2"><a href="gsp.html#cb183-2"></a></span>
+<span id="cb183-3"><a href="gsp.html#cb183-3"></a><span class="co"># We will try all combinations of three covariates.</span></span>
+<span id="cb183-4"><a href="gsp.html#cb183-4"></a>combos &lt;-<span class="st"> </span><span class="kw">combn</span>(predictors, <span class="dv">3</span>) <span class="op">%&gt;%</span></span>
+<span id="cb183-5"><a href="gsp.html#cb183-5"></a><span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span></span>
+<span id="cb183-6"><a href="gsp.html#cb183-6"></a><span class="st">  </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></span>
+<span id="cb183-7"><a href="gsp.html#cb183-7"></a><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>))</span>
+<span id="cb183-8"><a href="gsp.html#cb183-8"></a></span>
+<span id="cb183-9"><a href="gsp.html#cb183-9"></a><span class="kw">head</span>(combos)</span>
+<span id="cb183-10"><a href="gsp.html#cb183-10"></a></span>
+<span id="cb183-11"><a href="gsp.html#cb183-11"></a><span class="co"># We need to list each covariate as a symbol.</span></span>
+<span id="cb183-12"><a href="gsp.html#cb183-12"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(combos)) {</span>
+<span id="cb183-13"><a href="gsp.html#cb183-13"></a>  combos[[col]] &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(combos[[col]])</span>
+<span id="cb183-14"><a href="gsp.html#cb183-14"></a>}</span>
+<span id="cb183-15"><a href="gsp.html#cb183-15"></a></span>
+<span id="cb183-16"><a href="gsp.html#cb183-16"></a><span class="co"># Requires drake &gt;= 7.0.0 or the development version</span></span>
+<span id="cb183-17"><a href="gsp.html#cb183-17"></a><span class="co"># at github.com/ropensci/drake.</span></span>
+<span id="cb183-18"><a href="gsp.html#cb183-18"></a><span class="co"># Install with remotes::install_github(&quot;ropensci/drake&quot;).</span></span>
+<span id="cb183-19"><a href="gsp.html#cb183-19"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb183-20"><a href="gsp.html#cb183-20"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
+<span id="cb183-21"><a href="gsp.html#cb183-21"></a>    <span class="kw">biglm</span>(gsp <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3, <span class="dt">data =</span> Ecdat<span class="op">::</span>Produc),</span>
+<span id="cb183-22"><a href="gsp.html#cb183-22"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">.data =</span> <span class="op">!!</span>combos) <span class="co"># Remember the bang-bang!!</span></span>
+<span id="cb183-23"><a href="gsp.html#cb183-23"></a>  ),</span>
+<span id="cb183-24"><a href="gsp.html#cb183-24"></a>  <span class="dt">rmspe_i =</span> <span class="kw">target</span>(</span>
+<span id="cb183-25"><a href="gsp.html#cb183-25"></a>    <span class="kw">get_rmspe</span>(model, Ecdat<span class="op">::</span>Produc),</span>
+<span id="cb183-26"><a href="gsp.html#cb183-26"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(model)</span>
+<span id="cb183-27"><a href="gsp.html#cb183-27"></a>  ),</span>
+<span id="cb183-28"><a href="gsp.html#cb183-28"></a>  <span class="dt">rmspe =</span> <span class="kw">target</span>(</span>
+<span id="cb183-29"><a href="gsp.html#cb183-29"></a>    <span class="kw">bind_rows</span>(rmspe_i, <span class="dt">.id =</span> <span class="st">&quot;model&quot;</span>),</span>
+<span id="cb183-30"><a href="gsp.html#cb183-30"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(rmspe_i)</span>
+<span id="cb183-31"><a href="gsp.html#cb183-31"></a>  ),</span>
+<span id="cb183-32"><a href="gsp.html#cb183-32"></a>  <span class="dt">plot =</span> <span class="kw">ggsave</span>(</span>
+<span id="cb183-33"><a href="gsp.html#cb183-33"></a>    <span class="dt">filename =</span> <span class="kw">file_out</span>(<span class="st">&quot;rmspe.pdf&quot;</span>),</span>
+<span id="cb183-34"><a href="gsp.html#cb183-34"></a>    <span class="dt">plot =</span> <span class="kw">plot_rmspe</span>(rmspe),</span>
+<span id="cb183-35"><a href="gsp.html#cb183-35"></a>    <span class="dt">width =</span> <span class="dv">8</span>,</span>
+<span id="cb183-36"><a href="gsp.html#cb183-36"></a>    <span class="dt">height =</span> <span class="dv">8</span></span>
+<span id="cb183-37"><a href="gsp.html#cb183-37"></a>  ),</span>
+<span id="cb183-38"><a href="gsp.html#cb183-38"></a>  <span class="dt">report =</span> <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb183-39"><a href="gsp.html#cb183-39"></a>)</span>
+<span id="cb183-40"><a href="gsp.html#cb183-40"></a></span>
+<span id="cb183-41"><a href="gsp.html#cb183-41"></a>plan</span></code></pre></div>
 <p>We also need to define functions for summaries and plots.</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="gsp.html#cb185-1"></a>get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(model_fit, data){</span>
-<span id="cb185-2"><a href="gsp.html#cb185-2"></a>  y &lt;-<span class="st"> </span>data<span class="op">$</span>gsp</span>
-<span id="cb185-3"><a href="gsp.html#cb185-3"></a>  yhat &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">predict</span>(model_fit, <span class="dt">newdata =</span> data))</span>
-<span id="cb185-4"><a href="gsp.html#cb185-4"></a>  terms &lt;-<span class="st"> </span><span class="kw">attr</span>(model_fit<span class="op">$</span>terms, <span class="st">&quot;term.labels&quot;</span>)</span>
-<span id="cb185-5"><a href="gsp.html#cb185-5"></a>  <span class="kw">tibble</span>(</span>
-<span id="cb185-6"><a href="gsp.html#cb185-6"></a>    <span class="dt">rmspe =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>((y <span class="op">-</span><span class="st"> </span>yhat)<span class="op">^</span><span class="dv">2</span>)), <span class="co"># nolint</span></span>
-<span id="cb185-7"><a href="gsp.html#cb185-7"></a>    <span class="dt">X1 =</span> terms[<span class="dv">1</span>],</span>
-<span id="cb185-8"><a href="gsp.html#cb185-8"></a>    <span class="dt">X2 =</span> terms[<span class="dv">2</span>],</span>
-<span id="cb185-9"><a href="gsp.html#cb185-9"></a>    <span class="dt">X3 =</span> terms[<span class="dv">3</span>]</span>
-<span id="cb185-10"><a href="gsp.html#cb185-10"></a>  )</span>
-<span id="cb185-11"><a href="gsp.html#cb185-11"></a>}</span>
-<span id="cb185-12"><a href="gsp.html#cb185-12"></a></span>
-<span id="cb185-13"><a href="gsp.html#cb185-13"></a>plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){</span>
-<span id="cb185-14"><a href="gsp.html#cb185-14"></a>  <span class="kw">ggplot</span>(rmspe) <span class="op">+</span></span>
-<span id="cb185-15"><a href="gsp.html#cb185-15"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">15</span>)</span>
-<span id="cb185-16"><a href="gsp.html#cb185-16"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="gsp.html#cb184-1"></a>get_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(model_fit, data){</span>
+<span id="cb184-2"><a href="gsp.html#cb184-2"></a>  y &lt;-<span class="st"> </span>data<span class="op">$</span>gsp</span>
+<span id="cb184-3"><a href="gsp.html#cb184-3"></a>  yhat &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">predict</span>(model_fit, <span class="dt">newdata =</span> data))</span>
+<span id="cb184-4"><a href="gsp.html#cb184-4"></a>  terms &lt;-<span class="st"> </span><span class="kw">attr</span>(model_fit<span class="op">$</span>terms, <span class="st">&quot;term.labels&quot;</span>)</span>
+<span id="cb184-5"><a href="gsp.html#cb184-5"></a>  <span class="kw">tibble</span>(</span>
+<span id="cb184-6"><a href="gsp.html#cb184-6"></a>    <span class="dt">rmspe =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>((y <span class="op">-</span><span class="st"> </span>yhat)<span class="op">^</span><span class="dv">2</span>)), <span class="co"># nolint</span></span>
+<span id="cb184-7"><a href="gsp.html#cb184-7"></a>    <span class="dt">X1 =</span> terms[<span class="dv">1</span>],</span>
+<span id="cb184-8"><a href="gsp.html#cb184-8"></a>    <span class="dt">X2 =</span> terms[<span class="dv">2</span>],</span>
+<span id="cb184-9"><a href="gsp.html#cb184-9"></a>    <span class="dt">X3 =</span> terms[<span class="dv">3</span>]</span>
+<span id="cb184-10"><a href="gsp.html#cb184-10"></a>  )</span>
+<span id="cb184-11"><a href="gsp.html#cb184-11"></a>}</span>
+<span id="cb184-12"><a href="gsp.html#cb184-12"></a></span>
+<span id="cb184-13"><a href="gsp.html#cb184-13"></a>plot_rmspe &lt;-<span class="st"> </span><span class="cf">function</span>(rmspe){</span>
+<span id="cb184-14"><a href="gsp.html#cb184-14"></a>  <span class="kw">ggplot</span>(rmspe) <span class="op">+</span></span>
+<span id="cb184-15"><a href="gsp.html#cb184-15"></a><span class="st">    </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> rmspe), <span class="dt">bins =</span> <span class="dv">15</span>)</span>
+<span id="cb184-16"><a href="gsp.html#cb184-16"></a>}</span></code></pre></div>
 <p>We have a <a href="https://github.com/wlandau/drake-examples/blob/master/gsp/report.Rmd"><code>report.Rmd</code> file</a> to summarize our results at the end.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="gsp.html#cb186-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span>
-<span id="cb186-2"><a href="gsp.html#cb186-2"></a><span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="gsp.html#cb185-1"></a><span class="kw">drake_example</span>(<span class="st">&quot;gsp&quot;</span>)</span>
+<span id="cb185-2"><a href="gsp.html#cb185-2"></a><span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="st">&quot;gsp/report.Rmd&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>We can inspect the project before we run it.</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="gsp.html#cb187-1"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="gsp.html#cb186-1"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
 <p>Now, we can run the project.</p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="gsp.html#cb188-1"></a><span class="kw">make</span>(plan, <span class="dt">verbose =</span> 0L)</span></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="gsp.html#cb187-1"></a><span class="kw">make</span>(plan, <span class="dt">verbose =</span> 0L)</span></code></pre></div>
 </div>
 <div id="results" class="section level2" number="12.5">
 <h2><span class="header-section-number">12.5</span> Results</h2>
 <p>Here are the root mean squared prediction errors of all the models.</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="gsp.html#cb189-1"></a>results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)</span>
-<span id="cb189-2"><a href="gsp.html#cb189-2"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb189-3"><a href="gsp.html#cb189-3"></a><span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="gsp.html#cb188-1"></a>results &lt;-<span class="st"> </span><span class="kw">readd</span>(rmspe)</span>
+<span id="cb188-2"><a href="gsp.html#cb188-2"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb188-3"><a href="gsp.html#cb188-3"></a><span class="kw">plot_rmspe</span>(<span class="dt">rmspe =</span> results)</span></code></pre></div>
 <p>And here are the best models. The best variables are in the top row under <code>X1</code>, <code>X2</code>, and <code>X3</code>.</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="gsp.html#cb190-1"></a><span class="kw">head</span>(results[<span class="kw">order</span>(results<span class="op">$</span>rmspe, <span class="dt">decreasing =</span> <span class="ot">FALSE</span>), ])</span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="gsp.html#cb189-1"></a><span class="kw">head</span>(results[<span class="kw">order</span>(results<span class="op">$</span>rmspe, <span class="dt">decreasing =</span> <span class="ot">FALSE</span>), ])</span></code></pre></div>
 </div>
 <div id="comparison-with-gnu-make" class="section level2" number="12.6">
 <h2><span class="header-section-number">12.6</span> Comparison with GNU Make</h2>

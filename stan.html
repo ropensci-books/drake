@@ -307,11 +307,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>10.3</b> Plan</a>
 <ul>
 <li class="chapter" data-level="10.3.1" data-path="stan.html"><a href="stan.html#model"><i class="fa fa-check"></i><b>10.3.1</b> Model</a></li>
-<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#compiled"><i class="fa fa-check"></i><b>10.3.2</b> Compiled</a></li>
-<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.3</b> Index</a></li>
-<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.4</b> Data</a></li>
-<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.5</b> Fit</a></li>
-<li class="chapter" data-level="10.3.6" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.6</b> Report</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.2</b> Index</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.3</b> Data</a></li>
+<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.4</b> Fit</a></li>
+<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.5</b> Report</a></li>
 </ul></li>
 <li class="chapter" data-level="10.4" data-path="stan.html"><a href="stan.html#try-it-out"><i class="fa fa-check"></i><b>10.4</b> Try it out!</a></li>
 </ul></li>
@@ -570,11 +569,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="functions" class="section level2" number="10.2">
 <h2><span class="header-section-number">10.2</span> Functions</h2>
 <p>Good functions have meaningful inputs and outputs that are easy to generate. For data anlaysis, good inputs and outputs are typically datasets, models, and summaries of fitted models. The functions below for our Stan workflow follow this pattern.</p>
-<p>First, we need a function to compile the model. It accepts a Stan model specification file (a <code>*.stan</code> text file) and returns a path to the compiled RDS file. (We need to set <code>rstan_options(auto_write = TRUE)</code> to make sure <code>stan_model()</code> generates the RDS file.) We return the file path because the target that uses this function will be a <a href="https://books.ropensci.org/drake/plans.html#dynamic-files">dynamic file</a>.</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="stan.html#cb157-1"></a>compile_model &lt;-<span class="st"> </span><span class="cf">function</span>(model) {</span>
+<p>First, we need a function to compile the model. It accepts a Stan model specification file (a <code>*.stan</code> text file) and returns a paths to both the model file and the compiled RDS file. (We need to set <code>rstan_options(auto_write = TRUE)</code> to make sure <code>stan_model()</code> generates the RDS file.) We return the file paths because the target that uses this function will be a <a href="https://books.ropensci.org/drake/plans.html#dynamic-files">dynamic file target</a>. <code>drake</code> will reproducibly watch these files for changes and automatically recompile and run the model if changes are detected.</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="stan.html#cb157-1"></a>compile_model &lt;-<span class="st"> </span><span class="cf">function</span>(model_file) {</span>
 <span id="cb157-2"><a href="stan.html#cb157-2"></a>  <span class="kw">rstan_options</span>(<span class="dt">auto_write =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb157-3"><a href="stan.html#cb157-3"></a>  <span class="kw">stan_model</span>(model)</span>
-<span id="cb157-4"><a href="stan.html#cb157-4"></a>  <span class="kw">path_ext_set</span>(model, <span class="st">&quot;rds&quot;</span>)</span>
+<span id="cb157-3"><a href="stan.html#cb157-3"></a>  <span class="kw">stan_model</span>(model_file)</span>
+<span id="cb157-4"><a href="stan.html#cb157-4"></a>  <span class="kw">c</span>(model_file, <span class="kw">path_ext_set</span>(model_file, <span class="st">&quot;rds&quot;</span>))</span>
 <span id="cb157-5"><a href="stan.html#cb157-5"></a>}</span></code></pre></div>
 <p>Next, we need a function to simulate a dataset from the hierarchical model.</p>
 <div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="stan.html#cb158-1"></a>simulate_data &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
@@ -585,128 +584,114 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb158-6"><a href="stan.html#cb158-6"></a>  y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, alpha <span class="op">+</span><span class="st"> </span>x <span class="op">*</span><span class="st"> </span>beta, sigma)</span>
 <span id="cb158-7"><a href="stan.html#cb158-7"></a>  <span class="kw">tibble</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">beta_true =</span> beta)</span>
 <span id="cb158-8"><a href="stan.html#cb158-8"></a>}</span></code></pre></div>
-<p>Lastly, we write a function to fit the compiled model to a simulated dataset. In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="stan.html#cb159-1"></a>fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(compiled, data) {</span>
-<span id="cb159-2"><a href="stan.html#cb159-2"></a>  <span class="kw">rstan_options</span>(<span class="dt">auto_write =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb159-3"><a href="stan.html#cb159-3"></a>  output &lt;-<span class="st"> </span><span class="kw">sampling</span>(</span>
-<span id="cb159-4"><a href="stan.html#cb159-4"></a>    <span class="kw">readRDS</span>(compiled),</span>
-<span id="cb159-5"><a href="stan.html#cb159-5"></a>    <span class="kw">list</span>(<span class="dt">x =</span> data<span class="op">$</span>x, <span class="dt">y =</span> data<span class="op">$</span>y, <span class="dt">n =</span> <span class="kw">nrow</span>(data)),</span>
-<span id="cb159-6"><a href="stan.html#cb159-6"></a>    <span class="dt">refresh =</span> <span class="dv">0</span></span>
-<span id="cb159-7"><a href="stan.html#cb159-7"></a>  )</span>
-<span id="cb159-8"><a href="stan.html#cb159-8"></a>  mcmc_list &lt;-<span class="st"> </span><span class="kw">As.mcmc.list</span>(output)</span>
-<span id="cb159-9"><a href="stan.html#cb159-9"></a>  samples &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(mcmc_list))</span>
-<span id="cb159-10"><a href="stan.html#cb159-10"></a>  beta_<span class="dv">25</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.25</span>)</span>
-<span id="cb159-11"><a href="stan.html#cb159-11"></a>  beta_median &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.5</span>)</span>
-<span id="cb159-12"><a href="stan.html#cb159-12"></a>  beta_<span class="dv">75</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.75</span>)</span>
-<span id="cb159-13"><a href="stan.html#cb159-13"></a>  beta_true &lt;-<span class="st"> </span>data<span class="op">$</span>beta_true[<span class="dv">1</span>]</span>
-<span id="cb159-14"><a href="stan.html#cb159-14"></a>  beta_cover &lt;-<span class="st"> </span>beta_<span class="dv">25</span> <span class="op">&lt;</span><span class="st"> </span>beta_true <span class="op">&amp;&amp;</span><span class="st"> </span>beta_true <span class="op">&lt;</span><span class="st"> </span>beta_<span class="dv">75</span></span>
-<span id="cb159-15"><a href="stan.html#cb159-15"></a>  psrf &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">gelman.diag</span>(mcmc_list, <span class="dt">multivariate =</span> <span class="ot">FALSE</span>)<span class="op">$</span>psrf[, <span class="dv">1</span>])</span>
-<span id="cb159-16"><a href="stan.html#cb159-16"></a>  ess &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">effectiveSize</span>(mcmc_list))</span>
-<span id="cb159-17"><a href="stan.html#cb159-17"></a>  <span class="kw">tibble</span>(</span>
-<span id="cb159-18"><a href="stan.html#cb159-18"></a>    <span class="dt">beta_cover =</span> beta_cover,</span>
-<span id="cb159-19"><a href="stan.html#cb159-19"></a>    <span class="dt">beta_true =</span> beta_true,</span>
-<span id="cb159-20"><a href="stan.html#cb159-20"></a>    <span class="dt">beta_25 =</span> beta_<span class="dv">25</span>,</span>
-<span id="cb159-21"><a href="stan.html#cb159-21"></a>    <span class="dt">beta_median =</span> beta_median,</span>
-<span id="cb159-22"><a href="stan.html#cb159-22"></a>    <span class="dt">beta_75 =</span> beta_<span class="dv">75</span>,</span>
-<span id="cb159-23"><a href="stan.html#cb159-23"></a>    <span class="dt">psrf =</span> psrf,</span>
-<span id="cb159-24"><a href="stan.html#cb159-24"></a>    <span class="dt">ess =</span> ess</span>
-<span id="cb159-25"><a href="stan.html#cb159-25"></a>  )</span>
-<span id="cb159-26"><a href="stan.html#cb159-26"></a>}</span></code></pre></div>
+<p>Lastly, we write a function to fit the compiled model to a simulated dataset. We pass in the <code>*.stan</code> model specification file, but <code>rstan</code> is smart enough to use the compiled RDS model file instead if available.</p>
+<p>In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="stan.html#cb159-1"></a>fit_model &lt;-<span class="st"> </span><span class="cf">function</span>(model_file, data) {</span>
+<span id="cb159-2"><a href="stan.html#cb159-2"></a>  output &lt;-<span class="st"> </span><span class="kw">stan</span>(</span>
+<span id="cb159-3"><a href="stan.html#cb159-3"></a>    <span class="dt">file =</span> model_file,</span>
+<span id="cb159-4"><a href="stan.html#cb159-4"></a>    <span class="dt">data =</span> <span class="kw">list</span>(<span class="dt">x =</span> data<span class="op">$</span>x, <span class="dt">y =</span> data<span class="op">$</span>y, <span class="dt">n =</span> <span class="kw">nrow</span>(data)),</span>
+<span id="cb159-5"><a href="stan.html#cb159-5"></a>    <span class="dt">refresh =</span> <span class="dv">0</span></span>
+<span id="cb159-6"><a href="stan.html#cb159-6"></a>  )</span>
+<span id="cb159-7"><a href="stan.html#cb159-7"></a>  mcmc_list &lt;-<span class="st"> </span><span class="kw">As.mcmc.list</span>(output)</span>
+<span id="cb159-8"><a href="stan.html#cb159-8"></a>  samples &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(mcmc_list))</span>
+<span id="cb159-9"><a href="stan.html#cb159-9"></a>  beta_<span class="dv">25</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.25</span>)</span>
+<span id="cb159-10"><a href="stan.html#cb159-10"></a>  beta_median &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.5</span>)</span>
+<span id="cb159-11"><a href="stan.html#cb159-11"></a>  beta_<span class="dv">75</span> &lt;-<span class="st"> </span><span class="kw">quantile</span>(samples<span class="op">$</span>beta, <span class="fl">0.75</span>)</span>
+<span id="cb159-12"><a href="stan.html#cb159-12"></a>  beta_true &lt;-<span class="st"> </span>data<span class="op">$</span>beta_true[<span class="dv">1</span>]</span>
+<span id="cb159-13"><a href="stan.html#cb159-13"></a>  beta_cover &lt;-<span class="st"> </span>beta_<span class="dv">25</span> <span class="op">&lt;</span><span class="st"> </span>beta_true <span class="op">&amp;&amp;</span><span class="st"> </span>beta_true <span class="op">&lt;</span><span class="st"> </span>beta_<span class="dv">75</span></span>
+<span id="cb159-14"><a href="stan.html#cb159-14"></a>  psrf &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">gelman.diag</span>(mcmc_list, <span class="dt">multivariate =</span> <span class="ot">FALSE</span>)<span class="op">$</span>psrf[, <span class="dv">1</span>])</span>
+<span id="cb159-15"><a href="stan.html#cb159-15"></a>  ess &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">effectiveSize</span>(mcmc_list))</span>
+<span id="cb159-16"><a href="stan.html#cb159-16"></a>  <span class="kw">tibble</span>(</span>
+<span id="cb159-17"><a href="stan.html#cb159-17"></a>    <span class="dt">beta_cover =</span> beta_cover,</span>
+<span id="cb159-18"><a href="stan.html#cb159-18"></a>    <span class="dt">beta_true =</span> beta_true,</span>
+<span id="cb159-19"><a href="stan.html#cb159-19"></a>    <span class="dt">beta_25 =</span> beta_<span class="dv">25</span>,</span>
+<span id="cb159-20"><a href="stan.html#cb159-20"></a>    <span class="dt">beta_median =</span> beta_median,</span>
+<span id="cb159-21"><a href="stan.html#cb159-21"></a>    <span class="dt">beta_75 =</span> beta_<span class="dv">75</span>,</span>
+<span id="cb159-22"><a href="stan.html#cb159-22"></a>    <span class="dt">psrf =</span> psrf,</span>
+<span id="cb159-23"><a href="stan.html#cb159-23"></a>    <span class="dt">ess =</span> ess</span>
+<span id="cb159-24"><a href="stan.html#cb159-24"></a>  )</span>
+<span id="cb159-25"><a href="stan.html#cb159-25"></a>}</span></code></pre></div>
 </div>
 <div id="plan" class="section level2" number="10.3">
 <h2><span class="header-section-number">10.3</span> Plan</h2>
 <p>Our <a href="plans.html#plans"><code>drake</code> plan</a> is defined in the <code>R/plan.R</code> script.</p>
 <div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="stan.html#cb160-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb160-2"><a href="stan.html#cb160-2"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb160-3"><a href="stan.html#cb160-3"></a>    <span class="st">&quot;stan/model.stan&quot;</span>,</span>
+<span id="cb160-2"><a href="stan.html#cb160-2"></a>  <span class="dt">model_file =</span> <span class="kw">target</span>(</span>
+<span id="cb160-3"><a href="stan.html#cb160-3"></a>    <span class="kw">compile_model</span>(<span class="st">&quot;stan/model.stan&quot;</span>),</span>
 <span id="cb160-4"><a href="stan.html#cb160-4"></a>    <span class="dt">format =</span> <span class="st">&quot;file&quot;</span>,</span>
 <span id="cb160-5"><a href="stan.html#cb160-5"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
 <span id="cb160-6"><a href="stan.html#cb160-6"></a>  ),</span>
-<span id="cb160-7"><a href="stan.html#cb160-7"></a>  <span class="dt">compiled =</span> <span class="kw">target</span>(</span>
-<span id="cb160-8"><a href="stan.html#cb160-8"></a>    <span class="kw">compile_model</span>(model),</span>
-<span id="cb160-9"><a href="stan.html#cb160-9"></a>    <span class="dt">format =</span> <span class="st">&quot;file&quot;</span>,</span>
-<span id="cb160-10"><a href="stan.html#cb160-10"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb160-11"><a href="stan.html#cb160-11"></a>  ),</span>
-<span id="cb160-12"><a href="stan.html#cb160-12"></a>  <span class="dt">index =</span> <span class="kw">target</span>(</span>
-<span id="cb160-13"><a href="stan.html#cb160-13"></a>    <span class="kw">seq_len</span>(<span class="dv">10</span>), <span class="co"># Change the number of simulations here.</span></span>
-<span id="cb160-14"><a href="stan.html#cb160-14"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb160-7"><a href="stan.html#cb160-7"></a>  <span class="dt">index =</span> <span class="kw">target</span>(</span>
+<span id="cb160-8"><a href="stan.html#cb160-8"></a>    <span class="kw">seq_len</span>(<span class="dv">10</span>), <span class="co"># Change the number of simulations here.</span></span>
+<span id="cb160-9"><a href="stan.html#cb160-9"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb160-10"><a href="stan.html#cb160-10"></a>  ),</span>
+<span id="cb160-11"><a href="stan.html#cb160-11"></a>  <span class="dt">data =</span> <span class="kw">target</span>(</span>
+<span id="cb160-12"><a href="stan.html#cb160-12"></a>    <span class="kw">simulate_data</span>(),</span>
+<span id="cb160-13"><a href="stan.html#cb160-13"></a>    <span class="dt">dynamic =</span> <span class="kw">map</span>(index),</span>
+<span id="cb160-14"><a href="stan.html#cb160-14"></a>    <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
 <span id="cb160-15"><a href="stan.html#cb160-15"></a>  ),</span>
-<span id="cb160-16"><a href="stan.html#cb160-16"></a>  <span class="dt">data =</span> <span class="kw">target</span>(</span>
-<span id="cb160-17"><a href="stan.html#cb160-17"></a>    <span class="kw">simulate_data</span>(),</span>
-<span id="cb160-18"><a href="stan.html#cb160-18"></a>    <span class="dt">dynamic =</span> <span class="kw">map</span>(index),</span>
+<span id="cb160-16"><a href="stan.html#cb160-16"></a>  <span class="dt">fit =</span> <span class="kw">target</span>(</span>
+<span id="cb160-17"><a href="stan.html#cb160-17"></a>    <span class="kw">fit_model</span>(model_file[<span class="dv">1</span>], data),</span>
+<span id="cb160-18"><a href="stan.html#cb160-18"></a>    <span class="dt">dynamic =</span> <span class="kw">map</span>(data),</span>
 <span id="cb160-19"><a href="stan.html#cb160-19"></a>    <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
 <span id="cb160-20"><a href="stan.html#cb160-20"></a>  ),</span>
-<span id="cb160-21"><a href="stan.html#cb160-21"></a>  <span class="dt">fit =</span> <span class="kw">target</span>(</span>
-<span id="cb160-22"><a href="stan.html#cb160-22"></a>    <span class="kw">fit_model</span>(compiled, data),</span>
-<span id="cb160-23"><a href="stan.html#cb160-23"></a>    <span class="dt">dynamic =</span> <span class="kw">map</span>(data),</span>
-<span id="cb160-24"><a href="stan.html#cb160-24"></a>    <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
-<span id="cb160-25"><a href="stan.html#cb160-25"></a>  ),</span>
-<span id="cb160-26"><a href="stan.html#cb160-26"></a>  <span class="dt">report =</span> <span class="kw">target</span>(</span>
-<span id="cb160-27"><a href="stan.html#cb160-27"></a>    <span class="kw">render</span>(</span>
-<span id="cb160-28"><a href="stan.html#cb160-28"></a>      <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
-<span id="cb160-29"><a href="stan.html#cb160-29"></a>      <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</span>
-<span id="cb160-30"><a href="stan.html#cb160-30"></a>      <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
-<span id="cb160-31"><a href="stan.html#cb160-31"></a>    ),</span>
-<span id="cb160-32"><a href="stan.html#cb160-32"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb160-33"><a href="stan.html#cb160-33"></a>  )</span>
-<span id="cb160-34"><a href="stan.html#cb160-34"></a>)</span></code></pre></div>
+<span id="cb160-21"><a href="stan.html#cb160-21"></a>  <span class="dt">report =</span> <span class="kw">target</span>(</span>
+<span id="cb160-22"><a href="stan.html#cb160-22"></a>    <span class="kw">render</span>(</span>
+<span id="cb160-23"><a href="stan.html#cb160-23"></a>      <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
+<span id="cb160-24"><a href="stan.html#cb160-24"></a>      <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</span>
+<span id="cb160-25"><a href="stan.html#cb160-25"></a>      <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
+<span id="cb160-26"><a href="stan.html#cb160-26"></a>    ),</span>
+<span id="cb160-27"><a href="stan.html#cb160-27"></a>    <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb160-28"><a href="stan.html#cb160-28"></a>  )</span>
+<span id="cb160-29"><a href="stan.html#cb160-29"></a>)</span></code></pre></div>
 <p>The following subsections describe the strategy and practical adjustments behind each target.</p>
 <div id="model" class="section level3" number="10.3.1">
 <h3><span class="header-section-number">10.3.1</span> Model</h3>
-<p>The <code>model</code> target is a <a href="https://books.ropensci.org/drake/plans.html#dynamic-files">dynamic file</a> to reproducibly track our Stan model file in <code>stan/model.stan</code>. Below, <code>format = "file"</code> indicates that the target is a dynamic file, and <code>hpc = FALSE</code> tells <code>drake</code> not to run the target on a parallel worker in <a href="hpc.html#hpc">high-performance computing</a> scenarios.</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="stan.html#cb161-1"></a>model =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb161-2"><a href="stan.html#cb161-2"></a>  <span class="st">&quot;stan/model.stan&quot;</span>,</span>
+<p>The <code>model_files</code> target is a <a href="https://books.ropensci.org/drake/plans.html#dynamic-files">dynamic file target</a> to reproducibly track our Stan model specification file (<code>stan/model.stan</code>) and compiled model file (<code>stan/model.rds</code>). Below, <code>format = "file"</code> indicates that the target is a dynamic file target, and <code>hpc = FALSE</code> tells <code>drake</code> not to run the target on a parallel worker in <a href="hpc.html#hpc">high-performance computing</a> scenarios.</p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="stan.html#cb161-1"></a>model_files =<span class="st"> </span><span class="kw">target</span>(</span>
+<span id="cb161-2"><a href="stan.html#cb161-2"></a>  <span class="kw">compile_model</span>(<span class="st">&quot;stan/model.stan&quot;</span>),</span>
 <span id="cb161-3"><a href="stan.html#cb161-3"></a>  <span class="dt">format =</span> <span class="st">&quot;file&quot;</span>,</span>
 <span id="cb161-4"><a href="stan.html#cb161-4"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb161-5"><a href="stan.html#cb161-5"></a>)</span></code></pre></div>
+<span id="cb161-5"><a href="stan.html#cb161-5"></a>),</span></code></pre></div>
 </div>
-<div id="compiled" class="section level3" number="10.3.2">
-<h3><span class="header-section-number">10.3.2</span> Compiled</h3>
-<p>The <code>compiled</code> target compiles the Stan model in <code>stan/model.stan</code> and saves the result to the file <code>stan/model.rds</code>. This target is another dynamic file we want to run locally, so again, we write <code>format = "file"</code> and <code>hpc = FALSE</code>. Remember to set <code>rstan_options(auto_write = TRUE)</code> inside <code>compile_model()</code> so Stan actually generates this RDS file. The compiled model file is important because it allows us to avoid recompilation when we fit different models in different R processes in <a href="hpc.html#hpc">high-performance computing</a> scenarios.</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="stan.html#cb162-1"></a>compiled =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb162-2"><a href="stan.html#cb162-2"></a>  <span class="kw">compile_model</span>(model),</span>
-<span id="cb162-3"><a href="stan.html#cb162-3"></a>  <span class="dt">format =</span> <span class="st">&quot;file&quot;</span>,</span>
-<span id="cb162-4"><a href="stan.html#cb162-4"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb162-5"><a href="stan.html#cb162-5"></a>)</span></code></pre></div>
-</div>
-<div id="index" class="section level3" number="10.3.3">
-<h3><span class="header-section-number">10.3.3</span> Index</h3>
+<div id="index" class="section level3" number="10.3.2">
+<h3><span class="header-section-number">10.3.2</span> Index</h3>
 <p>The <code>index</code> target is simply a numeric vector from 1 to the number of simulations. To fit our model multiple times, we are going to <a href="dynamic.html#dynamic">dynamically map</a> over <code>index</code>. This is a small target and we do not want to waste expensive computing resources on it, so we set <code>hpc = FALSE</code>.</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="stan.html#cb163-1"></a>index =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb163-2"><a href="stan.html#cb163-2"></a>  <span class="kw">seq_len</span>(<span class="dv">1000</span>), <span class="co"># Change the number of simulations here.</span></span>
-<span id="cb163-3"><a href="stan.html#cb163-3"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb163-4"><a href="stan.html#cb163-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="stan.html#cb162-1"></a>index =<span class="st"> </span><span class="kw">target</span>(</span>
+<span id="cb162-2"><a href="stan.html#cb162-2"></a>  <span class="kw">seq_len</span>(<span class="dv">1000</span>), <span class="co"># Change the number of simulations here.</span></span>
+<span id="cb162-3"><a href="stan.html#cb162-3"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb162-4"><a href="stan.html#cb162-4"></a>)</span></code></pre></div>
 </div>
-<div id="data" class="section level3" number="10.3.4">
-<h3><span class="header-section-number">10.3.4</span> Data</h3>
+<div id="data" class="section level3" number="10.3.3">
+<h3><span class="header-section-number">10.3.3</span> Data</h3>
 <p><code>data</code> is a <a href="dynamic.html#dynamic">dynamic target</a> with one sub-target per simulated dataset, so we write <code>dynamic = map(index)</code> below. In addition, these datasets are data frames, so we choose <code>format = "fst_tbl"</code> below to increase read/write speeds and conserve storage space. <a href="https://books.ropensci.org/drake/plans.html#special-data-formats-for-targets">Read here</a> for more on specialized storage formats.</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="stan.html#cb164-1"></a>data =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb164-2"><a href="stan.html#cb164-2"></a>  <span class="kw">simulate_data</span>(),</span>
-<span id="cb164-3"><a href="stan.html#cb164-3"></a>  <span class="dt">dynamic =</span> <span class="kw">map</span>(index),</span>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="stan.html#cb163-1"></a>data =<span class="st"> </span><span class="kw">target</span>(</span>
+<span id="cb163-2"><a href="stan.html#cb163-2"></a>  <span class="kw">simulate_data</span>(),</span>
+<span id="cb163-3"><a href="stan.html#cb163-3"></a>  <span class="dt">dynamic =</span> <span class="kw">map</span>(index),</span>
+<span id="cb163-4"><a href="stan.html#cb163-4"></a>  <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
+<span id="cb163-5"><a href="stan.html#cb163-5"></a>)</span></code></pre></div>
+</div>
+<div id="fit" class="section level3" number="10.3.4">
+<h3><span class="header-section-number">10.3.4</span> Fit</h3>
+<p>We want to fit our model once for each simulated dataset, so our <code>fit</code> target dynamically maps over the datasets with <code>dynamic = map(data)</code>. We also pass in the path to the <code>stan/model.stan</code> specification file, but <code>rstan</code> is smart enough to use the compiled model <code>stan/model.rds</code> instead if available. And since <code>fit_model()</code> returns a data frame, we also choose <code>format = "fst_tbl"</code> here.</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="stan.html#cb164-1"></a>fit =<span class="st"> </span><span class="kw">target</span>(</span>
+<span id="cb164-2"><a href="stan.html#cb164-2"></a>  <span class="kw">fit_model</span>(model_files[<span class="dv">1</span>], data),</span>
+<span id="cb164-3"><a href="stan.html#cb164-3"></a>  <span class="dt">dynamic =</span> <span class="kw">map</span>(data),</span>
 <span id="cb164-4"><a href="stan.html#cb164-4"></a>  <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
 <span id="cb164-5"><a href="stan.html#cb164-5"></a>)</span></code></pre></div>
 </div>
-<div id="fit" class="section level3" number="10.3.5">
-<h3><span class="header-section-number">10.3.5</span> Fit</h3>
-<p>We want to fit our model once for each simulated dataset, so our <code>fit</code> target dynamically maps over the datasets with <code>dynamic = map(data)</code>. Since <code>fit_model()</code> returns a data frame, we also choose <code>format = "fst_tbl"</code> here.</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="stan.html#cb165-1"></a>fit =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb165-2"><a href="stan.html#cb165-2"></a>  <span class="kw">fit_model</span>(compiled, data),</span>
-<span id="cb165-3"><a href="stan.html#cb165-3"></a>  <span class="dt">dynamic =</span> <span class="kw">map</span>(data),</span>
-<span id="cb165-4"><a href="stan.html#cb165-4"></a>  <span class="dt">format =</span> <span class="st">&quot;fst_tbl&quot;</span></span>
-<span id="cb165-5"><a href="stan.html#cb165-5"></a>)</span></code></pre></div>
-</div>
-<div id="report" class="section level3" number="10.3.6">
-<h3><span class="header-section-number">10.3.6</span> Report</h3>
+<div id="report" class="section level3" number="10.3.5">
+<h3><span class="header-section-number">10.3.5</span> Report</h3>
 <p>R Markdown reports should never do any heavy lifting in <code>drake</code> pipelines. They should simply leverage the computationally expensive work done in the previous targets. If we follow this good practice and our report renders quickly, we should not need heavy computing resources to process it, and we can set <code>hpc = FALSE</code> below.</p>
 <p>The <a href="https://github.com/wlandau/drake-examples/blob/master/stan/report.Rmd"><code>report.Rmd</code> file itself</a> has <code>loadd()</code> and <code>readd()</code> statements to refer to these targets, and with the <code>knitr_in()</code> keyword below, <code>drake</code> knows that it needs to update the report when the models or datasets change. Similarly, <code>file_out("report.html")</code> tells <code>drake</code> to rerun the report if the output file gets corrupted.</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="stan.html#cb166-1"></a>report =<span class="st"> </span><span class="kw">target</span>(</span>
-<span id="cb166-2"><a href="stan.html#cb166-2"></a>  <span class="kw">render</span>(</span>
-<span id="cb166-3"><a href="stan.html#cb166-3"></a>    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
-<span id="cb166-4"><a href="stan.html#cb166-4"></a>    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</span>
-<span id="cb166-5"><a href="stan.html#cb166-5"></a>    <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
-<span id="cb166-6"><a href="stan.html#cb166-6"></a>  ),</span>
-<span id="cb166-7"><a href="stan.html#cb166-7"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
-<span id="cb166-8"><a href="stan.html#cb166-8"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="stan.html#cb165-1"></a>report =<span class="st"> </span><span class="kw">target</span>(</span>
+<span id="cb165-2"><a href="stan.html#cb165-2"></a>  <span class="kw">render</span>(</span>
+<span id="cb165-3"><a href="stan.html#cb165-3"></a>    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
+<span id="cb165-4"><a href="stan.html#cb165-4"></a>    <span class="dt">output_file =</span> <span class="kw">file_out</span>(<span class="st">&quot;report.html&quot;</span>),</span>
+<span id="cb165-5"><a href="stan.html#cb165-5"></a>    <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
+<span id="cb165-6"><a href="stan.html#cb165-6"></a>  ),</span>
+<span id="cb165-7"><a href="stan.html#cb165-7"></a>  <span class="dt">hpc =</span> <span class="ot">FALSE</span></span>
+<span id="cb165-8"><a href="stan.html#cb165-8"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="try-it-out" class="section level2" number="10.4">

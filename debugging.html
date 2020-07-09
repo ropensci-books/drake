@@ -307,11 +307,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="churn.html"><a href="churn.html#plan"><i class="fa fa-check"></i><b>10.3</b> Plan</a>
 <ul>
 <li class="chapter" data-level="10.3.1" data-path="stan.html"><a href="stan.html#model"><i class="fa fa-check"></i><b>10.3.1</b> Model</a></li>
-<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#compiled"><i class="fa fa-check"></i><b>10.3.2</b> Compiled</a></li>
-<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.3</b> Index</a></li>
-<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.4</b> Data</a></li>
-<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.5</b> Fit</a></li>
-<li class="chapter" data-level="10.3.6" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.6</b> Report</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stan.html"><a href="stan.html#index"><i class="fa fa-check"></i><b>10.3.2</b> Index</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stan.html"><a href="stan.html#data"><i class="fa fa-check"></i><b>10.3.3</b> Data</a></li>
+<li class="chapter" data-level="10.3.4" data-path="stan.html"><a href="stan.html#fit"><i class="fa fa-check"></i><b>10.3.4</b> Fit</a></li>
+<li class="chapter" data-level="10.3.5" data-path="stan.html"><a href="stan.html#report"><i class="fa fa-check"></i><b>10.3.5</b> Report</a></li>
 </ul></li>
 <li class="chapter" data-level="10.4" data-path="stan.html"><a href="stan.html#try-it-out"><i class="fa fa-check"></i><b>10.4</b> Try it out!</a></li>
 </ul></li>
@@ -500,89 +499,89 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="diagnosing-errors" class="section level3" number="18.1.1">
 <h3><span class="header-section-number">18.1.1</span> Diagnosing errors</h3>
 <p>When a target fails, <code>drake</code> tries to tell you.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="debugging.html#cb279-1"></a>large_dataset &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb279-2"><a href="debugging.html#cb279-2"></a>  <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>))</span>
-<span id="cb279-3"><a href="debugging.html#cb279-3"></a>}</span>
-<span id="cb279-4"><a href="debugging.html#cb279-4"></a></span>
-<span id="cb279-5"><a href="debugging.html#cb279-5"></a>expensive_analysis &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
-<span id="cb279-6"><a href="debugging.html#cb279-6"></a>  <span class="co"># More operations go here.</span></span>
-<span id="cb279-7"><a href="debugging.html#cb279-7"></a>  <span class="kw">tricky_operation</span>(data)</span>
-<span id="cb279-8"><a href="debugging.html#cb279-8"></a>}</span>
-<span id="cb279-9"><a href="debugging.html#cb279-9"></a></span>
-<span id="cb279-10"><a href="debugging.html#cb279-10"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
-<span id="cb279-11"><a href="debugging.html#cb279-11"></a>  <span class="co"># Expensive code here.</span></span>
-<span id="cb279-12"><a href="debugging.html#cb279-12"></a>  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</span>
-<span id="cb279-13"><a href="debugging.html#cb279-13"></a>}</span>
-<span id="cb279-14"><a href="debugging.html#cb279-14"></a></span>
-<span id="cb279-15"><a href="debugging.html#cb279-15"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb279-16"><a href="debugging.html#cb279-16"></a>  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),</span>
-<span id="cb279-17"><a href="debugging.html#cb279-17"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data)</span>
-<span id="cb279-18"><a href="debugging.html#cb279-18"></a>)</span>
-<span id="cb279-19"><a href="debugging.html#cb279-19"></a></span>
-<span id="cb279-20"><a href="debugging.html#cb279-20"></a><span class="kw">make</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="debugging.html#cb278-1"></a>large_dataset &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb278-2"><a href="debugging.html#cb278-2"></a>  <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="fl">1e6</span>))</span>
+<span id="cb278-3"><a href="debugging.html#cb278-3"></a>}</span>
+<span id="cb278-4"><a href="debugging.html#cb278-4"></a></span>
+<span id="cb278-5"><a href="debugging.html#cb278-5"></a>expensive_analysis &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
+<span id="cb278-6"><a href="debugging.html#cb278-6"></a>  <span class="co"># More operations go here.</span></span>
+<span id="cb278-7"><a href="debugging.html#cb278-7"></a>  <span class="kw">tricky_operation</span>(data)</span>
+<span id="cb278-8"><a href="debugging.html#cb278-8"></a>}</span>
+<span id="cb278-9"><a href="debugging.html#cb278-9"></a></span>
+<span id="cb278-10"><a href="debugging.html#cb278-10"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
+<span id="cb278-11"><a href="debugging.html#cb278-11"></a>  <span class="co"># Expensive code here.</span></span>
+<span id="cb278-12"><a href="debugging.html#cb278-12"></a>  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</span>
+<span id="cb278-13"><a href="debugging.html#cb278-13"></a>}</span>
+<span id="cb278-14"><a href="debugging.html#cb278-14"></a></span>
+<span id="cb278-15"><a href="debugging.html#cb278-15"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb278-16"><a href="debugging.html#cb278-16"></a>  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),</span>
+<span id="cb278-17"><a href="debugging.html#cb278-17"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data)</span>
+<span id="cb278-18"><a href="debugging.html#cb278-18"></a>)</span>
+<span id="cb278-19"><a href="debugging.html#cb278-19"></a></span>
+<span id="cb278-20"><a href="debugging.html#cb278-20"></a><span class="kw">make</span>(plan)</span></code></pre></div>
 <p><code>diagnose()</code> recovers the metadata on targets. For failed targets, this includes an error object.</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="debugging.html#cb280-1"></a>error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(analysis)<span class="op">$</span>error</span>
-<span id="cb280-2"><a href="debugging.html#cb280-2"></a>error</span>
-<span id="cb280-3"><a href="debugging.html#cb280-3"></a></span>
-<span id="cb280-4"><a href="debugging.html#cb280-4"></a><span class="kw">names</span>(error)</span></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="debugging.html#cb279-1"></a>error &lt;-<span class="st"> </span><span class="kw">diagnose</span>(analysis)<span class="op">$</span>error</span>
+<span id="cb279-2"><a href="debugging.html#cb279-2"></a>error</span>
+<span id="cb279-3"><a href="debugging.html#cb279-3"></a></span>
+<span id="cb279-4"><a href="debugging.html#cb279-4"></a><span class="kw">names</span>(error)</span></code></pre></div>
 <p>Using the call stack, you can trace back the location of the error. Once you know roughly where to find the bug, you can troubleshoot interactively.</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="debugging.html#cb281-1"></a><span class="kw">invisible</span>(<span class="kw">lapply</span>(<span class="kw">tail</span>(error<span class="op">$</span>calls, <span class="dv">3</span>), print))</span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="debugging.html#cb280-1"></a><span class="kw">invisible</span>(<span class="kw">lapply</span>(<span class="kw">tail</span>(error<span class="op">$</span>calls, <span class="dv">3</span>), print))</span></code></pre></div>
 </div>
 <div id="interactive-debugging" class="section level3" number="18.1.2">
 <h3><span class="header-section-number">18.1.2</span> Interactive debugging</h3>
 <p>The clues from <code>diagnose()</code> help us go back and inspect the failing code. <code>debug()</code> is an interactive debugging tool which helps you verify exactly what is going wrong. Below, <code>make(plan)</code> pauses execution and turn interactive control over to you inside <code>tricky_operation()</code>.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="debugging.html#cb282-1"></a><span class="kw">debug</span>(tricky_operation)</span>
-<span id="cb282-2"><a href="debugging.html#cb282-2"></a><span class="kw">make</span>(plan) <span class="co"># Pauses at tricky_operation(data).</span></span>
-<span id="cb282-3"><a href="debugging.html#cb282-3"></a><span class="kw">undebug</span>(tricky_operation) <span class="co"># Undoes debug().</span></span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="debugging.html#cb281-1"></a><span class="kw">debug</span>(tricky_operation)</span>
+<span id="cb281-2"><a href="debugging.html#cb281-2"></a><span class="kw">make</span>(plan) <span class="co"># Pauses at tricky_operation(data).</span></span>
+<span id="cb281-3"><a href="debugging.html#cb281-3"></a><span class="kw">undebug</span>(tricky_operation) <span class="co"># Undoes debug().</span></span></code></pre></div>
 <p><code>drake</code>’s own <code>drake_debug()</code> function is nearly equivalent.</p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="debugging.html#cb283-1"></a><span class="kw">drake_debug</span>(analysis, plan) <span class="co"># Pauses at the command expensive_analysis(data).</span></span></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="debugging.html#cb282-1"></a><span class="kw">drake_debug</span>(analysis, plan) <span class="co"># Pauses at the command expensive_analysis(data).</span></span></code></pre></div>
 <p><code>browser()</code> is similar, but it affords you finer control over to pause execution</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="debugging.html#cb284-1"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
-<span id="cb284-2"><a href="debugging.html#cb284-2"></a>  <span class="co"># Expensive code here.</span></span>
-<span id="cb284-3"><a href="debugging.html#cb284-3"></a>  <span class="kw">browser</span>() <span class="co"># Pauses right here to give you control.</span></span>
-<span id="cb284-4"><a href="debugging.html#cb284-4"></a>  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</span>
-<span id="cb284-5"><a href="debugging.html#cb284-5"></a>}</span>
-<span id="cb284-6"><a href="debugging.html#cb284-6"></a></span>
-<span id="cb284-7"><a href="debugging.html#cb284-7"></a><span class="kw">make</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="debugging.html#cb283-1"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
+<span id="cb283-2"><a href="debugging.html#cb283-2"></a>  <span class="co"># Expensive code here.</span></span>
+<span id="cb283-3"><a href="debugging.html#cb283-3"></a>  <span class="kw">browser</span>() <span class="co"># Pauses right here to give you control.</span></span>
+<span id="cb283-4"><a href="debugging.html#cb283-4"></a>  <span class="kw">stop</span>(<span class="st">&quot;there is a bug somewhere.&quot;</span>)</span>
+<span id="cb283-5"><a href="debugging.html#cb283-5"></a>}</span>
+<span id="cb283-6"><a href="debugging.html#cb283-6"></a></span>
+<span id="cb283-7"><a href="debugging.html#cb283-7"></a><span class="kw">make</span>(plan)</span></code></pre></div>
 </div>
 <div id="efficient-trial-and-error" class="section level3" number="18.1.3">
 <h3><span class="header-section-number">18.1.3</span> Efficient trial and error</h3>
 <p>If you are using <code>drake</code>, then chances are your targets are computationally expensive and the long runtimes make debugging difficult. To speed up trial and error, run the plan on a small dataset when you debug and repair things.</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="debugging.html#cb285-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb285-2"><a href="debugging.html#cb285-2"></a>  <span class="dt">data =</span> <span class="kw">head</span>(<span class="kw">large_dataset</span>()),       <span class="co"># Just work with the first few rows.</span></span>
-<span id="cb285-3"><a href="debugging.html#cb285-3"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Runs faster now.</span></span>
-<span id="cb285-4"><a href="debugging.html#cb285-4"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="debugging.html#cb286-1"></a>tricky_operation &lt;-<span class="st"> </span>... <span class="co"># Try to fix the function.</span></span>
-<span id="cb286-2"><a href="debugging.html#cb286-2"></a></span>
-<span id="cb286-3"><a href="debugging.html#cb286-3"></a><span class="kw">debug</span>(tricky_operation) <span class="co">#  Set up to debug interactively.</span></span>
-<span id="cb286-4"><a href="debugging.html#cb286-4"></a></span>
-<span id="cb286-5"><a href="debugging.html#cb286-5"></a><span class="kw">make</span>(plan) <span class="co"># Try to run the workflow.</span></span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="debugging.html#cb284-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb284-2"><a href="debugging.html#cb284-2"></a>  <span class="dt">data =</span> <span class="kw">head</span>(<span class="kw">large_dataset</span>()),       <span class="co"># Just work with the first few rows.</span></span>
+<span id="cb284-3"><a href="debugging.html#cb284-3"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Runs faster now.</span></span>
+<span id="cb284-4"><a href="debugging.html#cb284-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="debugging.html#cb285-1"></a>tricky_operation &lt;-<span class="st"> </span>... <span class="co"># Try to fix the function.</span></span>
+<span id="cb285-2"><a href="debugging.html#cb285-2"></a></span>
+<span id="cb285-3"><a href="debugging.html#cb285-3"></a><span class="kw">debug</span>(tricky_operation) <span class="co">#  Set up to debug interactively.</span></span>
+<span id="cb285-4"><a href="debugging.html#cb285-4"></a></span>
+<span id="cb285-5"><a href="debugging.html#cb285-5"></a><span class="kw">make</span>(plan) <span class="co"># Try to run the workflow.</span></span></code></pre></div>
 <p>After a lot of quick trial and error, we finally fix the function and run it on the small data.</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="debugging.html#cb287-1"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
-<span id="cb287-2"><a href="debugging.html#cb287-2"></a>  <span class="co"># Good code goes here.</span></span>
-<span id="cb287-3"><a href="debugging.html#cb287-3"></a>}</span>
-<span id="cb287-4"><a href="debugging.html#cb287-4"></a></span>
-<span id="cb287-5"><a href="debugging.html#cb287-5"></a><span class="kw">make</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="debugging.html#cb286-1"></a>tricky_operation &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
+<span id="cb286-2"><a href="debugging.html#cb286-2"></a>  <span class="co"># Good code goes here.</span></span>
+<span id="cb286-3"><a href="debugging.html#cb286-3"></a>}</span>
+<span id="cb286-4"><a href="debugging.html#cb286-4"></a></span>
+<span id="cb286-5"><a href="debugging.html#cb286-5"></a><span class="kw">make</span>(plan)</span></code></pre></div>
 <p>Now, that the code works, it is time to scale back up to the large data. Use <code>make(plan, recover = TRUE)</code> to salvage old targets from before the debugging process.</p>
-<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="debugging.html#cb288-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb288-2"><a href="debugging.html#cb288-2"></a>  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),             <span class="co"># Use the large data again.</span></span>
-<span id="cb288-3"><a href="debugging.html#cb288-3"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Should be repaired now.</span></span>
-<span id="cb288-4"><a href="debugging.html#cb288-4"></a>)</span>
-<span id="cb288-5"><a href="debugging.html#cb288-5"></a></span>
-<span id="cb288-6"><a href="debugging.html#cb288-6"></a><span class="kw">make</span>(plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="debugging.html#cb287-1"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb287-2"><a href="debugging.html#cb287-2"></a>  <span class="dt">data =</span> <span class="kw">large_dataset</span>(),             <span class="co"># Use the large data again.</span></span>
+<span id="cb287-3"><a href="debugging.html#cb287-3"></a>  <span class="dt">analysis =</span> <span class="kw">expensive_analysis</span>(data) <span class="co"># Should be repaired now.</span></span>
+<span id="cb287-4"><a href="debugging.html#cb287-4"></a>)</span>
+<span id="cb287-5"><a href="debugging.html#cb287-5"></a></span>
+<span id="cb287-6"><a href="debugging.html#cb287-6"></a><span class="kw">make</span>(plan, <span class="dt">recover =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="why-do-my-targets-keep-rerunning" class="section level2" number="18.2">
 <h2><span class="header-section-number">18.2</span> Why do my targets keep rerunning?</h2>
 <p>Consider the following completed workflow.</p>
-<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="debugging.html#cb289-1"></a><span class="kw">load_mtcars_example</span>()</span>
-<span id="cb289-2"><a href="debugging.html#cb289-2"></a><span class="kw">make</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="debugging.html#cb288-1"></a><span class="kw">load_mtcars_example</span>()</span>
+<span id="cb288-2"><a href="debugging.html#cb288-2"></a><span class="kw">make</span>(my_plan)</span></code></pre></div>
 <p>At this point, if you change the <code>reg1()</code> function, then <code>make()</code> will automatically detect and rerun downstream targets such as <code>regression1_large</code>.</p>
-<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="debugging.html#cb290-1"></a>reg1 &lt;-<span class="st"> </span><span class="cf">function</span> (d) {</span>
-<span id="cb290-2"><a href="debugging.html#cb290-2"></a>  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x, <span class="dt">data =</span> d)</span>
-<span id="cb290-3"><a href="debugging.html#cb290-3"></a>}</span>
-<span id="cb290-4"><a href="debugging.html#cb290-4"></a></span>
-<span id="cb290-5"><a href="debugging.html#cb290-5"></a><span class="kw">make</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="debugging.html#cb289-1"></a>reg1 &lt;-<span class="st"> </span><span class="cf">function</span> (d) {</span>
+<span id="cb289-2"><a href="debugging.html#cb289-2"></a>  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x, <span class="dt">data =</span> d)</span>
+<span id="cb289-3"><a href="debugging.html#cb289-3"></a>}</span>
+<span id="cb289-4"><a href="debugging.html#cb289-4"></a></span>
+<span id="cb289-5"><a href="debugging.html#cb289-5"></a><span class="kw">make</span>(my_plan)</span></code></pre></div>
 <p>In general, targets are “outdated” or “invalidated” they are out of sync with their dependencies. If a target is outdated, the next <code>make()</code> automatically detects discrepancies and rebuild the affected targets. Usually, this automation adds convenience, saves time, and ensures reproducibility in the face of long runtimes.</p>
 <p>However, it can be frustrating when <code>drake</code> detects outdated targets when you think everything is up to date. If this happens, it is important to understand</p>
 <ol style="list-style-type: decimal">
@@ -595,30 +594,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="how-your-workflow-fits-together" class="section level3" number="18.2.1">
 <h3><span class="header-section-number">18.2.1</span> How your workflow fits together</h3>
 <p><code>drake</code> automatically analyzes your plan and functions to understand how your targets depend on each other. It assembles this information in a directed acyclic graph (DAG) which you can visualize and explore.</p>
-<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="debugging.html#cb291-1"></a><span class="kw">vis_drake_graph</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="debugging.html#cb290-1"></a><span class="kw">vis_drake_graph</span>(my_plan)</span></code></pre></div>
 <p>To get a more localized version of the graph, use <code>deps_target()</code>. Unlike <code>vis_drake_graph()</code>, <code>deps_target()</code> gives you a more granular view of the dependencies of an individual target.</p>
-<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="debugging.html#cb292-1"></a><span class="kw">deps_target</span>(regression1_large, my_plan)</span>
-<span id="cb292-2"><a href="debugging.html#cb292-2"></a></span>
-<span id="cb292-3"><a href="debugging.html#cb292-3"></a><span class="kw">deps_target</span>(report, my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="debugging.html#cb291-1"></a><span class="kw">deps_target</span>(regression1_large, my_plan)</span>
+<span id="cb291-2"><a href="debugging.html#cb291-2"></a></span>
+<span id="cb291-3"><a href="debugging.html#cb291-3"></a><span class="kw">deps_target</span>(report, my_plan)</span></code></pre></div>
 <p>To understand how <code>drake</code> detects dependencies in the first place, use <code>deps_code()</code>. This is what <code>drake</code> first sees when it reads your plan and functions to understand the dependencies.</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="debugging.html#cb293-1"></a><span class="kw">deps_code</span>(<span class="kw">quote</span>(</span>
-<span id="cb293-2"><a href="debugging.html#cb293-2"></a>  <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(regression1_large<span class="op">$</span>residuals))</span>
-<span id="cb293-3"><a href="debugging.html#cb293-3"></a>))</span>
-<span id="cb293-4"><a href="debugging.html#cb293-4"></a></span>
-<span id="cb293-5"><a href="debugging.html#cb293-5"></a><span class="kw">deps_code</span>(<span class="kw">quote</span>(</span>
-<span id="cb293-6"><a href="debugging.html#cb293-6"></a>  <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb293-7"><a href="debugging.html#cb293-7"></a>))</span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="debugging.html#cb292-1"></a><span class="kw">deps_code</span>(<span class="kw">quote</span>(</span>
+<span id="cb292-2"><a href="debugging.html#cb292-2"></a>  <span class="kw">suppressWarnings</span>(<span class="kw">summary</span>(regression1_large<span class="op">$</span>residuals))</span>
+<span id="cb292-3"><a href="debugging.html#cb292-3"></a>))</span>
+<span id="cb292-4"><a href="debugging.html#cb292-4"></a></span>
+<span id="cb292-5"><a href="debugging.html#cb292-5"></a><span class="kw">deps_code</span>(<span class="kw">quote</span>(</span>
+<span id="cb292-6"><a href="debugging.html#cb292-6"></a>  <span class="kw">knit</span>(<span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>), <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>), <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb292-7"><a href="debugging.html#cb292-7"></a>))</span></code></pre></div>
 <p>If <code>drake</code> detects new dependencies you were unaware of, that could be a reason why your targets are out of date.</p>
 </div>
 <div id="which-targets-are-outdated" class="section level3" number="18.2.2">
 <h3><span class="header-section-number">18.2.2</span> Which targets are outdated</h3>
 <p>Graphing utilities like <code>vis_drake_graph()</code> label the outdated targets, but sometimes it is helpful to get a more programmatic view.</p>
-<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="debugging.html#cb294-1"></a><span class="kw">outdated</span>(my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="debugging.html#cb293-1"></a><span class="kw">outdated</span>(my_plan)</span></code></pre></div>
 </div>
 <div id="why-your-targets-are-outdated" class="section level3" number="18.2.3">
 <h3><span class="header-section-number">18.2.3</span> Why your targets are outdated</h3>
 <p>The <code>deps_profile()</code> function offers clues.</p>
-<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="debugging.html#cb295-1"></a><span class="kw">deps_profile</span>(regression1_small, my_plan)</span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="debugging.html#cb294-1"></a><span class="kw">deps_profile</span>(regression1_small, my_plan)</span></code></pre></div>
 <p>From the data frame above, <code>regression1_small</code> is outdated because an R object dependency changed since the last <code>make()</code>. <code>drake</code> does not hold on to enough information to tell you precisely which object is the culprit, but functions like <code>vis_drake_graph()</code>, <code>deps_target()</code>, and <code>deps_code()</code> can help narrow down the possibilities.</p>
 </div>
 <div id="strategies-to-prevent-unexpected-changes-in-the-future" class="section level3" number="18.2.4">
