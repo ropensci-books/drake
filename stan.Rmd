@@ -61,13 +61,13 @@ The following sections walk through the functions and plan.
 
 Good functions have meaningful inputs and outputs that are easy to generate. For data anlaysis, good inputs and outputs are typically datasets, models, and summaries of fitted models. The functions below for our Stan workflow follow this pattern.
 
-First, we need a function to compile the model. It accepts a Stan model specification file (a `*.stan` text file) and returns a path to the compiled RDS file. (We need to set `rstan_options(auto_write = TRUE)` to make sure `stan_model()` generates the RDS file.) We return the file path because the target that uses this function will be a [dynamic file](https://books.ropensci.org/drake/plans.html#dynamic-files).
+First, we need a function to compile the model. It accepts a Stan model specification file (a `*.stan` text file) and returns a paths to both the model file and the compiled RDS file. (We need to set `rstan_options(auto_write = TRUE)` to make sure `stan_model()` generates the RDS file.) We return the file paths because the target that uses this function will be a [dynamic file target](https://books.ropensci.org/drake/plans.html#dynamic-files). `drake` will reproducibly watch these files for changes and automatically recompile and run the model if changes are detected.
 
 ```{r}
-compile_model <- function(model) {
+compile_model <- function(model_file) {
   rstan_options(auto_write = TRUE)
-  stan_model(model)
-  path_ext_set(model, "rds")
+  stan_model(model_file)
+  c(model_file, path_ext_set(model_file, "rds"))
 }
 ```
 
@@ -84,14 +84,15 @@ simulate_data <- function() {
 }
 ```
 
-Lastly, we write a function to fit the compiled model to a simulated dataset. In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.
+Lastly, we write a function to fit the compiled model to a simulated dataset. We pass in the `*.stan` model specification file, but `rstan` is smart enough to use the compiled RDS model file instead if available.
+
+In Bayesian data analysis workflows with many runs of the same model, we need to make a conscious effort to conserve computing resources. That means we should not save all the posterior samples from every single model fit. Instead, we compute summary statistics on the chains such as posterior quantiles, coverage in credible intervals, and convergence diagnostics.
 
 ```{r}
-fit_model <- function(compiled, data) {
-  rstan_options(auto_write = TRUE)
-  output <- sampling(
-    readRDS(compiled),
-    list(x = data$x, y = data$y, n = nrow(data)),
+fit_model <- function(model_file, data) {
+  output <- stan(
+    file = model_file,
+    data = list(x = data$x, y = data$y, n = nrow(data)),
     refresh = 0
   )
   mcmc_list <- As.mcmc.list(output)
@@ -121,13 +122,8 @@ Our [`drake` plan](#plans) is defined in the `R/plan.R` script.
 
 ```{r}
 plan <- drake_plan(
-  model = target(
-    "stan/model.stan",
-    format = "file",
-    hpc = FALSE
-  ),
-  compiled = target(
-    compile_model(model),
+  model_file = target(
+    compile_model("stan/model.stan"),
     format = "file",
     hpc = FALSE
   ),
@@ -141,7 +137,7 @@ plan <- drake_plan(
     format = "fst_tbl"
   ),
   fit = target(
-    fit_model(compiled, data),
+    fit_model(model_file[1], data),
     dynamic = map(data),
     format = "fst_tbl"
   ),
@@ -160,26 +156,14 @@ The following subsections describe the strategy and practical adjustments behind
 
 ### Model
 
-The `model` target is a [dynamic file](https://books.ropensci.org/drake/plans.html#dynamic-files) to reproducibly track our Stan model file in `stan/model.stan`. Below, `format = "file"` indicates that the target is a dynamic file, and `hpc = FALSE` tells `drake` not to run the target on a parallel worker in [high-performance computing](#hpc) scenarios.
+The `model_files` target is a [dynamic file target](https://books.ropensci.org/drake/plans.html#dynamic-files) to reproducibly track our Stan model specification file (`stan/model.stan`) and compiled model file (`stan/model.rds`). Below, `format = "file"` indicates that the target is a dynamic file target, and `hpc = FALSE` tells `drake` not to run the target on a parallel worker in [high-performance computing](#hpc) scenarios.
 
 ```{r}
-model = target(
-  "stan/model.stan",
+model_files = target(
+  compile_model("stan/model.stan"),
   format = "file",
   hpc = FALSE
-)
-```
-
-### Compiled
-
-The `compiled` target compiles the Stan model in `stan/model.stan` and saves the result to the file `stan/model.rds`. This target is another dynamic file we want to run locally, so again, we write `format = "file"` and `hpc = FALSE`. Remember to set `rstan_options(auto_write = TRUE)` inside `compile_model()` so Stan actually generates this RDS file. The compiled model file is important because it allows us to avoid recompilation when we fit different models in different R processes in [high-performance computing](#hpc) scenarios. 
-
-```{r}
-compiled = target(
-  compile_model(model),
-  format = "file",
-  hpc = FALSE
-)
+),
 ```
 
 ### Index
@@ -207,11 +191,11 @@ data = target(
 
 ### Fit
 
-We want to fit our model once for each simulated dataset, so our `fit` target dynamically maps over the datasets with `dynamic = map(data)`. Since `fit_model()` returns a data frame, we also choose `format = "fst_tbl"` here.
+We want to fit our model once for each simulated dataset, so our `fit` target dynamically maps over the datasets with `dynamic = map(data)`. We also pass in the path to the `stan/model.stan` specification file, but `rstan` is smart enough to use the compiled model `stan/model.rds` instead if available. And since `fit_model()` returns a data frame, we also choose `format = "fst_tbl"` here.
 
 ```{r}
 fit = target(
-  fit_model(compiled, data),
+  fit_model(model_files[1], data),
   dynamic = map(data),
   format = "fst_tbl"
 )
