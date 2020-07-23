@@ -39,7 +39,7 @@ invisible(file.copy("customer-churn/data/customer_churn.csv", ".", overwrite = T
 
 [`drake`](https://github.com/ropensci/drake) is designed for workflows with long runtimes, and a major use case is deep learning. This chapter demonstrates how to leverage [`drake`](https://github.com/ropensci/drake) to manage a deep learning workflow. The original example comes from a [blog post by Matt Dancho](https://blogs.rstudio.com/tensorflow/posts/2018-01-11-keras-customer-churn/), and the chapter's content itself comes directly from [this R notebook](https://github.com/sol-eng/tensorflow-w-r/blob/master/workflow/tensorflow-drake.Rmd), part of an [RStudio Solutions Engineering example demonstrating TensorFlow in R](https://github.com/sol-eng/tensorflow-w-r). The notebook is modified and redistributed under the terms of the [Apache 2.0 license](https://github.com/sol-eng/tensorflow-w-r/blob/master/LICENSE), copyright RStudio ([details here](https://github.com/ropensci-books/drake/blob/master/COPYRIGHT)).
 
-## Packages
+## Churn packages
 
 First, we load our packages into a fresh R session.
 
@@ -52,7 +52,7 @@ library(recipes)
 library(yardstick)
 ```
 
-## Functions
+## Churn functions
 
 [`drake`](https://github.com/ropensci/drake) is R-focused and function-oriented. We create functions to [preprocess the data](https://github.com/tidymodels/recipes),
 
@@ -195,7 +195,7 @@ compare_models <- function(...) {
 }
 ```
 
-## Plan
+## Churn plan
 
 Next, we define our workflow in a [`drake` plan](https://books.ropensci.org/drake/plans.html). We will prepare the data, train different models with different activation functions, and compare the models in terms of performance. 
 
@@ -228,7 +228,7 @@ The plan is a data frame with the steps we are going to do.
 plan
 ```
 
-## Dependency graph
+## Churn dependency graph
 
 The graph visualizes the dependency relationships among the steps of the workflow.
 
@@ -236,7 +236,7 @@ The graph visualizes the dependency relationships among the steps of the workflo
 vis_drake_graph(plan)
 ```
 
-## Run the models
+## Run the Keras models
 
 Call [`make()`](https://docs.ropensci.org/drake/reference/make.html) to actually run the workflow.
 
@@ -244,7 +244,7 @@ Call [`make()`](https://docs.ropensci.org/drake/reference/make.html) to actually
 make(plan)
 ```
 
-## Inspect the results
+## Inspect the Keras results
 
 The two models performed about the same.
 
@@ -252,7 +252,7 @@ The two models performed about the same.
 readd(metrics) # see also loadd()
 ```
 
-## Add models
+## Add Keras models
 
 Let's try the softmax activation function.
 
@@ -289,13 +289,13 @@ vis_drake_graph(plan) # see also outdated() and predict_runtime()
 make(plan)
 ```
 
-## Inspect the results again
+## Inspect the Churn results again
 
 ```{r}
 readd(metrics) # see also loadd()
 ```
 
-## Update your code
+## Update the Churn code
 
 If you change upstream functions, even nested ones, `drake` automatically refits the affected models. Let's increase dropout in both layers.
 
@@ -332,9 +332,9 @@ All the models and downstream results are affected.
 make(plan)
 ```
 
-## History and provenance
+## Churn history and provenance
 
-`drake` version 7.5.0 and above tracks history and provenance. You can see which models you ran, when you ran them, how long they took, and which settings you tried (i.e. named arguments to function calls in your commands).
+`drake` tracks history and provenance. You can see which models you ran, when you ran them, how long they took, and which settings you tried (i.e. named arguments to function calls in your commands).
 
 ```{r}
 history <- drake_history()
