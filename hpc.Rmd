@@ -376,6 +376,19 @@ make(plan)
 readd(x)
 ```
 
+If you happen to be using `r_make` and want to use parallelism _within_ targets, `future::plan(future.callr::callr)` needs to go inside `_drake.R` before the call to `drake_config()`. In that case your  `_drake.R` file would look like this:
+
+```{r, eval = FALSE}
+plan <- drake_plan(
+       x = furrr::future_map_int(1:2, function(x) Sys.getpid()),
+       y = furrr::future_map_int(1:2, function(x) Sys.getpid())
+     )
+     
+future::plan(future.callr::callr)
+
+drake_config(plan)
+```
+This will allow you to call `r_make` like normal.
 
 #### Persistent workers
 
