@@ -567,40 +567,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb84-14"><a href="dynamic.html#cb84-14" aria-hidden="true"></a><span class="co">#&gt; 10 Oceania   year            11.5  9.48e-11</span></span></code></pre></div>
 <p>This behavior is powered by the <a href="https://vctrs.r-lib.org/"><code>vctrs</code></a>. A dynamic target like <code>model</code> above is really a “<code>vctr</code>” of sub-targets. Under the hood, the aggregated value of <code>model</code> is what you get from calling <code>vec_c()</code> on all the <code>model_*</code> sub-targets. When you dynamically <code>map()</code> over a non-dynamic object, you are taking slices with <code>vec_slice()</code>. (When you <code>map()</code> over a dynamic target, each element is a sub-target and <code>vec_slice()</code> is not necessary.)</p>
 <div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="dynamic.html#cb85-1" aria-hidden="true"></a><span class="kw">library</span>(vctrs)</span>
-<span id="cb85-2"><a href="dynamic.html#cb85-2" aria-hidden="true"></a></span>
-<span id="cb85-3"><a href="dynamic.html#cb85-3" aria-hidden="true"></a><span class="co"># same as readd(model)</span></span>
-<span id="cb85-4"><a href="dynamic.html#cb85-4" aria-hidden="true"></a>s &lt;-<span class="st"> </span><span class="kw">subtargets</span>(model)</span>
-<span id="cb85-5"><a href="dynamic.html#cb85-5" aria-hidden="true"></a><span class="kw">vec_c</span>(</span>
-<span id="cb85-6"><a href="dynamic.html#cb85-6" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">1</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
-<span id="cb85-7"><a href="dynamic.html#cb85-7" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">2</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
-<span id="cb85-8"><a href="dynamic.html#cb85-8" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">3</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
-<span id="cb85-9"><a href="dynamic.html#cb85-9" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">4</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
-<span id="cb85-10"><a href="dynamic.html#cb85-10" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">5</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb85-11"><a href="dynamic.html#cb85-11" aria-hidden="true"></a>)</span>
-<span id="cb85-12"><a href="dynamic.html#cb85-12" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 10 x 4</span></span>
-<span id="cb85-13"><a href="dynamic.html#cb85-13" aria-hidden="true"></a><span class="co">#&gt;    continent term        statistic  p.value</span></span>
-<span id="cb85-14"><a href="dynamic.html#cb85-14" aria-hidden="true"></a><span class="co">#&gt;    &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span id="cb85-15"><a href="dynamic.html#cb85-15" aria-hidden="true"></a><span class="co">#&gt;  1 Africa    (Intercept)     -4.44 1.08e- 5</span></span>
-<span id="cb85-16"><a href="dynamic.html#cb85-16" aria-hidden="true"></a><span class="co">#&gt;  2 Africa    year             4.04 5.90e- 5</span></span>
-<span id="cb85-17"><a href="dynamic.html#cb85-17" aria-hidden="true"></a><span class="co">#&gt;  3 Americas  (Intercept)     -5.56 6.10e- 8</span></span>
-<span id="cb85-18"><a href="dynamic.html#cb85-18" aria-hidden="true"></a><span class="co">#&gt;  4 Americas  year             5.55 6.16e- 8</span></span>
-<span id="cb85-19"><a href="dynamic.html#cb85-19" aria-hidden="true"></a><span class="co">#&gt;  5 Asia      (Intercept)     -2.74 6.39e- 3</span></span>
-<span id="cb85-20"><a href="dynamic.html#cb85-20" aria-hidden="true"></a><span class="co">#&gt;  6 Asia      year             2.75 6.23e- 3</span></span>
-<span id="cb85-21"><a href="dynamic.html#cb85-21" aria-hidden="true"></a><span class="co">#&gt;  7 Europe    (Intercept)    -14.4  3.12e-37</span></span>
-<span id="cb85-22"><a href="dynamic.html#cb85-22" aria-hidden="true"></a><span class="co">#&gt;  8 Europe    year            14.5  7.06e-38</span></span>
-<span id="cb85-23"><a href="dynamic.html#cb85-23" aria-hidden="true"></a><span class="co">#&gt;  9 Oceania   (Intercept)    -11.3  1.32e-10</span></span>
-<span id="cb85-24"><a href="dynamic.html#cb85-24" aria-hidden="true"></a><span class="co">#&gt; 10 Oceania   year            11.5  9.48e-11</span></span>
-<span id="cb85-25"><a href="dynamic.html#cb85-25" aria-hidden="true"></a></span>
-<span id="cb85-26"><a href="dynamic.html#cb85-26" aria-hidden="true"></a><span class="kw">loadd</span>(model)</span>
-<span id="cb85-27"><a href="dynamic.html#cb85-27" aria-hidden="true"></a></span>
-<span id="cb85-28"><a href="dynamic.html#cb85-28" aria-hidden="true"></a><span class="co"># Second slice if you were to map() over mtcars.</span></span>
-<span id="cb85-29"><a href="dynamic.html#cb85-29" aria-hidden="true"></a><span class="kw">vec_slice</span>(mtcars, <span class="dv">2</span>)</span>
-<span id="cb85-30"><a href="dynamic.html#cb85-30" aria-hidden="true"></a><span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
-<span id="cb85-31"><a href="dynamic.html#cb85-31" aria-hidden="true"></a><span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span></span>
-<span id="cb85-32"><a href="dynamic.html#cb85-32" aria-hidden="true"></a></span>
-<span id="cb85-33"><a href="dynamic.html#cb85-33" aria-hidden="true"></a><span class="co"># Fifth slice if you were to map() over letters.</span></span>
-<span id="cb85-34"><a href="dynamic.html#cb85-34" aria-hidden="true"></a><span class="kw">vec_slice</span>(letters, <span class="dv">5</span>)</span>
-<span id="cb85-35"><a href="dynamic.html#cb85-35" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;e&quot;</span></span></code></pre></div>
+<span id="cb85-2"><a href="dynamic.html#cb85-2" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb85-3"><a href="dynamic.html#cb85-3" aria-hidden="true"></a><span class="co">#&gt; Attaching package: &#39;vctrs&#39;</span></span>
+<span id="cb85-4"><a href="dynamic.html#cb85-4" aria-hidden="true"></a><span class="co">#&gt; The following object is masked from &#39;package:tibble&#39;:</span></span>
+<span id="cb85-5"><a href="dynamic.html#cb85-5" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb85-6"><a href="dynamic.html#cb85-6" aria-hidden="true"></a><span class="co">#&gt;     data_frame</span></span>
+<span id="cb85-7"><a href="dynamic.html#cb85-7" aria-hidden="true"></a><span class="co">#&gt; The following object is masked from &#39;package:dplyr&#39;:</span></span>
+<span id="cb85-8"><a href="dynamic.html#cb85-8" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb85-9"><a href="dynamic.html#cb85-9" aria-hidden="true"></a><span class="co">#&gt;     data_frame</span></span>
+<span id="cb85-10"><a href="dynamic.html#cb85-10" aria-hidden="true"></a></span>
+<span id="cb85-11"><a href="dynamic.html#cb85-11" aria-hidden="true"></a><span class="co"># same as readd(model)</span></span>
+<span id="cb85-12"><a href="dynamic.html#cb85-12" aria-hidden="true"></a>s &lt;-<span class="st"> </span><span class="kw">subtargets</span>(model)</span>
+<span id="cb85-13"><a href="dynamic.html#cb85-13" aria-hidden="true"></a><span class="kw">vec_c</span>(</span>
+<span id="cb85-14"><a href="dynamic.html#cb85-14" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">1</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb85-15"><a href="dynamic.html#cb85-15" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">2</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb85-16"><a href="dynamic.html#cb85-16" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">3</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb85-17"><a href="dynamic.html#cb85-17" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">4</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb85-18"><a href="dynamic.html#cb85-18" aria-hidden="true"></a>  <span class="kw">readd</span>(s[<span class="dv">5</span>], <span class="dt">character_only =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb85-19"><a href="dynamic.html#cb85-19" aria-hidden="true"></a>)</span>
+<span id="cb85-20"><a href="dynamic.html#cb85-20" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 10 x 4</span></span>
+<span id="cb85-21"><a href="dynamic.html#cb85-21" aria-hidden="true"></a><span class="co">#&gt;    continent term        statistic  p.value</span></span>
+<span id="cb85-22"><a href="dynamic.html#cb85-22" aria-hidden="true"></a><span class="co">#&gt;    &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb85-23"><a href="dynamic.html#cb85-23" aria-hidden="true"></a><span class="co">#&gt;  1 Africa    (Intercept)     -4.44 1.08e- 5</span></span>
+<span id="cb85-24"><a href="dynamic.html#cb85-24" aria-hidden="true"></a><span class="co">#&gt;  2 Africa    year             4.04 5.90e- 5</span></span>
+<span id="cb85-25"><a href="dynamic.html#cb85-25" aria-hidden="true"></a><span class="co">#&gt;  3 Americas  (Intercept)     -5.56 6.10e- 8</span></span>
+<span id="cb85-26"><a href="dynamic.html#cb85-26" aria-hidden="true"></a><span class="co">#&gt;  4 Americas  year             5.55 6.16e- 8</span></span>
+<span id="cb85-27"><a href="dynamic.html#cb85-27" aria-hidden="true"></a><span class="co">#&gt;  5 Asia      (Intercept)     -2.74 6.39e- 3</span></span>
+<span id="cb85-28"><a href="dynamic.html#cb85-28" aria-hidden="true"></a><span class="co">#&gt;  6 Asia      year             2.75 6.23e- 3</span></span>
+<span id="cb85-29"><a href="dynamic.html#cb85-29" aria-hidden="true"></a><span class="co">#&gt;  7 Europe    (Intercept)    -14.4  3.12e-37</span></span>
+<span id="cb85-30"><a href="dynamic.html#cb85-30" aria-hidden="true"></a><span class="co">#&gt;  8 Europe    year            14.5  7.06e-38</span></span>
+<span id="cb85-31"><a href="dynamic.html#cb85-31" aria-hidden="true"></a><span class="co">#&gt;  9 Oceania   (Intercept)    -11.3  1.32e-10</span></span>
+<span id="cb85-32"><a href="dynamic.html#cb85-32" aria-hidden="true"></a><span class="co">#&gt; 10 Oceania   year            11.5  9.48e-11</span></span>
+<span id="cb85-33"><a href="dynamic.html#cb85-33" aria-hidden="true"></a></span>
+<span id="cb85-34"><a href="dynamic.html#cb85-34" aria-hidden="true"></a><span class="kw">loadd</span>(model)</span>
+<span id="cb85-35"><a href="dynamic.html#cb85-35" aria-hidden="true"></a></span>
+<span id="cb85-36"><a href="dynamic.html#cb85-36" aria-hidden="true"></a><span class="co"># Second slice if you were to map() over mtcars.</span></span>
+<span id="cb85-37"><a href="dynamic.html#cb85-37" aria-hidden="true"></a><span class="kw">vec_slice</span>(mtcars, <span class="dv">2</span>)</span>
+<span id="cb85-38"><a href="dynamic.html#cb85-38" aria-hidden="true"></a><span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
+<span id="cb85-39"><a href="dynamic.html#cb85-39" aria-hidden="true"></a><span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span></span>
+<span id="cb85-40"><a href="dynamic.html#cb85-40" aria-hidden="true"></a></span>
+<span id="cb85-41"><a href="dynamic.html#cb85-41" aria-hidden="true"></a><span class="co"># Fifth slice if you were to map() over letters.</span></span>
+<span id="cb85-42"><a href="dynamic.html#cb85-42" aria-hidden="true"></a><span class="kw">vec_slice</span>(letters, <span class="dv">5</span>)</span>
+<span id="cb85-43"><a href="dynamic.html#cb85-43" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;e&quot;</span></span></code></pre></div>
 <p>You can use <code>vec_c()</code> and <code>vec_slice()</code> to anticipate edge cases in dynamic branching.</p>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="dynamic.html#cb86-1" aria-hidden="true"></a><span class="co"># If you map() over a list, each sub-target is a single-element list.</span></span>
 <span id="cb86-2"><a href="dynamic.html#cb86-2" aria-hidden="true"></a><span class="kw">vec_slice</span>(<span class="kw">list</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dv">1</span>)</span>
