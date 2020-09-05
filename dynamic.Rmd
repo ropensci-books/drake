@@ -147,14 +147,40 @@ If automatic concatenation of sub-targets is confusing (e.g. if some sub-targets
 readd(model, subtarget_list = TRUE) # Requires drake >= 7.10.0.
 ```
 
-Alternatively, you can work with the individual sub-targets.
+Alternatively, you can identify an individual sub-target by its index.
 
 ```{r}
 subtargets(model)
 
-readd(model, subtargets = 1) # equivalent to readd() on a single model_* sub-target
+readd(model, subtargets = 2) # equivalent to readd() on a single model_* sub-target
 ```
 
+If you don't know the index offhand, you can find out using the sub-target's name.
+
+```{r, echo = FALSE}
+subtarget <- subtargets(model)[2]
+```
+
+```{r}
+print(subtarget)
+
+which(subtarget == subtargets(model))
+```
+
+If the sub-target errored out and `subtargets()` fails, the individual sub-target metadata will have a `subtarget_index` field.
+
+```{r, eval = FALSE}
+diagnose(subtarget, character_only = TRUE)$subtarget_index
+#> [1] 2
+```
+
+Either way, once you have the sub-target's index, you can retrieve the section of data that the sub-target took as input. Below, we load the part of `contenents` that the second sub-target of `model` used during `make()`.
+
+```{r}
+vctrs::vec_slice(readd(continents), 2)
+```
+
+If `continents` were dynamic, we could have just used `readd(continents, subtargets = 2)`. But `continents` was a static target, so we needed to replicate `drake`'s dynamic branching behavior using `vctrs`.
 
 ## Dynamic transformations
 
