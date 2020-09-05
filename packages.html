@@ -502,119 +502,119 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="get-the-code." class="section level2" number="11.1">
 <h2><span class="header-section-number">11.1</span> Get the code.</h2>
 <p>Write the code files to your workspace.</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="packages.html#cb166-1" aria-hidden="true"></a><span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="packages.html#cb169-1" aria-hidden="true"></a><span class="kw">drake_example</span>(<span class="st">&quot;packages&quot;</span>)</span></code></pre></div>
 <p>The new <code>packages</code> folder now includes a file structure of a serious <code>drake</code> project, plus an <code>interactive-tutorial.R</code> to narrate the example. The code is also <a href="https://github.com/wlandau/drake-examples/tree/master/packages">online here</a>.</p>
 </div>
 <div id="overview" class="section level2" number="11.2">
 <h2><span class="header-section-number">11.2</span> Overview</h2>
 <p>This small data analysis project explores some trends in R package downloads over time. The datasets are downloaded using the <a href="https://github.com/metacran/cranlogs">cranlogs package</a>.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="packages.html#cb167-1" aria-hidden="true"></a><span class="kw">library</span>(cranlogs)</span>
-<span id="cb167-2"><a href="packages.html#cb167-2" aria-hidden="true"></a><span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="packages.html#cb170-1" aria-hidden="true"></a><span class="kw">library</span>(cranlogs)</span>
+<span id="cb170-2"><a href="packages.html#cb170-2" aria-hidden="true"></a><span class="kw">cran_downloads</span>(<span class="dt">packages =</span> <span class="st">&quot;dplyr&quot;</span>, <span class="dt">when =</span> <span class="st">&quot;last-week&quot;</span>)</span></code></pre></div>
 <p>Above, each count is the number of times <code>dplyr</code> was downloaded from the RStudio CRAN mirror on the given day. To stay up to date with the latest download statistics, we need to refresh the data frequently. With <code>drake</code>, we can bring all our work up to date without restarting everything from scratch.</p>
 </div>
 <div id="analysis" class="section level2" number="11.3">
 <h2><span class="header-section-number">11.3</span> Analysis</h2>
 <p>First, we load the required packages. <code>drake</code> detects the packages you install and load.</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="packages.html#cb168-1" aria-hidden="true"></a><span class="kw">library</span>(cranlogs)</span>
-<span id="cb168-2"><a href="packages.html#cb168-2" aria-hidden="true"></a><span class="kw">library</span>(drake)</span>
-<span id="cb168-3"><a href="packages.html#cb168-3" aria-hidden="true"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb168-4"><a href="packages.html#cb168-4" aria-hidden="true"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb168-5"><a href="packages.html#cb168-5" aria-hidden="true"></a><span class="kw">library</span>(knitr)</span>
-<span id="cb168-6"><a href="packages.html#cb168-6" aria-hidden="true"></a><span class="kw">library</span>(rvest)</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="packages.html#cb171-1" aria-hidden="true"></a><span class="kw">library</span>(cranlogs)</span>
+<span id="cb171-2"><a href="packages.html#cb171-2" aria-hidden="true"></a><span class="kw">library</span>(drake)</span>
+<span id="cb171-3"><a href="packages.html#cb171-3" aria-hidden="true"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb171-4"><a href="packages.html#cb171-4" aria-hidden="true"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb171-5"><a href="packages.html#cb171-5" aria-hidden="true"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb171-6"><a href="packages.html#cb171-6" aria-hidden="true"></a><span class="kw">library</span>(rvest)</span></code></pre></div>
 <p>We will want custom functions to summarize the CRAN logs we download.</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="packages.html#cb169-1" aria-hidden="true"></a>make_my_table &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</span>
-<span id="cb169-2"><a href="packages.html#cb169-2" aria-hidden="true"></a>  <span class="kw">group_by</span>(downloads, package) <span class="op">%&gt;%</span></span>
-<span id="cb169-3"><a href="packages.html#cb169-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">summarize</span>(<span class="dt">mean_downloads =</span> <span class="kw">mean</span>(count))</span>
-<span id="cb169-4"><a href="packages.html#cb169-4" aria-hidden="true"></a>}</span>
-<span id="cb169-5"><a href="packages.html#cb169-5" aria-hidden="true"></a></span>
-<span id="cb169-6"><a href="packages.html#cb169-6" aria-hidden="true"></a>make_my_plot &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</span>
-<span id="cb169-7"><a href="packages.html#cb169-7" aria-hidden="true"></a>  <span class="kw">ggplot</span>(downloads) <span class="op">+</span></span>
-<span id="cb169-8"><a href="packages.html#cb169-8" aria-hidden="true"></a><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> count, <span class="dt">group =</span> package, <span class="dt">color =</span> package))</span>
-<span id="cb169-9"><a href="packages.html#cb169-9" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="packages.html#cb172-1" aria-hidden="true"></a>make_my_table &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</span>
+<span id="cb172-2"><a href="packages.html#cb172-2" aria-hidden="true"></a>  <span class="kw">group_by</span>(downloads, package) <span class="op">%&gt;%</span></span>
+<span id="cb172-3"><a href="packages.html#cb172-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">summarize</span>(<span class="dt">mean_downloads =</span> <span class="kw">mean</span>(count))</span>
+<span id="cb172-4"><a href="packages.html#cb172-4" aria-hidden="true"></a>}</span>
+<span id="cb172-5"><a href="packages.html#cb172-5" aria-hidden="true"></a></span>
+<span id="cb172-6"><a href="packages.html#cb172-6" aria-hidden="true"></a>make_my_plot &lt;-<span class="st"> </span><span class="cf">function</span>(downloads){</span>
+<span id="cb172-7"><a href="packages.html#cb172-7" aria-hidden="true"></a>  <span class="kw">ggplot</span>(downloads) <span class="op">+</span></span>
+<span id="cb172-8"><a href="packages.html#cb172-8" aria-hidden="true"></a><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> count, <span class="dt">group =</span> package, <span class="dt">color =</span> package))</span>
+<span id="cb172-9"><a href="packages.html#cb172-9" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Next, we generate the plan.</p>
 <p>We want to explore the daily downloads from the <code>knitr</code>, <code>Rcpp</code>, and <code>ggplot2</code> packages. We will use the <a href="https://github.com/metacran/cranlogs"><code>cranlogs</code> package</a> to get daily logs of package downloads from RStudio’s CRAN mirror. In our <code>drake_plan()</code>, we declare targets <code>older</code> and <code>recent</code> to kcontain snapshots of the logs.</p>
 <p>The following <code>drake_plan()</code> syntax is described <a href="https://books.ropensci.org/drake/static.html">here</a>, which is supported in <code>drake</code> 7.0.0 and above.</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="packages.html#cb170-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb170-2"><a href="packages.html#cb170-2" aria-hidden="true"></a>  <span class="dt">older =</span> <span class="kw">cran_downloads</span>(</span>
-<span id="cb170-3"><a href="packages.html#cb170-3" aria-hidden="true"></a>    <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</span>
-<span id="cb170-4"><a href="packages.html#cb170-4" aria-hidden="true"></a>    <span class="dt">from =</span> <span class="st">&quot;2016-11-01&quot;</span>,</span>
-<span id="cb170-5"><a href="packages.html#cb170-5" aria-hidden="true"></a>    <span class="dt">to =</span> <span class="st">&quot;2016-12-01&quot;</span></span>
-<span id="cb170-6"><a href="packages.html#cb170-6" aria-hidden="true"></a>  ),</span>
-<span id="cb170-7"><a href="packages.html#cb170-7" aria-hidden="true"></a>  <span class="dt">recent =</span> <span class="kw">target</span>(</span>
-<span id="cb170-8"><a href="packages.html#cb170-8" aria-hidden="true"></a>    <span class="dt">command =</span> <span class="kw">cran_downloads</span>(</span>
-<span id="cb170-9"><a href="packages.html#cb170-9" aria-hidden="true"></a>      <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</span>
-<span id="cb170-10"><a href="packages.html#cb170-10" aria-hidden="true"></a>      <span class="dt">when =</span> <span class="st">&quot;last-month&quot;</span></span>
-<span id="cb170-11"><a href="packages.html#cb170-11" aria-hidden="true"></a>    ),</span>
-<span id="cb170-12"><a href="packages.html#cb170-12" aria-hidden="true"></a>    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">latest_log_date</span>())</span>
-<span id="cb170-13"><a href="packages.html#cb170-13" aria-hidden="true"></a>  ),</span>
-<span id="cb170-14"><a href="packages.html#cb170-14" aria-hidden="true"></a>  <span class="dt">averages =</span> <span class="kw">target</span>(</span>
-<span id="cb170-15"><a href="packages.html#cb170-15" aria-hidden="true"></a>    <span class="kw">make_my_table</span>(data),</span>
-<span id="cb170-16"><a href="packages.html#cb170-16" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data =</span> <span class="kw">c</span>(older, recent))</span>
-<span id="cb170-17"><a href="packages.html#cb170-17" aria-hidden="true"></a>  ),</span>
-<span id="cb170-18"><a href="packages.html#cb170-18" aria-hidden="true"></a>  <span class="dt">plot =</span> <span class="kw">target</span>(</span>
-<span id="cb170-19"><a href="packages.html#cb170-19" aria-hidden="true"></a>    <span class="kw">make_my_plot</span>(data),</span>
-<span id="cb170-20"><a href="packages.html#cb170-20" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(data)</span>
-<span id="cb170-21"><a href="packages.html#cb170-21" aria-hidden="true"></a>  ),</span>
-<span id="cb170-22"><a href="packages.html#cb170-22" aria-hidden="true"></a>  <span class="dt">report =</span> <span class="kw">knit</span>(</span>
-<span id="cb170-23"><a href="packages.html#cb170-23" aria-hidden="true"></a>    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
-<span id="cb170-24"><a href="packages.html#cb170-24" aria-hidden="true"></a>    <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>),</span>
-<span id="cb170-25"><a href="packages.html#cb170-25" aria-hidden="true"></a>    <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
-<span id="cb170-26"><a href="packages.html#cb170-26" aria-hidden="true"></a>  )</span>
-<span id="cb170-27"><a href="packages.html#cb170-27" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="packages.html#cb173-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb173-2"><a href="packages.html#cb173-2" aria-hidden="true"></a>  <span class="dt">older =</span> <span class="kw">cran_downloads</span>(</span>
+<span id="cb173-3"><a href="packages.html#cb173-3" aria-hidden="true"></a>    <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</span>
+<span id="cb173-4"><a href="packages.html#cb173-4" aria-hidden="true"></a>    <span class="dt">from =</span> <span class="st">&quot;2016-11-01&quot;</span>,</span>
+<span id="cb173-5"><a href="packages.html#cb173-5" aria-hidden="true"></a>    <span class="dt">to =</span> <span class="st">&quot;2016-12-01&quot;</span></span>
+<span id="cb173-6"><a href="packages.html#cb173-6" aria-hidden="true"></a>  ),</span>
+<span id="cb173-7"><a href="packages.html#cb173-7" aria-hidden="true"></a>  <span class="dt">recent =</span> <span class="kw">target</span>(</span>
+<span id="cb173-8"><a href="packages.html#cb173-8" aria-hidden="true"></a>    <span class="dt">command =</span> <span class="kw">cran_downloads</span>(</span>
+<span id="cb173-9"><a href="packages.html#cb173-9" aria-hidden="true"></a>      <span class="dt">packages =</span> <span class="kw">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>),</span>
+<span id="cb173-10"><a href="packages.html#cb173-10" aria-hidden="true"></a>      <span class="dt">when =</span> <span class="st">&quot;last-month&quot;</span></span>
+<span id="cb173-11"><a href="packages.html#cb173-11" aria-hidden="true"></a>    ),</span>
+<span id="cb173-12"><a href="packages.html#cb173-12" aria-hidden="true"></a>    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">latest_log_date</span>())</span>
+<span id="cb173-13"><a href="packages.html#cb173-13" aria-hidden="true"></a>  ),</span>
+<span id="cb173-14"><a href="packages.html#cb173-14" aria-hidden="true"></a>  <span class="dt">averages =</span> <span class="kw">target</span>(</span>
+<span id="cb173-15"><a href="packages.html#cb173-15" aria-hidden="true"></a>    <span class="kw">make_my_table</span>(data),</span>
+<span id="cb173-16"><a href="packages.html#cb173-16" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">data =</span> <span class="kw">c</span>(older, recent))</span>
+<span id="cb173-17"><a href="packages.html#cb173-17" aria-hidden="true"></a>  ),</span>
+<span id="cb173-18"><a href="packages.html#cb173-18" aria-hidden="true"></a>  <span class="dt">plot =</span> <span class="kw">target</span>(</span>
+<span id="cb173-19"><a href="packages.html#cb173-19" aria-hidden="true"></a>    <span class="kw">make_my_plot</span>(data),</span>
+<span id="cb173-20"><a href="packages.html#cb173-20" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(data)</span>
+<span id="cb173-21"><a href="packages.html#cb173-21" aria-hidden="true"></a>  ),</span>
+<span id="cb173-22"><a href="packages.html#cb173-22" aria-hidden="true"></a>  <span class="dt">report =</span> <span class="kw">knit</span>(</span>
+<span id="cb173-23"><a href="packages.html#cb173-23" aria-hidden="true"></a>    <span class="kw">knitr_in</span>(<span class="st">&quot;report.Rmd&quot;</span>),</span>
+<span id="cb173-24"><a href="packages.html#cb173-24" aria-hidden="true"></a>    <span class="kw">file_out</span>(<span class="st">&quot;report.md&quot;</span>),</span>
+<span id="cb173-25"><a href="packages.html#cb173-25" aria-hidden="true"></a>    <span class="dt">quiet =</span> <span class="ot">TRUE</span></span>
+<span id="cb173-26"><a href="packages.html#cb173-26" aria-hidden="true"></a>  )</span>
+<span id="cb173-27"><a href="packages.html#cb173-27" aria-hidden="true"></a>)</span></code></pre></div>
 <p>Notice the custom trigger for the target <code>recent</code>. Here, we are telling <code>drake</code> to rebuild <code>recent</code> whenever a new day’s log is uploaded to <a href="http://cran-logs.rstudio.com">http://cran-logs.rstudio.com</a>. In other words, <code>drake</code> keeps track of the return value of <code>latest_log_date()</code> and recomputes <code>recent</code> (during <code>make()</code>) if that value changed since the last <code>make()</code>. Here, <code>latest_log_date()</code> is one of our custom imported functions. We use it to scrape <a href="http://cran-logs.rstudio.com">http://cran-logs.rstudio.com</a> using the <a href="https://github.com/hadley/rvest"><code>rvest</code></a> package.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="packages.html#cb171-1" aria-hidden="true"></a>latest_log_date &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb171-2"><a href="packages.html#cb171-2" aria-hidden="true"></a>  <span class="kw">read_html</span>(<span class="st">&quot;http://cran-logs.rstudio.com/&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb171-3"><a href="packages.html#cb171-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;li:last-of-type&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb171-4"><a href="packages.html#cb171-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;a:last-of-type&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb171-5"><a href="packages.html#cb171-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span></span>
-<span id="cb171-6"><a href="packages.html#cb171-6" aria-hidden="true"></a><span class="st">    </span>max</span>
-<span id="cb171-7"><a href="packages.html#cb171-7" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="packages.html#cb174-1" aria-hidden="true"></a>latest_log_date &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb174-2"><a href="packages.html#cb174-2" aria-hidden="true"></a>  <span class="kw">read_html</span>(<span class="st">&quot;http://cran-logs.rstudio.com/&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb174-3"><a href="packages.html#cb174-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;li:last-of-type&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb174-4"><a href="packages.html#cb174-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_nodes</span>(<span class="st">&quot;a:last-of-type&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb174-5"><a href="packages.html#cb174-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span></span>
+<span id="cb174-6"><a href="packages.html#cb174-6" aria-hidden="true"></a><span class="st">    </span>max</span>
+<span id="cb174-7"><a href="packages.html#cb174-7" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Now, we run the project to download the data and analyze it.
 The results will be summarized in the knitted report, <code>report.md</code>,
 but you can also read the results directly from the cache.</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="packages.html#cb172-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb172-2"><a href="packages.html#cb172-2" aria-hidden="true"></a></span>
-<span id="cb172-3"><a href="packages.html#cb172-3" aria-hidden="true"></a><span class="kw">readd</span>(averages_recent)</span>
-<span id="cb172-4"><a href="packages.html#cb172-4" aria-hidden="true"></a></span>
-<span id="cb172-5"><a href="packages.html#cb172-5" aria-hidden="true"></a><span class="kw">readd</span>(averages_older)</span>
-<span id="cb172-6"><a href="packages.html#cb172-6" aria-hidden="true"></a></span>
-<span id="cb172-7"><a href="packages.html#cb172-7" aria-hidden="true"></a><span class="kw">readd</span>(plot_recent)</span>
-<span id="cb172-8"><a href="packages.html#cb172-8" aria-hidden="true"></a></span>
-<span id="cb172-9"><a href="packages.html#cb172-9" aria-hidden="true"></a><span class="kw">readd</span>(plot_older)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="packages.html#cb175-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb175-2"><a href="packages.html#cb175-2" aria-hidden="true"></a></span>
+<span id="cb175-3"><a href="packages.html#cb175-3" aria-hidden="true"></a><span class="kw">readd</span>(averages_recent)</span>
+<span id="cb175-4"><a href="packages.html#cb175-4" aria-hidden="true"></a></span>
+<span id="cb175-5"><a href="packages.html#cb175-5" aria-hidden="true"></a><span class="kw">readd</span>(averages_older)</span>
+<span id="cb175-6"><a href="packages.html#cb175-6" aria-hidden="true"></a></span>
+<span id="cb175-7"><a href="packages.html#cb175-7" aria-hidden="true"></a><span class="kw">readd</span>(plot_recent)</span>
+<span id="cb175-8"><a href="packages.html#cb175-8" aria-hidden="true"></a></span>
+<span id="cb175-9"><a href="packages.html#cb175-9" aria-hidden="true"></a><span class="kw">readd</span>(plot_older)</span></code></pre></div>
 <p>If we run <code>make()</code> again right away, we see that everything is up to date. But if we wait until a new day’s log is uploaded, <code>make()</code> will update <code>recent</code> and everything that depends on it.</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="packages.html#cb173-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="packages.html#cb176-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span></code></pre></div>
 <p>To visualize the build behavior, you can plot the dependency network.</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="packages.html#cb174-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="packages.html#cb177-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
 </div>
 <div id="other-ways-to-trigger-downloads" class="section level2" number="11.4">
 <h2><span class="header-section-number">11.4</span> Other ways to trigger downloads</h2>
 <p>Sometimes, our remote data sources get revised, and web scraping may not be the best way to detect changes. We may want to look at our remote dataset’s modification time or HTTP ETag. To see how this works, consider the CRAN log file from February 9, 2018.</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="packages.html#cb175-1" aria-hidden="true"></a>url &lt;-<span class="st"> &quot;http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="packages.html#cb178-1" aria-hidden="true"></a>url &lt;-<span class="st"> &quot;http://cran-logs.rstudio.com/2018/2018-02-09-r.csv.gz&quot;</span></span></code></pre></div>
 <p>We can track the modification date using the <a href="https://github.com/r-lib/httr"><code>httr</code></a> package.</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="packages.html#cb176-1" aria-hidden="true"></a><span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span></span>
-<span id="cb176-2"><a href="packages.html#cb176-2" aria-hidden="true"></a><span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="packages.html#cb179-1" aria-hidden="true"></a><span class="kw">library</span>(httr)    <span class="co"># For querying websites.</span></span>
+<span id="cb179-2"><a href="packages.html#cb179-2" aria-hidden="true"></a><span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]]</span></code></pre></div>
 <p>In our <code>drake</code> plan, we can track this timestamp and trigger a download whenever it changes.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="packages.html#cb177-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb177-2"><a href="packages.html#cb177-2" aria-hidden="true"></a>  <span class="dt">logs =</span> <span class="kw">target</span>(</span>
-<span id="cb177-3"><a href="packages.html#cb177-3" aria-hidden="true"></a>    <span class="kw">get_logs</span>(url),</span>
-<span id="cb177-4"><a href="packages.html#cb177-4" aria-hidden="true"></a>    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]])</span>
-<span id="cb177-5"><a href="packages.html#cb177-5" aria-hidden="true"></a>  )</span>
-<span id="cb177-6"><a href="packages.html#cb177-6" aria-hidden="true"></a>)</span>
-<span id="cb177-7"><a href="packages.html#cb177-7" aria-hidden="true"></a>plan</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="packages.html#cb180-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb180-2"><a href="packages.html#cb180-2" aria-hidden="true"></a>  <span class="dt">logs =</span> <span class="kw">target</span>(</span>
+<span id="cb180-3"><a href="packages.html#cb180-3" aria-hidden="true"></a>    <span class="kw">get_logs</span>(url),</span>
+<span id="cb180-4"><a href="packages.html#cb180-4" aria-hidden="true"></a>    <span class="dt">trigger =</span> <span class="kw">trigger</span>(<span class="dt">change =</span> <span class="kw">HEAD</span>(url)<span class="op">$</span>headers[[<span class="st">&quot;last-modified&quot;</span>]])</span>
+<span id="cb180-5"><a href="packages.html#cb180-5" aria-hidden="true"></a>  )</span>
+<span id="cb180-6"><a href="packages.html#cb180-6" aria-hidden="true"></a>)</span>
+<span id="cb180-7"><a href="packages.html#cb180-7" aria-hidden="true"></a>plan</span></code></pre></div>
 <p>where</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="packages.html#cb178-1" aria-hidden="true"></a><span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span></span>
-<span id="cb178-2"><a href="packages.html#cb178-2" aria-hidden="true"></a><span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span></span>
-<span id="cb178-3"><a href="packages.html#cb178-3" aria-hidden="true"></a>get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url){</span>
-<span id="cb178-4"><a href="packages.html#cb178-4" aria-hidden="true"></a>  <span class="kw">curl_download</span>(url, <span class="st">&quot;logs.csv.gz&quot;</span>)       <span class="co"># Get a big file.</span></span>
-<span id="cb178-5"><a href="packages.html#cb178-5" aria-hidden="true"></a>  <span class="kw">gunzip</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>) <span class="co"># Unzip it.</span></span>
-<span id="cb178-6"><a href="packages.html#cb178-6" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;logs.csv&quot;</span>, <span class="dt">nrows =</span> <span class="dv">4</span>)  <span class="co"># Extract the data you need.</span></span>
-<span id="cb178-7"><a href="packages.html#cb178-7" aria-hidden="true"></a>  <span class="kw">unlink</span>(<span class="kw">c</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="st">&quot;logs.csv&quot;</span>))    <span class="co"># Remove the big files</span></span>
-<span id="cb178-8"><a href="packages.html#cb178-8" aria-hidden="true"></a>  out                                     <span class="co"># Value of the target.</span></span>
-<span id="cb178-9"><a href="packages.html#cb178-9" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="packages.html#cb181-1" aria-hidden="true"></a><span class="kw">library</span>(R.utils) <span class="co"># For unzipping the files we download.</span></span>
+<span id="cb181-2"><a href="packages.html#cb181-2" aria-hidden="true"></a><span class="kw">library</span>(curl)    <span class="co"># For downloading data.</span></span>
+<span id="cb181-3"><a href="packages.html#cb181-3" aria-hidden="true"></a>get_logs &lt;-<span class="st"> </span><span class="cf">function</span>(url){</span>
+<span id="cb181-4"><a href="packages.html#cb181-4" aria-hidden="true"></a>  <span class="kw">curl_download</span>(url, <span class="st">&quot;logs.csv.gz&quot;</span>)       <span class="co"># Get a big file.</span></span>
+<span id="cb181-5"><a href="packages.html#cb181-5" aria-hidden="true"></a>  <span class="kw">gunzip</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>) <span class="co"># Unzip it.</span></span>
+<span id="cb181-6"><a href="packages.html#cb181-6" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;logs.csv&quot;</span>, <span class="dt">nrows =</span> <span class="dv">4</span>)  <span class="co"># Extract the data you need.</span></span>
+<span id="cb181-7"><a href="packages.html#cb181-7" aria-hidden="true"></a>  <span class="kw">unlink</span>(<span class="kw">c</span>(<span class="st">&quot;logs.csv.gz&quot;</span>, <span class="st">&quot;logs.csv&quot;</span>))    <span class="co"># Remove the big files</span></span>
+<span id="cb181-8"><a href="packages.html#cb181-8" aria-hidden="true"></a>  out                                     <span class="co"># Value of the target.</span></span>
+<span id="cb181-9"><a href="packages.html#cb181-9" aria-hidden="true"></a>}</span></code></pre></div>
 <p>When we are ready, we run the workflow.</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="packages.html#cb179-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb179-2"><a href="packages.html#cb179-2" aria-hidden="true"></a></span>
-<span id="cb179-3"><a href="packages.html#cb179-3" aria-hidden="true"></a><span class="kw">readd</span>(logs)</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="packages.html#cb182-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb182-2"><a href="packages.html#cb182-2" aria-hidden="true"></a></span>
+<span id="cb182-3"><a href="packages.html#cb182-3" aria-hidden="true"></a><span class="kw">readd</span>(logs)</span></code></pre></div>
 <p>If the log file at the <code>url</code> ever changes, the timestamp will update remotely, and <code>make()</code> will download the file again.</p>
 
 </div>

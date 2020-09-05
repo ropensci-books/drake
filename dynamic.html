@@ -696,17 +696,44 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb91-33"><a href="dynamic.html#cb91-33" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
 <span id="cb91-34"><a href="dynamic.html#cb91-34" aria-hidden="true"></a><span class="co">#&gt; 1 Oceania   (Intercept)     -11.3 1.32e-10</span></span>
 <span id="cb91-35"><a href="dynamic.html#cb91-35" aria-hidden="true"></a><span class="co">#&gt; 2 Oceania   year             11.5 9.48e-11</span></span></code></pre></div>
-<p>Alternatively, you can work with the individual sub-targets.</p>
+<p>Alternatively, you can identify an individual sub-target by its index.</p>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="dynamic.html#cb92-1" aria-hidden="true"></a><span class="kw">subtargets</span>(model)</span>
 <span id="cb92-2"><a href="dynamic.html#cb92-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;model_c56e5407&quot; &quot;model_706a1529&quot; &quot;model_da843806&quot; &quot;model_862f8003&quot;</span></span>
 <span id="cb92-3"><a href="dynamic.html#cb92-3" aria-hidden="true"></a><span class="co">#&gt; [5] &quot;model_ebb41f51&quot;</span></span>
 <span id="cb92-4"><a href="dynamic.html#cb92-4" aria-hidden="true"></a></span>
-<span id="cb92-5"><a href="dynamic.html#cb92-5" aria-hidden="true"></a><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> <span class="dv">1</span>) <span class="co"># equivalent to readd() on a single model_* sub-target</span></span>
+<span id="cb92-5"><a href="dynamic.html#cb92-5" aria-hidden="true"></a><span class="kw">readd</span>(model, <span class="dt">subtargets =</span> <span class="dv">2</span>) <span class="co"># equivalent to readd() on a single model_* sub-target</span></span>
 <span id="cb92-6"><a href="dynamic.html#cb92-6" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
-<span id="cb92-7"><a href="dynamic.html#cb92-7" aria-hidden="true"></a><span class="co">#&gt;   continent term        statistic   p.value</span></span>
-<span id="cb92-8"><a href="dynamic.html#cb92-8" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span id="cb92-9"><a href="dynamic.html#cb92-9" aria-hidden="true"></a><span class="co">#&gt; 1 Africa    (Intercept)     -4.44 0.0000108</span></span>
-<span id="cb92-10"><a href="dynamic.html#cb92-10" aria-hidden="true"></a><span class="co">#&gt; 2 Africa    year             4.04 0.0000590</span></span></code></pre></div>
+<span id="cb92-7"><a href="dynamic.html#cb92-7" aria-hidden="true"></a><span class="co">#&gt;   continent term        statistic      p.value</span></span>
+<span id="cb92-8"><a href="dynamic.html#cb92-8" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb92-9"><a href="dynamic.html#cb92-9" aria-hidden="true"></a><span class="co">#&gt; 1 Americas  (Intercept)     -5.56 0.0000000610</span></span>
+<span id="cb92-10"><a href="dynamic.html#cb92-10" aria-hidden="true"></a><span class="co">#&gt; 2 Americas  year             5.55 0.0000000616</span></span></code></pre></div>
+<p>If you don’t know the index offhand, you can find out using the sub-target’s name.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="dynamic.html#cb93-1" aria-hidden="true"></a><span class="kw">print</span>(subtarget)</span>
+<span id="cb93-2"><a href="dynamic.html#cb93-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;model_706a1529&quot;</span></span>
+<span id="cb93-3"><a href="dynamic.html#cb93-3" aria-hidden="true"></a></span>
+<span id="cb93-4"><a href="dynamic.html#cb93-4" aria-hidden="true"></a><span class="kw">which</span>(subtarget <span class="op">==</span><span class="st"> </span><span class="kw">subtargets</span>(model))</span>
+<span id="cb93-5"><a href="dynamic.html#cb93-5" aria-hidden="true"></a><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<p>If the sub-target errored out and <code>subtargets()</code> fails, the individual sub-target metadata will have a <code>subtarget_index</code> field.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="dynamic.html#cb94-1" aria-hidden="true"></a><span class="kw">diagnose</span>(subtarget, <span class="dt">character_only =</span> <span class="ot">TRUE</span>)<span class="op">$</span>subtarget_index</span>
+<span id="cb94-2"><a href="dynamic.html#cb94-2" aria-hidden="true"></a><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<p>Either way, once you have the sub-target’s index, you can retrieve the section of data that the sub-target took as input. Below, we load the part of <code>contenents</code> that the second sub-target of <code>model</code> used during <code>make()</code>.</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="dynamic.html#cb95-1" aria-hidden="true"></a>vctrs<span class="op">::</span><span class="kw">vec_slice</span>(<span class="kw">readd</span>(continents), <span class="dv">2</span>)</span>
+<span id="cb95-2"><a href="dynamic.html#cb95-2" aria-hidden="true"></a><span class="co">#&gt; $Americas</span></span>
+<span id="cb95-3"><a href="dynamic.html#cb95-3" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 300 x 6</span></span>
+<span id="cb95-4"><a href="dynamic.html#cb95-4" aria-hidden="true"></a><span class="co">#&gt;    country   continent  year lifeExp      pop gdpPercap[,1]</span></span>
+<span id="cb95-5"><a href="dynamic.html#cb95-5" aria-hidden="true"></a><span class="co">#&gt;    &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;</span></span>
+<span id="cb95-6"><a href="dynamic.html#cb95-6" aria-hidden="true"></a><span class="co">#&gt;  1 Argentina Americas   1952    62.5 17876956      -0.132  </span></span>
+<span id="cb95-7"><a href="dynamic.html#cb95-7" aria-hidden="true"></a><span class="co">#&gt;  2 Argentina Americas   1957    64.4 19610538      -0.0364 </span></span>
+<span id="cb95-8"><a href="dynamic.html#cb95-8" aria-hidden="true"></a><span class="co">#&gt;  3 Argentina Americas   1962    65.1 21283783      -0.00833</span></span>
+<span id="cb95-9"><a href="dynamic.html#cb95-9" aria-hidden="true"></a><span class="co">#&gt;  4 Argentina Americas   1967    65.6 22934225       0.0850 </span></span>
+<span id="cb95-10"><a href="dynamic.html#cb95-10" aria-hidden="true"></a><span class="co">#&gt;  5 Argentina Americas   1972    67.1 24779799       0.226  </span></span>
+<span id="cb95-11"><a href="dynamic.html#cb95-11" aria-hidden="true"></a><span class="co">#&gt;  6 Argentina Americas   1977    68.5 26983828       0.291  </span></span>
+<span id="cb95-12"><a href="dynamic.html#cb95-12" aria-hidden="true"></a><span class="co">#&gt;  7 Argentina Americas   1982    69.9 29341374       0.181  </span></span>
+<span id="cb95-13"><a href="dynamic.html#cb95-13" aria-hidden="true"></a><span class="co">#&gt;  8 Argentina Americas   1987    70.8 31620918       0.195  </span></span>
+<span id="cb95-14"><a href="dynamic.html#cb95-14" aria-hidden="true"></a><span class="co">#&gt;  9 Argentina Americas   1992    71.9 33958947       0.212  </span></span>
+<span id="cb95-15"><a href="dynamic.html#cb95-15" aria-hidden="true"></a><span class="co">#&gt; 10 Argentina Americas   1997    73.3 36203463       0.381  </span></span>
+<span id="cb95-16"><a href="dynamic.html#cb95-16" aria-hidden="true"></a><span class="co">#&gt; # … with 290 more rows</span></span></code></pre></div>
+<p>If <code>continents</code> were dynamic, we could have just used <code>readd(continents, subtargets = 2)</code>. But <code>continents</code> was a static target, so we needed to replicate <code>drake</code>’s dynamic branching behavior using <code>vctrs</code>.</p>
 </div>
 <div id="dynamic-transformations" class="section level2" number="6.5">
 <h2><span class="header-section-number">6.5</span> Dynamic transformations</h2>
@@ -714,153 +741,153 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="map" class="section level3" number="6.5.1">
 <h3><span class="header-section-number">6.5.1</span> <code>map()</code></h3>
 <p><code>map()</code> iterates over the <a href="https://vctrs.r-lib.org/reference/vec_slice.html">vector slices</a> of the targets you supply as arguments. We saw above how <code>map()</code> iterates over lists. If you give it a data frame, it will map over the rows.</p>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="dynamic.html#cb93-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb93-2"><a href="dynamic.html#cb93-2" aria-hidden="true"></a>  <span class="dt">subset =</span> <span class="kw">head</span>(gapminder),</span>
-<span id="cb93-3"><a href="dynamic.html#cb93-3" aria-hidden="true"></a>  <span class="dt">row =</span> <span class="kw">target</span>(subset, <span class="dt">dynamic =</span> <span class="kw">map</span>(subset))</span>
-<span id="cb93-4"><a href="dynamic.html#cb93-4" aria-hidden="true"></a>)</span>
-<span id="cb93-5"><a href="dynamic.html#cb93-5" aria-hidden="true"></a></span>
-<span id="cb93-6"><a href="dynamic.html#cb93-6" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb93-7"><a href="dynamic.html#cb93-7" aria-hidden="true"></a><span class="co">#&gt; ▶ target subset</span></span>
-<span id="cb93-8"><a href="dynamic.html#cb93-8" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic row</span></span>
-<span id="cb93-9"><a href="dynamic.html#cb93-9" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_9939cae3</span></span>
-<span id="cb93-10"><a href="dynamic.html#cb93-10" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_e8047114</span></span>
-<span id="cb93-11"><a href="dynamic.html#cb93-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_2ef3db10</span></span>
-<span id="cb93-12"><a href="dynamic.html#cb93-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_f9171bbe</span></span>
-<span id="cb93-13"><a href="dynamic.html#cb93-13" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_7d6002e9</span></span>
-<span id="cb93-14"><a href="dynamic.html#cb93-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_509468b3</span></span>
-<span id="cb93-15"><a href="dynamic.html#cb93-15" aria-hidden="true"></a><span class="co">#&gt; ■ finalize row</span></span></code></pre></div>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="dynamic.html#cb94-1" aria-hidden="true"></a><span class="kw">readd</span>(row_9939cae3)</span>
-<span id="cb94-2"><a href="dynamic.html#cb94-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 6</span></span>
-<span id="cb94-3"><a href="dynamic.html#cb94-3" aria-hidden="true"></a><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></span>
-<span id="cb94-4"><a href="dynamic.html#cb94-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></span>
-<span id="cb94-5"><a href="dynamic.html#cb94-5" aria-hidden="true"></a><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779.</span></span></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="dynamic.html#cb96-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb96-2"><a href="dynamic.html#cb96-2" aria-hidden="true"></a>  <span class="dt">subset =</span> <span class="kw">head</span>(gapminder),</span>
+<span id="cb96-3"><a href="dynamic.html#cb96-3" aria-hidden="true"></a>  <span class="dt">row =</span> <span class="kw">target</span>(subset, <span class="dt">dynamic =</span> <span class="kw">map</span>(subset))</span>
+<span id="cb96-4"><a href="dynamic.html#cb96-4" aria-hidden="true"></a>)</span>
+<span id="cb96-5"><a href="dynamic.html#cb96-5" aria-hidden="true"></a></span>
+<span id="cb96-6"><a href="dynamic.html#cb96-6" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb96-7"><a href="dynamic.html#cb96-7" aria-hidden="true"></a><span class="co">#&gt; ▶ target subset</span></span>
+<span id="cb96-8"><a href="dynamic.html#cb96-8" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic row</span></span>
+<span id="cb96-9"><a href="dynamic.html#cb96-9" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_9939cae3</span></span>
+<span id="cb96-10"><a href="dynamic.html#cb96-10" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_e8047114</span></span>
+<span id="cb96-11"><a href="dynamic.html#cb96-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_2ef3db10</span></span>
+<span id="cb96-12"><a href="dynamic.html#cb96-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_f9171bbe</span></span>
+<span id="cb96-13"><a href="dynamic.html#cb96-13" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_7d6002e9</span></span>
+<span id="cb96-14"><a href="dynamic.html#cb96-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget row_509468b3</span></span>
+<span id="cb96-15"><a href="dynamic.html#cb96-15" aria-hidden="true"></a><span class="co">#&gt; ■ finalize row</span></span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="dynamic.html#cb97-1" aria-hidden="true"></a><span class="kw">readd</span>(row_9939cae3)</span>
+<span id="cb97-2"><a href="dynamic.html#cb97-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 6</span></span>
+<span id="cb97-3"><a href="dynamic.html#cb97-3" aria-hidden="true"></a><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap</span></span>
+<span id="cb97-4"><a href="dynamic.html#cb97-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb97-5"><a href="dynamic.html#cb97-5" aria-hidden="true"></a><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779.</span></span></code></pre></div>
 <p>If you supply multiple targets, <code>map()</code> iterates over the slices of each.</p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="dynamic.html#cb95-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb95-2"><a href="dynamic.html#cb95-2" aria-hidden="true"></a>  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</span>
-<span id="cb95-3"><a href="dynamic.html#cb95-3" aria-hidden="true"></a>  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
-<span id="cb95-4"><a href="dynamic.html#cb95-4" aria-hidden="true"></a>  <span class="dt">zipped =</span> <span class="kw">target</span>(<span class="kw">paste0</span>(numbers, letters), <span class="dt">dynamic =</span> <span class="kw">map</span>(numbers, letters))</span>
-<span id="cb95-5"><a href="dynamic.html#cb95-5" aria-hidden="true"></a>)</span>
-<span id="cb95-6"><a href="dynamic.html#cb95-6" aria-hidden="true"></a></span>
-<span id="cb95-7"><a href="dynamic.html#cb95-7" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb95-8"><a href="dynamic.html#cb95-8" aria-hidden="true"></a><span class="co">#&gt; ▶ target numbers</span></span>
-<span id="cb95-9"><a href="dynamic.html#cb95-9" aria-hidden="true"></a><span class="co">#&gt; ▶ target letters</span></span>
-<span id="cb95-10"><a href="dynamic.html#cb95-10" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic zipped</span></span>
-<span id="cb95-11"><a href="dynamic.html#cb95-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget zipped_8ac3968c</span></span>
-<span id="cb95-12"><a href="dynamic.html#cb95-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget zipped_4a7a9b07</span></span>
-<span id="cb95-13"><a href="dynamic.html#cb95-13" aria-hidden="true"></a><span class="co">#&gt; ■ finalize zipped</span></span></code></pre></div>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="dynamic.html#cb96-1" aria-hidden="true"></a><span class="kw">readd</span>(zipped)</span>
-<span id="cb96-2"><a href="dynamic.html#cb96-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;1a&quot; &quot;2b&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="dynamic.html#cb98-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb98-2"><a href="dynamic.html#cb98-2" aria-hidden="true"></a>  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</span>
+<span id="cb98-3"><a href="dynamic.html#cb98-3" aria-hidden="true"></a>  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
+<span id="cb98-4"><a href="dynamic.html#cb98-4" aria-hidden="true"></a>  <span class="dt">zipped =</span> <span class="kw">target</span>(<span class="kw">paste0</span>(numbers, letters), <span class="dt">dynamic =</span> <span class="kw">map</span>(numbers, letters))</span>
+<span id="cb98-5"><a href="dynamic.html#cb98-5" aria-hidden="true"></a>)</span>
+<span id="cb98-6"><a href="dynamic.html#cb98-6" aria-hidden="true"></a></span>
+<span id="cb98-7"><a href="dynamic.html#cb98-7" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb98-8"><a href="dynamic.html#cb98-8" aria-hidden="true"></a><span class="co">#&gt; ▶ target numbers</span></span>
+<span id="cb98-9"><a href="dynamic.html#cb98-9" aria-hidden="true"></a><span class="co">#&gt; ▶ target letters</span></span>
+<span id="cb98-10"><a href="dynamic.html#cb98-10" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic zipped</span></span>
+<span id="cb98-11"><a href="dynamic.html#cb98-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget zipped_8ac3968c</span></span>
+<span id="cb98-12"><a href="dynamic.html#cb98-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget zipped_4a7a9b07</span></span>
+<span id="cb98-13"><a href="dynamic.html#cb98-13" aria-hidden="true"></a><span class="co">#&gt; ■ finalize zipped</span></span></code></pre></div>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="dynamic.html#cb99-1" aria-hidden="true"></a><span class="kw">readd</span>(zipped)</span>
+<span id="cb99-2"><a href="dynamic.html#cb99-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;1a&quot; &quot;2b&quot;</span></span></code></pre></div>
 </div>
 <div id="cross" class="section level3" number="6.5.2">
 <h3><span class="header-section-number">6.5.2</span> <code>cross()</code></h3>
 <p><code>cross()</code> creates a new sub-target for each combination of targets you supply as arguments.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="dynamic.html#cb97-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb97-2"><a href="dynamic.html#cb97-2" aria-hidden="true"></a>  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</span>
-<span id="cb97-3"><a href="dynamic.html#cb97-3" aria-hidden="true"></a>  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
-<span id="cb97-4"><a href="dynamic.html#cb97-4" aria-hidden="true"></a>  <span class="dt">combo =</span> <span class="kw">target</span>(<span class="kw">paste0</span>(numbers, letters), <span class="dt">dynamic =</span> <span class="kw">cross</span>(numbers, letters))</span>
-<span id="cb97-5"><a href="dynamic.html#cb97-5" aria-hidden="true"></a>)</span>
-<span id="cb97-6"><a href="dynamic.html#cb97-6" aria-hidden="true"></a></span>
-<span id="cb97-7"><a href="dynamic.html#cb97-7" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb97-8"><a href="dynamic.html#cb97-8" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic combo</span></span>
-<span id="cb97-9"><a href="dynamic.html#cb97-9" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_8ac3968c</span></span>
-<span id="cb97-10"><a href="dynamic.html#cb97-10" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_ed1d2e7b</span></span>
-<span id="cb97-11"><a href="dynamic.html#cb97-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_ef37ab56</span></span>
-<span id="cb97-12"><a href="dynamic.html#cb97-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_4a7a9b07</span></span>
-<span id="cb97-13"><a href="dynamic.html#cb97-13" aria-hidden="true"></a><span class="co">#&gt; ■ finalize combo</span></span></code></pre></div>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="dynamic.html#cb98-1" aria-hidden="true"></a><span class="kw">readd</span>(combo)</span>
-<span id="cb98-2"><a href="dynamic.html#cb98-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;1a&quot; &quot;1b&quot; &quot;2a&quot; &quot;2b&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="dynamic.html#cb100-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb100-2"><a href="dynamic.html#cb100-2" aria-hidden="true"></a>  <span class="dt">numbers =</span> <span class="kw">seq_len</span>(<span class="dv">2</span>),</span>
+<span id="cb100-3"><a href="dynamic.html#cb100-3" aria-hidden="true"></a>  <span class="dt">letters =</span> <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
+<span id="cb100-4"><a href="dynamic.html#cb100-4" aria-hidden="true"></a>  <span class="dt">combo =</span> <span class="kw">target</span>(<span class="kw">paste0</span>(numbers, letters), <span class="dt">dynamic =</span> <span class="kw">cross</span>(numbers, letters))</span>
+<span id="cb100-5"><a href="dynamic.html#cb100-5" aria-hidden="true"></a>)</span>
+<span id="cb100-6"><a href="dynamic.html#cb100-6" aria-hidden="true"></a></span>
+<span id="cb100-7"><a href="dynamic.html#cb100-7" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb100-8"><a href="dynamic.html#cb100-8" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic combo</span></span>
+<span id="cb100-9"><a href="dynamic.html#cb100-9" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_8ac3968c</span></span>
+<span id="cb100-10"><a href="dynamic.html#cb100-10" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_ed1d2e7b</span></span>
+<span id="cb100-11"><a href="dynamic.html#cb100-11" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_ef37ab56</span></span>
+<span id="cb100-12"><a href="dynamic.html#cb100-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget combo_4a7a9b07</span></span>
+<span id="cb100-13"><a href="dynamic.html#cb100-13" aria-hidden="true"></a><span class="co">#&gt; ■ finalize combo</span></span></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="dynamic.html#cb101-1" aria-hidden="true"></a><span class="kw">readd</span>(combo)</span>
+<span id="cb101-2"><a href="dynamic.html#cb101-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;1a&quot; &quot;1b&quot; &quot;2a&quot; &quot;2b&quot;</span></span></code></pre></div>
 </div>
 <div id="group" class="section level3" number="6.5.3">
 <h3><span class="header-section-number">6.5.3</span> <code>group()</code></h3>
 <p>With <code>group()</code>, you can create multiple aggregates of a given target. Use the <code>.by</code> argument to set a grouping variable.</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="dynamic.html#cb99-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb99-2"><a href="dynamic.html#cb99-2" aria-hidden="true"></a>  <span class="dt">data =</span> gapminder,</span>
-<span id="cb99-3"><a href="dynamic.html#cb99-3" aria-hidden="true"></a>  <span class="dt">by =</span> data<span class="op">$</span>continent,</span>
-<span id="cb99-4"><a href="dynamic.html#cb99-4" aria-hidden="true"></a>  <span class="dt">gdp =</span> <span class="kw">target</span>(</span>
-<span id="cb99-5"><a href="dynamic.html#cb99-5" aria-hidden="true"></a>    <span class="kw">tibble</span>(<span class="dt">median =</span> <span class="kw">median</span>(data<span class="op">$</span>gdpPercap), <span class="dt">continent =</span> by[<span class="dv">1</span>]),</span>
-<span id="cb99-6"><a href="dynamic.html#cb99-6" aria-hidden="true"></a>    <span class="dt">dynamic =</span> <span class="kw">group</span>(data, <span class="dt">.by =</span> by)</span>
-<span id="cb99-7"><a href="dynamic.html#cb99-7" aria-hidden="true"></a>  )</span>
-<span id="cb99-8"><a href="dynamic.html#cb99-8" aria-hidden="true"></a>)</span>
-<span id="cb99-9"><a href="dynamic.html#cb99-9" aria-hidden="true"></a></span>
-<span id="cb99-10"><a href="dynamic.html#cb99-10" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb99-11"><a href="dynamic.html#cb99-11" aria-hidden="true"></a><span class="co">#&gt; ▶ target data</span></span>
-<span id="cb99-12"><a href="dynamic.html#cb99-12" aria-hidden="true"></a><span class="co">#&gt; ▶ target by</span></span>
-<span id="cb99-13"><a href="dynamic.html#cb99-13" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic gdp</span></span>
-<span id="cb99-14"><a href="dynamic.html#cb99-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_9adfc39f</span></span>
-<span id="cb99-15"><a href="dynamic.html#cb99-15" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_d9f30951</span></span>
-<span id="cb99-16"><a href="dynamic.html#cb99-16" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_958a2f81</span></span>
-<span id="cb99-17"><a href="dynamic.html#cb99-17" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_962b03c8</span></span>
-<span id="cb99-18"><a href="dynamic.html#cb99-18" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_dc1cff81</span></span>
-<span id="cb99-19"><a href="dynamic.html#cb99-19" aria-hidden="true"></a><span class="co">#&gt; ■ finalize gdp</span></span></code></pre></div>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="dynamic.html#cb100-1" aria-hidden="true"></a><span class="kw">readd</span>(gdp)</span>
-<span id="cb100-2"><a href="dynamic.html#cb100-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 5 x 2</span></span>
-<span id="cb100-3"><a href="dynamic.html#cb100-3" aria-hidden="true"></a><span class="co">#&gt;   median continent</span></span>
-<span id="cb100-4"><a href="dynamic.html#cb100-4" aria-hidden="true"></a><span class="co">#&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></span>
-<span id="cb100-5"><a href="dynamic.html#cb100-5" aria-hidden="true"></a><span class="co">#&gt; 1  2647. Asia     </span></span>
-<span id="cb100-6"><a href="dynamic.html#cb100-6" aria-hidden="true"></a><span class="co">#&gt; 2 12082. Europe   </span></span>
-<span id="cb100-7"><a href="dynamic.html#cb100-7" aria-hidden="true"></a><span class="co">#&gt; 3  1192. Africa   </span></span>
-<span id="cb100-8"><a href="dynamic.html#cb100-8" aria-hidden="true"></a><span class="co">#&gt; 4  5466. Americas </span></span>
-<span id="cb100-9"><a href="dynamic.html#cb100-9" aria-hidden="true"></a><span class="co">#&gt; 5 17983. Oceania</span></span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="dynamic.html#cb102-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb102-2"><a href="dynamic.html#cb102-2" aria-hidden="true"></a>  <span class="dt">data =</span> gapminder,</span>
+<span id="cb102-3"><a href="dynamic.html#cb102-3" aria-hidden="true"></a>  <span class="dt">by =</span> data<span class="op">$</span>continent,</span>
+<span id="cb102-4"><a href="dynamic.html#cb102-4" aria-hidden="true"></a>  <span class="dt">gdp =</span> <span class="kw">target</span>(</span>
+<span id="cb102-5"><a href="dynamic.html#cb102-5" aria-hidden="true"></a>    <span class="kw">tibble</span>(<span class="dt">median =</span> <span class="kw">median</span>(data<span class="op">$</span>gdpPercap), <span class="dt">continent =</span> by[<span class="dv">1</span>]),</span>
+<span id="cb102-6"><a href="dynamic.html#cb102-6" aria-hidden="true"></a>    <span class="dt">dynamic =</span> <span class="kw">group</span>(data, <span class="dt">.by =</span> by)</span>
+<span id="cb102-7"><a href="dynamic.html#cb102-7" aria-hidden="true"></a>  )</span>
+<span id="cb102-8"><a href="dynamic.html#cb102-8" aria-hidden="true"></a>)</span>
+<span id="cb102-9"><a href="dynamic.html#cb102-9" aria-hidden="true"></a></span>
+<span id="cb102-10"><a href="dynamic.html#cb102-10" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb102-11"><a href="dynamic.html#cb102-11" aria-hidden="true"></a><span class="co">#&gt; ▶ target data</span></span>
+<span id="cb102-12"><a href="dynamic.html#cb102-12" aria-hidden="true"></a><span class="co">#&gt; ▶ target by</span></span>
+<span id="cb102-13"><a href="dynamic.html#cb102-13" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic gdp</span></span>
+<span id="cb102-14"><a href="dynamic.html#cb102-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_9adfc39f</span></span>
+<span id="cb102-15"><a href="dynamic.html#cb102-15" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_d9f30951</span></span>
+<span id="cb102-16"><a href="dynamic.html#cb102-16" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_958a2f81</span></span>
+<span id="cb102-17"><a href="dynamic.html#cb102-17" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_962b03c8</span></span>
+<span id="cb102-18"><a href="dynamic.html#cb102-18" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_dc1cff81</span></span>
+<span id="cb102-19"><a href="dynamic.html#cb102-19" aria-hidden="true"></a><span class="co">#&gt; ■ finalize gdp</span></span></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="dynamic.html#cb103-1" aria-hidden="true"></a><span class="kw">readd</span>(gdp)</span>
+<span id="cb103-2"><a href="dynamic.html#cb103-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 5 x 2</span></span>
+<span id="cb103-3"><a href="dynamic.html#cb103-3" aria-hidden="true"></a><span class="co">#&gt;   median continent</span></span>
+<span id="cb103-4"><a href="dynamic.html#cb103-4" aria-hidden="true"></a><span class="co">#&gt;    &lt;dbl&gt; &lt;fct&gt;    </span></span>
+<span id="cb103-5"><a href="dynamic.html#cb103-5" aria-hidden="true"></a><span class="co">#&gt; 1  2647. Asia     </span></span>
+<span id="cb103-6"><a href="dynamic.html#cb103-6" aria-hidden="true"></a><span class="co">#&gt; 2 12082. Europe   </span></span>
+<span id="cb103-7"><a href="dynamic.html#cb103-7" aria-hidden="true"></a><span class="co">#&gt; 3  1192. Africa   </span></span>
+<span id="cb103-8"><a href="dynamic.html#cb103-8" aria-hidden="true"></a><span class="co">#&gt; 4  5466. Americas </span></span>
+<span id="cb103-9"><a href="dynamic.html#cb103-9" aria-hidden="true"></a><span class="co">#&gt; 5 17983. Oceania</span></span></code></pre></div>
 </div>
 </div>
 <div id="trace" class="section level2" number="6.6">
 <h2><span class="header-section-number">6.6</span> Trace</h2>
 <p>All dynamic transforms have a <code>.trace</code> argument to record optional metadata for each sub-target. In the example from <code>group()</code>, the trace is another way to keep track of the continent of each median GDP value.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="dynamic.html#cb101-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb101-2"><a href="dynamic.html#cb101-2" aria-hidden="true"></a>  <span class="dt">data =</span> gapminder,</span>
-<span id="cb101-3"><a href="dynamic.html#cb101-3" aria-hidden="true"></a>  <span class="dt">by =</span> data<span class="op">$</span>continent,</span>
-<span id="cb101-4"><a href="dynamic.html#cb101-4" aria-hidden="true"></a>  <span class="dt">gdp =</span> <span class="kw">target</span>(</span>
-<span id="cb101-5"><a href="dynamic.html#cb101-5" aria-hidden="true"></a>    <span class="kw">median</span>(data<span class="op">$</span>gdpPercap),</span>
-<span id="cb101-6"><a href="dynamic.html#cb101-6" aria-hidden="true"></a>    <span class="dt">dynamic =</span> <span class="kw">group</span>(data, <span class="dt">.by =</span> by, <span class="dt">.trace =</span> by)</span>
-<span id="cb101-7"><a href="dynamic.html#cb101-7" aria-hidden="true"></a>  )</span>
-<span id="cb101-8"><a href="dynamic.html#cb101-8" aria-hidden="true"></a>)</span>
-<span id="cb101-9"><a href="dynamic.html#cb101-9" aria-hidden="true"></a></span>
-<span id="cb101-10"><a href="dynamic.html#cb101-10" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb101-11"><a href="dynamic.html#cb101-11" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic gdp</span></span>
-<span id="cb101-12"><a href="dynamic.html#cb101-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_7e88fb1c</span></span>
-<span id="cb101-13"><a href="dynamic.html#cb101-13" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_a61b8e1b</span></span>
-<span id="cb101-14"><a href="dynamic.html#cb101-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_278ff532</span></span>
-<span id="cb101-15"><a href="dynamic.html#cb101-15" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_6f3facea</span></span>
-<span id="cb101-16"><a href="dynamic.html#cb101-16" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_73037e69</span></span>
-<span id="cb101-17"><a href="dynamic.html#cb101-17" aria-hidden="true"></a><span class="co">#&gt; ■ finalize gdp</span></span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="dynamic.html#cb104-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb104-2"><a href="dynamic.html#cb104-2" aria-hidden="true"></a>  <span class="dt">data =</span> gapminder,</span>
+<span id="cb104-3"><a href="dynamic.html#cb104-3" aria-hidden="true"></a>  <span class="dt">by =</span> data<span class="op">$</span>continent,</span>
+<span id="cb104-4"><a href="dynamic.html#cb104-4" aria-hidden="true"></a>  <span class="dt">gdp =</span> <span class="kw">target</span>(</span>
+<span id="cb104-5"><a href="dynamic.html#cb104-5" aria-hidden="true"></a>    <span class="kw">median</span>(data<span class="op">$</span>gdpPercap),</span>
+<span id="cb104-6"><a href="dynamic.html#cb104-6" aria-hidden="true"></a>    <span class="dt">dynamic =</span> <span class="kw">group</span>(data, <span class="dt">.by =</span> by, <span class="dt">.trace =</span> by)</span>
+<span id="cb104-7"><a href="dynamic.html#cb104-7" aria-hidden="true"></a>  )</span>
+<span id="cb104-8"><a href="dynamic.html#cb104-8" aria-hidden="true"></a>)</span>
+<span id="cb104-9"><a href="dynamic.html#cb104-9" aria-hidden="true"></a></span>
+<span id="cb104-10"><a href="dynamic.html#cb104-10" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
+<span id="cb104-11"><a href="dynamic.html#cb104-11" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic gdp</span></span>
+<span id="cb104-12"><a href="dynamic.html#cb104-12" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_7e88fb1c</span></span>
+<span id="cb104-13"><a href="dynamic.html#cb104-13" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_a61b8e1b</span></span>
+<span id="cb104-14"><a href="dynamic.html#cb104-14" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_278ff532</span></span>
+<span id="cb104-15"><a href="dynamic.html#cb104-15" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_6f3facea</span></span>
+<span id="cb104-16"><a href="dynamic.html#cb104-16" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget gdp_73037e69</span></span>
+<span id="cb104-17"><a href="dynamic.html#cb104-17" aria-hidden="true"></a><span class="co">#&gt; ■ finalize gdp</span></span></code></pre></div>
 <p>The <code>gdp</code> target no longer contains any explicit reference to continent.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="dynamic.html#cb102-1" aria-hidden="true"></a><span class="kw">readd</span>(gdp)</span>
-<span id="cb102-2"><a href="dynamic.html#cb102-2" aria-hidden="true"></a><span class="co">#&gt; [1]  2646.787 12081.749  1192.138  5465.510 17983.304</span></span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="dynamic.html#cb105-1" aria-hidden="true"></a><span class="kw">readd</span>(gdp)</span>
+<span id="cb105-2"><a href="dynamic.html#cb105-2" aria-hidden="true"></a><span class="co">#&gt; [1]  2646.787 12081.749  1192.138  5465.510 17983.304</span></span></code></pre></div>
 <p>However, we can look up the continents in the trace.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="dynamic.html#cb103-1" aria-hidden="true"></a><span class="kw">read_trace</span>(<span class="st">&quot;by&quot;</span>, gdp)</span>
-<span id="cb103-2"><a href="dynamic.html#cb103-2" aria-hidden="true"></a><span class="co">#&gt; [1] Asia     Europe   Africa   Americas Oceania </span></span>
-<span id="cb103-3"><a href="dynamic.html#cb103-3" aria-hidden="true"></a><span class="co">#&gt; Levels: Africa Americas Asia Europe Oceania</span></span></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="dynamic.html#cb106-1" aria-hidden="true"></a><span class="kw">read_trace</span>(<span class="st">&quot;by&quot;</span>, gdp)</span>
+<span id="cb106-2"><a href="dynamic.html#cb106-2" aria-hidden="true"></a><span class="co">#&gt; [1] Asia     Europe   Africa   Americas Oceania </span></span>
+<span id="cb106-3"><a href="dynamic.html#cb106-3" aria-hidden="true"></a><span class="co">#&gt; Levels: Africa Americas Asia Europe Oceania</span></span></code></pre></div>
 </div>
 <div id="max_expand" class="section level2" number="6.7">
 <h2><span class="header-section-number">6.7</span> <code>max_expand</code></h2>
 <p>Suppose we want a model for each <em>country</em>.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="dynamic.html#cb104-1" aria-hidden="true"></a>gapminder_countries &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb104-2"><a href="dynamic.html#cb104-2" aria-hidden="true"></a>  gapminder <span class="op">%&gt;%</span></span>
-<span id="cb104-3"><a href="dynamic.html#cb104-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)) <span class="op">%&gt;%</span></span>
-<span id="cb104-4"><a href="dynamic.html#cb104-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">split</span>(<span class="dt">f =</span> .<span class="op">$</span>country)</span>
-<span id="cb104-5"><a href="dynamic.html#cb104-5" aria-hidden="true"></a>}</span>
-<span id="cb104-6"><a href="dynamic.html#cb104-6" aria-hidden="true"></a></span>
-<span id="cb104-7"><a href="dynamic.html#cb104-7" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb104-8"><a href="dynamic.html#cb104-8" aria-hidden="true"></a>  <span class="dt">countries =</span> <span class="kw">gapminder_countries</span>(),</span>
-<span id="cb104-9"><a href="dynamic.html#cb104-9" aria-hidden="true"></a>  <span class="dt">model =</span> <span class="kw">target</span>(<span class="kw">fit_model</span>(countries), <span class="dt">dynamic =</span> <span class="kw">map</span>(countries))</span>
-<span id="cb104-10"><a href="dynamic.html#cb104-10" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="dynamic.html#cb107-1" aria-hidden="true"></a>gapminder_countries &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb107-2"><a href="dynamic.html#cb107-2" aria-hidden="true"></a>  gapminder <span class="op">%&gt;%</span></span>
+<span id="cb107-3"><a href="dynamic.html#cb107-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">gdpPercap =</span> <span class="kw">scale</span>(gdpPercap)) <span class="op">%&gt;%</span></span>
+<span id="cb107-4"><a href="dynamic.html#cb107-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">split</span>(<span class="dt">f =</span> .<span class="op">$</span>country)</span>
+<span id="cb107-5"><a href="dynamic.html#cb107-5" aria-hidden="true"></a>}</span>
+<span id="cb107-6"><a href="dynamic.html#cb107-6" aria-hidden="true"></a></span>
+<span id="cb107-7"><a href="dynamic.html#cb107-7" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
+<span id="cb107-8"><a href="dynamic.html#cb107-8" aria-hidden="true"></a>  <span class="dt">countries =</span> <span class="kw">gapminder_countries</span>(),</span>
+<span id="cb107-9"><a href="dynamic.html#cb107-9" aria-hidden="true"></a>  <span class="dt">model =</span> <span class="kw">target</span>(<span class="kw">fit_model</span>(countries), <span class="dt">dynamic =</span> <span class="kw">map</span>(countries))</span>
+<span id="cb107-10"><a href="dynamic.html#cb107-10" aria-hidden="true"></a>)</span></code></pre></div>
 <p>The Gapminder dataset has 142 countries, which can get overwhelming. In the early stages of the workflow when we are still debugging and testing, we can limit the number of sub-targets using the <code>max_expand</code> argument of <code>make()</code>.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="dynamic.html#cb105-1" aria-hidden="true"></a><span class="kw">make</span>(plan, <span class="dt">max_expand =</span> <span class="dv">2</span>)</span>
-<span id="cb105-2"><a href="dynamic.html#cb105-2" aria-hidden="true"></a><span class="co">#&gt; ▶ target countries</span></span>
-<span id="cb105-3"><a href="dynamic.html#cb105-3" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic model</span></span>
-<span id="cb105-4"><a href="dynamic.html#cb105-4" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget model_ab009698</span></span>
-<span id="cb105-5"><a href="dynamic.html#cb105-5" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget model_cc031a6d</span></span>
-<span id="cb105-6"><a href="dynamic.html#cb105-6" aria-hidden="true"></a><span class="co">#&gt; ■ finalize model</span></span></code></pre></div>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="dynamic.html#cb106-1" aria-hidden="true"></a><span class="kw">readd</span>(model)</span>
-<span id="cb106-2"><a href="dynamic.html#cb106-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 4 x 4</span></span>
-<span id="cb106-3"><a href="dynamic.html#cb106-3" aria-hidden="true"></a><span class="co">#&gt;   continent term        statistic  p.value</span></span>
-<span id="cb106-4"><a href="dynamic.html#cb106-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span id="cb106-5"><a href="dynamic.html#cb106-5" aria-hidden="true"></a><span class="co">#&gt; 1 Asia      (Intercept)    -1.48  0.170   </span></span>
-<span id="cb106-6"><a href="dynamic.html#cb106-6" aria-hidden="true"></a><span class="co">#&gt; 2 Asia      year           -0.233 0.821   </span></span>
-<span id="cb106-7"><a href="dynamic.html#cb106-7" aria-hidden="true"></a><span class="co">#&gt; 3 Europe    (Intercept)    -4.76  0.000773</span></span>
-<span id="cb106-8"><a href="dynamic.html#cb106-8" aria-hidden="true"></a><span class="co">#&gt; 4 Europe    year            4.59  0.000998</span></span></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="dynamic.html#cb108-1" aria-hidden="true"></a><span class="kw">make</span>(plan, <span class="dt">max_expand =</span> <span class="dv">2</span>)</span>
+<span id="cb108-2"><a href="dynamic.html#cb108-2" aria-hidden="true"></a><span class="co">#&gt; ▶ target countries</span></span>
+<span id="cb108-3"><a href="dynamic.html#cb108-3" aria-hidden="true"></a><span class="co">#&gt; ▶ dynamic model</span></span>
+<span id="cb108-4"><a href="dynamic.html#cb108-4" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget model_ab009698</span></span>
+<span id="cb108-5"><a href="dynamic.html#cb108-5" aria-hidden="true"></a><span class="co">#&gt; ❯ subtarget model_cc031a6d</span></span>
+<span id="cb108-6"><a href="dynamic.html#cb108-6" aria-hidden="true"></a><span class="co">#&gt; ■ finalize model</span></span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="dynamic.html#cb109-1" aria-hidden="true"></a><span class="kw">readd</span>(model)</span>
+<span id="cb109-2"><a href="dynamic.html#cb109-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 4 x 4</span></span>
+<span id="cb109-3"><a href="dynamic.html#cb109-3" aria-hidden="true"></a><span class="co">#&gt;   continent term        statistic  p.value</span></span>
+<span id="cb109-4"><a href="dynamic.html#cb109-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;fct&gt;     &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb109-5"><a href="dynamic.html#cb109-5" aria-hidden="true"></a><span class="co">#&gt; 1 Asia      (Intercept)    -1.48  0.170   </span></span>
+<span id="cb109-6"><a href="dynamic.html#cb109-6" aria-hidden="true"></a><span class="co">#&gt; 2 Asia      year           -0.233 0.821   </span></span>
+<span id="cb109-7"><a href="dynamic.html#cb109-7" aria-hidden="true"></a><span class="co">#&gt; 3 Europe    (Intercept)    -4.76  0.000773</span></span>
+<span id="cb109-8"><a href="dynamic.html#cb109-8" aria-hidden="true"></a><span class="co">#&gt; 4 Europe    year            4.59  0.000998</span></span></code></pre></div>
 <p>Then, when we are confident and ready, we can scale up to the full number of models.</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="dynamic.html#cb107-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="dynamic.html#cb110-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span></code></pre></div>
 
 </div>
 </div>
