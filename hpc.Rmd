@@ -30,17 +30,17 @@ Before you jump into high-performance computing with a large workflow, consider 
 When it comes time to activate high-performance computing, `drake` launches its own parallel workers and sends targets to those workers. The workers can be local processes or jobs on a cluster. `drake` uses your project's implicit dependency graph to figure out which targets can run in parallel and which ones need to wait for dependencies.
 
 ```{r}
-load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/master/mtcars
+load_mtcars_example() # from https://github.com/wlandau/drake-examples/tree/main/mtcars
 vis_drake_graph(my_plan)
 ```
 
 You do not need to not micromanage how targets are scheduled, and you do not need to run simultaneous instances of `make()`.
 
-## The master process
+## The main process
 
 `make()` takes care of the jobs it launches, but `make()` *itself* is a job too, and it is your responsibility to manage it.
 
-### Master on a cluster
+### Main process on a cluster
 
 Most clusters will let you submit `make()` as a job on a compute node. Let's consider the Sun Grid Engine (SGE) as an example. First, we create a script that calls `make()` (or [`r_make()`](https://docs.ropensci.org/drake/reference/r_make.html)).
 
@@ -90,7 +90,7 @@ And here is what happens:
 
 So 9 simultaneous jobs run on the cluster and we avoid bothering the headnode / login node.
 
-### Local master
+### Local main process
 
 Alternatively, you can run `make()` in a persistent background process. The following should work in the Mac/Linux terminal/shell.
 
@@ -114,13 +114,13 @@ Choose the parallel backend with the `parallelism` argument and set the `jobs` a
 ```{r, eval = FALSE}
 make(my_plan, parallelism = "future", jobs = 2)
 ```
-The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the best choice is usually [`clustermq`](https://github.com/mschubert/clustermq). (It is faster than [`future`](https://github.com/HenrikBengtsson/future).) However, [`future`](https://github.com/HenrikBengtsson/future) is more accessible: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/master/Docker-psock) (`drake_example("Docker-psock")`).
+The two primary backends with long term support are [`clustermq`](https://github.com/mschubert/clustermq) and [`future`](https://github.com/HenrikBengtsson/future). If you can install [ZeroMQ](http://zeromq.org), the best choice is usually [`clustermq`](https://github.com/mschubert/clustermq). (It is faster than [`future`](https://github.com/HenrikBengtsson/future).) However, [`future`](https://github.com/HenrikBengtsson/future) is more accessible: it does not require [ZeroMQ](http://zeromq.org), it supports parallel computing on Windows, it can work with more restrictive wall time limits on clusters, and it [can deploy targets to Docker images](https://github.com/wlandau/drake-examples/tree/main/Docker-psock) (`drake_example("Docker-psock")`).
 
 ## The `clustermq` backend
 
 ### Persistent workers
 
-The `make(parallelism = "clustermq", jobs = 2)` launches 2 parallel *persistent workers*. The master process assigns targets to workers, and the workers simultaneously traverse the dependency graph.
+The `make(parallelism = "clustermq", jobs = 2)` launches 2 parallel *persistent workers*. The main process assigns targets to workers, and the workers simultaneously traverse the dependency graph.
 
 <script src="https://fast.wistia.com/embed/medias/ycczhxwkjw.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_ycczhxwkjw videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/ycczhxwkjw/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
 
@@ -145,7 +145,7 @@ Set the [`clustermq`](https://github.com/mschubert/clustermq) global options to 
 options(clustermq.scheduler = "slurm", clustermq.template = "slurm_clustermq.tmpl")
 ```
 
-Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/master/inst/templates/hpc) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
+Here, `slurm_clustermq.tmpl` is a [template file](https://github.com/ropensci/drake/tree/main/inst/templates/hpc) with configuration details. Use `drake_hpc_template_file()` to write one of the available examples.
 
 ```{r, eval = FALSE}
 drake_hpc_template_file("slurm_clustermq.tmpl") # Write the file slurm_clustermq.tmpl.
@@ -161,7 +161,7 @@ make(plan, parallelism = "clustermq", jobs = 4)
 
 ### Transient workers
 
-`make(parallelism = "future", jobs = 2)` launches *transient workers* to build your targets. When a target is ready to build, the master process creates a fresh worker to build it, and the worker terminates when the target is done. `jobs = 2` means that at most 2 transient workers are allowed to run at a given time.
+`make(parallelism = "future", jobs = 2)` launches *transient workers* to build your targets. When a target is ready to build, the main process creates a fresh worker to build it, and the worker terminates when the target is done. `jobs = 2` means that at most 2 transient workers are allowed to run at a given time.
 
 <script src="https://fast.wistia.com/embed/medias/340yvlp515.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.21% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_340yvlp515 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/340yvlp515/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" onload="this.parentNode.style.opacity=1;" /></div></div></div></div><br>
 
@@ -216,7 +216,7 @@ make(plan, parallelism = "future", jobs = 2)
 
 ### Selectivity
 
-Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the master process, define a special `hpc` column of your `drake` plan. Below, `NA` and `TRUE` are treated the same, and `make(plan, parallelism = "clustermq")` only sends `model_1` and `model_2` to parallel workers.
+Some targets build so quickly that it is not worth sending them to parallel workers. To run these targets locally in the main process, define a special `hpc` column of your `drake` plan. Below, `NA` and `TRUE` are treated the same, and `make(plan, parallelism = "clustermq")` only sends `model_1` and `model_2` to parallel workers.
 
 ```{r}
 drake_plan(
@@ -251,11 +251,11 @@ By default, `make()` keeps targets in memory during runtime. Some targets are de
 
 ### Storage options
 
-In `make(caching = "master")`, the workers send the targets to the master process, and the master process stores them one by one in the cache. `caching = "master"` is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
+In `make(caching = "main")`, the workers send the targets to the main process, and the main process stores them one by one in the cache. `caching = "main"` is compatible with all [`storr`](https://github.com/richfitz/storr) cache formats, including the more esoteric ones like `storr_dbi()` and `storr_environment()`. 
 
 In `make(caching = "worker")`, the parallel workers are responsible for writing the targets to the cache. Some output-heavy projects can benefit from this form of parallelism. However, it can sometimes add slowness on clusters due to lag from network file systems. And there are additional restrictions:
 
-- All the workers must have the same file system and the same working directory as the master process.
+- All the workers must have the same file system and the same working directory as the main process.
 - Only the default `storr_rds()` cache may be used. Other formats like `storr_dbi()` and `storr_environment()` cannot accommodate parallel cache operations.
 
 See the [storage chapter](#storage) for details.

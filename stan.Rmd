@@ -33,7 +33,7 @@ We simulate multiple datasets from the model and fit the model on each dataset. 
 
 ## The `drake` project
 
-Because of the long computation time involved, this chapter of the manual does not actually run the analysis code. The complete code can be found at <https://github.com/wlandau/drake-examples/tree/master/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself. This chapter serves to walk through the functions and plan and explain the overall thought process.
+Because of the long computation time involved, this chapter of the manual does not actually run the analysis code. The complete code can be found at <https://github.com/wlandau/drake-examples/tree/main/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself. This chapter serves to walk through the functions and plan and explain the overall thought process.
 
 The file structure is that of a [typical `drake` project](#projects) with some additions to allow optional [high-performance computing](#hpc) on a cluster.
 
@@ -217,7 +217,7 @@ fit = target(
 
 R Markdown reports should never do any heavy lifting in `drake` pipelines. They should simply leverage the computationally expensive work done in the previous targets. If we follow this good practice and our report renders quickly, we should not need heavy computing resources to process it, and we can set `hpc = FALSE` below.
 
-The [`report.Rmd` file itself](https://github.com/wlandau/drake-examples/blob/master/stan/report.Rmd) has `loadd()` and `readd()` statements to refer to these targets, and with the `knitr_in()` keyword below, `drake` knows that it needs to update the report when the models or datasets change. Similarly, `file_out("report.html")` tells `drake` to rerun the report if the output file gets corrupted.
+The [`report.Rmd` file itself](https://github.com/wlandau/drake-examples/blob/main/stan/report.Rmd) has `loadd()` and `readd()` statements to refer to these targets, and with the `knitr_in()` keyword below, `drake` knows that it needs to update the report when the models or datasets change. Similarly, `file_out("report.html")` tells `drake` to rerun the report if the output file gets corrupted.
 
 ```{r}
 report = target(
@@ -232,4 +232,4 @@ report = target(
 
 ## Try it out!
 
-The complete code can be found at <https://github.com/wlandau/drake-examples/tree/master/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself.
+The complete code can be found at <https://github.com/wlandau/drake-examples/tree/main/stan> and downloaded with `drake::drake_example("stan")`, and we encourage you to try out the code yourself.

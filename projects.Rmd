@@ -48,13 +48,13 @@ R/
 └── plan.R
 ```
 
-Here, `make.R` is a master script that
+Here, `make.R` is a main top-level script that
 
 1. Loads your packages, functions, and other in-memory data.
 2. Creates the `drake` plan.
 3. Calls `make()`.
 
-Let's consider the [main example](https://github.com/wlandau/drake-examples/tree/master/main), which you can download with `drake_example("main")`. Here, our master script is called `make.R`:
+Let's consider the [main example](https://github.com/wlandau/drake-examples/tree/main/main), which you can download with `drake_example("main")`. Here, our main script is called `make.R`:
 
 ```{r, eval = FALSE}
 source("R/packages.R")  # loads packages
@@ -130,7 +130,7 @@ vis_drake_graph(plan)
 
 ### Motivation
 
-A serious [`drake`](https://github.com/ropensci/drake) workflow should be consistent and reliable, ideally with the help of a [master R script](https://github.com/wlandau/drake-examples/blob/master/gsp/make.R). Before it builds your targets, this script should begin in a fresh R session and load your packages and functions in a [dependable manner](https://github.com/wlandau/drake-examples/blob/d9417547a05aec416afbbda913eaf2d44a552d5b/gsp/make.R#L4-L6). [Batch mode](https://www.statmethods.net/interface/batch.html) makes sure all this goes according to plan.
+A serious [`drake`](https://github.com/ropensci/drake) workflow should be consistent and reliable, ideally with the help of a [main top-level R script](https://github.com/wlandau/drake-examples/blob/main/gsp/make.R). Before it builds your targets, this script should begin in a fresh R session and load your packages and functions in a [dependable manner](https://github.com/wlandau/drake-examples/blob/d9417547a05aec416afbbda913eaf2d44a552d5b/gsp/make.R#L4-L6). [Batch mode](https://www.statmethods.net/interface/batch.html) makes sure all this goes according to plan.
 
 If you use a single persistent [interactive R session](https://stat.ethz.ch/R-manual/R-devel/library/base/html/interactive.html) to repeatedly invoke `make()` while you develop the workflow, then over time, your session could grow stale and accidentally invalidate targets. For example, if you interactively tinker with a new version of `create_plot()`, targets `hist` and `report` will fall out of date without warning, and the next `make()` will build them again. Even worse, the outputs from `hist` and `report` will be wrong if they depend on a half-finished `create_plot()`.
 
@@ -205,7 +205,7 @@ Remarks:
 
 - You can run `r_make()` in an interactive session, but the transient process it launches will not be interactive. Thus, any `browser()` statements in the commands in your `drake` plan will be ignored.
 - You can select and configure the underlying [`callr`](https://github.com/r-lib/callr) function using arguments `r_fn` and `r_args`, respectively.
-- For example code, you can download the updated [main example](https://github.com/wlandau/drake-examples/tree/master/main) (`drake_example("main")`) and experiment with files [`_drake.R`](https://github.com/wlandau/drake-examples/blob/master/main/_drake.R) and [`interactive.R`](https://github.com/wlandau/drake-examples/blob/master/main/interactive.R).
+- For example code, you can download the updated [main example](https://github.com/wlandau/drake-examples/tree/main/main) (`drake_example("main")`) and experiment with files [`_drake.R`](https://github.com/wlandau/drake-examples/blob/main/main/_drake.R) and [`interactive.R`](https://github.com/wlandau/drake-examples/blob/main/main/interactive.R).
 
 ## Script file pitfalls
 
