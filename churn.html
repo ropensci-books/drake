@@ -33,7 +33,7 @@
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="scripts.html"/>
 <link rel="next" href="stan.html"/>
-<script src="libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,7 +51,7 @@
 
 
 
-<script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
@@ -70,6 +70,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -502,322 +503,322 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="churn-packages" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> Churn packages</h2>
 <p>First, we load our packages into a fresh R session.</p>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="churn.html#cb139-1" aria-hidden="true"></a><span class="kw">library</span>(drake)</span>
-<span id="cb139-2"><a href="churn.html#cb139-2" aria-hidden="true"></a><span class="kw">library</span>(keras)</span>
-<span id="cb139-3"><a href="churn.html#cb139-3" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
-<span id="cb139-4"><a href="churn.html#cb139-4" aria-hidden="true"></a><span class="kw">library</span>(rsample)</span>
-<span id="cb139-5"><a href="churn.html#cb139-5" aria-hidden="true"></a><span class="kw">library</span>(recipes)</span>
-<span id="cb139-6"><a href="churn.html#cb139-6" aria-hidden="true"></a><span class="kw">library</span>(yardstick)</span></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="churn.html#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drake)</span>
+<span id="cb137-2"><a href="churn.html#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb137-3"><a href="churn.html#cb137-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb137-4"><a href="churn.html#cb137-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb137-5"><a href="churn.html#cb137-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
+<span id="cb137-6"><a href="churn.html#cb137-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span></code></pre></div>
 </div>
 <div id="churn-functions" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Churn functions</h2>
 <p><a href="https://github.com/ropensci/drake"><code>drake</code></a> is R-focused and function-oriented. We create functions to <a href="https://github.com/tidymodels/recipes">preprocess the data</a>,</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="churn.html#cb140-1" aria-hidden="true"></a>prepare_recipe &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</span>
-<span id="cb140-2"><a href="churn.html#cb140-2" aria-hidden="true"></a>  data <span class="op">%&gt;%</span></span>
-<span id="cb140-3"><a href="churn.html#cb140-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">training</span>() <span class="op">%&gt;%</span></span>
-<span id="cb140-4"><a href="churn.html#cb140-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">recipe</span>(Churn <span class="op">~</span><span class="st"> </span>.) <span class="op">%&gt;%</span></span>
-<span id="cb140-5"><a href="churn.html#cb140-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_rm</span>(customerID) <span class="op">%&gt;%</span></span>
-<span id="cb140-6"><a href="churn.html#cb140-6" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_naomit</span>(<span class="kw">all_outcomes</span>(), <span class="kw">all_predictors</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb140-7"><a href="churn.html#cb140-7" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_discretize</span>(tenure, <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">cuts =</span> <span class="dv">6</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb140-8"><a href="churn.html#cb140-8" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_log</span>(TotalCharges) <span class="op">%&gt;%</span></span>
-<span id="cb140-9"><a href="churn.html#cb140-9" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_mutate</span>(<span class="dt">Churn =</span> <span class="kw">ifelse</span>(Churn <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb140-10"><a href="churn.html#cb140-10" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_dummy</span>(<span class="kw">all_nominal</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb140-11"><a href="churn.html#cb140-11" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_center</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb140-12"><a href="churn.html#cb140-12" aria-hidden="true"></a><span class="st">    </span><span class="kw">step_scale</span>(<span class="kw">all_predictors</span>(), <span class="op">-</span><span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb140-13"><a href="churn.html#cb140-13" aria-hidden="true"></a><span class="st">    </span><span class="kw">prep</span>()</span>
-<span id="cb140-14"><a href="churn.html#cb140-14" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="churn.html#cb138-1" aria-hidden="true" tabindex="-1"></a>prepare_recipe <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb138-2"><a href="churn.html#cb138-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span></span>
+<span id="cb138-3"><a href="churn.html#cb138-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">training</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb138-4"><a href="churn.html#cb138-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">recipe</span>(Churn <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
+<span id="cb138-5"><a href="churn.html#cb138-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_rm</span>(customerID) <span class="sc">%&gt;%</span></span>
+<span id="cb138-6"><a href="churn.html#cb138-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_naomit</span>(<span class="fu">all_outcomes</span>(), <span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb138-7"><a href="churn.html#cb138-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_discretize</span>(tenure, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">cuts =</span> <span class="dv">6</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb138-8"><a href="churn.html#cb138-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_log</span>(TotalCharges) <span class="sc">%&gt;%</span></span>
+<span id="cb138-9"><a href="churn.html#cb138-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_mutate</span>(<span class="at">Churn =</span> <span class="fu">ifelse</span>(Churn <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb138-10"><a href="churn.html#cb138-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb138-11"><a href="churn.html#cb138-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_center</span>(<span class="fu">all_predictors</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb138-12"><a href="churn.html#cb138-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_scale</span>(<span class="fu">all_predictors</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb138-13"><a href="churn.html#cb138-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prep</span>()</span>
+<span id="cb138-14"><a href="churn.html#cb138-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>define a <a href="https://github.com/rstudio/keras"><code>keras</code></a> model, exposing arguments to set the dimensionality and activation functions of the layers,</p>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="churn.html#cb141-1" aria-hidden="true"></a>define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</span>
-<span id="cb141-2"><a href="churn.html#cb141-2" aria-hidden="true"></a>  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</span>
-<span id="cb141-3"><a href="churn.html#cb141-3" aria-hidden="true"></a>    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb141-4"><a href="churn.html#cb141-4" aria-hidden="true"></a>  )</span>
-<span id="cb141-5"><a href="churn.html#cb141-5" aria-hidden="true"></a>  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></span>
-<span id="cb141-6"><a href="churn.html#cb141-6" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb141-7"><a href="churn.html#cb141-7" aria-hidden="true"></a>      <span class="dt">units =</span> units1,</span>
-<span id="cb141-8"><a href="churn.html#cb141-8" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb141-9"><a href="churn.html#cb141-9" aria-hidden="true"></a>      <span class="dt">activation =</span> act1,</span>
-<span id="cb141-10"><a href="churn.html#cb141-10" aria-hidden="true"></a>      <span class="dt">input_shape =</span> input_shape</span>
-<span id="cb141-11"><a href="churn.html#cb141-11" aria-hidden="true"></a>    ) <span class="op">%&gt;%</span></span>
-<span id="cb141-12"><a href="churn.html#cb141-12" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb141-13"><a href="churn.html#cb141-13" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb141-14"><a href="churn.html#cb141-14" aria-hidden="true"></a>      <span class="dt">units =</span> units2,</span>
-<span id="cb141-15"><a href="churn.html#cb141-15" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb141-16"><a href="churn.html#cb141-16" aria-hidden="true"></a>      <span class="dt">activation =</span> act2</span>
-<span id="cb141-17"><a href="churn.html#cb141-17" aria-hidden="true"></a>    ) <span class="op">%&gt;%</span></span>
-<span id="cb141-18"><a href="churn.html#cb141-18" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb141-19"><a href="churn.html#cb141-19" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb141-20"><a href="churn.html#cb141-20" aria-hidden="true"></a>      <span class="dt">units =</span> <span class="dv">1</span>,</span>
-<span id="cb141-21"><a href="churn.html#cb141-21" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb141-22"><a href="churn.html#cb141-22" aria-hidden="true"></a>      <span class="dt">activation =</span> act3</span>
-<span id="cb141-23"><a href="churn.html#cb141-23" aria-hidden="true"></a>    )</span>
-<span id="cb141-24"><a href="churn.html#cb141-24" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="churn.html#cb139-1" aria-hidden="true" tabindex="-1"></a>define_model <span class="ot">&lt;-</span> <span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</span>
+<span id="cb139-2"><a href="churn.html#cb139-2" aria-hidden="true" tabindex="-1"></a>  input_shape <span class="ot">&lt;-</span> <span class="fu">ncol</span>(</span>
+<span id="cb139-3"><a href="churn.html#cb139-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">juice</span>(rec, <span class="fu">all_predictors</span>(), <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb139-4"><a href="churn.html#cb139-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb139-5"><a href="churn.html#cb139-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb139-6"><a href="churn.html#cb139-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb139-7"><a href="churn.html#cb139-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> units1,</span>
+<span id="cb139-8"><a href="churn.html#cb139-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb139-9"><a href="churn.html#cb139-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act1,</span>
+<span id="cb139-10"><a href="churn.html#cb139-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">input_shape =</span> input_shape</span>
+<span id="cb139-11"><a href="churn.html#cb139-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb139-12"><a href="churn.html#cb139-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb139-13"><a href="churn.html#cb139-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb139-14"><a href="churn.html#cb139-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> units2,</span>
+<span id="cb139-15"><a href="churn.html#cb139-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb139-16"><a href="churn.html#cb139-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act2</span>
+<span id="cb139-17"><a href="churn.html#cb139-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb139-18"><a href="churn.html#cb139-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb139-19"><a href="churn.html#cb139-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb139-20"><a href="churn.html#cb139-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> <span class="dv">1</span>,</span>
+<span id="cb139-21"><a href="churn.html#cb139-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb139-22"><a href="churn.html#cb139-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act3</span>
+<span id="cb139-23"><a href="churn.html#cb139-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb139-24"><a href="churn.html#cb139-24" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>train a model,</p>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="churn.html#cb142-1" aria-hidden="true"></a>train_model &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb142-2"><a href="churn.html#cb142-2" aria-hidden="true"></a>  rec,</span>
-<span id="cb142-3"><a href="churn.html#cb142-3" aria-hidden="true"></a>  <span class="dt">units1 =</span> <span class="dv">16</span>,</span>
-<span id="cb142-4"><a href="churn.html#cb142-4" aria-hidden="true"></a>  <span class="dt">units2 =</span> <span class="dv">16</span>,</span>
-<span id="cb142-5"><a href="churn.html#cb142-5" aria-hidden="true"></a>  <span class="dt">act1 =</span> <span class="st">&quot;relu&quot;</span>,</span>
-<span id="cb142-6"><a href="churn.html#cb142-6" aria-hidden="true"></a>  <span class="dt">act2 =</span> <span class="st">&quot;relu&quot;</span>,</span>
-<span id="cb142-7"><a href="churn.html#cb142-7" aria-hidden="true"></a>  <span class="dt">act3 =</span> <span class="st">&quot;sigmoid&quot;</span></span>
-<span id="cb142-8"><a href="churn.html#cb142-8" aria-hidden="true"></a>) {</span>
-<span id="cb142-9"><a href="churn.html#cb142-9" aria-hidden="true"></a>  model &lt;-<span class="st"> </span><span class="kw">define_model</span>(</span>
-<span id="cb142-10"><a href="churn.html#cb142-10" aria-hidden="true"></a>    <span class="dt">rec =</span> rec,</span>
-<span id="cb142-11"><a href="churn.html#cb142-11" aria-hidden="true"></a>    <span class="dt">units1 =</span> units1,</span>
-<span id="cb142-12"><a href="churn.html#cb142-12" aria-hidden="true"></a>    <span class="dt">units2 =</span> units2,</span>
-<span id="cb142-13"><a href="churn.html#cb142-13" aria-hidden="true"></a>    <span class="dt">act1 =</span> act1,</span>
-<span id="cb142-14"><a href="churn.html#cb142-14" aria-hidden="true"></a>    <span class="dt">act2 =</span> act2,</span>
-<span id="cb142-15"><a href="churn.html#cb142-15" aria-hidden="true"></a>    <span class="dt">act3 =</span> act3</span>
-<span id="cb142-16"><a href="churn.html#cb142-16" aria-hidden="true"></a>  )</span>
-<span id="cb142-17"><a href="churn.html#cb142-17" aria-hidden="true"></a>  <span class="kw">compile</span>(</span>
-<span id="cb142-18"><a href="churn.html#cb142-18" aria-hidden="true"></a>    model,</span>
-<span id="cb142-19"><a href="churn.html#cb142-19" aria-hidden="true"></a>    <span class="dt">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb142-20"><a href="churn.html#cb142-20" aria-hidden="true"></a>    <span class="dt">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb142-21"><a href="churn.html#cb142-21" aria-hidden="true"></a>    <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb142-22"><a href="churn.html#cb142-22" aria-hidden="true"></a>  )</span>
-<span id="cb142-23"><a href="churn.html#cb142-23" aria-hidden="true"></a>  x_train_tbl &lt;-<span class="st"> </span><span class="kw">juice</span>(</span>
-<span id="cb142-24"><a href="churn.html#cb142-24" aria-hidden="true"></a>    rec,</span>
-<span id="cb142-25"><a href="churn.html#cb142-25" aria-hidden="true"></a>    <span class="kw">all_predictors</span>(),</span>
-<span id="cb142-26"><a href="churn.html#cb142-26" aria-hidden="true"></a>    <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span></span>
-<span id="cb142-27"><a href="churn.html#cb142-27" aria-hidden="true"></a>  )</span>
-<span id="cb142-28"><a href="churn.html#cb142-28" aria-hidden="true"></a>  y_train_vec &lt;-<span class="st"> </span><span class="kw">juice</span>(rec, <span class="kw">all_outcomes</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb142-29"><a href="churn.html#cb142-29" aria-hidden="true"></a><span class="st">    </span><span class="kw">pull</span>()</span>
-<span id="cb142-30"><a href="churn.html#cb142-30" aria-hidden="true"></a>  <span class="kw">fit</span>(</span>
-<span id="cb142-31"><a href="churn.html#cb142-31" aria-hidden="true"></a>    <span class="dt">object =</span> model,</span>
-<span id="cb142-32"><a href="churn.html#cb142-32" aria-hidden="true"></a>    <span class="dt">x =</span> x_train_tbl,</span>
-<span id="cb142-33"><a href="churn.html#cb142-33" aria-hidden="true"></a>    <span class="dt">y =</span> y_train_vec,</span>
-<span id="cb142-34"><a href="churn.html#cb142-34" aria-hidden="true"></a>    <span class="dt">batch_size =</span> <span class="dv">32</span>,</span>
-<span id="cb142-35"><a href="churn.html#cb142-35" aria-hidden="true"></a>    <span class="dt">epochs =</span> <span class="dv">32</span>,</span>
-<span id="cb142-36"><a href="churn.html#cb142-36" aria-hidden="true"></a>    <span class="dt">validation_split =</span> <span class="fl">0.3</span>,</span>
-<span id="cb142-37"><a href="churn.html#cb142-37" aria-hidden="true"></a>    <span class="dt">verbose =</span> <span class="dv">0</span></span>
-<span id="cb142-38"><a href="churn.html#cb142-38" aria-hidden="true"></a>  )</span>
-<span id="cb142-39"><a href="churn.html#cb142-39" aria-hidden="true"></a>  model</span>
-<span id="cb142-40"><a href="churn.html#cb142-40" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="churn.html#cb140-1" aria-hidden="true" tabindex="-1"></a>train_model <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb140-2"><a href="churn.html#cb140-2" aria-hidden="true" tabindex="-1"></a>  rec,</span>
+<span id="cb140-3"><a href="churn.html#cb140-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">units1 =</span> <span class="dv">16</span>,</span>
+<span id="cb140-4"><a href="churn.html#cb140-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">units2 =</span> <span class="dv">16</span>,</span>
+<span id="cb140-5"><a href="churn.html#cb140-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">act1 =</span> <span class="st">&quot;relu&quot;</span>,</span>
+<span id="cb140-6"><a href="churn.html#cb140-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">act2 =</span> <span class="st">&quot;relu&quot;</span>,</span>
+<span id="cb140-7"><a href="churn.html#cb140-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">act3 =</span> <span class="st">&quot;sigmoid&quot;</span></span>
+<span id="cb140-8"><a href="churn.html#cb140-8" aria-hidden="true" tabindex="-1"></a>) {</span>
+<span id="cb140-9"><a href="churn.html#cb140-9" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">define_model</span>(</span>
+<span id="cb140-10"><a href="churn.html#cb140-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">rec =</span> rec,</span>
+<span id="cb140-11"><a href="churn.html#cb140-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">units1 =</span> units1,</span>
+<span id="cb140-12"><a href="churn.html#cb140-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">units2 =</span> units2,</span>
+<span id="cb140-13"><a href="churn.html#cb140-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">act1 =</span> act1,</span>
+<span id="cb140-14"><a href="churn.html#cb140-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">act2 =</span> act2,</span>
+<span id="cb140-15"><a href="churn.html#cb140-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">act3 =</span> act3</span>
+<span id="cb140-16"><a href="churn.html#cb140-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb140-17"><a href="churn.html#cb140-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb140-18"><a href="churn.html#cb140-18" aria-hidden="true" tabindex="-1"></a>    model,</span>
+<span id="cb140-19"><a href="churn.html#cb140-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb140-20"><a href="churn.html#cb140-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb140-21"><a href="churn.html#cb140-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb140-22"><a href="churn.html#cb140-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb140-23"><a href="churn.html#cb140-23" aria-hidden="true" tabindex="-1"></a>  x_train_tbl <span class="ot">&lt;-</span> <span class="fu">juice</span>(</span>
+<span id="cb140-24"><a href="churn.html#cb140-24" aria-hidden="true" tabindex="-1"></a>    rec,</span>
+<span id="cb140-25"><a href="churn.html#cb140-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_predictors</span>(),</span>
+<span id="cb140-26"><a href="churn.html#cb140-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span></span>
+<span id="cb140-27"><a href="churn.html#cb140-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb140-28"><a href="churn.html#cb140-28" aria-hidden="true" tabindex="-1"></a>  y_train_vec <span class="ot">&lt;-</span> <span class="fu">juice</span>(rec, <span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb140-29"><a href="churn.html#cb140-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>()</span>
+<span id="cb140-30"><a href="churn.html#cb140-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb140-31"><a href="churn.html#cb140-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">object =</span> model,</span>
+<span id="cb140-32"><a href="churn.html#cb140-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> x_train_tbl,</span>
+<span id="cb140-33"><a href="churn.html#cb140-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> y_train_vec,</span>
+<span id="cb140-34"><a href="churn.html#cb140-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">32</span>,</span>
+<span id="cb140-35"><a href="churn.html#cb140-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">32</span>,</span>
+<span id="cb140-36"><a href="churn.html#cb140-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.3</span>,</span>
+<span id="cb140-37"><a href="churn.html#cb140-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span></span>
+<span id="cb140-38"><a href="churn.html#cb140-38" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb140-39"><a href="churn.html#cb140-39" aria-hidden="true" tabindex="-1"></a>  model</span>
+<span id="cb140-40"><a href="churn.html#cb140-40" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>compare predictions against reality,</p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="churn.html#cb143-1" aria-hidden="true"></a>confusion_matrix &lt;-<span class="st"> </span><span class="cf">function</span>(data, rec, model) {</span>
-<span id="cb143-2"><a href="churn.html#cb143-2" aria-hidden="true"></a>  testing_data &lt;-<span class="st"> </span><span class="kw">bake</span>(rec, <span class="kw">testing</span>(data))</span>
-<span id="cb143-3"><a href="churn.html#cb143-3" aria-hidden="true"></a>  x_test_tbl &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></span>
-<span id="cb143-4"><a href="churn.html#cb143-4" aria-hidden="true"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>Churn) <span class="op">%&gt;%</span></span>
-<span id="cb143-5"><a href="churn.html#cb143-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.matrix</span>()</span>
-<span id="cb143-6"><a href="churn.html#cb143-6" aria-hidden="true"></a>  y_test_vec &lt;-<span class="st"> </span>testing_data <span class="op">%&gt;%</span></span>
-<span id="cb143-7"><a href="churn.html#cb143-7" aria-hidden="true"></a><span class="st">    </span><span class="kw">select</span>(Churn) <span class="op">%&gt;%</span></span>
-<span id="cb143-8"><a href="churn.html#cb143-8" aria-hidden="true"></a><span class="st">    </span><span class="kw">pull</span>()</span>
-<span id="cb143-9"><a href="churn.html#cb143-9" aria-hidden="true"></a>  yhat_keras_class_vec &lt;-<span class="st"> </span>model <span class="op">%&gt;%</span></span>
-<span id="cb143-10"><a href="churn.html#cb143-10" aria-hidden="true"></a><span class="st">    </span><span class="kw">predict_classes</span>(x_test_tbl) <span class="op">%&gt;%</span></span>
-<span id="cb143-11"><a href="churn.html#cb143-11" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></span>
-<span id="cb143-12"><a href="churn.html#cb143-12" aria-hidden="true"></a><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb143-13"><a href="churn.html#cb143-13" aria-hidden="true"></a>  yhat_keras_prob_vec &lt;-</span>
-<span id="cb143-14"><a href="churn.html#cb143-14" aria-hidden="true"></a><span class="st">    </span>model <span class="op">%&gt;%</span></span>
-<span id="cb143-15"><a href="churn.html#cb143-15" aria-hidden="true"></a><span class="st">    </span><span class="kw">predict_proba</span>(x_test_tbl) <span class="op">%&gt;%</span></span>
-<span id="cb143-16"><a href="churn.html#cb143-16" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.vector</span>()</span>
-<span id="cb143-17"><a href="churn.html#cb143-17" aria-hidden="true"></a>  test_truth &lt;-<span class="st"> </span>y_test_vec <span class="op">%&gt;%</span></span>
-<span id="cb143-18"><a href="churn.html#cb143-18" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.factor</span>() <span class="op">%&gt;%</span></span>
-<span id="cb143-19"><a href="churn.html#cb143-19" aria-hidden="true"></a><span class="st">    </span><span class="kw">fct_recode</span>(<span class="dt">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">no =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb143-20"><a href="churn.html#cb143-20" aria-hidden="true"></a>  estimates_keras_tbl &lt;-<span class="st"> </span><span class="kw">tibble</span>(</span>
-<span id="cb143-21"><a href="churn.html#cb143-21" aria-hidden="true"></a>    <span class="dt">truth =</span> test_truth,</span>
-<span id="cb143-22"><a href="churn.html#cb143-22" aria-hidden="true"></a>    <span class="dt">estimate =</span> yhat_keras_class_vec,</span>
-<span id="cb143-23"><a href="churn.html#cb143-23" aria-hidden="true"></a>    <span class="dt">class_prob =</span> yhat_keras_prob_vec</span>
-<span id="cb143-24"><a href="churn.html#cb143-24" aria-hidden="true"></a>  )</span>
-<span id="cb143-25"><a href="churn.html#cb143-25" aria-hidden="true"></a>  estimates_keras_tbl <span class="op">%&gt;%</span></span>
-<span id="cb143-26"><a href="churn.html#cb143-26" aria-hidden="true"></a><span class="st">    </span><span class="kw">conf_mat</span>(truth, estimate)</span>
-<span id="cb143-27"><a href="churn.html#cb143-27" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="churn.html#cb141-1" aria-hidden="true" tabindex="-1"></a>confusion_matrix <span class="ot">&lt;-</span> <span class="cf">function</span>(data, rec, model) {</span>
+<span id="cb141-2"><a href="churn.html#cb141-2" aria-hidden="true" tabindex="-1"></a>  testing_data <span class="ot">&lt;-</span> <span class="fu">bake</span>(rec, <span class="fu">testing</span>(data))</span>
+<span id="cb141-3"><a href="churn.html#cb141-3" aria-hidden="true" tabindex="-1"></a>  x_test_tbl <span class="ot">&lt;-</span> testing_data <span class="sc">%&gt;%</span></span>
+<span id="cb141-4"><a href="churn.html#cb141-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>Churn) <span class="sc">%&gt;%</span></span>
+<span id="cb141-5"><a href="churn.html#cb141-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>()</span>
+<span id="cb141-6"><a href="churn.html#cb141-6" aria-hidden="true" tabindex="-1"></a>  y_test_vec <span class="ot">&lt;-</span> testing_data <span class="sc">%&gt;%</span></span>
+<span id="cb141-7"><a href="churn.html#cb141-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Churn) <span class="sc">%&gt;%</span></span>
+<span id="cb141-8"><a href="churn.html#cb141-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>()</span>
+<span id="cb141-9"><a href="churn.html#cb141-9" aria-hidden="true" tabindex="-1"></a>  yhat_keras_class_vec <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span></span>
+<span id="cb141-10"><a href="churn.html#cb141-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict_classes</span>(x_test_tbl) <span class="sc">%&gt;%</span></span>
+<span id="cb141-11"><a href="churn.html#cb141-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.factor</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb141-12"><a href="churn.html#cb141-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fct_recode</span>(<span class="at">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="at">no =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb141-13"><a href="churn.html#cb141-13" aria-hidden="true" tabindex="-1"></a>  yhat_keras_prob_vec <span class="ot">&lt;-</span></span>
+<span id="cb141-14"><a href="churn.html#cb141-14" aria-hidden="true" tabindex="-1"></a>    model <span class="sc">%&gt;%</span></span>
+<span id="cb141-15"><a href="churn.html#cb141-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict_proba</span>(x_test_tbl) <span class="sc">%&gt;%</span></span>
+<span id="cb141-16"><a href="churn.html#cb141-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.vector</span>()</span>
+<span id="cb141-17"><a href="churn.html#cb141-17" aria-hidden="true" tabindex="-1"></a>  test_truth <span class="ot">&lt;-</span> y_test_vec <span class="sc">%&gt;%</span></span>
+<span id="cb141-18"><a href="churn.html#cb141-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.factor</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb141-19"><a href="churn.html#cb141-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fct_recode</span>(<span class="at">yes =</span> <span class="st">&quot;1&quot;</span>, <span class="at">no =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb141-20"><a href="churn.html#cb141-20" aria-hidden="true" tabindex="-1"></a>  estimates_keras_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb141-21"><a href="churn.html#cb141-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">truth =</span> test_truth,</span>
+<span id="cb141-22"><a href="churn.html#cb141-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> yhat_keras_class_vec,</span>
+<span id="cb141-23"><a href="churn.html#cb141-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">class_prob =</span> yhat_keras_prob_vec</span>
+<span id="cb141-24"><a href="churn.html#cb141-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb141-25"><a href="churn.html#cb141-25" aria-hidden="true" tabindex="-1"></a>  estimates_keras_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb141-26"><a href="churn.html#cb141-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">conf_mat</span>(truth, estimate)</span>
+<span id="cb141-27"><a href="churn.html#cb141-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>and compare the performance of multiple models.</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="churn.html#cb144-1" aria-hidden="true"></a>compare_models &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</span>
-<span id="cb144-2"><a href="churn.html#cb144-2" aria-hidden="true"></a>  name &lt;-<span class="st"> </span><span class="kw">match.call</span>()[<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span></span>
-<span id="cb144-3"><a href="churn.html#cb144-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.character</span>()</span>
-<span id="cb144-4"><a href="churn.html#cb144-4" aria-hidden="true"></a>  df &lt;-<span class="st"> </span><span class="kw">map_df</span>(<span class="kw">list</span>(...), summary) <span class="op">%&gt;%</span></span>
-<span id="cb144-5"><a href="churn.html#cb144-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">filter</span>(.metric <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;accuracy&quot;</span>, <span class="st">&quot;sens&quot;</span>, <span class="st">&quot;spec&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb144-6"><a href="churn.html#cb144-6" aria-hidden="true"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">name =</span> <span class="kw">rep</span>(name, <span class="dt">each =</span> <span class="kw">n</span>() <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(name))) <span class="op">%&gt;%</span></span>
-<span id="cb144-7"><a href="churn.html#cb144-7" aria-hidden="true"></a><span class="st">    </span><span class="kw">rename</span>(<span class="dt">metric =</span> .metric, <span class="dt">estimate =</span> .estimate)</span>
-<span id="cb144-8"><a href="churn.html#cb144-8" aria-hidden="true"></a>  <span class="kw">ggplot</span>(df) <span class="op">+</span></span>
-<span id="cb144-9"><a href="churn.html#cb144-9" aria-hidden="true"></a><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> metric, <span class="dt">y =</span> estimate, <span class="dt">color =</span> name, <span class="dt">group =</span> name)) <span class="op">+</span></span>
-<span id="cb144-10"><a href="churn.html#cb144-10" aria-hidden="true"></a><span class="st">    </span><span class="kw">theme_gray</span>(<span class="dv">24</span>)</span>
-<span id="cb144-11"><a href="churn.html#cb144-11" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="churn.html#cb142-1" aria-hidden="true" tabindex="-1"></a>compare_models <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb142-2"><a href="churn.html#cb142-2" aria-hidden="true" tabindex="-1"></a>  name <span class="ot">&lt;-</span> <span class="fu">match.call</span>()[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">%&gt;%</span></span>
+<span id="cb142-3"><a href="churn.html#cb142-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>()</span>
+<span id="cb142-4"><a href="churn.html#cb142-4" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">map_df</span>(<span class="fu">list</span>(...), summary) <span class="sc">%&gt;%</span></span>
+<span id="cb142-5"><a href="churn.html#cb142-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(.metric <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>, <span class="st">&quot;sens&quot;</span>, <span class="st">&quot;spec&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb142-6"><a href="churn.html#cb142-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">rep</span>(name, <span class="at">each =</span> <span class="fu">n</span>() <span class="sc">/</span> <span class="fu">length</span>(name))) <span class="sc">%&gt;%</span></span>
+<span id="cb142-7"><a href="churn.html#cb142-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">metric =</span> .metric, <span class="at">estimate =</span> .estimate)</span>
+<span id="cb142-8"><a href="churn.html#cb142-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df) <span class="sc">+</span></span>
+<span id="cb142-9"><a href="churn.html#cb142-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> metric, <span class="at">y =</span> estimate, <span class="at">color =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
+<span id="cb142-10"><a href="churn.html#cb142-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_gray</span>(<span class="dv">24</span>)</span>
+<span id="cb142-11"><a href="churn.html#cb142-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="churn-plan" class="section level2" number="9.3">
 <h2><span class="header-section-number">9.3</span> Churn plan</h2>
 <p>Next, we define our workflow in a <a href="https://books.ropensci.org/drake/plans.html"><code>drake</code> plan</a>. We will prepare the data, train different models with different activation functions, and compare the models in terms of performance.</p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="churn.html#cb145-1" aria-hidden="true"></a>activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb145-2"><a href="churn.html#cb145-2" aria-hidden="true"></a></span>
-<span id="cb145-3"><a href="churn.html#cb145-3" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb145-4"><a href="churn.html#cb145-4" aria-hidden="true"></a>  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb145-5"><a href="churn.html#cb145-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</span>
-<span id="cb145-6"><a href="churn.html#cb145-6" aria-hidden="true"></a>  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</span>
-<span id="cb145-7"><a href="churn.html#cb145-7" aria-hidden="true"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb145-8"><a href="churn.html#cb145-8" aria-hidden="true"></a>    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</span>
-<span id="cb145-9"><a href="churn.html#cb145-9" aria-hidden="true"></a>    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></span>
-<span id="cb145-10"><a href="churn.html#cb145-10" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</span>
-<span id="cb145-11"><a href="churn.html#cb145-11" aria-hidden="true"></a>  ),</span>
-<span id="cb145-12"><a href="churn.html#cb145-12" aria-hidden="true"></a>  <span class="dt">conf =</span> <span class="kw">target</span>(</span>
-<span id="cb145-13"><a href="churn.html#cb145-13" aria-hidden="true"></a>    <span class="kw">confusion_matrix</span>(data, rec, model),</span>
-<span id="cb145-14"><a href="churn.html#cb145-14" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</span>
-<span id="cb145-15"><a href="churn.html#cb145-15" aria-hidden="true"></a>  ),</span>
-<span id="cb145-16"><a href="churn.html#cb145-16" aria-hidden="true"></a>  <span class="dt">metrics =</span> <span class="kw">target</span>(</span>
-<span id="cb145-17"><a href="churn.html#cb145-17" aria-hidden="true"></a>    <span class="kw">compare_models</span>(conf),</span>
-<span id="cb145-18"><a href="churn.html#cb145-18" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</span>
-<span id="cb145-19"><a href="churn.html#cb145-19" aria-hidden="true"></a>  )</span>
-<span id="cb145-20"><a href="churn.html#cb145-20" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="churn.html#cb143-1" aria-hidden="true" tabindex="-1"></a>activations <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb143-2"><a href="churn.html#cb143-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb143-3"><a href="churn.html#cb143-3" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb143-4"><a href="churn.html#cb143-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">read_csv</span>(<span class="fu">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="at">col_types =</span> <span class="fu">cols</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb143-5"><a href="churn.html#cb143-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">initial_split</span>(<span class="at">prop =</span> <span class="fl">0.3</span>),</span>
+<span id="cb143-6"><a href="churn.html#cb143-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">rec =</span> <span class="fu">prepare_recipe</span>(data),</span>
+<span id="cb143-7"><a href="churn.html#cb143-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">target</span>(</span>
+<span id="cb143-8"><a href="churn.html#cb143-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">train_model</span>(rec, <span class="at">act1 =</span> act),</span>
+<span id="cb143-9"><a href="churn.html#cb143-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></span>
+<span id="cb143-10"><a href="churn.html#cb143-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">act =</span> <span class="sc">!!</span>activations)</span>
+<span id="cb143-11"><a href="churn.html#cb143-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb143-12"><a href="churn.html#cb143-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">conf =</span> <span class="fu">target</span>(</span>
+<span id="cb143-13"><a href="churn.html#cb143-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">confusion_matrix</span>(data, rec, model),</span>
+<span id="cb143-14"><a href="churn.html#cb143-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(model, <span class="at">.id =</span> act)</span>
+<span id="cb143-15"><a href="churn.html#cb143-15" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb143-16"><a href="churn.html#cb143-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">target</span>(</span>
+<span id="cb143-17"><a href="churn.html#cb143-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compare_models</span>(conf),</span>
+<span id="cb143-18"><a href="churn.html#cb143-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">combine</span>(conf)</span>
+<span id="cb143-19"><a href="churn.html#cb143-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb143-20"><a href="churn.html#cb143-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>The plan is a data frame with the steps we are going to do.</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="churn.html#cb146-1" aria-hidden="true"></a>plan</span>
-<span id="cb146-2"><a href="churn.html#cb146-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 7 x 3</span></span>
-<span id="cb146-3"><a href="churn.html#cb146-3" aria-hidden="true"></a><span class="co">#&gt;   target       command                                                    format</span></span>
-<span id="cb146-4"><a href="churn.html#cb146-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;expr_lst&gt;                                                 &lt;chr&gt; </span></span>
-<span id="cb146-5"><a href="churn.html#cb146-5" aria-hidden="true"></a><span class="co">#&gt; 1 conf_relu    confusion_matrix(data, rec, model_relu)                  … &lt;NA&gt;  </span></span>
-<span id="cb146-6"><a href="churn.html#cb146-6" aria-hidden="true"></a><span class="co">#&gt; 2 conf_sigmoid confusion_matrix(data, rec, model_sigmoid)               … &lt;NA&gt;  </span></span>
-<span id="cb146-7"><a href="churn.html#cb146-7" aria-hidden="true"></a><span class="co">#&gt; 3 data         read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols(… &lt;NA&gt;  </span></span>
-<span id="cb146-8"><a href="churn.html#cb146-8" aria-hidden="true"></a><span class="co">#&gt; 4 metrics      compare_models(conf_relu, conf_sigmoid)                  … &lt;NA&gt;  </span></span>
-<span id="cb146-9"><a href="churn.html#cb146-9" aria-hidden="true"></a><span class="co">#&gt; 5 model_relu   train_model(rec, act1 = &quot;relu&quot;)                          … keras </span></span>
-<span id="cb146-10"><a href="churn.html#cb146-10" aria-hidden="true"></a><span class="co">#&gt; 6 model_sigmo… train_model(rec, act1 = &quot;sigmoid&quot;)                       … keras </span></span>
-<span id="cb146-11"><a href="churn.html#cb146-11" aria-hidden="true"></a><span class="co">#&gt; 7 rec          prepare_recipe(data)                                     … &lt;NA&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="churn.html#cb144-1" aria-hidden="true" tabindex="-1"></a>plan</span>
+<span id="cb144-2"><a href="churn.html#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 7 x 3</span></span>
+<span id="cb144-3"><a href="churn.html#cb144-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   target       command                                                    format</span></span>
+<span id="cb144-4"><a href="churn.html#cb144-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;expr_lst&gt;                                                 &lt;chr&gt; </span></span>
+<span id="cb144-5"><a href="churn.html#cb144-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 conf_relu    confusion_matrix(data, rec, model_relu)                  … &lt;NA&gt;  </span></span>
+<span id="cb144-6"><a href="churn.html#cb144-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 conf_sigmoid confusion_matrix(data, rec, model_sigmoid)               … &lt;NA&gt;  </span></span>
+<span id="cb144-7"><a href="churn.html#cb144-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 data         read_csv(file_in(&quot;customer_churn.csv&quot;), col_types = cols(… &lt;NA&gt;  </span></span>
+<span id="cb144-8"><a href="churn.html#cb144-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 metrics      compare_models(conf_relu, conf_sigmoid)                  … &lt;NA&gt;  </span></span>
+<span id="cb144-9"><a href="churn.html#cb144-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 model_relu   train_model(rec, act1 = &quot;relu&quot;)                          … keras </span></span>
+<span id="cb144-10"><a href="churn.html#cb144-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 model_sigmo… train_model(rec, act1 = &quot;sigmoid&quot;)                       … keras </span></span>
+<span id="cb144-11"><a href="churn.html#cb144-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 rec          prepare_recipe(data)                                     … &lt;NA&gt;</span></span></code></pre></div>
 </div>
 <div id="churn-dependency-graph" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Churn dependency graph</h2>
 <p>The graph visualizes the dependency relationships among the steps of the workflow.</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="churn.html#cb147-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
-<div id="htmlwidget-a4082786421a9e3275e7" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a4082786421a9e3275e7">{"x":{"nodes":{"id":["prepare_recipe","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","compare_models","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false],"label":["prepare_recipe","confusion_matrix","define_model","file customer_churn.csv","compare_models","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"status":["imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","file","function","function","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","square","triangle","triangle","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["prepare_recipe","data","data","data","train_model","train_model","rec","rec","rec","rec","model_relu","confusion_matrix","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","model_sigmoid","conf_sigmoid","compare_models","conf_relu"],"to":["rec","rec","conf_sigmoid","conf_relu","model_relu","model_sigmoid","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_relu","conf_sigmoid","conf_relu","train_model","data","conf_sigmoid","metrics","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":{"type":"cubicBezier","forceDirection":"horizontal"}},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="churn.html#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vis_drake_graph</span>(plan)</span></code></pre></div>
+<div id="htmlwidget-c77ac61219542bacf14a" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c77ac61219542bacf14a">{"x":{"nodes":{"id":["prepare_recipe","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","compare_models","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"imported":[true,true,true,true,true,true,false,false,false,false,false,false,false],"label":["prepare_recipe","confusion_matrix","define_model","file customer_churn.csv","compare_models","train_model","data","rec","model_relu","model_sigmoid","conf_relu","conf_sigmoid","metrics"],"status":["imported","imported","imported","imported","imported","imported","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"type":["function","function","function","file","function","function","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#000000","#000000","#000000","#000000","#000000","#000000","#000000"],"shape":["triangle","triangle","triangle","square","triangle","triangle","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.5,0.5,-0.5,0.5,2.22044604925031e-16]},"edges":{"from":["prepare_recipe","data","data","data","train_model","train_model","rec","rec","rec","rec","model_relu","confusion_matrix","confusion_matrix","define_model","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","model_sigmoid","conf_sigmoid","compare_models","conf_relu"],"to":["rec","rec","conf_sigmoid","conf_relu","model_relu","model_sigmoid","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_relu","conf_sigmoid","conf_relu","train_model","data","conf_sigmoid","metrics","metrics","metrics"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":{"type":"cubicBezier","forceDirection":"horizontal"}},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Imported","Object","Function","File"],"color":["#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black"],"font.size":[20,20,20,20,20],"id":[2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="run-the-keras-models" class="section level2" number="9.5">
 <h2><span class="header-section-number">9.5</span> Run the Keras models</h2>
 <p>Call <a href="https://docs.ropensci.org/drake/reference/make.html"><code>make()</code></a> to actually run the workflow.</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="churn.html#cb148-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb148-2"><a href="churn.html#cb148-2" aria-hidden="true"></a><span class="co">#&gt; ▶ target data</span></span>
-<span id="cb148-3"><a href="churn.html#cb148-3" aria-hidden="true"></a><span class="co">#&gt; ▶ target rec</span></span>
-<span id="cb148-4"><a href="churn.html#cb148-4" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_relu</span></span>
-<span id="cb148-5"><a href="churn.html#cb148-5" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_sigmoid</span></span>
-<span id="cb148-6"><a href="churn.html#cb148-6" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_relu</span></span>
-<span id="cb148-7"><a href="churn.html#cb148-7" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_sigmoid</span></span>
-<span id="cb148-8"><a href="churn.html#cb148-8" aria-hidden="true"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="churn.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan)</span>
+<span id="cb146-2"><a href="churn.html#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target data</span></span>
+<span id="cb146-3"><a href="churn.html#cb146-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target rec</span></span>
+<span id="cb146-4"><a href="churn.html#cb146-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_relu</span></span>
+<span id="cb146-5"><a href="churn.html#cb146-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_sigmoid</span></span>
+<span id="cb146-6"><a href="churn.html#cb146-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_relu</span></span>
+<span id="cb146-7"><a href="churn.html#cb146-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_sigmoid</span></span>
+<span id="cb146-8"><a href="churn.html#cb146-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
 </div>
 <div id="inspect-the-keras-results" class="section level2" number="9.6">
 <h2><span class="header-section-number">9.6</span> Inspect the Keras results</h2>
 <p>The two models performed about the same.</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="churn.html#cb149-1" aria-hidden="true"></a><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></span></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="churn.html#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">readd</span>(metrics) <span class="co"># see also loadd()</span></span></code></pre></div>
 <p><img src="drake-manual_files/figure-html/unnamed-chunk-157-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="add-keras-models" class="section level2" number="9.7">
 <h2><span class="header-section-number">9.7</span> Add Keras models</h2>
 <p>Let’s try the softmax activation function.</p>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="churn.html#cb150-1" aria-hidden="true"></a>activations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)</span>
-<span id="cb150-2"><a href="churn.html#cb150-2" aria-hidden="true"></a></span>
-<span id="cb150-3"><a href="churn.html#cb150-3" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb150-4"><a href="churn.html#cb150-4" aria-hidden="true"></a>  <span class="dt">data =</span> <span class="kw">read_csv</span>(<span class="kw">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="dt">col_types =</span> <span class="kw">cols</span>()) <span class="op">%&gt;%</span></span>
-<span id="cb150-5"><a href="churn.html#cb150-5" aria-hidden="true"></a><span class="st">    </span><span class="kw">initial_split</span>(<span class="dt">prop =</span> <span class="fl">0.3</span>),</span>
-<span id="cb150-6"><a href="churn.html#cb150-6" aria-hidden="true"></a>  <span class="dt">rec =</span> <span class="kw">prepare_recipe</span>(data),</span>
-<span id="cb150-7"><a href="churn.html#cb150-7" aria-hidden="true"></a>  <span class="dt">model =</span> <span class="kw">target</span>(</span>
-<span id="cb150-8"><a href="churn.html#cb150-8" aria-hidden="true"></a>    <span class="kw">train_model</span>(rec, <span class="dt">act1 =</span> act),</span>
-<span id="cb150-9"><a href="churn.html#cb150-9" aria-hidden="true"></a>    <span class="dt">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></span>
-<span id="cb150-10"><a href="churn.html#cb150-10" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">act =</span> <span class="op">!!</span>activations)</span>
-<span id="cb150-11"><a href="churn.html#cb150-11" aria-hidden="true"></a>  ),</span>
-<span id="cb150-12"><a href="churn.html#cb150-12" aria-hidden="true"></a>  <span class="dt">conf =</span> <span class="kw">target</span>(</span>
-<span id="cb150-13"><a href="churn.html#cb150-13" aria-hidden="true"></a>    <span class="kw">confusion_matrix</span>(data, rec, model),</span>
-<span id="cb150-14"><a href="churn.html#cb150-14" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(model, <span class="dt">.id =</span> act)</span>
-<span id="cb150-15"><a href="churn.html#cb150-15" aria-hidden="true"></a>  ),</span>
-<span id="cb150-16"><a href="churn.html#cb150-16" aria-hidden="true"></a>  <span class="dt">metrics =</span> <span class="kw">target</span>(</span>
-<span id="cb150-17"><a href="churn.html#cb150-17" aria-hidden="true"></a>    <span class="kw">compare_models</span>(conf),</span>
-<span id="cb150-18"><a href="churn.html#cb150-18" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(conf)</span>
-<span id="cb150-19"><a href="churn.html#cb150-19" aria-hidden="true"></a>  )</span>
-<span id="cb150-20"><a href="churn.html#cb150-20" aria-hidden="true"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="churn.html#cb151-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan) <span class="co"># see also outdated() and predict_runtime()</span></span></code></pre></div>
-<div id="htmlwidget-95dd65ac6b4d54206e3f" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-95dd65ac6b4d54206e3f">{"x":{"nodes":{"id":["confusion_matrix","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","define_model","compare_models","prepare_recipe","data","train_model","rec","model_relu","model_sigmoid","model_softmax","conf_relu","conf_sigmoid","conf_softmax","metrics"],"imported":[true,true,true,true,true,false,true,false,false,false,false,false,false,false,false],"label":["confusion_matrix","file customer_churn.csv","define_model","compare_models","prepare_recipe","data\n0.13s","train_model","rec\n0.472s","model_relu\n18.493s","model_sigmoid\n4.247s","model_softmax","conf_relu\n0.506s","conf_sigmoid\n0.432s","conf_softmax","metrics\n0.073s"],"status":["imported","imported","imported","imported","imported","up to date","imported","up to date","up to date","up to date","outdated","up to date","up to date","outdated","outdated"],"type":["function","file","function","function","function","object","function","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#1874CD","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#000000"],"shape":["triangle","square","triangle","triangle","triangle","dot","triangle","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","model_relu","confusion_matrix","confusion_matrix","confusion_matrix","data","data","data","data","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","define_model","compare_models","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","prepare_recipe","model_softmax"],"to":["model_relu","model_sigmoid","model_softmax","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","model_softmax","conf_relu","conf_sigmoid","conf_relu","conf_softmax","rec","conf_sigmoid","conf_relu","conf_softmax","data","train_model","metrics","conf_sigmoid","metrics","metrics","metrics","rec","conf_softmax"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":{"type":"cubicBezier","forceDirection":"horizontal"}},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="churn.html#cb148-1" aria-hidden="true" tabindex="-1"></a>activations <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;relu&quot;</span>, <span class="st">&quot;sigmoid&quot;</span>, <span class="st">&quot;softmax&quot;</span>)</span>
+<span id="cb148-2"><a href="churn.html#cb148-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb148-3"><a href="churn.html#cb148-3" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb148-4"><a href="churn.html#cb148-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">read_csv</span>(<span class="fu">file_in</span>(<span class="st">&quot;customer_churn.csv&quot;</span>), <span class="at">col_types =</span> <span class="fu">cols</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb148-5"><a href="churn.html#cb148-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">initial_split</span>(<span class="at">prop =</span> <span class="fl">0.3</span>),</span>
+<span id="cb148-6"><a href="churn.html#cb148-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">rec =</span> <span class="fu">prepare_recipe</span>(data),</span>
+<span id="cb148-7"><a href="churn.html#cb148-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">target</span>(</span>
+<span id="cb148-8"><a href="churn.html#cb148-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">train_model</span>(rec, <span class="at">act1 =</span> act),</span>
+<span id="cb148-9"><a href="churn.html#cb148-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">format =</span> <span class="st">&quot;keras&quot;</span>, <span class="co"># Supported in drake &gt; 7.5.2 to store models properly.</span></span>
+<span id="cb148-10"><a href="churn.html#cb148-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">act =</span> <span class="sc">!!</span>activations)</span>
+<span id="cb148-11"><a href="churn.html#cb148-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb148-12"><a href="churn.html#cb148-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">conf =</span> <span class="fu">target</span>(</span>
+<span id="cb148-13"><a href="churn.html#cb148-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">confusion_matrix</span>(data, rec, model),</span>
+<span id="cb148-14"><a href="churn.html#cb148-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(model, <span class="at">.id =</span> act)</span>
+<span id="cb148-15"><a href="churn.html#cb148-15" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb148-16"><a href="churn.html#cb148-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">target</span>(</span>
+<span id="cb148-17"><a href="churn.html#cb148-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compare_models</span>(conf),</span>
+<span id="cb148-18"><a href="churn.html#cb148-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">combine</span>(conf)</span>
+<span id="cb148-19"><a href="churn.html#cb148-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb148-20"><a href="churn.html#cb148-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="churn.html#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vis_drake_graph</span>(plan) <span class="co"># see also outdated() and predict_runtime()</span></span></code></pre></div>
+<div id="htmlwidget-0aabf184e352accdfe83" style="width:576px;height:576px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0aabf184e352accdfe83">{"x":{"nodes":{"id":["confusion_matrix","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","define_model","compare_models","prepare_recipe","data","train_model","rec","model_relu","model_sigmoid","model_softmax","conf_relu","conf_sigmoid","conf_softmax","metrics"],"imported":[true,true,true,true,true,false,true,false,false,false,false,false,false,false,false],"label":["confusion_matrix","file customer_churn.csv","define_model","compare_models","prepare_recipe","data\n0.143s","train_model","rec\n0.505s","model_relu\n11.024s","model_sigmoid\n5.929s","model_softmax","conf_relu\n0.566s","conf_sigmoid\n0.389s","conf_softmax","metrics\n0.075s"],"status":["imported","imported","imported","imported","imported","up to date","imported","up to date","up to date","up to date","outdated","up to date","up to date","outdated","outdated"],"type":["function","file","function","function","function","object","function","object","object","object","object","object","object","object","object"],"font.size":[20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"color":["#1874CD","#1874CD","#1874CD","#1874CD","#1874CD","#228B22","#1874CD","#228B22","#228B22","#228B22","#000000","#228B22","#228B22","#000000","#000000"],"shape":["triangle","square","triangle","triangle","triangle","dot","triangle","dot","dot","dot","dot","dot","dot","dot","dot"],"level":[1,1,1,1,1,2,2,3,4,4,4,5,5,5,6],"x":[-1,-1,-1,-1,-1,-0.6,-0.6,-0.2,0.2,0.2,0.2,0.6,0.6,0.6,1],"y":[-1,-0.5,2.22044604925031e-16,0.5,1,-0.5,0.5,2.22044604925031e-16,-0.75,2.22044604925031e-16,0.75,-0.75,2.22044604925031e-16,0.75,2.22044604925031e-16]},"edges":{"from":["train_model","train_model","train_model","rec","rec","rec","rec","rec","rec","model_relu","confusion_matrix","confusion_matrix","confusion_matrix","data","data","data","data","p-MN2XG5DPNVSXEX3DNB2XE3ROMNZXM","define_model","compare_models","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","prepare_recipe","model_softmax"],"to":["model_relu","model_sigmoid","model_softmax","model_relu","model_sigmoid","conf_sigmoid","conf_relu","conf_softmax","model_softmax","conf_relu","conf_sigmoid","conf_relu","conf_softmax","rec","conf_sigmoid","conf_relu","conf_softmax","data","train_model","metrics","conf_sigmoid","metrics","metrics","metrics","rec","conf_softmax"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":{"type":"cubicBezier","forceDirection":"horizontal"}},"interaction":{"navigationButtons":true},"layout":{"hierarchical":{"enabled":true,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"Dependency graph","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":false,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Up to date","Outdated","Imported","Object","Function","File"],"color":["#228B22","#000000","#1874CD","#888888","#888888","#888888"],"shape":["dot","dot","dot","dot","triangle","square"],"font.color":["black","black","black","black","black","black"],"font.size":[20,20,20,20,20,20],"id":[1,2,6,8,10,11]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 <p><a href="https://docs.ropensci.org/drake/reference/make.html"><code>make()</code></a> skips the relu and sigmoid models because they are already up to date. (Their dependencies did not change.) Only the softmax model needs to run.</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="churn.html#cb152-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb152-2"><a href="churn.html#cb152-2" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_softmax</span></span>
-<span id="cb152-3"><a href="churn.html#cb152-3" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_softmax</span></span>
-<span id="cb152-4"><a href="churn.html#cb152-4" aria-hidden="true"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="churn.html#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan)</span>
+<span id="cb150-2"><a href="churn.html#cb150-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_softmax</span></span>
+<span id="cb150-3"><a href="churn.html#cb150-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_softmax</span></span>
+<span id="cb150-4"><a href="churn.html#cb150-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
 </div>
 <div id="inspect-the-churn-results-again" class="section level2" number="9.8">
 <h2><span class="header-section-number">9.8</span> Inspect the Churn results again</h2>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="churn.html#cb153-1" aria-hidden="true"></a><span class="kw">readd</span>(metrics) <span class="co"># see also loadd()</span></span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="churn.html#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">readd</span>(metrics) <span class="co"># see also loadd()</span></span></code></pre></div>
 <p><img src="drake-manual_files/figure-html/unnamed-chunk-161-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="update-the-churn-code" class="section level2" number="9.9">
 <h2><span class="header-section-number">9.9</span> Update the Churn code</h2>
 <p>If you change upstream functions, even nested ones, <code>drake</code> automatically refits the affected models. Let’s increase dropout in both layers.</p>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="churn.html#cb154-1" aria-hidden="true"></a>define_model &lt;-<span class="st"> </span><span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</span>
-<span id="cb154-2"><a href="churn.html#cb154-2" aria-hidden="true"></a>  input_shape &lt;-<span class="st"> </span><span class="kw">ncol</span>(</span>
-<span id="cb154-3"><a href="churn.html#cb154-3" aria-hidden="true"></a>    <span class="kw">juice</span>(rec, <span class="kw">all_predictors</span>(), <span class="dt">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb154-4"><a href="churn.html#cb154-4" aria-hidden="true"></a>  )</span>
-<span id="cb154-5"><a href="churn.html#cb154-5" aria-hidden="true"></a>  <span class="kw">keras_model_sequential</span>() <span class="op">%&gt;%</span></span>
-<span id="cb154-6"><a href="churn.html#cb154-6" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb154-7"><a href="churn.html#cb154-7" aria-hidden="true"></a>      <span class="dt">units =</span> units1,</span>
-<span id="cb154-8"><a href="churn.html#cb154-8" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb154-9"><a href="churn.html#cb154-9" aria-hidden="true"></a>      <span class="dt">activation =</span> act1,</span>
-<span id="cb154-10"><a href="churn.html#cb154-10" aria-hidden="true"></a>      <span class="dt">input_shape =</span> input_shape</span>
-<span id="cb154-11"><a href="churn.html#cb154-11" aria-hidden="true"></a>    ) <span class="op">%&gt;%</span></span>
-<span id="cb154-12"><a href="churn.html#cb154-12" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></span>
-<span id="cb154-13"><a href="churn.html#cb154-13" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb154-14"><a href="churn.html#cb154-14" aria-hidden="true"></a>      <span class="dt">units =</span> units2,</span>
-<span id="cb154-15"><a href="churn.html#cb154-15" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb154-16"><a href="churn.html#cb154-16" aria-hidden="true"></a>      <span class="dt">activation =</span> act2</span>
-<span id="cb154-17"><a href="churn.html#cb154-17" aria-hidden="true"></a>    ) <span class="op">%&gt;%</span></span>
-<span id="cb154-18"><a href="churn.html#cb154-18" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.15</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Changed from 0.1 to 0.15.</span></span>
-<span id="cb154-19"><a href="churn.html#cb154-19" aria-hidden="true"></a><span class="st">    </span><span class="kw">layer_dense</span>(</span>
-<span id="cb154-20"><a href="churn.html#cb154-20" aria-hidden="true"></a>      <span class="dt">units =</span> <span class="dv">1</span>,</span>
-<span id="cb154-21"><a href="churn.html#cb154-21" aria-hidden="true"></a>      <span class="dt">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
-<span id="cb154-22"><a href="churn.html#cb154-22" aria-hidden="true"></a>      <span class="dt">activation =</span> act3</span>
-<span id="cb154-23"><a href="churn.html#cb154-23" aria-hidden="true"></a>    )</span>
-<span id="cb154-24"><a href="churn.html#cb154-24" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="churn.html#cb152-1" aria-hidden="true" tabindex="-1"></a>define_model <span class="ot">&lt;-</span> <span class="cf">function</span>(rec, units1, units2, act1, act2, act3) {</span>
+<span id="cb152-2"><a href="churn.html#cb152-2" aria-hidden="true" tabindex="-1"></a>  input_shape <span class="ot">&lt;-</span> <span class="fu">ncol</span>(</span>
+<span id="cb152-3"><a href="churn.html#cb152-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">juice</span>(rec, <span class="fu">all_predictors</span>(), <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb152-4"><a href="churn.html#cb152-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb152-5"><a href="churn.html#cb152-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb152-6"><a href="churn.html#cb152-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb152-7"><a href="churn.html#cb152-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> units1,</span>
+<span id="cb152-8"><a href="churn.html#cb152-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb152-9"><a href="churn.html#cb152-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act1,</span>
+<span id="cb152-10"><a href="churn.html#cb152-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">input_shape =</span> input_shape</span>
+<span id="cb152-11"><a href="churn.html#cb152-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb152-12"><a href="churn.html#cb152-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.15</span>) <span class="sc">%&gt;%</span> <span class="co"># Changed from 0.1 to 0.15.</span></span>
+<span id="cb152-13"><a href="churn.html#cb152-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb152-14"><a href="churn.html#cb152-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> units2,</span>
+<span id="cb152-15"><a href="churn.html#cb152-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb152-16"><a href="churn.html#cb152-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act2</span>
+<span id="cb152-17"><a href="churn.html#cb152-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb152-18"><a href="churn.html#cb152-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.15</span>) <span class="sc">%&gt;%</span> <span class="co"># Changed from 0.1 to 0.15.</span></span>
+<span id="cb152-19"><a href="churn.html#cb152-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(</span>
+<span id="cb152-20"><a href="churn.html#cb152-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> <span class="dv">1</span>,</span>
+<span id="cb152-21"><a href="churn.html#cb152-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">kernel_initializer =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb152-22"><a href="churn.html#cb152-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">activation =</span> act3</span>
+<span id="cb152-23"><a href="churn.html#cb152-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb152-24"><a href="churn.html#cb152-24" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>All the models and downstream results are affected.</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="churn.html#cb155-1" aria-hidden="true"></a><span class="kw">make</span>(plan)</span>
-<span id="cb155-2"><a href="churn.html#cb155-2" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_relu</span></span>
-<span id="cb155-3"><a href="churn.html#cb155-3" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_sigmoid</span></span>
-<span id="cb155-4"><a href="churn.html#cb155-4" aria-hidden="true"></a><span class="co">#&gt; ▶ target model_softmax</span></span>
-<span id="cb155-5"><a href="churn.html#cb155-5" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_relu</span></span>
-<span id="cb155-6"><a href="churn.html#cb155-6" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_sigmoid</span></span>
-<span id="cb155-7"><a href="churn.html#cb155-7" aria-hidden="true"></a><span class="co">#&gt; ▶ target conf_softmax</span></span>
-<span id="cb155-8"><a href="churn.html#cb155-8" aria-hidden="true"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="churn.html#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan)</span>
+<span id="cb153-2"><a href="churn.html#cb153-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_relu</span></span>
+<span id="cb153-3"><a href="churn.html#cb153-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_sigmoid</span></span>
+<span id="cb153-4"><a href="churn.html#cb153-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target model_softmax</span></span>
+<span id="cb153-5"><a href="churn.html#cb153-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_relu</span></span>
+<span id="cb153-6"><a href="churn.html#cb153-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_sigmoid</span></span>
+<span id="cb153-7"><a href="churn.html#cb153-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target conf_softmax</span></span>
+<span id="cb153-8"><a href="churn.html#cb153-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ▶ target metrics</span></span></code></pre></div>
 </div>
 <div id="churn-history-and-provenance" class="section level2" number="9.10">
 <h2><span class="header-section-number">9.10</span> Churn history and provenance</h2>
 <p><code>drake</code> tracks history and provenance. You can see which models you ran, when you ran them, how long they took, and which settings you tried (i.e. named arguments to function calls in your commands).</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="churn.html#cb156-1" aria-hidden="true"></a>history &lt;-<span class="st"> </span><span class="kw">drake_history</span>()</span>
-<span id="cb156-2"><a href="churn.html#cb156-2" aria-hidden="true"></a>history</span>
-<span id="cb156-3"><a href="churn.html#cb156-3" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 17 x 10</span></span>
-<span id="cb156-4"><a href="churn.html#cb156-4" aria-hidden="true"></a><span class="co">#&gt;    target  current built    exists hash  command        seed runtime  prop act1 </span></span>
-<span id="cb156-5"><a href="churn.html#cb156-5" aria-hidden="true"></a><span class="co">#&gt;    &lt;chr&gt;   &lt;lgl&gt;   &lt;chr&gt;    &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;         &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;</span></span>
-<span id="cb156-6"><a href="churn.html#cb156-6" aria-hidden="true"></a><span class="co">#&gt;  1 conf_r… FALSE   2020-10… TRUE   a67a… &quot;confusion_… 4.05e8  0.501   NA   &lt;NA&gt; </span></span>
-<span id="cb156-7"><a href="churn.html#cb156-7" aria-hidden="true"></a><span class="co">#&gt;  2 conf_r… TRUE    2020-10… TRUE   979f… &quot;confusion_… 4.05e8  0.638   NA   &lt;NA&gt; </span></span>
-<span id="cb156-8"><a href="churn.html#cb156-8" aria-hidden="true"></a><span class="co">#&gt;  3 conf_s… FALSE   2020-10… TRUE   4a7b… &quot;confusion_… 1.93e9  0.428   NA   &lt;NA&gt; </span></span>
-<span id="cb156-9"><a href="churn.html#cb156-9" aria-hidden="true"></a><span class="co">#&gt;  4 conf_s… TRUE    2020-10… TRUE   c372… &quot;confusion_… 1.93e9  0.396   NA   &lt;NA&gt; </span></span>
-<span id="cb156-10"><a href="churn.html#cb156-10" aria-hidden="true"></a><span class="co">#&gt;  5 conf_s… FALSE   2020-10… TRUE   8ed1… &quot;confusion_… 1.80e9  0.641   NA   &lt;NA&gt; </span></span>
-<span id="cb156-11"><a href="churn.html#cb156-11" aria-hidden="true"></a><span class="co">#&gt;  6 conf_s… TRUE    2020-10… TRUE   599c… &quot;confusion_… 1.80e9  0.405   NA   &lt;NA&gt; </span></span>
-<span id="cb156-12"><a href="churn.html#cb156-12" aria-hidden="true"></a><span class="co">#&gt;  7 data    TRUE    2020-10… TRUE   62d3… &quot;read_csv(f… 1.29e9  0.076    0.3 &lt;NA&gt; </span></span>
-<span id="cb156-13"><a href="churn.html#cb156-13" aria-hidden="true"></a><span class="co">#&gt;  8 metrics FALSE   2020-10… TRUE   dcec… &quot;compare_mo… 1.21e9  0.0550  NA   &lt;NA&gt; </span></span>
-<span id="cb156-14"><a href="churn.html#cb156-14" aria-hidden="true"></a><span class="co">#&gt;  9 metrics FALSE   2020-10… TRUE   0d97… &quot;compare_mo… 1.21e9  0.072   NA   &lt;NA&gt; </span></span>
-<span id="cb156-15"><a href="churn.html#cb156-15" aria-hidden="true"></a><span class="co">#&gt; 10 metrics TRUE    2020-10… TRUE   68ab… &quot;compare_mo… 1.21e9  0.06    NA   &lt;NA&gt; </span></span>
-<span id="cb156-16"><a href="churn.html#cb156-16" aria-hidden="true"></a><span class="co">#&gt; 11 model_… FALSE   2020-10… TRUE   2d62… &quot;train_mode… 1.47e9 18.5     NA   relu </span></span>
-<span id="cb156-17"><a href="churn.html#cb156-17" aria-hidden="true"></a><span class="co">#&gt; 12 model_… TRUE    2020-10… TRUE   e89d… &quot;train_mode… 1.47e9  4.23    NA   relu </span></span>
-<span id="cb156-18"><a href="churn.html#cb156-18" aria-hidden="true"></a><span class="co">#&gt; 13 model_… FALSE   2020-10… TRUE   9afc… &quot;train_mode… 1.26e9  4.22    NA   sigm…</span></span>
-<span id="cb156-19"><a href="churn.html#cb156-19" aria-hidden="true"></a><span class="co">#&gt; 14 model_… TRUE    2020-10… TRUE   3dd4… &quot;train_mode… 1.26e9  4.19    NA   sigm…</span></span>
-<span id="cb156-20"><a href="churn.html#cb156-20" aria-hidden="true"></a><span class="co">#&gt; 15 model_… FALSE   2020-10… TRUE   fab3… &quot;train_mode… 8.05e8  4.31    NA   soft…</span></span>
-<span id="cb156-21"><a href="churn.html#cb156-21" aria-hidden="true"></a><span class="co">#&gt; 16 model_… TRUE    2020-10… TRUE   a299… &quot;train_mode… 8.05e8  4.26    NA   soft…</span></span>
-<span id="cb156-22"><a href="churn.html#cb156-22" aria-hidden="true"></a><span class="co">#&gt; 17 rec     TRUE    2020-10… TRUE   1bc4… &quot;prepare_re… 6.29e8  0.286   NA   &lt;NA&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="churn.html#cb154-1" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> <span class="fu">drake_history</span>()</span>
+<span id="cb154-2"><a href="churn.html#cb154-2" aria-hidden="true" tabindex="-1"></a>history</span>
+<span id="cb154-3"><a href="churn.html#cb154-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 17 x 10</span></span>
+<span id="cb154-4"><a href="churn.html#cb154-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    target  current built    exists hash  command        seed runtime  prop act1 </span></span>
+<span id="cb154-5"><a href="churn.html#cb154-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;   &lt;lgl&gt;   &lt;chr&gt;    &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;         &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;</span></span>
+<span id="cb154-6"><a href="churn.html#cb154-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1 conf_r… FALSE   2021-01… TRUE   3c47… &quot;confusion_… 4.05e8  0.561   NA   &lt;NA&gt; </span></span>
+<span id="cb154-7"><a href="churn.html#cb154-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2 conf_r… TRUE    2021-01… TRUE   8e5a… &quot;confusion_… 4.05e8  0.382   NA   &lt;NA&gt; </span></span>
+<span id="cb154-8"><a href="churn.html#cb154-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3 conf_s… FALSE   2021-01… TRUE   9ec4… &quot;confusion_… 1.93e9  0.385   NA   &lt;NA&gt; </span></span>
+<span id="cb154-9"><a href="churn.html#cb154-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4 conf_s… TRUE    2021-01… TRUE   a6dd… &quot;confusion_… 1.93e9  0.393   NA   &lt;NA&gt; </span></span>
+<span id="cb154-10"><a href="churn.html#cb154-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5 conf_s… FALSE   2021-01… TRUE   c797… &quot;confusion_… 1.80e9  0.51    NA   &lt;NA&gt; </span></span>
+<span id="cb154-11"><a href="churn.html#cb154-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6 conf_s… TRUE    2021-01… TRUE   bb10… &quot;confusion_… 1.80e9  0.367   NA   &lt;NA&gt; </span></span>
+<span id="cb154-12"><a href="churn.html#cb154-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  7 data    TRUE    2021-01… TRUE   62d3… &quot;read_csv(f… 1.29e9  0.087    0.3 &lt;NA&gt; </span></span>
+<span id="cb154-13"><a href="churn.html#cb154-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  8 metrics FALSE   2021-01… TRUE   9f5c… &quot;compare_mo… 1.21e9  0.0550  NA   &lt;NA&gt; </span></span>
+<span id="cb154-14"><a href="churn.html#cb154-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  9 metrics FALSE   2021-01… TRUE   eb95… &quot;compare_mo… 1.21e9  0.0770  NA   &lt;NA&gt; </span></span>
+<span id="cb154-15"><a href="churn.html#cb154-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 metrics TRUE    2021-01… TRUE   dc8b… &quot;compare_mo… 1.21e9  0.0620  NA   &lt;NA&gt; </span></span>
+<span id="cb154-16"><a href="churn.html#cb154-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 model_… FALSE   2021-01… TRUE   b58f… &quot;train_mode… 1.47e9 11.0     NA   relu </span></span>
+<span id="cb154-17"><a href="churn.html#cb154-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 model_… TRUE    2021-01… TRUE   23c9… &quot;train_mode… 1.47e9  5.39    NA   relu </span></span>
+<span id="cb154-18"><a href="churn.html#cb154-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 model_… FALSE   2021-01… TRUE   c2dc… &quot;train_mode… 1.26e9  5.89    NA   sigm…</span></span>
+<span id="cb154-19"><a href="churn.html#cb154-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 model_… TRUE    2021-01… TRUE   9b92… &quot;train_mode… 1.26e9  5.68    NA   sigm…</span></span>
+<span id="cb154-20"><a href="churn.html#cb154-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 model_… FALSE   2021-01… TRUE   a284… &quot;train_mode… 8.05e8  5.74    NA   soft…</span></span>
+<span id="cb154-21"><a href="churn.html#cb154-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 model_… TRUE    2021-01… TRUE   6bc4… &quot;train_mode… 8.05e8  5.34    NA   soft…</span></span>
+<span id="cb154-22"><a href="churn.html#cb154-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17 rec     TRUE    2021-01… TRUE   71f6… &quot;prepare_re… 6.29e8  0.302   NA   &lt;NA&gt;</span></span></code></pre></div>
 <p>And as long as you did not run <code>clean(garbage_collection = TRUE)</code>, you can get the old data back. Let’s find the oldest run of the relu model.</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="churn.html#cb157-1" aria-hidden="true"></a>hash &lt;-<span class="st"> </span>history <span class="op">%&gt;%</span></span>
-<span id="cb157-2"><a href="churn.html#cb157-2" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(act1 <span class="op">==</span><span class="st"> &quot;relu&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb157-3"><a href="churn.html#cb157-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">pull</span>(hash) <span class="op">%&gt;%</span></span>
-<span id="cb157-4"><a href="churn.html#cb157-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">head</span>(<span class="dt">n =</span> <span class="dv">1</span>)</span>
-<span id="cb157-5"><a href="churn.html#cb157-5" aria-hidden="true"></a><span class="kw">drake_cache</span>()<span class="op">$</span><span class="kw">get_value</span>(hash)</span>
-<span id="cb157-6"><a href="churn.html#cb157-6" aria-hidden="true"></a><span class="co">#&gt; Model</span></span>
-<span id="cb157-7"><a href="churn.html#cb157-7" aria-hidden="true"></a><span class="co">#&gt; Model: &quot;sequential&quot;</span></span>
-<span id="cb157-8"><a href="churn.html#cb157-8" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span id="cb157-9"><a href="churn.html#cb157-9" aria-hidden="true"></a><span class="co">#&gt; Layer (type)                        Output Shape                    Param #     </span></span>
-<span id="cb157-10"><a href="churn.html#cb157-10" aria-hidden="true"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb157-11"><a href="churn.html#cb157-11" aria-hidden="true"></a><span class="co">#&gt; dense (Dense)                       (None, 16)                      576         </span></span>
-<span id="cb157-12"><a href="churn.html#cb157-12" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span id="cb157-13"><a href="churn.html#cb157-13" aria-hidden="true"></a><span class="co">#&gt; dropout (Dropout)                   (None, 16)                      0           </span></span>
-<span id="cb157-14"><a href="churn.html#cb157-14" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span id="cb157-15"><a href="churn.html#cb157-15" aria-hidden="true"></a><span class="co">#&gt; dense_1 (Dense)                     (None, 16)                      272         </span></span>
-<span id="cb157-16"><a href="churn.html#cb157-16" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span id="cb157-17"><a href="churn.html#cb157-17" aria-hidden="true"></a><span class="co">#&gt; dropout_1 (Dropout)                 (None, 16)                      0           </span></span>
-<span id="cb157-18"><a href="churn.html#cb157-18" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span id="cb157-19"><a href="churn.html#cb157-19" aria-hidden="true"></a><span class="co">#&gt; dense_2 (Dense)                     (None, 1)                       17          </span></span>
-<span id="cb157-20"><a href="churn.html#cb157-20" aria-hidden="true"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb157-21"><a href="churn.html#cb157-21" aria-hidden="true"></a><span class="co">#&gt; Total params: 865</span></span>
-<span id="cb157-22"><a href="churn.html#cb157-22" aria-hidden="true"></a><span class="co">#&gt; Trainable params: 865</span></span>
-<span id="cb157-23"><a href="churn.html#cb157-23" aria-hidden="true"></a><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span id="cb157-24"><a href="churn.html#cb157-24" aria-hidden="true"></a><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="churn.html#cb155-1" aria-hidden="true" tabindex="-1"></a>hash <span class="ot">&lt;-</span> history <span class="sc">%&gt;%</span></span>
+<span id="cb155-2"><a href="churn.html#cb155-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(act1 <span class="sc">==</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb155-3"><a href="churn.html#cb155-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(hash) <span class="sc">%&gt;%</span></span>
+<span id="cb155-4"><a href="churn.html#cb155-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">1</span>)</span>
+<span id="cb155-5"><a href="churn.html#cb155-5" aria-hidden="true" tabindex="-1"></a><span class="fu">drake_cache</span>()<span class="sc">$</span><span class="fu">get_value</span>(hash)</span>
+<span id="cb155-6"><a href="churn.html#cb155-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Model</span></span>
+<span id="cb155-7"><a href="churn.html#cb155-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Model: &quot;sequential&quot;</span></span>
+<span id="cb155-8"><a href="churn.html#cb155-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span id="cb155-9"><a href="churn.html#cb155-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb155-10"><a href="churn.html#cb155-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
+<span id="cb155-11"><a href="churn.html#cb155-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dense_2 (Dense)                     (None, 16)                      576         </span></span>
+<span id="cb155-12"><a href="churn.html#cb155-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span id="cb155-13"><a href="churn.html#cb155-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dropout_1 (Dropout)                 (None, 16)                      0           </span></span>
+<span id="cb155-14"><a href="churn.html#cb155-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span id="cb155-15"><a href="churn.html#cb155-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dense_1 (Dense)                     (None, 16)                      272         </span></span>
+<span id="cb155-16"><a href="churn.html#cb155-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span id="cb155-17"><a href="churn.html#cb155-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dropout (Dropout)                   (None, 16)                      0           </span></span>
+<span id="cb155-18"><a href="churn.html#cb155-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span id="cb155-19"><a href="churn.html#cb155-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dense (Dense)                       (None, 1)                       17          </span></span>
+<span id="cb155-20"><a href="churn.html#cb155-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
+<span id="cb155-21"><a href="churn.html#cb155-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Total params: 865</span></span>
+<span id="cb155-22"><a href="churn.html#cb155-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Trainable params: 865</span></span>
+<span id="cb155-23"><a href="churn.html#cb155-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Non-trainable params: 0</span></span>
+<span id="cb155-24"><a href="churn.html#cb155-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
 
 </div>
 </div>

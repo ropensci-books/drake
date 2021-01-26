@@ -33,7 +33,7 @@
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <link rel="prev" href="time.html"/>
 <link rel="next" href="storage.html"/>
-<script src="libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,7 +51,7 @@
 
 
 
-<script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
@@ -70,6 +70,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -499,36 +500,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="memory" class="section level1" number="15">
 <h1><span class="header-section-number">Chapter 15</span> Memory management</h1>
 <p>The default settings of <code>drake</code> prioritize speed over memory efficiency. For projects with large data, this default behavior can cause problems. Consider the following hypothetical workflow, where we simulate several large datasets and summarize them.</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="memory.html#cb228-1" aria-hidden="true"></a>reps &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
-<span id="cb228-2"><a href="memory.html#cb228-2" aria-hidden="true"></a></span>
-<span id="cb228-3"><a href="memory.html#cb228-3" aria-hidden="true"></a><span class="co"># Reduce `n` to lighten the load if you want to try this workflow yourself.</span></span>
-<span id="cb228-4"><a href="memory.html#cb228-4" aria-hidden="true"></a><span class="co"># It is super high in this chapter to motivate the memory issues.</span></span>
-<span id="cb228-5"><a href="memory.html#cb228-5" aria-hidden="true"></a>generate_large_data &lt;-<span class="st"> </span><span class="cf">function</span>(rep, <span class="dt">n =</span> <span class="fl">1e8</span>) {</span>
-<span id="cb228-6"><a href="memory.html#cb228-6" aria-hidden="true"></a>  <span class="kw">tibble</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(n), <span class="dt">y =</span> <span class="kw">rnorm</span>(n), <span class="dt">rep =</span> rep)</span>
-<span id="cb228-7"><a href="memory.html#cb228-7" aria-hidden="true"></a>}</span>
-<span id="cb228-8"><a href="memory.html#cb228-8" aria-hidden="true"></a></span>
-<span id="cb228-9"><a href="memory.html#cb228-9" aria-hidden="true"></a>get_means &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</span>
-<span id="cb228-10"><a href="memory.html#cb228-10" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb228-11"><a href="memory.html#cb228-11" aria-hidden="true"></a>  <span class="cf">for</span> (dataset <span class="cf">in</span> <span class="kw">list</span>(...)) {</span>
-<span id="cb228-12"><a href="memory.html#cb228-12" aria-hidden="true"></a>    out &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(out, <span class="kw">colMeans</span>(dataset))</span>
-<span id="cb228-13"><a href="memory.html#cb228-13" aria-hidden="true"></a>  }</span>
-<span id="cb228-14"><a href="memory.html#cb228-14" aria-hidden="true"></a>  out</span>
-<span id="cb228-15"><a href="memory.html#cb228-15" aria-hidden="true"></a>}</span>
-<span id="cb228-16"><a href="memory.html#cb228-16" aria-hidden="true"></a></span>
-<span id="cb228-17"><a href="memory.html#cb228-17" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb228-18"><a href="memory.html#cb228-18" aria-hidden="true"></a>  <span class="dt">large_data =</span> <span class="kw">target</span>(</span>
-<span id="cb228-19"><a href="memory.html#cb228-19" aria-hidden="true"></a>    <span class="kw">generate_large_data</span>(rep),</span>
-<span id="cb228-20"><a href="memory.html#cb228-20" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">rep =</span> <span class="op">!!</span><span class="kw">seq_len</span>(reps), <span class="dt">.id =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb228-21"><a href="memory.html#cb228-21" aria-hidden="true"></a>  ),</span>
-<span id="cb228-22"><a href="memory.html#cb228-22" aria-hidden="true"></a>  <span class="dt">means =</span> <span class="kw">target</span>(</span>
-<span id="cb228-23"><a href="memory.html#cb228-23" aria-hidden="true"></a>    <span class="kw">get_means</span>(large_data),</span>
-<span id="cb228-24"><a href="memory.html#cb228-24" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(large_data)</span>
-<span id="cb228-25"><a href="memory.html#cb228-25" aria-hidden="true"></a>  ),</span>
-<span id="cb228-26"><a href="memory.html#cb228-26" aria-hidden="true"></a>  <span class="dt">summ =</span> <span class="kw">summary</span>(means)</span>
-<span id="cb228-27"><a href="memory.html#cb228-27" aria-hidden="true"></a>)</span>
-<span id="cb228-28"><a href="memory.html#cb228-28" aria-hidden="true"></a></span>
-<span id="cb228-29"><a href="memory.html#cb228-29" aria-hidden="true"></a><span class="kw">print</span>(plan)</span></code></pre></div>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="memory.html#cb229-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="memory.html#cb226-1" aria-hidden="true" tabindex="-1"></a>reps <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
+<span id="cb226-2"><a href="memory.html#cb226-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb226-3"><a href="memory.html#cb226-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Reduce `n` to lighten the load if you want to try this workflow yourself.</span></span>
+<span id="cb226-4"><a href="memory.html#cb226-4" aria-hidden="true" tabindex="-1"></a><span class="co"># It is super high in this chapter to motivate the memory issues.</span></span>
+<span id="cb226-5"><a href="memory.html#cb226-5" aria-hidden="true" tabindex="-1"></a>generate_large_data <span class="ot">&lt;-</span> <span class="cf">function</span>(rep, <span class="at">n =</span> <span class="fl">1e8</span>) {</span>
+<span id="cb226-6"><a href="memory.html#cb226-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(n), <span class="at">y =</span> <span class="fu">rnorm</span>(n), <span class="at">rep =</span> rep)</span>
+<span id="cb226-7"><a href="memory.html#cb226-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb226-8"><a href="memory.html#cb226-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb226-9"><a href="memory.html#cb226-9" aria-hidden="true" tabindex="-1"></a>get_means <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb226-10"><a href="memory.html#cb226-10" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb226-11"><a href="memory.html#cb226-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (dataset <span class="cf">in</span> <span class="fu">list</span>(...)) {</span>
+<span id="cb226-12"><a href="memory.html#cb226-12" aria-hidden="true" tabindex="-1"></a>    out <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(out, <span class="fu">colMeans</span>(dataset))</span>
+<span id="cb226-13"><a href="memory.html#cb226-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb226-14"><a href="memory.html#cb226-14" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb226-15"><a href="memory.html#cb226-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb226-16"><a href="memory.html#cb226-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb226-17"><a href="memory.html#cb226-17" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb226-18"><a href="memory.html#cb226-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">large_data =</span> <span class="fu">target</span>(</span>
+<span id="cb226-19"><a href="memory.html#cb226-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">generate_large_data</span>(rep),</span>
+<span id="cb226-20"><a href="memory.html#cb226-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">rep =</span> <span class="sc">!!</span><span class="fu">seq_len</span>(reps), <span class="at">.id =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb226-21"><a href="memory.html#cb226-21" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb226-22"><a href="memory.html#cb226-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">means =</span> <span class="fu">target</span>(</span>
+<span id="cb226-23"><a href="memory.html#cb226-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_means</span>(large_data),</span>
+<span id="cb226-24"><a href="memory.html#cb226-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">combine</span>(large_data)</span>
+<span id="cb226-25"><a href="memory.html#cb226-25" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb226-26"><a href="memory.html#cb226-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">summ =</span> <span class="fu">summary</span>(means)</span>
+<span id="cb226-27"><a href="memory.html#cb226-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb226-28"><a href="memory.html#cb226-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb226-29"><a href="memory.html#cb226-29" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="memory.html#cb227-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vis_drake_graph</span>(plan)</span></code></pre></div>
 <p>If you call <code>make(plan)</code> with no additional arguments, <code>drake</code> will try to load all the datasets into the same R session. Each dataset from <code>generate_large_data(n = 1e8)</code> occupies about 2.4 GB of memory, and most machines cannot handle all the data at once. We should use memory more wisely.</p>
 <div id="garbage-collection-and-custom-files" class="section level2" number="15.1">
 <h2><span class="header-section-number">15.1</span> Garbage collection and custom files</h2>
@@ -539,36 +540,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Avoid <code>drake</code>’s caching system with custom <code>file_out()</code> files in the plan.</li>
 <li>Call <code>make(plan, garbage_collection = TRUE)</code>.</li>
 </ol>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="memory.html#cb230-1" aria-hidden="true"></a>reps &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
-<span id="cb230-2"><a href="memory.html#cb230-2" aria-hidden="true"></a>files &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">seq_len</span>(reps), <span class="st">&quot;.rds&quot;</span>)</span>
-<span id="cb230-3"><a href="memory.html#cb230-3" aria-hidden="true"></a></span>
-<span id="cb230-4"><a href="memory.html#cb230-4" aria-hidden="true"></a>generate_large_data &lt;-<span class="st"> </span><span class="cf">function</span>(file, <span class="dt">n =</span> <span class="fl">1e8</span>) {</span>
-<span id="cb230-5"><a href="memory.html#cb230-5" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(n), <span class="dt">y =</span> <span class="kw">rnorm</span>(n)) <span class="co"># a billion rows</span></span>
-<span id="cb230-6"><a href="memory.html#cb230-6" aria-hidden="true"></a>  <span class="kw">saveRDS</span>(out, file)</span>
-<span id="cb230-7"><a href="memory.html#cb230-7" aria-hidden="true"></a>}</span>
-<span id="cb230-8"><a href="memory.html#cb230-8" aria-hidden="true"></a></span>
-<span id="cb230-9"><a href="memory.html#cb230-9" aria-hidden="true"></a>get_means &lt;-<span class="st"> </span><span class="cf">function</span>(files) {</span>
-<span id="cb230-10"><a href="memory.html#cb230-10" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb230-11"><a href="memory.html#cb230-11" aria-hidden="true"></a>  <span class="cf">for</span> (file <span class="cf">in</span> files) {</span>
-<span id="cb230-12"><a href="memory.html#cb230-12" aria-hidden="true"></a>    x &lt;-<span class="st"> </span><span class="kw">colMeans</span>(<span class="kw">readRDS</span>(file))</span>
-<span id="cb230-13"><a href="memory.html#cb230-13" aria-hidden="true"></a>    out &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(out, x)</span>
-<span id="cb230-14"><a href="memory.html#cb230-14" aria-hidden="true"></a>    <span class="kw">gc</span>() <span class="co"># Use the gc() function here to make sure each x gets unloaded.</span></span>
-<span id="cb230-15"><a href="memory.html#cb230-15" aria-hidden="true"></a>  }</span>
-<span id="cb230-16"><a href="memory.html#cb230-16" aria-hidden="true"></a>  out</span>
-<span id="cb230-17"><a href="memory.html#cb230-17" aria-hidden="true"></a>}</span>
-<span id="cb230-18"><a href="memory.html#cb230-18" aria-hidden="true"></a></span>
-<span id="cb230-19"><a href="memory.html#cb230-19" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb230-20"><a href="memory.html#cb230-20" aria-hidden="true"></a>  <span class="dt">large_data =</span> <span class="kw">target</span>(</span>
-<span id="cb230-21"><a href="memory.html#cb230-21" aria-hidden="true"></a>    <span class="kw">generate_large_data</span>(<span class="dt">file =</span> <span class="kw">file_out</span>(file)),</span>
-<span id="cb230-22"><a href="memory.html#cb230-22" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">file =</span> <span class="op">!!</span>files, <span class="dt">.id =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb230-23"><a href="memory.html#cb230-23" aria-hidden="true"></a>  ),</span>
-<span id="cb230-24"><a href="memory.html#cb230-24" aria-hidden="true"></a>  <span class="dt">means =</span> <span class="kw">get_means</span>(<span class="kw">file_in</span>(<span class="op">!!</span>files)),</span>
-<span id="cb230-25"><a href="memory.html#cb230-25" aria-hidden="true"></a>  <span class="dt">summ =</span> <span class="kw">summary</span>(means)</span>
-<span id="cb230-26"><a href="memory.html#cb230-26" aria-hidden="true"></a>)</span>
-<span id="cb230-27"><a href="memory.html#cb230-27" aria-hidden="true"></a></span>
-<span id="cb230-28"><a href="memory.html#cb230-28" aria-hidden="true"></a><span class="kw">print</span>(plan)</span></code></pre></div>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="memory.html#cb231-1" aria-hidden="true"></a><span class="kw">vis_drake_graph</span>(plan)</span></code></pre></div>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="memory.html#cb232-1" aria-hidden="true"></a><span class="kw">make</span>(plan, <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="memory.html#cb228-1" aria-hidden="true" tabindex="-1"></a>reps <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
+<span id="cb228-2"><a href="memory.html#cb228-2" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">seq_len</span>(reps), <span class="st">&quot;.rds&quot;</span>)</span>
+<span id="cb228-3"><a href="memory.html#cb228-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb228-4"><a href="memory.html#cb228-4" aria-hidden="true" tabindex="-1"></a>generate_large_data <span class="ot">&lt;-</span> <span class="cf">function</span>(file, <span class="at">n =</span> <span class="fl">1e8</span>) {</span>
+<span id="cb228-5"><a href="memory.html#cb228-5" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(n), <span class="at">y =</span> <span class="fu">rnorm</span>(n)) <span class="co"># a billion rows</span></span>
+<span id="cb228-6"><a href="memory.html#cb228-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(out, file)</span>
+<span id="cb228-7"><a href="memory.html#cb228-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb228-8"><a href="memory.html#cb228-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb228-9"><a href="memory.html#cb228-9" aria-hidden="true" tabindex="-1"></a>get_means <span class="ot">&lt;-</span> <span class="cf">function</span>(files) {</span>
+<span id="cb228-10"><a href="memory.html#cb228-10" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb228-11"><a href="memory.html#cb228-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (file <span class="cf">in</span> files) {</span>
+<span id="cb228-12"><a href="memory.html#cb228-12" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">readRDS</span>(file))</span>
+<span id="cb228-13"><a href="memory.html#cb228-13" aria-hidden="true" tabindex="-1"></a>    out <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(out, x)</span>
+<span id="cb228-14"><a href="memory.html#cb228-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gc</span>() <span class="co"># Use the gc() function here to make sure each x gets unloaded.</span></span>
+<span id="cb228-15"><a href="memory.html#cb228-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb228-16"><a href="memory.html#cb228-16" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb228-17"><a href="memory.html#cb228-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb228-18"><a href="memory.html#cb228-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb228-19"><a href="memory.html#cb228-19" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb228-20"><a href="memory.html#cb228-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">large_data =</span> <span class="fu">target</span>(</span>
+<span id="cb228-21"><a href="memory.html#cb228-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">generate_large_data</span>(<span class="at">file =</span> <span class="fu">file_out</span>(file)),</span>
+<span id="cb228-22"><a href="memory.html#cb228-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">file =</span> <span class="sc">!!</span>files, <span class="at">.id =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb228-23"><a href="memory.html#cb228-23" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb228-24"><a href="memory.html#cb228-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">means =</span> <span class="fu">get_means</span>(<span class="fu">file_in</span>(<span class="sc">!!</span>files)),</span>
+<span id="cb228-25"><a href="memory.html#cb228-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">summ =</span> <span class="fu">summary</span>(means)</span>
+<span id="cb228-26"><a href="memory.html#cb228-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb228-27"><a href="memory.html#cb228-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb228-28"><a href="memory.html#cb228-28" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="memory.html#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vis_drake_graph</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="memory.html#cb230-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan, <span class="at">garbage_collection =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="memory-strategies" class="section level2" number="15.2">
 <h2><span class="header-section-number">15.2</span> Memory strategies</h2>
@@ -636,94 +637,94 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>With the <code>"speed"</code>, <code>"autoclean"</code>, <code>"preclean"</code>, and <code>"lookahead"</code> strategies, you can simply call <code>make(plan, memory_strategy = YOUR_CHOICE, garbage_collection = TRUE)</code> and trust that your targets will build normally. For the <code>"unload"</code> and <code>"none"</code> strategies, there is extra work to do: you will need to manually load each target’s dependencies with <code>loadd()</code> or <code>readd()</code>. This manual bookkeeping lets you aggressively optimize your workflow, and it is less cumbersome than swarms of <code>file_out()</code> files. It is particularly useful when you have a large <code>combine()</code> step.</p>
 <p>Let’s redesign the workflow to reap the benefits of <code>make(plan, memory_strategy = "none", garbage_collection = TRUE)</code>. The trick is to use <a href="https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/match.call"><code>match.call()</code></a> inside <code>get_means()</code> so we can load and unload dependencies one at a time instead of all at once.</p>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="memory.html#cb233-1" aria-hidden="true"></a>reps &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
-<span id="cb233-2"><a href="memory.html#cb233-2" aria-hidden="true"></a></span>
-<span id="cb233-3"><a href="memory.html#cb233-3" aria-hidden="true"></a>generate_large_data &lt;-<span class="st"> </span><span class="cf">function</span>(rep, <span class="dt">n =</span> <span class="fl">1e8</span>) {</span>
-<span id="cb233-4"><a href="memory.html#cb233-4" aria-hidden="true"></a>  <span class="kw">tibble</span>(<span class="dt">x =</span> <span class="kw">rnorm</span>(n), <span class="dt">y =</span> <span class="kw">rnorm</span>(n), <span class="dt">rep =</span> rep)</span>
-<span id="cb233-5"><a href="memory.html#cb233-5" aria-hidden="true"></a>}</span>
-<span id="cb233-6"><a href="memory.html#cb233-6" aria-hidden="true"></a></span>
-<span id="cb233-7"><a href="memory.html#cb233-7" aria-hidden="true"></a><span class="co"># Load targets one at a time</span></span>
-<span id="cb233-8"><a href="memory.html#cb233-8" aria-hidden="true"></a>get_means &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</span>
-<span id="cb233-9"><a href="memory.html#cb233-9" aria-hidden="true"></a>  arg_symbols &lt;-<span class="st"> </span><span class="kw">match.call</span>(<span class="dt">expand.dots =</span> <span class="ot">FALSE</span>)<span class="op">$</span>...</span>
-<span id="cb233-10"><a href="memory.html#cb233-10" aria-hidden="true"></a>  arg_names &lt;-<span class="st"> </span><span class="kw">as.character</span>(arg_symbols)</span>
-<span id="cb233-11"><a href="memory.html#cb233-11" aria-hidden="true"></a>  out &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb233-12"><a href="memory.html#cb233-12" aria-hidden="true"></a>  <span class="cf">for</span> (arg_name <span class="cf">in</span> arg_names) {</span>
-<span id="cb233-13"><a href="memory.html#cb233-13" aria-hidden="true"></a>    dataset &lt;-<span class="st"> </span><span class="kw">readd</span>(arg_name, <span class="dt">character_only =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb233-14"><a href="memory.html#cb233-14" aria-hidden="true"></a>    out &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(out, <span class="kw">colMeans</span>(dataset))</span>
-<span id="cb233-15"><a href="memory.html#cb233-15" aria-hidden="true"></a>    <span class="kw">gc</span>() <span class="co"># Run garbage collection.</span></span>
-<span id="cb233-16"><a href="memory.html#cb233-16" aria-hidden="true"></a>  }</span>
-<span id="cb233-17"><a href="memory.html#cb233-17" aria-hidden="true"></a>  out</span>
-<span id="cb233-18"><a href="memory.html#cb233-18" aria-hidden="true"></a>}</span>
-<span id="cb233-19"><a href="memory.html#cb233-19" aria-hidden="true"></a></span>
-<span id="cb233-20"><a href="memory.html#cb233-20" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb233-21"><a href="memory.html#cb233-21" aria-hidden="true"></a>  <span class="dt">large_data =</span> <span class="kw">target</span>(</span>
-<span id="cb233-22"><a href="memory.html#cb233-22" aria-hidden="true"></a>    <span class="kw">generate_large_data</span>(rep),</span>
-<span id="cb233-23"><a href="memory.html#cb233-23" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">rep =</span> <span class="op">!!</span><span class="kw">seq_len</span>(reps), <span class="dt">.id =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb233-24"><a href="memory.html#cb233-24" aria-hidden="true"></a>  ),</span>
-<span id="cb233-25"><a href="memory.html#cb233-25" aria-hidden="true"></a>  <span class="dt">means =</span> <span class="kw">target</span>(</span>
-<span id="cb233-26"><a href="memory.html#cb233-26" aria-hidden="true"></a>    <span class="kw">get_means</span>(large_data),</span>
-<span id="cb233-27"><a href="memory.html#cb233-27" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(large_data)</span>
-<span id="cb233-28"><a href="memory.html#cb233-28" aria-hidden="true"></a>  ),</span>
-<span id="cb233-29"><a href="memory.html#cb233-29" aria-hidden="true"></a>  <span class="dt">summ =</span> {</span>
-<span id="cb233-30"><a href="memory.html#cb233-30" aria-hidden="true"></a>    <span class="kw">loadd</span>(means) <span class="co"># Annoying, but necessary with the &quot;none&quot; strategy.</span></span>
-<span id="cb233-31"><a href="memory.html#cb233-31" aria-hidden="true"></a>    <span class="kw">summary</span>(means)</span>
-<span id="cb233-32"><a href="memory.html#cb233-32" aria-hidden="true"></a>  }</span>
-<span id="cb233-33"><a href="memory.html#cb233-33" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="memory.html#cb231-1" aria-hidden="true" tabindex="-1"></a>reps <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># Serious workflows may have several times more.</span></span>
+<span id="cb231-2"><a href="memory.html#cb231-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb231-3"><a href="memory.html#cb231-3" aria-hidden="true" tabindex="-1"></a>generate_large_data <span class="ot">&lt;-</span> <span class="cf">function</span>(rep, <span class="at">n =</span> <span class="fl">1e8</span>) {</span>
+<span id="cb231-4"><a href="memory.html#cb231-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(n), <span class="at">y =</span> <span class="fu">rnorm</span>(n), <span class="at">rep =</span> rep)</span>
+<span id="cb231-5"><a href="memory.html#cb231-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb231-6"><a href="memory.html#cb231-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb231-7"><a href="memory.html#cb231-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Load targets one at a time</span></span>
+<span id="cb231-8"><a href="memory.html#cb231-8" aria-hidden="true" tabindex="-1"></a>get_means <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb231-9"><a href="memory.html#cb231-9" aria-hidden="true" tabindex="-1"></a>  arg_symbols <span class="ot">&lt;-</span> <span class="fu">match.call</span>(<span class="at">expand.dots =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>...</span>
+<span id="cb231-10"><a href="memory.html#cb231-10" aria-hidden="true" tabindex="-1"></a>  arg_names <span class="ot">&lt;-</span> <span class="fu">as.character</span>(arg_symbols)</span>
+<span id="cb231-11"><a href="memory.html#cb231-11" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb231-12"><a href="memory.html#cb231-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (arg_name <span class="cf">in</span> arg_names) {</span>
+<span id="cb231-13"><a href="memory.html#cb231-13" aria-hidden="true" tabindex="-1"></a>    dataset <span class="ot">&lt;-</span> <span class="fu">readd</span>(arg_name, <span class="at">character_only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb231-14"><a href="memory.html#cb231-14" aria-hidden="true" tabindex="-1"></a>    out <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(out, <span class="fu">colMeans</span>(dataset))</span>
+<span id="cb231-15"><a href="memory.html#cb231-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gc</span>() <span class="co"># Run garbage collection.</span></span>
+<span id="cb231-16"><a href="memory.html#cb231-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb231-17"><a href="memory.html#cb231-17" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb231-18"><a href="memory.html#cb231-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb231-19"><a href="memory.html#cb231-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb231-20"><a href="memory.html#cb231-20" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb231-21"><a href="memory.html#cb231-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">large_data =</span> <span class="fu">target</span>(</span>
+<span id="cb231-22"><a href="memory.html#cb231-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">generate_large_data</span>(rep),</span>
+<span id="cb231-23"><a href="memory.html#cb231-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">rep =</span> <span class="sc">!!</span><span class="fu">seq_len</span>(reps), <span class="at">.id =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb231-24"><a href="memory.html#cb231-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb231-25"><a href="memory.html#cb231-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">means =</span> <span class="fu">target</span>(</span>
+<span id="cb231-26"><a href="memory.html#cb231-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_means</span>(large_data),</span>
+<span id="cb231-27"><a href="memory.html#cb231-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">combine</span>(large_data)</span>
+<span id="cb231-28"><a href="memory.html#cb231-28" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb231-29"><a href="memory.html#cb231-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">summ =</span> {</span>
+<span id="cb231-30"><a href="memory.html#cb231-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">loadd</span>(means) <span class="co"># Annoying, but necessary with the &quot;none&quot; strategy.</span></span>
+<span id="cb231-31"><a href="memory.html#cb231-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summary</span>(means)</span>
+<span id="cb231-32"><a href="memory.html#cb231-32" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb231-33"><a href="memory.html#cb231-33" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Now, we can build our targets.</p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="memory.html#cb234-1" aria-hidden="true"></a><span class="kw">make</span>(plan, <span class="dt">memory_strategy =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="memory.html#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan, <span class="at">memory_strategy =</span> <span class="st">&quot;none&quot;</span>, <span class="at">garbage_collection =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>But there is a snag: we needed to manually load <code>means</code> in the command for <code>summ</code> (notice the call to <code>loadd()</code>). This is annoying, especially because <code>means</code> is quite small. Fortunately, <code>drake</code> lets you define different memory strategies for different targets in the plan. The target-specific memory strategies override the global one (i.e. the <code>memory_strategy</code> argument of <code>make()</code>).</p>
-<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="memory.html#cb235-1" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb235-2"><a href="memory.html#cb235-2" aria-hidden="true"></a>  <span class="dt">large_data =</span> <span class="kw">target</span>(</span>
-<span id="cb235-3"><a href="memory.html#cb235-3" aria-hidden="true"></a>    <span class="kw">generate_large_data</span>(rep),</span>
-<span id="cb235-4"><a href="memory.html#cb235-4" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">map</span>(<span class="dt">rep =</span> <span class="op">!!</span><span class="kw">seq_len</span>(reps), <span class="dt">.id =</span> <span class="ot">FALSE</span>),</span>
-<span id="cb235-5"><a href="memory.html#cb235-5" aria-hidden="true"></a>    <span class="dt">memory_strategy =</span> <span class="st">&quot;none&quot;</span></span>
-<span id="cb235-6"><a href="memory.html#cb235-6" aria-hidden="true"></a>  ),</span>
-<span id="cb235-7"><a href="memory.html#cb235-7" aria-hidden="true"></a>  <span class="dt">means =</span> <span class="kw">target</span>(</span>
-<span id="cb235-8"><a href="memory.html#cb235-8" aria-hidden="true"></a>    <span class="kw">get_means</span>(large_data),</span>
-<span id="cb235-9"><a href="memory.html#cb235-9" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">combine</span>(large_data),</span>
-<span id="cb235-10"><a href="memory.html#cb235-10" aria-hidden="true"></a>    <span class="dt">memory_strategy =</span> <span class="st">&quot;unload&quot;</span> <span class="co"># Be careful with this one.</span></span>
-<span id="cb235-11"><a href="memory.html#cb235-11" aria-hidden="true"></a>  ),</span>
-<span id="cb235-12"><a href="memory.html#cb235-12" aria-hidden="true"></a>  <span class="dt">summ =</span> <span class="kw">summary</span>(means)</span>
-<span id="cb235-13"><a href="memory.html#cb235-13" aria-hidden="true"></a>)</span>
-<span id="cb235-14"><a href="memory.html#cb235-14" aria-hidden="true"></a></span>
-<span id="cb235-15"><a href="memory.html#cb235-15" aria-hidden="true"></a><span class="kw">print</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="memory.html#cb233-1" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb233-2"><a href="memory.html#cb233-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">large_data =</span> <span class="fu">target</span>(</span>
+<span id="cb233-3"><a href="memory.html#cb233-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">generate_large_data</span>(rep),</span>
+<span id="cb233-4"><a href="memory.html#cb233-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">map</span>(<span class="at">rep =</span> <span class="sc">!!</span><span class="fu">seq_len</span>(reps), <span class="at">.id =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb233-5"><a href="memory.html#cb233-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">memory_strategy =</span> <span class="st">&quot;none&quot;</span></span>
+<span id="cb233-6"><a href="memory.html#cb233-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb233-7"><a href="memory.html#cb233-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">means =</span> <span class="fu">target</span>(</span>
+<span id="cb233-8"><a href="memory.html#cb233-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_means</span>(large_data),</span>
+<span id="cb233-9"><a href="memory.html#cb233-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">combine</span>(large_data),</span>
+<span id="cb233-10"><a href="memory.html#cb233-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">memory_strategy =</span> <span class="st">&quot;unload&quot;</span> <span class="co"># Be careful with this one.</span></span>
+<span id="cb233-11"><a href="memory.html#cb233-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb233-12"><a href="memory.html#cb233-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">summ =</span> <span class="fu">summary</span>(means)</span>
+<span id="cb233-13"><a href="memory.html#cb233-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb233-14"><a href="memory.html#cb233-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb233-15"><a href="memory.html#cb233-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(plan)</span></code></pre></div>
 <p>In fact, now you can run <code>make()</code> without setting a global memory strategy at all.</p>
-<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="memory.html#cb236-1" aria-hidden="true"></a><span class="kw">make</span>(plan, <span class="dt">garbage_collection =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="memory.html#cb234-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>(plan, <span class="at">garbage_collection =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="data-splitting" class="section level2" number="15.3">
 <h2><span class="header-section-number">15.3</span> Data splitting</h2>
 <p>The <a href="https://books.ropensci.org/drake/plans.html#split"><code>split()</code> transformation</a> breaks up a dataset into smaller targets. The ordinary use of <code>split()</code> is to partition an in-memory dataset into slices.</p>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="memory.html#cb237-1" aria-hidden="true"></a><span class="kw">drake_plan</span>(</span>
-<span id="cb237-2"><a href="memory.html#cb237-2" aria-hidden="true"></a>  <span class="dt">data =</span> <span class="kw">get_large_data</span>(),</span>
-<span id="cb237-3"><a href="memory.html#cb237-3" aria-hidden="true"></a>  <span class="dt">x =</span> <span class="kw">target</span>(</span>
-<span id="cb237-4"><a href="memory.html#cb237-4" aria-hidden="true"></a>    data <span class="op">%&gt;%</span></span>
-<span id="cb237-5"><a href="memory.html#cb237-5" aria-hidden="true"></a><span class="st">      </span><span class="kw">analyze_data</span>(),</span>
-<span id="cb237-6"><a href="memory.html#cb237-6" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">split</span>(data, <span class="dt">slices =</span> <span class="dv">4</span>)</span>
-<span id="cb237-7"><a href="memory.html#cb237-7" aria-hidden="true"></a>  )</span>
-<span id="cb237-8"><a href="memory.html#cb237-8" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="memory.html#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="fu">drake_plan</span>(</span>
+<span id="cb235-2"><a href="memory.html#cb235-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">get_large_data</span>(),</span>
+<span id="cb235-3"><a href="memory.html#cb235-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">target</span>(</span>
+<span id="cb235-4"><a href="memory.html#cb235-4" aria-hidden="true" tabindex="-1"></a>    data <span class="sc">%&gt;%</span></span>
+<span id="cb235-5"><a href="memory.html#cb235-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">analyze_data</span>(),</span>
+<span id="cb235-6"><a href="memory.html#cb235-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">split</span>(data, <span class="at">slices =</span> <span class="dv">4</span>)</span>
+<span id="cb235-7"><a href="memory.html#cb235-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb235-8"><a href="memory.html#cb235-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>However, you can also use it to load individual pieces of a large file, thus conserving memory. The trick is to break up an index set instead of the data itself. In the following sketch, <code>get_number_of_rows()</code> and <code>read_selected_rows()</code> are user-defined functions, and <code>%&gt;%</code> is the <a href="https://magrittr.tidyverse.org"><code>magrittr</code></a> pipe.</p>
-<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="memory.html#cb238-1" aria-hidden="true"></a>get_number_of_rows &lt;-<span class="st"> </span><span class="cf">function</span>(file) {</span>
-<span id="cb238-2"><a href="memory.html#cb238-2" aria-hidden="true"></a>  <span class="co"># ...</span></span>
-<span id="cb238-3"><a href="memory.html#cb238-3" aria-hidden="true"></a>}</span>
-<span id="cb238-4"><a href="memory.html#cb238-4" aria-hidden="true"></a></span>
-<span id="cb238-5"><a href="memory.html#cb238-5" aria-hidden="true"></a>read_selected_rows &lt;-<span class="st"> </span><span class="cf">function</span>(which_rows, file) {</span>
-<span id="cb238-6"><a href="memory.html#cb238-6" aria-hidden="true"></a>  <span class="co"># ...</span></span>
-<span id="cb238-7"><a href="memory.html#cb238-7" aria-hidden="true"></a>}</span>
-<span id="cb238-8"><a href="memory.html#cb238-8" aria-hidden="true"></a></span>
-<span id="cb238-9"><a href="memory.html#cb238-9" aria-hidden="true"></a>plan &lt;-<span class="st"> </span><span class="kw">drake_plan</span>(</span>
-<span id="cb238-10"><a href="memory.html#cb238-10" aria-hidden="true"></a>  <span class="dt">row_indices =</span> <span class="kw">file_in</span>(<span class="st">&quot;large_file.csv&quot;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb238-11"><a href="memory.html#cb238-11" aria-hidden="true"></a><span class="st">    </span><span class="kw">get_number_of_rows</span>() <span class="op">%&gt;%</span></span>
-<span id="cb238-12"><a href="memory.html#cb238-12" aria-hidden="true"></a><span class="st">    </span><span class="kw">seq_len</span>(),</span>
-<span id="cb238-13"><a href="memory.html#cb238-13" aria-hidden="true"></a>  <span class="dt">subset =</span> <span class="kw">target</span>(</span>
-<span id="cb238-14"><a href="memory.html#cb238-14" aria-hidden="true"></a>    row_indices <span class="op">%&gt;%</span></span>
-<span id="cb238-15"><a href="memory.html#cb238-15" aria-hidden="true"></a><span class="st">      </span><span class="kw">read_selected_rows</span>(<span class="dt">file =</span> <span class="kw">file_in</span>(<span class="st">&quot;large_file.csv&quot;</span>)),</span>
-<span id="cb238-16"><a href="memory.html#cb238-16" aria-hidden="true"></a>    <span class="dt">transform =</span> <span class="kw">split</span>(row_indices, <span class="dt">slices =</span> <span class="dv">4</span>)</span>
-<span id="cb238-17"><a href="memory.html#cb238-17" aria-hidden="true"></a>  )</span>
-<span id="cb238-18"><a href="memory.html#cb238-18" aria-hidden="true"></a>)</span>
-<span id="cb238-19"><a href="memory.html#cb238-19" aria-hidden="true"></a></span>
-<span id="cb238-20"><a href="memory.html#cb238-20" aria-hidden="true"></a>plan</span>
-<span id="cb238-21"><a href="memory.html#cb238-21" aria-hidden="true"></a></span>
-<span id="cb238-22"><a href="memory.html#cb238-22" aria-hidden="true"></a><span class="kw">drake_plan_source</span>(plan)</span></code></pre></div>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="memory.html#cb236-1" aria-hidden="true" tabindex="-1"></a>get_number_of_rows <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
+<span id="cb236-2"><a href="memory.html#cb236-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
+<span id="cb236-3"><a href="memory.html#cb236-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb236-4"><a href="memory.html#cb236-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb236-5"><a href="memory.html#cb236-5" aria-hidden="true" tabindex="-1"></a>read_selected_rows <span class="ot">&lt;-</span> <span class="cf">function</span>(which_rows, file) {</span>
+<span id="cb236-6"><a href="memory.html#cb236-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
+<span id="cb236-7"><a href="memory.html#cb236-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb236-8"><a href="memory.html#cb236-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb236-9"><a href="memory.html#cb236-9" aria-hidden="true" tabindex="-1"></a>plan <span class="ot">&lt;-</span> <span class="fu">drake_plan</span>(</span>
+<span id="cb236-10"><a href="memory.html#cb236-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">row_indices =</span> <span class="fu">file_in</span>(<span class="st">&quot;large_file.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb236-11"><a href="memory.html#cb236-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_number_of_rows</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb236-12"><a href="memory.html#cb236-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">seq_len</span>(),</span>
+<span id="cb236-13"><a href="memory.html#cb236-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">subset =</span> <span class="fu">target</span>(</span>
+<span id="cb236-14"><a href="memory.html#cb236-14" aria-hidden="true" tabindex="-1"></a>    row_indices <span class="sc">%&gt;%</span></span>
+<span id="cb236-15"><a href="memory.html#cb236-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">read_selected_rows</span>(<span class="at">file =</span> <span class="fu">file_in</span>(<span class="st">&quot;large_file.csv&quot;</span>)),</span>
+<span id="cb236-16"><a href="memory.html#cb236-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">transform =</span> <span class="fu">split</span>(row_indices, <span class="at">slices =</span> <span class="dv">4</span>)</span>
+<span id="cb236-17"><a href="memory.html#cb236-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb236-18"><a href="memory.html#cb236-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb236-19"><a href="memory.html#cb236-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb236-20"><a href="memory.html#cb236-20" aria-hidden="true" tabindex="-1"></a>plan</span>
+<span id="cb236-21"><a href="memory.html#cb236-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb236-22"><a href="memory.html#cb236-22" aria-hidden="true" tabindex="-1"></a><span class="fu">drake_plan_source</span>(plan)</span></code></pre></div>
 
 </div>
 </div>
