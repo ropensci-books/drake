@@ -10,8 +10,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUBPAT }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      TF_VERSION: '2.1.0'
-      CRAN: 
       PIP_NO_WARN_SCRIPT_LOCATION: false
       RETICULATE_AUTOCONFIGURE: 'FALSE'
 
@@ -38,12 +36,12 @@ jobs:
           Rscript -e "install.packages('remotes')"
           Rscript -e "remotes::install_github('rstudio/reticulate')"
           Rscript -e "reticulate::install_miniconda()"
-          Rscript -e "reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))"
 
       - name: Install TensorFlow
         run: |
           Rscript -e "install.packages(c('keras', 'tensorflow'))" 
-          Rscript -e "keras::install_keras(tensorflow = Sys.getenv('TF_VERSION'))"
+          Rscript -e "keras::install_keras()"
+          Rscript -e "tensorflow::tf_config()"
 
       - name: Install packages
         run: |
