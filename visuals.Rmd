@@ -24,7 +24,7 @@ Data analysis projects have complicated networks of dependencies, and `drake` ca
 
 Except for `drake` 7.7.0 and below, you can simply `plot()` the plan to show the targets and their dependency relationships.
 
-```{r}
+```{r, eval = TRUE}
 library(drake)
 # from https://github.com/wlandau/drake-examples/tree/main/mtcars
 load_mtcars_example()
@@ -43,7 +43,7 @@ Powered by [`visNetwork`](http://datastorm-open.github.io/visNetwork/). Colors r
 - The body of an imported function, or
 - The content of an imported text file.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan)
 ```
 
@@ -63,7 +63,7 @@ vis_drake_graph(my_plan, file = "graph.png")
 
 These interactive [`networkD3`](https://github.com/christophergandrud/networkD3) [Sankey diagrams](https://en.wikipedia.org/wiki/Sankey_diagram) have more nuance: the height of each node is proportional to its number of connections. Nodes with many incoming connnections tend to fall out of date more often, and nodes with many outgoing connections can invalidate bigger chunks of the downstream pipeline.
 
-```{r}
+```{r, eval = TRUE}
 sankey_drake_graph(my_plan)
 ```
 
@@ -76,7 +76,7 @@ sankey_drake_graph(my_plan, file = "graph.png")  # Static image file
 
 Unfortunately, a legend is [not yet available for Sankey diagrams](https://github.com/ropensci/drake/pull/467), but `drake` exposes a separate legend for the colors and shapes.
 
-```{r}
+```{r, eval = TRUE}
 library(visNetwork)
 legend_nodes()
 visNetwork(nodes = legend_nodes())
@@ -86,7 +86,7 @@ visNetwork(nodes = legend_nodes())
 
 `drake_ggraph()` can handle larger workflows than the other graphing functions. If your project has thousands of targets and `vis_drake_graph()`/`sankey_drake_graph()` does not render properly, consider `drake_ggraph()`. Powered by [`ggraph`](https://github.com/thomasp85/ggraph), `drake_ggraph()`s are static [`ggplot2`](https://github.com/tidyverse/ggplot2) objects, and you can save them with `ggsave()`.
 
-```{r}
+```{r, eval = TRUE}
 drake_ggraph(my_plan)
 ```
 
@@ -94,7 +94,7 @@ drake_ggraph(my_plan)
 
 If you are running R in a terminal without [X Window](https://en.wikipedia.org/wiki/X_Window_System) support, the usual visualizations will show up interactively in your session. Here, you can use `text_drake_graph()` to see a text display in your terminal window. Terminal colors are deactivated in this manual, but you will see color in your console.
 
-```{r}
+```{r, eval = TRUE}
 # Use nchar = 0 or nchar = 1 for better results.
 # The color display is better in your own terminal.
 text_drake_graph(my_plan, nchar = 3)
@@ -105,7 +105,7 @@ text_drake_graph(my_plan, nchar = 3)
 
 `drake_graph_info()` is used behind the scenes in `vis_drake_graph()`, `sankey_drake_graph()`, and `drake_ggraph()` to get the graph information ready for rendering. To save time, you can call `drake_graph_info()` to get these internals and then call `render_drake_graph()`, `render_sankey_drake_graph()`, or  `render_drake_ggraph()`.
 
-```{r}
+```{r, eval = TRUE}
 str(drake_graph_info(my_plan))
 ```
 
@@ -113,7 +113,7 @@ str(drake_graph_info(my_plan))
 
 `drake`'s visuals tell you which targets are up to date and which are outdated.
 
-```{r}
+```{r, eval = TRUE}
 make(my_plan, verbose = 0L)
 outdated(my_plan)
 
@@ -122,7 +122,7 @@ sankey_drake_graph(my_plan)
 
 When you change a dependency, some targets fall out of date (black nodes).
 
-```{r}
+```{r, eval = TRUE}
 reg2 <- function(d){
   d$x3 <- d$x ^ 3
   lm(y ~ x3, data = d)
@@ -134,7 +134,7 @@ sankey_drake_graph(my_plan)
 
 Graphs can grow enormous for serious projects, so there are multiple ways to focus on a manageable subgraph. The most brute-force way is to just pick a manual `subset` of nodes. However, with the `subset` argument, the graphing functions can drop intermediate nodes and edges.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(
   my_plan,
   subset = c("regression2_small", "large")
@@ -143,25 +143,25 @@ vis_drake_graph(
 
 The rest of the subgraph functionality preserves connectedness. Use `targets_only` to ignore the imports.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, targets_only = TRUE)
 ```
 
 Similarly, you can just show downstream nodes.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, from = c("regression2_small", "regression2_large"))
 ```
 
 Or upstream ones.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, from = "small", mode = "in")
 ```
 
 In fact, let us just take a small neighborhood around a target in both directions. For the graph below, given order is 1, but all the custom `file_out()` output files of the neighborhood's targets appear as well. This ensures consistent behavior between `show_output_files = TRUE` and `show_output_files = FALSE` (more on that later).
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, from = "small", mode = "all", order = 1)
 ```
 
@@ -169,13 +169,13 @@ vis_drake_graph(my_plan, from = "small", mode = "all", order = 1)
 
 Some arguments to `vis_drake_graph()` control the legend.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, full_legend = TRUE, ncol_legend = 2)
 ```
 
 To remove the legend altogether, set the `ncol_legend` argument to `0`.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan, ncol_legend = 0)
 ```
 
@@ -183,7 +183,7 @@ vis_drake_graph(my_plan, ncol_legend = 0)
 
 With the `group` and `clusters` arguments to the graphing functions, you can condense nodes into clusters. This is handy for workflows with lots of targets. Take the schools scenario from the [`drake` plan guide](#plans). Our plan was generated with `drake_plan(trace = TRUE)`, so it has wildcard columns that group nodes into natural clusters already. You can manually add such columns if you wish.
 
-```{r}
+```{r, eval = TRUE}
 # Visit https://books.ropensci.org/drake/static.html
 # to learn about the syntax with target(transform = ...).
 plan <- drake_plan(
@@ -214,13 +214,13 @@ check_credit_hours <- check_students <- check_graduations <-
   check_public_funding <- get_school_data <- function(){}
 ```
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(plan)
 ```
 
 For large projects with hundreds of nodes, this can get quite cumbersome. But here, we can choose a wildcard column (or any other column in the plan, even custom columns) to condense nodes into natural clusters. For the `group` argument to the graphing functions, choose the name of a column in `plan` or a column you know will be in `drake_graph_info(my_plan)$nodes`. Then for `clusters`, choose the values in your `group` column that correspond to nodes you want to bunch together. The new graph is not as cumbersome.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(plan,
   group = "school",
   clusters = c("school_1", "school_2", "school_3")
@@ -229,13 +229,13 @@ vis_drake_graph(plan,
 
 As previously mentioned, you can group on any column in `drake_graph_info(my_plan)$nodes`. Let's return to the `mtcars` project for demonstration.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(my_plan)
 ```
 
 Let's condense all the imports into one node and all the up-to-date targets into another. That way, the outdated targets stand out.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(
   my_plan,
   group = "status",
@@ -248,7 +248,7 @@ vis_drake_graph(
 
 `drake` can reproducibly track multiple output files per target and show them in the graph.
 
-```{r}
+```{r, eval = TRUE}
 plan <- drake_plan(
   target1 = {
     file.copy(file_in("in1.txt"), file_out("out1.txt"))
@@ -269,7 +269,7 @@ vis_drake_graph(plan, targets_only = TRUE)
 
 If your graph is too busy, you can hide the output files with `show_output_files = FALSE`.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(plan, show_output_files = FALSE, targets_only = TRUE)
 ```
 
@@ -280,7 +280,7 @@ vis_drake_graph(plan, show_output_files = FALSE, targets_only = TRUE)
 
 First, we define our plan, adding a custom column named "link".
 
-```{r}
+```{r, eval = TRUE}
 mtcars_link <-
   "https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html"
 
@@ -302,7 +302,7 @@ plan <- drake_plan(
 )
 ```
 
-```{r}
+```{r, eval = TRUE}
 unique_stems <- unique(plan$cluster_id)
 ```
 
@@ -312,7 +312,7 @@ unique_stems <- unique(plan$cluster_id)
 By supplying `vis_drake_graph(on_select = TRUE, on_select_col = "my_column")`,
 treats the values in the column named `"my_column"` as hyperlinks. Click on a node in the graph to navigate to the corresponding link in your browser.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(
   plan,
   clusters = unique_stems,
@@ -333,7 +333,7 @@ No action will be taken if any of the following are given to
 
 This is the default behaviour.
 
-```{r}
+```{r, eval = TRUE}
 vis_drake_graph(
   my_plan,
   clusters = unique_stems,
@@ -349,7 +349,7 @@ vis_drake_graph(
 What if we instead wanted the browser to display an alert when a node is
 clicked?
 
-```{r}
+```{r, eval = TRUE}
 alert_behaviour <- function(){
   js <- "
   function(props) {
