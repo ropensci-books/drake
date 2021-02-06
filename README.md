@@ -1,6 +1,8 @@
 # Consider targets
 
-The [`targets`](https://docs.ropensci.org/targets) R package is the long-term successor of `drake`, and it is more robust and easier to use. Please visit <https://books.ropensci.org/targets/drake.html> for full context and advice on transitioning.
+<a href="https://www.tidyverse.org/lifecycle/#superseded"><img src="https://img.shields.io/badge/lifecycle-superseded-blue.svg" alt='superseded lifecycle'></a>
+
+`drake` is [superseded](https://www.tidyverse.org/lifecycle/#superseded). The [`targets`](https://docs.ropensci.org/targets) R package is the long-term successor of `drake`, and it is more robust and easier to use. Please visit <https://books.ropensci.org/targets/drake.html> for full context and advice on transitioning.
 
 # The drake R package user manual
 
